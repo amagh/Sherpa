@@ -1,0 +1,56 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
+    defaultConfig {
+        applicationId "project.hikerguide"
+        minSdkVersion 16
+        targetSdkVersion 25
+        versionCode 1
+        versionName "0.1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+}
+
+ext {
+    supportLibVersion = "25.3.1"
+    playServicesVersion = "11.0.2"
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testCompile 'junit:junit:4.12'
+
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support:design:${supportLibVersion}"
+    compile "com.android.support:support-vector-drawable:${supportLibVersion}"
+
+    compile "com.google.android.gms:play-services-places:${playServicesVersion}"
+    compile "com.google.android.gms:play-services-ads:${playServicesVersion}"
+
+    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:5.1.0@aar'){
+        transitive=true
+    }
+
+    compile 'io.ticofab.androidgpxparser:parser:1.0.0'
+    compile 'com.droidninja:filepicker:2.0.6'
+
+    annotationProcessor 'net.simonvt.schematic:schematic-compiler:0.7.0'
+    compile 'net.simonvt.schematic:schematic:0.7.0'
+}
