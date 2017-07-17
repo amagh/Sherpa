@@ -37,12 +37,16 @@ dependencies {
     })
     testCompile 'junit:junit:4.12'
 
+    compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:support-vector-drawable:${supportLibVersion}"
 
     compile "com.google.android.gms:play-services-places:${playServicesVersion}"
     compile "com.google.android.gms:play-services-ads:${playServicesVersion}"
+
+    compile "com.google.firebase:firebase-storage:${playServicesVersion}"
+    compile "com.google.firebase:firebase-database:${playServicesVersion}"
 
     compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:5.1.0@aar'){
         transitive=true
@@ -53,4 +57,11 @@ dependencies {
 
     annotationProcessor 'net.simonvt.schematic:schematic-compiler:0.7.0'
     compile 'net.simonvt.schematic:schematic:0.7.0'
+
+    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
+
+    compile 'com.jakewharton.timber:timber:4.5.1'
 }
+
+apply plugin: 'com.google.gms.google-services'
