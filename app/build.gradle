@@ -47,6 +47,7 @@ dependencies {
 
     compile "com.google.firebase:firebase-storage:${playServicesVersion}"
     compile "com.google.firebase:firebase-database:${playServicesVersion}"
+    compile 'com.firebase:geofire-android:2.1.1'
 
     compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:5.1.0@aar'){
         transitive=true
