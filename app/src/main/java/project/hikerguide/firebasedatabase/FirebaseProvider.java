@@ -2,7 +2,6 @@ package project.hikerguide.firebasedatabase;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -12,8 +11,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.models.Area;
 import project.hikerguide.models.Author;
@@ -37,6 +41,7 @@ public class FirebaseProvider {
     // ** Constants ** //
     private static final String TAG = FirebaseProvider.class.getSimpleName();
     private static final String GEOFIRE_PATH = "geofire";
+    private static final int GUIDE_LIMIT = 20;
 
     @IntDef({GUIDE, TRAIL, AUTHOR, SECTION, AREA})
     public @interface FirebaseType {
@@ -117,7 +122,7 @@ public class FirebaseProvider {
      * @param id          ID of the Guide to retrieve
      * @param listener    Listener to pass the instance of the Guide that was retrieved
      */
-    public void getRecord(@FirebaseType final int type, final long id, @NonNull final FirebaseListener listener) {
+    public void getRecord(@FirebaseType final int type, final long id, @NonNull final FirebaseSingleListener listener) {
 
         // Initialize the child variable that will be used as the directory to retrieve the data
         // from the Firebase Database
@@ -186,6 +191,8 @@ public class FirebaseProvider {
 
                 // Inform the observer that the model is ready
                 listener.onDataReady(model);
+
+                mDatabase.removeEventListener(this);
             }
 
             @Override
@@ -196,12 +203,78 @@ public class FirebaseProvider {
     }
 
     /**
-     * Deletes a Guide from the Firebase Database
+     * Retrieves a List of Guides that were most recently added to the database
      *
-     * @param id    ID of the Guide to remove from the Firebase Database
+     * @param listener    The listener used to pass the List of Guides returned from the database
      */
-    public void deleteGuide(long id) {
-        mDatabase.child(GuideDatabase.GUIDES).child(Long.toString(id)).removeValue();
+    public void getRecentGuides(final FirebaseListListener listener) {
+        // Query for the most recent guides
+        mDatabase.child(GuideDatabase.GUIDES)
+                .orderByChild(GuideContract.GuideEntry.DATE_ADDED)
+                .limitToLast(GUIDE_LIMIT)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Guide> guideList = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    guideList.add(snapshot.getValue(Guide.class));
+                }
+
+                listener.onDataReady(guideList);
+                mDatabase.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                mDatabase.removeEventListener(this);
+            }
+        });
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Removes records from the Firebase Database
+     *
+     * @param type    The Firebase Type of record to remove
+     * @param ids     The ID of the record to remove
+     */
+    public void deleteRecords(@FirebaseType int type, long... ids) {
+        // Init the variable to hold the path of the type to be deleted
+        String child;
+
+        switch (type) {
+            case GUIDE:
+                child = GuideDatabase.GUIDES;
+                break;
+
+            case TRAIL:
+                child = GuideDatabase.TRAILS;
+                break;
+
+            case AUTHOR:
+                child = GuideDatabase.AUTHORS;
+                break;
+
+            case SECTION:
+                child = GuideDatabase.SECTIONS;
+                break;
+
+            case AREA:
+                child = GuideDatabase.AREAS;
+                break;
+
+            default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
+        }
+
+        // Iterate and delete each child that matches one of the ids within the path
+        for (long id : ids) {
+            mDatabase.child(child).child(Long.toString(id)).removeValue();
+        }
     }
 
     /**
@@ -247,8 +320,12 @@ public class FirebaseProvider {
         });
     }
 
-    public interface FirebaseListener {
+    public interface FirebaseSingleListener {
         void onDataReady(BaseModel model);
+    }
+
+    public interface FirebaseListListener {
+        void onDataReady(List<Guide> guideList);
     }
 
     public interface GeofireListener {
