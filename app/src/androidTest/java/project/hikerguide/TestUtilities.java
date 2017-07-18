@@ -3,9 +3,16 @@ package project.hikerguide;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import java.lang.reflect.Field;
 import java.util.Set;
 
 import project.hikerguide.data.GuideContract;
+import project.hikerguide.models.Area;
+import project.hikerguide.models.Author;
+import project.hikerguide.models.BaseModel;
+import project.hikerguide.models.Guide;
+import project.hikerguide.models.Section;
+import project.hikerguide.models.Trail;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -43,6 +50,29 @@ public class TestUtilities {
                     " does not match actual value: " + cursorValue;
 
             assertEquals(matchError, expectedValue, cursorValue);
+        }
+    }
+
+    /**
+     * Checks that the values of the data model returned has the same values as the data model that
+     * was inserted in the Firebase Database
+     *
+     * @param expected    The data model inserted into the Firebase Database
+     * @param returned    The data model that was returned from the Firebase Database
+     */
+    public static void validateModelValues(BaseModel expected, BaseModel returned) {
+        String errorValueDifferent = "Values in the returned data model do not match the values inserted.";
+
+        // Get all the Fields of the data model
+        Field[] fields = expected.getClass().getFields();
+
+        // Iterate through and ensure each Field value is equal
+        for (Field field : fields) {
+            try {
+                assertEquals(errorValueDifferent, field.get(expected), field.get(returned));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -95,5 +125,25 @@ public class TestUtilities {
         values.put(GuideContract.SectionEntry.CONTENT, "Description of the hike");
 
         return values;
+    }
+
+    public static Guide getGuide() {
+        return new Guide(1, 1, 1, System.currentTimeMillis(), "Firebase GPX URI", 37.734, -119.602, "Firebase Image URI");
+    }
+
+    public static Trail getTrail() {
+        return new Trail(1, 1, "Four Mile Trail", "Temporarily closed");
+    }
+
+    public static Author getAuthor() {
+        return new Author(1, "John Muir", "Firebase Profile URI", 0);
+    }
+
+    public static Section getSection() {
+        return new Section(1, 1, 1, "Description of hike");
+    }
+
+    public static Area getArea() {
+        return new Area(1, "Yosemite");
     }
 }
