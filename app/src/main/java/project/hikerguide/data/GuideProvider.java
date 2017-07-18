@@ -65,14 +65,17 @@ public class GuideProvider {
                 path = Path.GUIDES + "/#",
                 name = "GUIDE_DETAILS",
                 type = "vnd.android.cursor.item/guides",
-                whereColumn = GuideContract.GuideEntry._ID,
+                whereColumn = GuideDatabase.GUIDES + "." + GuideContract.GuideEntry._ID,
                 pathSegment = 1,
-                join = "JOIN " + GuideDatabase.GUIDES + " ON " +
+                join = "JOIN " + GuideDatabase.TRAILS + " ON " +
                         GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.TRAIL_ID + " = "  +
                         GuideDatabase.TRAILS + "." + GuideContract.TrailEntry._ID               +
-                        " JOIN " + GuideDatabase.GUIDES + " ON "                                +
+                        " JOIN " + GuideDatabase.AUTHORS + " ON "                               +
                         GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.AUTHOR_ID + " = " +
-                        GuideDatabase.AUTHORS + "." + GuideContract.AuthorEntry._ID
+                        GuideDatabase.AUTHORS + "." + GuideContract.AuthorEntry._ID             +
+                        " JOIN " + GuideDatabase.SECTIONS + " ON "                              +
+                        GuideDatabase.GUIDES + "." + GuideContract.GuideEntry._ID + " = "       +
+                        GuideDatabase.SECTIONS + "." + GuideContract.SectionEntry.GUIDE_ID
         )
         public static Uri withId(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
