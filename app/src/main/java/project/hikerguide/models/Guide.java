@@ -39,22 +39,6 @@ public class Guide {
     }
 
     /**
-     * Setter for the Guide's rating
-     * @param rating    The Guide's rating
-     */
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
-
-    /**
-     * Setter for the Guide's number of reviews
-     * @param reviews    The number of reviews for the Guide
-     */
-    public void setReviews(int reviews) {
-        this.reviews = reviews;
-    }
-
-    /**
      * Takes the values from a Cursor and uses it to create a new Guide
      *
      * @param cursor    Cursor describing a Guide
@@ -87,8 +71,8 @@ public class Guide {
 
         // Create a new Guide using the values from the Cursor
         Guide guide = new Guide(id, trailId, authorId, dateAdded, gpx, latitude, longitude, image);
-        guide.setRating(rating);
-        guide.setReviews(reviews);
+        guide.rating = rating;
+        guide.reviews = reviews;
 
         return guide;
     }
