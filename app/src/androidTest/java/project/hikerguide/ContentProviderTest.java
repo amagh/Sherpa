@@ -107,12 +107,21 @@ public class ContentProviderTest {
                 null,
                 null);
 
-        // Assert that the Cursor has valid entries
-        String emptyCursor = "Cursor does not contain any entries.";
-        assertTrue(emptyCursor, cursor.moveToFirst());
+        // Assert the the Cursor is not null
+        String errorNullCursor = "Cursor is null. Check the query is valid.";
+        assertNotNull(errorNullCursor, cursor);
 
-        // Assert the Cursor contains as many columns as all the joined tables combined
-        assertEquals(22, cursor.getColumnCount());
+        try {
+            // Assert that the Cursor has valid entries
+            String emptyCursor = "Cursor does not contain any entries.";
+            assertTrue(emptyCursor, cursor.moveToFirst());
+
+            // Assert the Cursor contains as many columns as all the joined tables combined
+            assertEquals(22, cursor.getColumnCount());
+        } finally {
+            // Close the Cursor
+            cursor.close();
+        }
     }
 
     /**
@@ -146,12 +155,21 @@ public class ContentProviderTest {
                 null,
                 null);
 
-        // Assert that the Cursor has valid entries
-        String emptyCursor = "Cursor does not contain any entries.";
-        assertTrue(emptyCursor, cursor.moveToFirst());
+        // Assert the the Cursor is not null
+        String errorNullCursor = "Cursor is null. Check the query is valid.";
+        assertNotNull(errorNullCursor, cursor);
 
-        // Check the values of the database against the ContentValues used to insert those values
-        TestUtilities.validateCursorValues(cursor, values);
+        try {
+            // Assert that the Cursor has valid entries
+            String emptyCursor = "Cursor does not contain any entries.";
+            assertTrue(emptyCursor, cursor.moveToFirst());
+
+            // Check the values of the database against the ContentValues used to insert those values
+            TestUtilities.validateCursorValues(cursor, values);
+        } finally {
+            // Close the Cursor
+            cursor.close();
+        }
     }
 
     /**
