@@ -8,8 +8,7 @@ import project.hikerguide.data.GuideContract;
  * Created by Alvin on 7/17/2017.
  */
 
-public class Author {
-    public long id;
+public class Author extends BaseModel {
     public String name;
     public String profilePicture;
     public int score;

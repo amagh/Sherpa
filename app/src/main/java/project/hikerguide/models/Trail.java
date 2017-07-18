@@ -8,8 +8,7 @@ import project.hikerguide.data.GuideContract;
  * Created by Alvin on 7/17/2017.
  */
 
-public class Trail {
-    public long id;
+public class Trail extends BaseModel {
     public long areaId;
     public String name;
     public String notes;
