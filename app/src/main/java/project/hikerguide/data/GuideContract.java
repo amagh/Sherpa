@@ -23,7 +23,7 @@ public class GuideContract {
         @References(table = GuideDatabase.AUTHORS, column = AuthorEntry._ID)
         @NotNull String AUTHOR_ID                                                   = "author_id";
 
-        @DataType(DataType.Type.REAL) @NotNull String DATE_ADDED                    = "date_added";
+        @DataType(DataType.Type.TEXT) @NotNull String DATE_ADDED                    = "date_added";
         @DataType(DataType.Type.REAL) String RATING                                 = "rating";
         @DataType(DataType.Type.INTEGER) String REVIEWS                             = "reviews";
         @DataType(DataType.Type.TEXT) @NotNull String GPX                           = "gpx";
