@@ -2,7 +2,12 @@ package project.hikerguide.firebasedatabase;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,6 +35,9 @@ import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.
 
 public class FirebaseProvider {
     // ** Constants ** //
+    private static final String TAG = FirebaseProvider.class.getSimpleName();
+    private static final String GEOFIRE_PATH = "geofire";
+
     @IntDef({GUIDE, TRAIL, AUTHOR, SECTION, AREA})
     public @interface FirebaseType {
         int GUIDE = 0;
@@ -77,6 +85,15 @@ public class FirebaseProvider {
             if (model instanceof Guide) {
                 Guide guide = (Guide) model;
                 mDatabase.child(GuideDatabase.GUIDES).child(Long.toString(guide.id)).setValue(guide);
+
+                // When inserting a Guide object, there needs to be accompanying coordinate data
+                // loaded into the Database for GeoFire queries
+                DatabaseReference geoFireReference = mDatabase.child(GEOFIRE_PATH);
+                GeoFire geoFire = new GeoFire(geoFireReference);
+
+                GeoLocation location = new GeoLocation(((Guide) model).latitude, ((Guide) model).longitude);
+
+                geoFire.setLocation(Long.toString(model.id), location);
             } else if (model instanceof Trail) {
                 Trail trail = (Trail) model;
                 mDatabase.child(GuideDatabase.TRAILS).child(Long.toString(trail.id)).setValue(trail);
@@ -187,7 +204,54 @@ public class FirebaseProvider {
         mDatabase.child(GuideDatabase.GUIDES).child(Long.toString(id)).removeValue();
     }
 
+    /**
+     * Queries the Firebase Database for all Guides that exist in the search area
+     *
+     * @param location    GeoLocation Object containing the coordinates to center the search around
+     * @param radius      How far from the center the search should take place
+     * @param listener    GeofireListener to inform the observer which guides are in the area
+     */
+    public void geoQuery(GeoLocation location, double radius, final GeofireListener listener) {
+        // Get a reference to the child for Geofire
+        DatabaseReference firebaseRef = mDatabase.child(GEOFIRE_PATH);
+        GeoFire geofire = new GeoFire(firebaseRef);
+
+        // Use Geofire to query for all guides in the parameter area
+        GeoQuery query = geofire.queryAtLocation(location, radius);
+        query.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                // Inform the observer that a guide is in the search radius
+                listener.onKeyEntered(Long.parseLong(key));
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+    }
+
     public interface FirebaseListener {
         void onDataReady(BaseModel model);
+    }
+
+    public interface GeofireListener {
+        void onKeyEntered(long guideId);
     }
 }
