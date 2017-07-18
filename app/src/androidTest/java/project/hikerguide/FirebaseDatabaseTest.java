@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.lang.reflect.Field;
+import java.util.List;
 
 import project.hikerguide.firebasedatabase.FirebaseProvider;
 import project.hikerguide.models.Area;
@@ -39,9 +39,6 @@ public class FirebaseDatabaseTest {
     public void setup() {
         // Store the reference to the FirebaseProvider as a mem var
         mWriter = FirebaseProvider.getInstance();
-
-        // Delete the test guide that was previously uploaded
-        mWriter.deleteGuide(1);
     }
 
     @Test
@@ -57,7 +54,7 @@ public class FirebaseDatabaseTest {
 
         for (int type : types) {
             // Retrieve the Guide from the FirebaseDatabase using the guide's id
-            mWriter.getRecord(type, 1, new FirebaseProvider.FirebaseListener() {
+            mWriter.getRecord(type, 1, new FirebaseProvider.FirebaseSingleListener() {
                 @Override
                 public void onDataReady(BaseModel model) {
                     // Assert that all values from the returned Guide are equal to the inserted Guide's
@@ -91,6 +88,54 @@ public class FirebaseDatabaseTest {
                 // Ensure that the query returns the inserted Guide's ID
                 String errorIncorrectGuideId = "The GeoQuery did not return the correct guide id";
                 assertEquals(errorIncorrectGuideId, guide.id, guideId);
+            }
+        });
+    }
+
+    @Test
+    public void testGetRecordList() {
+        // Generate an Array of Guides to insert in the database
+        final Guide[] guides = TestUtilities.getGuides();
+
+        // Insert
+        mWriter.insertRecord(guides);
+
+        // Query for the latest guides
+        mWriter.getRecentGuides(new FirebaseProvider.FirebaseListListener() {
+            @Override
+            public void onDataReady(List<Guide> guideList) {
+                // Validate each returned Guide against the guides inserted
+                for (int i = 0; i < guideList.size(); i++) {
+                    TestUtilities.validateModelValues(guides[i], guideList.get(i));
+                }
+            }
+        });
+    }
+
+    @Test
+    public void testDeleteRecords() {
+        // Get an Array of guides
+        Guide[] guides = TestUtilities.getGuides();
+
+        // Get an array of the ids of each of the guides
+        long[] ids = new long[guides.length];
+        for (int i = 0; i < guides.length; i++) {
+            ids[i] = guides[i].id;
+        }
+
+        // Insert the guides into the database
+        mWriter.insertRecord(guides);
+
+        // Delete all the records from the database
+        mWriter.deleteRecords(GUIDE, ids);
+
+        // Check to ensure that there are no guides left in the database
+        mWriter.getRecentGuides(new FirebaseProvider.FirebaseListListener() {
+            @Override
+            public void onDataReady(List<Guide> guideList) {
+                // Verify that there are no guides returned
+                String errorNotEmpty = "The size of the returned guide list is greater than 0";
+                assertEquals(errorNotEmpty, 0, guideList.size());
             }
         });
     }
@@ -132,6 +177,5 @@ public class FirebaseDatabaseTest {
     @After
     public void cleanup() {
         // Delete the test guide that was previously uploaded
-        mWriter.deleteGuide(1);
     }
 }

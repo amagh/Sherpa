@@ -131,6 +131,21 @@ public class TestUtilities {
         return new Guide(1, 1, 1, System.currentTimeMillis(), "Firebase GPX URI", 37.734, -119.602, "Firebase Image URI");
     }
 
+    public static Guide[] getGuides() {
+        Guide guide1 = new Guide(1, 1, 1, System.currentTimeMillis(), "Firebase1 GPX URI", 37.734, -119.602, "Firebase Image URI");
+        Guide guide2 = new Guide(2, 1, 1, System.currentTimeMillis(), "Firebase2 GPX URI", 37.735, -119.603, "Firebase Image URI");
+        Guide guide3 = new Guide(3, 1, 1, System.currentTimeMillis(), "Firebase3 GPX URI", 37.736, -119.604, "Firebase Image URI");
+        Guide guide4 = new Guide(4, 1, 1, System.currentTimeMillis(), "Firebase4 GPX URI", 37.737, -119.605, "Firebase Image URI");
+        Guide guide5 = new Guide(5, 1, 1, System.currentTimeMillis(), "Firebase5 GPX URI", 37.738, -119.606, "Firebase Image URI");
+        Guide guide6 = new Guide(6, 1, 1, System.currentTimeMillis(), "Firebase6 GPX URI", 37.739, -119.607, "Firebase Image URI");
+        Guide guide7 = new Guide(7, 1, 1, System.currentTimeMillis(), "Firebase7 GPX URI", 37.730, -119.608, "Firebase Image URI");
+        Guide guide8 = new Guide(8, 1, 1, System.currentTimeMillis(), "Firebase8 GPX URI", 37.731, -119.609, "Firebase Image URI");
+        Guide guide9 = new Guide(9, 1, 1, System.currentTimeMillis(), "Firebase9 GPX URI", 37.732, -119.600, "Firebase Image URI");
+
+        Guide[] guides = {guide1, guide2, guide3, guide4, guide5, guide6, guide7, guide8, guide9};
+        return guides;
+    }
+
     public static Trail getTrail() {
         return new Trail(1, 1, "Four Mile Trail", "Temporarily closed");
     }
