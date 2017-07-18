@@ -5,6 +5,7 @@ import net.simonvt.schematic.annotation.DataType;
 import net.simonvt.schematic.annotation.ForeignKeyConstraint;
 import net.simonvt.schematic.annotation.NotNull;
 import net.simonvt.schematic.annotation.PrimaryKey;
+import net.simonvt.schematic.annotation.References;
 
 /**
  * Defines the tables and columns to be created for the database
@@ -13,8 +14,15 @@ import net.simonvt.schematic.annotation.PrimaryKey;
 public class GuideContract {
     public interface GuideEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
-        @DataType(DataType.Type.INTEGER) @NotNull String TRAIL_ID                   = "trail_id";
-        @DataType(DataType.Type.INTEGER) @NotNull String AUTHOR_ID                  = "author_id";
+
+        @DataType(DataType.Type.INTEGER)
+        @References(table = GuideDatabase.TRAILS, column = TrailEntry._ID)
+        @NotNull String TRAIL_ID                                                    = "trail_id";
+
+        @DataType(DataType.Type.INTEGER)
+        @References(table = GuideDatabase.AUTHORS, column = AuthorEntry._ID)
+        @NotNull String AUTHOR_ID                                                   = "author_id";
+
         @DataType(DataType.Type.REAL) @NotNull String DATE_ADDED                    = "date_added";
         @DataType(DataType.Type.REAL) String RATING                                 = "rating";
         @DataType(DataType.Type.INTEGER) String REVIEWS                             = "reviews";
@@ -26,7 +34,11 @@ public class GuideContract {
 
     public interface TrailEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
-        @DataType(DataType.Type.INTEGER) @NotNull String AREA_ID                    = "area_id";
+
+        @DataType(DataType.Type.INTEGER)
+        @References(table = GuideDatabase.AUTHORS, column = AreaEntry._ID)
+        @NotNull String AREA_ID                                                     = "area_id";
+
         @DataType(DataType.Type.TEXT) @NotNull String NAME                          = "name";
         @DataType(DataType.Type.TEXT) String NOTES                                  = "notes";
     }
@@ -40,7 +52,11 @@ public class GuideContract {
 
     public interface SectionEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
-        @DataType(DataType.Type.INTEGER) @NotNull String GUIDE_ID                   = "guide_id";
+
+        @DataType(DataType.Type.INTEGER)
+        @References(table = GuideDatabase.GUIDES, column = GuideEntry._ID)
+        @NotNull String GUIDE_ID                                                    = "guide_id";
+        
         @DataType(DataType.Type.INTEGER) @NotNull String SECTION                    = "section";
         @DataType(DataType.Type.TEXT) @NotNull String CONTENT                       = "content";
     }
