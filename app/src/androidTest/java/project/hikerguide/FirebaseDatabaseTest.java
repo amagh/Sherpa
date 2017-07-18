@@ -2,6 +2,8 @@ package project.hikerguide;
 
 import android.support.test.runner.AndroidJUnit4;
 
+import com.firebase.geofire.GeoLocation;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,7 +76,23 @@ public class FirebaseDatabaseTest {
                 }
             });
         }
+    }
 
+    @Test
+    public void testGeoQuery() {
+        // Insert the Guide into the Database - also inserts the guide's coordinates to the GeoFire
+        // child of the Database
+        final Guide guide = insertGuide();
+
+        // Run a GeoQuery for the lat/long of the inserted Guide
+        mWriter.geoQuery(new GeoLocation(guide.latitude, guide.longitude), 1, new FirebaseProvider.GeofireListener() {
+            @Override
+            public void onKeyEntered(long guideId) {
+                // Ensure that the query returns the inserted Guide's ID
+                String errorIncorrectGuideId = "The GeoQuery did not return the correct guide id";
+                assertEquals(errorIncorrectGuideId, guide.id, guideId);
+            }
+        });
     }
 
     public Guide insertGuide() {
