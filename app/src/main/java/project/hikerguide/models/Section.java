@@ -2,6 +2,9 @@ package project.hikerguide.models;
 
 import android.database.Cursor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import project.hikerguide.data.GuideContract;
 
 /**
@@ -9,6 +12,12 @@ import project.hikerguide.data.GuideContract;
  */
 
 public class Section extends BaseModel{
+    // ** Constants ** //
+    private static final String GUIDE_ID = "guideId";
+    private static final String SECTION = "section";
+    private static final String CONTENT = "content";
+
+    // ** Member Variables ** //
     public long guideId;
     public int section;
     public String content;
@@ -43,5 +52,17 @@ public class Section extends BaseModel{
 
         // Instantiate a new Section with the values
         return new Section(id, guideId, section, content);
+    }
+
+    @Override
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+
+        map.put(ID, id);
+        map.put(GUIDE_ID, guideId);
+        map.put(SECTION, section);
+        map.put(CONTENT, content);
+
+        return map;
     }
 }

@@ -2,6 +2,9 @@ package project.hikerguide.models;
 
 import android.database.Cursor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import project.hikerguide.data.GuideContract;
 
 /**
@@ -9,6 +12,18 @@ import project.hikerguide.data.GuideContract;
  */
 
 public class Guide extends BaseModel {
+    // ** Constants ** //
+    private static final String TRAIL_ID = "trailId";
+    private static final String AUTHOR_ID = "authorId";
+    private static final String DATE_ADDED = "dateAdded";
+    private static final String RATING = "rating";
+    private static final String REVIEWS = "reviews";
+    private static final String GPX = "gpx";
+    private static final String LATITUDE = "latitude";
+    private static final String LONGITUDE = "longitude";
+    private static final String IMAGE = "image";
+
+    // ** Member Variables ** //
     public long trailId;
     public long authorId;
     public long dateAdded;
@@ -74,5 +89,22 @@ public class Guide extends BaseModel {
         guide.reviews = reviews;
 
         return guide;
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+
+        map.put(ID, id);
+        map.put(TRAIL_ID, trailId);
+        map.put(AUTHOR_ID, authorId);
+        map.put(DATE_ADDED, dateAdded);
+        map.put(RATING, rating);
+        map.put(REVIEWS, reviews);
+        map.put(GPX, gpx);
+        map.put(LATITUDE, latitude);
+        map.put(LONGITUDE, longitude);
+        map.put(IMAGE, image);
+
+        return map;
     }
 }

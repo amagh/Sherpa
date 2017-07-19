@@ -2,6 +2,9 @@ package project.hikerguide.models;
 
 import android.database.Cursor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import project.hikerguide.data.GuideContract;
 
 /**
@@ -9,6 +12,12 @@ import project.hikerguide.data.GuideContract;
  */
 
 public class Author extends BaseModel {
+    // ** Constants ** //
+    private static final String NAME = "name";
+    private static final String PROFILE_PICTURE = "profilePicture";
+    private static final String SCORE = "score";
+
+    // ** Member Variables ** //
     public String name;
     public String profilePicture;
     public int score;
@@ -49,5 +58,17 @@ public class Author extends BaseModel {
 
         // Instantiate a new Author with the values
         return new Author(id, name, profilePicture, score);
+    }
+
+    @Override
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+
+        map.put(ID, id);
+        map.put(NAME, name);
+        map.put(PROFILE_PICTURE, profilePicture);
+        map.put(SCORE, score);
+
+        return map;
     }
 }
