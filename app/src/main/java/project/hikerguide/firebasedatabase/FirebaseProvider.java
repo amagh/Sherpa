@@ -150,6 +150,7 @@ public class FirebaseProvider {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure(databaseError);
                 mDatabase.child(directory).child(firebaseId).removeEventListener(this);
             }
         });
@@ -176,6 +177,7 @@ public class FirebaseProvider {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure(databaseError);
                 mDatabase.child(GuideDatabase.GUIDES).removeEventListener(this);
             }
         });
@@ -233,6 +235,7 @@ public class FirebaseProvider {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure(databaseError);
                 mDatabase.child(FirebaseProviderUtils.getDirectoryFromType(type)).removeEventListener(this);
             }
         });
@@ -251,7 +254,7 @@ public class FirebaseProvider {
         GeoFire geofire = new GeoFire(firebaseRef);
 
         // Use Geofire to query for all guides in the parameter area
-        GeoQuery query = geofire.queryAtLocation(location, radius);
+        final GeoQuery query = geofire.queryAtLocation(location, radius);
         query.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
@@ -271,12 +274,12 @@ public class FirebaseProvider {
 
             @Override
             public void onGeoQueryReady() {
-
+                query.removeGeoQueryEventListener(this);
             }
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
-
+                listener.onFailure(error);
             }
         });
     }
@@ -293,13 +296,16 @@ public class FirebaseProvider {
 
     public interface FirebaseSingleListener {
         void onDataReady(BaseModel model);
+        void onFailure(DatabaseError databaseError);
     }
 
     public interface FirebaseListener {
         void onDataReady(BaseModel[] models);
+        void onFailure(DatabaseError databaseError);
     }
 
     public interface GeofireListener {
         void onKeyEntered(String guideId);
+        void onFailure(DatabaseError databaseError);
     }
 }

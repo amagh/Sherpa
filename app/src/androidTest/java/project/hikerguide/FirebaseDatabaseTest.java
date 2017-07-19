@@ -3,6 +3,7 @@ package project.hikerguide;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.firebase.geofire.GeoLocation;
+import com.google.firebase.database.DatabaseError;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,6 +23,7 @@ import project.hikerguide.models.Trail;
 
 import static android.test.MoreAsserts.assertEmpty;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
@@ -78,6 +80,11 @@ public class FirebaseDatabaseTest {
                         TestUtilities.validateModelValues(area, model);
                     }
                 }
+
+                @Override
+                public void onFailure(DatabaseError databaseError) {
+                    assertNull(databaseError.getMessage(), databaseError);
+                }
             });
         }
     }
@@ -95,6 +102,11 @@ public class FirebaseDatabaseTest {
                 // Ensure that the query returns the inserted Guide's ID
                 String errorIncorrectGuideId = "The GeoQuery did not return any ids";
                 assertThat(errorIncorrectGuideId, guideId, not(isEmptyOrNullString()));
+            }
+
+            @Override
+            public void onFailure(DatabaseError databaseError) {
+                assertNull(databaseError.getMessage(), databaseError);
             }
         });
     }
@@ -119,6 +131,11 @@ public class FirebaseDatabaseTest {
                         }
                     }
                 }
+            }
+
+            @Override
+            public void onFailure(DatabaseError databaseError) {
+                assertNull(databaseError.getMessage(), databaseError);
             }
         });
     }
@@ -154,6 +171,11 @@ public class FirebaseDatabaseTest {
                 String errorNotEmpty = "The size of the returned guide list is greater than 0";
                 assertEquals(errorNotEmpty, 0, models.length);
             }
+
+            @Override
+            public void onFailure(DatabaseError databaseError) {
+                assertNull(databaseError.getMessage(), databaseError);
+            }
         });
     }
 
@@ -175,6 +197,11 @@ public class FirebaseDatabaseTest {
 
                 String errorWrongNames = "The search query did not return all the names expected.";
                 assertEmpty(errorWrongNames, expectedNames);
+            }
+
+            @Override
+            public void onFailure(DatabaseError databaseError) {
+                assertNull(databaseError.getMessage(), databaseError);
             }
         });
     }
