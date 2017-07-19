@@ -61,14 +61,14 @@ public class TestUtilities {
      * @param returned    The data model that was returned from the Firebase Database
      */
     public static void validateModelValues(BaseModel expected, BaseModel returned) {
-        String errorValueDifferent = "Values in the returned data model do not match the values inserted.";
-
         // Get all the Fields of the data model
         Field[] fields = expected.getClass().getFields();
 
         // Iterate through and ensure each Field value is equal
         for (Field field : fields) {
+            String errorValueDifferent = "Values in the returned data model (" + returned.firebaseId + ") do not match the values inserted (" + expected.firebaseId + "). " + field.toString();
             try {
+                System.out.println("Field: " + field.toString() + " | Expected: " + field.get(expected) + " | Actual: " + field.get(returned));
                 assertEquals(errorValueDifferent, field.get(expected), field.get(returned));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();

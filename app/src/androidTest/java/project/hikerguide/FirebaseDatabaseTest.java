@@ -20,6 +20,9 @@ import project.hikerguide.models.Section;
 import project.hikerguide.models.Trail;
 
 import static junit.framework.Assert.assertEquals;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
 import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.AREA;
 import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.AUTHOR;
 import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.GUIDE;
@@ -39,6 +42,7 @@ public class FirebaseDatabaseTest {
     public void setup() {
         // Store the reference to the FirebaseProvider as a mem var
         mWriter = FirebaseProvider.getInstance();
+        mWriter.deleteAllRecords();
     }
 
     @Test
@@ -51,10 +55,11 @@ public class FirebaseDatabaseTest {
         final Area area = insertArea();
 
         int[] types = {GUIDE, TRAIL, AUTHOR, SECTION, AREA};
+        BaseModel[] models = {guide, trail, author, section, area};
 
-        for (int type : types) {
+        for (int i = 0; i < types.length; i++) {
             // Retrieve the Guide from the FirebaseDatabase using the guide's id
-            mWriter.getRecord(type, 1, new FirebaseProvider.FirebaseSingleListener() {
+            mWriter.getRecord(types[i], models[i].firebaseId, new FirebaseProvider.FirebaseSingleListener() {
                 @Override
                 public void onDataReady(BaseModel model) {
                     // Assert that all values from the returned Guide are equal to the inserted Guide's
@@ -84,10 +89,10 @@ public class FirebaseDatabaseTest {
         // Run a GeoQuery for the lat/long of the inserted Guide
         mWriter.geoQuery(new GeoLocation(guide.latitude, guide.longitude), 1, new FirebaseProvider.GeofireListener() {
             @Override
-            public void onKeyEntered(long guideId) {
+            public void onKeyEntered(String guideId) {
                 // Ensure that the query returns the inserted Guide's ID
-                String errorIncorrectGuideId = "The GeoQuery did not return the correct guide id";
-                assertEquals(errorIncorrectGuideId, guide.id, guideId);
+                String errorIncorrectGuideId = "The GeoQuery did not return any ids";
+                assertThat(errorIncorrectGuideId, guideId, not(isEmptyOrNullString()));
             }
         });
     }
@@ -95,10 +100,10 @@ public class FirebaseDatabaseTest {
     @Test
     public void testGetRecordList() {
         // Generate an Array of Guides to insert in the database
-        final Guide[] guides = TestUtilities.getGuides();
+        Guide[] guides = TestUtilities.getGuides();
 
         // Insert
-        mWriter.insertRecord(guides);
+        final Guide[] returnedGuides = (Guide[]) mWriter.insertRecord(guides);
 
         // Query for the latest guides
         mWriter.getRecentGuides(new FirebaseProvider.FirebaseListListener() {
@@ -106,7 +111,11 @@ public class FirebaseDatabaseTest {
             public void onDataReady(List<Guide> guideList) {
                 // Validate each returned Guide against the guides inserted
                 for (int i = 0; i < guideList.size(); i++) {
-                    TestUtilities.validateModelValues(guides[i], guideList.get(i));
+                    for (Guide guide : returnedGuides) {
+                        if (guide.firebaseId.equals(guideList.get(i).firebaseId)) {
+                            TestUtilities.validateModelValues(guide, guideList.get(i));
+                        }
+                    }
                 }
             }
         });
@@ -117,17 +126,23 @@ public class FirebaseDatabaseTest {
         // Get an Array of guides
         Guide[] guides = TestUtilities.getGuides();
 
+        // Insert the guides into the database
+        guides = (Guide[]) mWriter.insertRecord(guides);
+
         // Get an array of the ids of each of the guides
-        long[] ids = new long[guides.length];
+        String[] firebaseIds = new String[guides.length];
         for (int i = 0; i < guides.length; i++) {
-            ids[i] = guides[i].id;
+            firebaseIds[i] = guides[i].firebaseId;
         }
 
-        // Insert the guides into the database
-        mWriter.insertRecord(guides);
-
         // Delete all the records from the database
-        mWriter.deleteRecords(GUIDE, ids);
+        mWriter.deleteRecords(GUIDE, firebaseIds);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         // Check to ensure that there are no guides left in the database
         mWriter.getRecentGuides(new FirebaseProvider.FirebaseListListener() {
@@ -142,40 +157,42 @@ public class FirebaseDatabaseTest {
 
     public Guide insertGuide() {
         Guide guide = TestUtilities.getGuide();
-        mWriter.insertRecord(guide);
+        guide = (Guide) mWriter.insertRecord(guide)[0];
 
         return guide;
     }
 
     public Trail insertTrail() {
         Trail trail = TestUtilities.getTrail();
-        mWriter.insertRecord(trail);
+        trail = (Trail) mWriter.insertRecord(trail)[0];
 
         return trail;
     }
 
     public Author insertAuthor() {
         Author author = TestUtilities.getAuthor();
-        mWriter.insertRecord(author);
+        author = (Author) mWriter.insertRecord(author)[0];
 
         return author;
     }
 
     public Section insertSection() {
         Section section = TestUtilities.getSection();
-        mWriter.insertRecord(section);
+        section = (Section) mWriter.insertRecord(section)[0];
 
         return section;
     }
 
     public Area insertArea() {
         Area area = TestUtilities.getArea();
-        mWriter.insertRecord(area);
+        area = (Area) mWriter.insertRecord(area)[0];
 
         return area;
     }
+
     @After
     public void cleanup() {
         // Delete the test guide that was previously uploaded
+        mWriter.deleteAllRecords();
     }
 }
