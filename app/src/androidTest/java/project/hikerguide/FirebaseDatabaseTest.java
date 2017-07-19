@@ -9,8 +9,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import project.hikerguide.data.GuideContract;
 import project.hikerguide.firebasedatabase.FirebaseProvider;
 import project.hikerguide.models.Area;
 import project.hikerguide.models.Author;
@@ -19,6 +22,7 @@ import project.hikerguide.models.Guide;
 import project.hikerguide.models.Section;
 import project.hikerguide.models.Trail;
 
+import static android.test.MoreAsserts.assertEmpty;
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
@@ -100,20 +104,20 @@ public class FirebaseDatabaseTest {
     @Test
     public void testGetRecordList() {
         // Generate an Array of Guides to insert in the database
-        Guide[] guides = TestUtilities.getGuides();
+        final Guide[] guides = TestUtilities.getGuides();
 
         // Insert
-        final Guide[] returnedGuides = (Guide[]) mWriter.insertRecord(guides);
+        mWriter.insertRecord(guides);
 
         // Query for the latest guides
-        mWriter.getRecentGuides(new FirebaseProvider.FirebaseListListener() {
+        mWriter.getRecentGuides(new FirebaseProvider.FirebaseListener() {
             @Override
-            public void onDataReady(List<Guide> guideList) {
+            public void onDataReady(BaseModel[] models) {
                 // Validate each returned Guide against the guides inserted
-                for (int i = 0; i < guideList.size(); i++) {
-                    for (Guide guide : returnedGuides) {
-                        if (guide.firebaseId.equals(guideList.get(i).firebaseId)) {
-                            TestUtilities.validateModelValues(guide, guideList.get(i));
+                for (BaseModel model : models) {
+                    for (Guide guide : guides) {
+                        if (guide.firebaseId.equals(model.firebaseId)) {
+                            TestUtilities.validateModelValues(guide, model);
                         }
                     }
                 }
@@ -127,7 +131,7 @@ public class FirebaseDatabaseTest {
         Guide[] guides = TestUtilities.getGuides();
 
         // Insert the guides into the database
-        guides = (Guide[]) mWriter.insertRecord(guides);
+        mWriter.insertRecord(guides);
 
         // Get an array of the ids of each of the guides
         String[] firebaseIds = new String[guides.length];
@@ -145,47 +149,69 @@ public class FirebaseDatabaseTest {
         }
 
         // Check to ensure that there are no guides left in the database
-        mWriter.getRecentGuides(new FirebaseProvider.FirebaseListListener() {
+        mWriter.getRecentGuides(new FirebaseProvider.FirebaseListener() {
             @Override
-            public void onDataReady(List<Guide> guideList) {
+            public void onDataReady(BaseModel[] models) {
                 // Verify that there are no guides returned
                 String errorNotEmpty = "The size of the returned guide list is greater than 0";
-                assertEquals(errorNotEmpty, 0, guideList.size());
+                assertEquals(errorNotEmpty, 0, models.length);
+            }
+        });
+    }
+
+    @Test
+    public void testSearch() {
+        Area[] areas = TestUtilities.getAreas();
+        mWriter.insertRecord(areas);
+
+        mWriter.searchForRecords(AREA, "Grand", 5, new FirebaseProvider.FirebaseListener() {
+            @Override
+            public void onDataReady(BaseModel[] models) {
+                Set<String> expectedNames = new HashSet();
+                expectedNames.add("Grand Canyon");
+                expectedNames.add("Grand Teton");
+
+                for (BaseModel model : models) {
+                    expectedNames.remove(((Area) model).name);
+                }
+
+                String errorWrongNames = "The search query did not return all the names expected.";
+                assertEmpty(errorWrongNames, expectedNames);
             }
         });
     }
 
     public Guide insertGuide() {
         Guide guide = TestUtilities.getGuide();
-        guide = (Guide) mWriter.insertRecord(guide)[0];
+        mWriter.insertRecord(guide);
 
         return guide;
     }
 
     public Trail insertTrail() {
         Trail trail = TestUtilities.getTrail();
-        trail = (Trail) mWriter.insertRecord(trail)[0];
+        mWriter.insertRecord(trail);
 
         return trail;
     }
 
     public Author insertAuthor() {
         Author author = TestUtilities.getAuthor();
-        author = (Author) mWriter.insertRecord(author)[0];
+        mWriter.insertRecord(author);
 
         return author;
     }
 
     public Section insertSection() {
         Section section = TestUtilities.getSection();
-        section = (Section) mWriter.insertRecord(section)[0];
+        mWriter.insertRecord(section);
 
         return section;
     }
 
     public Area insertArea() {
         Area area = TestUtilities.getArea();
-        area = (Area) mWriter.insertRecord(area)[0];
+        mWriter.insertRecord(area);
 
         return area;
     }

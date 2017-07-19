@@ -132,15 +132,15 @@ public class TestUtilities {
     }
 
     public static Guide[] getGuides() {
-        Guide guide1 = new Guide(1, "1", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide2 = new Guide(2, "1", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide3 = new Guide(3, "1", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide4 = new Guide(4, "1", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide5 = new Guide(5, "1", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide6 = new Guide(6, "1", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide7 = new Guide(7, "1", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide8 = new Guide(8, "1", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide9 = new Guide(9, "1", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide1 = new Guide(1, "a", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide2 = new Guide(2, "b", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide3 = new Guide(3, "c", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide4 = new Guide(4, "d", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide5 = new Guide(5, "f", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide6 = new Guide(6, "g", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide7 = new Guide(7, "h", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide8 = new Guide(8, "i", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide9 = new Guide(9, "j", "1", System.currentTimeMillis(), 37.734, -119.602);
 
         Guide[] guides = {guide1, guide2, guide3, guide4, guide5, guide6, guide7, guide8, guide9};
         return guides;
@@ -160,5 +160,19 @@ public class TestUtilities {
 
     public static Area getArea() {
         return new Area(1, "Yosemite");
+    }
+
+    public static Area[] getAreas() {
+        Area area1 = new Area(1, "Yosemite");
+        Area area2 = new Area(2, "Grand Canyon");
+        Area area3 = new Area(3, "Red Wood Forest");
+        Area area4 = new Area(4, "Yellowstone");
+        Area area5 = new Area(5, "Acadia");
+        Area area6 = new Area(6, "Glacier");
+        Area area7 = new Area(7, "Zion");
+        Area area8 = new Area(8, "Arches");
+        Area area9 = new Area(9, "Grand Teton");
+
+        return new Area[] {area1, area2, area3, area4, area5, area6, area7, area8, area9};
     }
 }
