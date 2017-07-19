@@ -2,6 +2,7 @@ package project.hikerguide.firebasedatabase;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -11,11 +12,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
@@ -78,19 +80,50 @@ public class FirebaseProvider {
         return sProvider;
     }
 
+    private String getFirebasePath(String directory, String key) {
+        return "/" + directory + "/" + key;
+    }
+
     /**
      * Inserts a record into the Firebase Database
      *
      * @param models    The data model Object describing the information to add to the database
      */
-    public void insertRecord(BaseModel... models) {
+    public BaseModel[] insertRecord(BaseModel... models) {
 
-        // Iterate and insert each record into the database
+        // Init the Map that will be used to insert values into the Firebase Database
+        Map<String, Object> childUpdates = new HashMap<>();
+
+        // Init the directory variable that will be used to generate the path for insertion
+        String directory;
+
+        // Iterate, get the key for each record, and add the values to childUpdates
         for (BaseModel model : models) {
-            if (model instanceof Guide) {
-                Guide guide = (Guide) model;
-                mDatabase.child(GuideDatabase.GUIDES).child(Long.toString(guide.id)).setValue(guide);
 
+            if (model instanceof Guide) {
+                directory = GuideDatabase.GUIDES;
+            } else if (model instanceof Trail) {
+                directory = GuideDatabase.TRAILS;
+            } else if (model instanceof Author) {
+                directory = GuideDatabase.AUTHORS;
+            } else if (model instanceof Section) {
+                directory = GuideDatabase.SECTIONS;
+            } else if (model instanceof Area) {
+                directory = GuideDatabase.AREAS;
+            } else {
+                throw new UnsupportedOperationException("Unknown model:" + model.getClass());
+            }
+
+            // Push the path to get the key
+            String key = mDatabase.child(directory).push().getKey();
+
+            // Add the model's values to childUpdates
+            childUpdates.put(getFirebasePath(directory, key), model.toMap());
+
+            // Modify the model so it includes the key
+            model.firebaseId = key;
+
+            if (model instanceof Guide) {
                 // When inserting a Guide object, there needs to be accompanying coordinate data
                 // loaded into the Database for GeoFire queries
                 DatabaseReference geoFireReference = mDatabase.child(GEOFIRE_PATH);
@@ -98,31 +131,22 @@ public class FirebaseProvider {
 
                 GeoLocation location = new GeoLocation(((Guide) model).latitude, ((Guide) model).longitude);
 
-                geoFire.setLocation(Long.toString(model.id), location);
-            } else if (model instanceof Trail) {
-                Trail trail = (Trail) model;
-                mDatabase.child(GuideDatabase.TRAILS).child(Long.toString(trail.id)).setValue(trail);
-            } else if (model instanceof Author) {
-                Author author = (Author) model;
-                mDatabase.child(GuideDatabase.AUTHORS).child(Long.toString(author.id)).setValue(author);
-            } else if (model instanceof Section) {
-                Section section = (Section) model;
-                mDatabase.child(GuideDatabase.SECTIONS).child(Long.toString(section.id)).setValue(section);
-            } else if (model instanceof Area) {
-                Area area = (Area) model;
-                mDatabase.child(GuideDatabase.AREAS).child(Long.toString(area.id)).setValue(area);
+                geoFire.setLocation(key, location);
             }
         }
+
+        mDatabase.updateChildren(childUpdates);
+        return models;
     }
 
     /**
      * Retrieves a data model Object from the Firebase Database
      *
      * @param type        The Firebase type corresponding to the data model to be retrieved
-     * @param id          ID of the Guide to retrieve
+     * @param firebaseId  ID of the Guide to retrieve
      * @param listener    Listener to pass the instance of the Guide that was retrieved
      */
-    public void getRecord(@FirebaseType final int type, final long id, @NonNull final FirebaseSingleListener listener) {
+    public void getRecord(@FirebaseType final int type, final String firebaseId, @NonNull final FirebaseSingleListener listener) {
 
         // Initialize the child variable that will be used as the directory to retrieve the data
         // from the Firebase Database
@@ -154,7 +178,7 @@ public class FirebaseProvider {
         }
 
         // Retrieve the record from the database
-        mDatabase.child(child).child(Long.toString(id)).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child(child).child(firebaseId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Init the variable that will hold the values from the database
@@ -185,9 +209,11 @@ public class FirebaseProvider {
                     default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
                 }
 
+                System.out.println("Snapshot: " + dataSnapshot);
+
                 // Add the id to the data model
                 assertNotNull(model);
-                model.id = id;
+                model.firebaseId = firebaseId;
 
                 // Inform the observer that the model is ready
                 listener.onDataReady(model);
@@ -217,7 +243,15 @@ public class FirebaseProvider {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Guide> guideList = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    guideList.add(snapshot.getValue(Guide.class));
+                    // Cast the data to a Guide Object
+                    Guide guide = snapshot.getValue(Guide.class);
+
+                    // Set the Guide's firebaseId
+                    assertNotNull(guide);
+                    guide.firebaseId = snapshot.getKey();
+
+                    // Add it to the List to be returned by the listener
+                    guideList.add(guide);
                 }
 
                 listener.onDataReady(guideList);
@@ -229,21 +263,15 @@ public class FirebaseProvider {
                 mDatabase.removeEventListener(this);
             }
         });
-
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
      * Removes records from the Firebase Database
      *
      * @param type    The Firebase Type of record to remove
-     * @param ids     The ID of the record to remove
+     * @param firebaseIds     The ID of the record to remove
      */
-    public void deleteRecords(@FirebaseType int type, long... ids) {
+    public void deleteRecords(@FirebaseType int type, String... firebaseIds) {
         // Init the variable to hold the path of the type to be deleted
         String child;
 
@@ -272,8 +300,8 @@ public class FirebaseProvider {
         }
 
         // Iterate and delete each child that matches one of the ids within the path
-        for (long id : ids) {
-            mDatabase.child(child).child(Long.toString(id)).removeValue();
+        for (String firebaseId : firebaseIds) {
+            mDatabase.child(child).child(firebaseId).removeValue();
         }
     }
 
@@ -295,7 +323,7 @@ public class FirebaseProvider {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
                 // Inform the observer that a guide is in the search radius
-                listener.onKeyEntered(Long.parseLong(key));
+                listener.onKeyEntered(key);
             }
 
             @Override
@@ -320,6 +348,16 @@ public class FirebaseProvider {
         });
     }
 
+    @VisibleForTesting
+    public void deleteAllRecords() {
+        mDatabase.child(GuideDatabase.GUIDES).removeValue();
+        mDatabase.child(GuideDatabase.TRAILS).removeValue();
+        mDatabase.child(GuideDatabase.AUTHORS).removeValue();
+        mDatabase.child(GuideDatabase.SECTIONS).removeValue();
+        mDatabase.child(GuideDatabase.AREAS).removeValue();
+        mDatabase.child(GEOFIRE_PATH).removeValue();
+    }
+
     public interface FirebaseSingleListener {
         void onDataReady(BaseModel model);
     }
@@ -329,6 +367,6 @@ public class FirebaseProvider {
     }
 
     public interface GeofireListener {
-        void onKeyEntered(long guideId);
+        void onKeyEntered(String guideId);
     }
 }
