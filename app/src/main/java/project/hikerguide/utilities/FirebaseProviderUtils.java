@@ -4,13 +4,12 @@ import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.FirebaseProvider;
 import project.hikerguide.models.Area;
 import project.hikerguide.models.Author;
-import project.hikerguide.models.BaseModel;
+import project.hikerguide.models.abstractmodels.BaseModel;
 import project.hikerguide.models.Guide;
 import project.hikerguide.models.Section;
 import project.hikerguide.models.Trail;

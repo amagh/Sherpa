@@ -1,4 +1,4 @@
-package project.hikerguide.models;
+package project.hikerguide.models.abstractmodels;
 
 import java.util.Map;
 
@@ -8,7 +8,7 @@ import java.util.Map;
 
 public abstract class BaseModel {
     // ** Constants ** //
-    static final String ID = "id";
+    public static final String ID = "id";
 
     // ** Member Variables ** //
     public long id;

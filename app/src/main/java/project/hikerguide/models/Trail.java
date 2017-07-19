@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
+import project.hikerguide.models.abstractmodels.BaseModel;
 
 /**
  * Created by Alvin on 7/17/2017.

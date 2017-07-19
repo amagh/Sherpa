@@ -19,7 +19,7 @@ import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
-import project.hikerguide.models.BaseModel;
+import project.hikerguide.models.abstractmodels.BaseModel;
 import project.hikerguide.models.Guide;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 

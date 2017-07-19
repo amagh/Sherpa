@@ -10,14 +10,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import project.hikerguide.data.GuideContract;
 import project.hikerguide.firebasedatabase.FirebaseProvider;
 import project.hikerguide.models.Area;
 import project.hikerguide.models.Author;
-import project.hikerguide.models.BaseModel;
+import project.hikerguide.models.abstractmodels.BaseModel;
 import project.hikerguide.models.Guide;
 import project.hikerguide.models.Section;
 import project.hikerguide.models.Trail;

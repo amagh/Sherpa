@@ -6,12 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
+import project.hikerguide.models.abstractmodels.BaseModelWithImage;
 
 /**
  * Created by Alvin on 7/17/2017.
  */
 
-public class Section extends BaseModel{
+public class Section extends BaseModelWithImage {
     // ** Constants ** //
     private static final String GUIDE_ID = "guideId";
     private static final String SECTION = "section";

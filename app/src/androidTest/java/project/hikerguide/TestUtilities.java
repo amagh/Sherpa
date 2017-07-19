@@ -9,7 +9,7 @@ import java.util.Set;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.models.Area;
 import project.hikerguide.models.Author;
-import project.hikerguide.models.BaseModel;
+import project.hikerguide.models.abstractmodels.BaseModel;
 import project.hikerguide.models.Guide;
 import project.hikerguide.models.Section;
 import project.hikerguide.models.Trail;

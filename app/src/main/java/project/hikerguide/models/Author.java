@@ -6,12 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
+import project.hikerguide.models.abstractmodels.BaseModelWithImage;
 
 /**
  * Created by Alvin on 7/17/2017.
  */
 
-public class Author extends BaseModel {
+public class Author extends BaseModelWithImage {
     // ** Constants ** //
     private static final String NAME = "name";
     private static final String LOWER_CASE_NAME = "lowerCaseName";
