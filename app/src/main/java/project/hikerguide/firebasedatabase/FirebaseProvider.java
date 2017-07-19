@@ -14,19 +14,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
-import project.hikerguide.models.Area;
-import project.hikerguide.models.Author;
 import project.hikerguide.models.BaseModel;
 import project.hikerguide.models.Guide;
-import project.hikerguide.models.Section;
-import project.hikerguide.models.Trail;
+import project.hikerguide.utilities.FirebaseProviderUtils;
 
 import static junit.framework.Assert.assertNotNull;
 import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.AREA;
@@ -80,7 +75,7 @@ public class FirebaseProvider {
         return sProvider;
     }
 
-    private String getFirebasePath(String directory, String key) {
+    private static String getFirebasePath(String directory, String key) {
         return "/" + directory + "/" + key;
     }
 
@@ -99,20 +94,8 @@ public class FirebaseProvider {
 
         // Iterate, get the key for each record, and add the values to childUpdates
         for (BaseModel model : models) {
-
-            if (model instanceof Guide) {
-                directory = GuideDatabase.GUIDES;
-            } else if (model instanceof Trail) {
-                directory = GuideDatabase.TRAILS;
-            } else if (model instanceof Author) {
-                directory = GuideDatabase.AUTHORS;
-            } else if (model instanceof Section) {
-                directory = GuideDatabase.SECTIONS;
-            } else if (model instanceof Area) {
-                directory = GuideDatabase.AREAS;
-            } else {
-                throw new UnsupportedOperationException("Unknown model:" + model.getClass());
-            }
+            // Get the directory to insert the records into from the BaseModel's class
+            directory = FirebaseProviderUtils.getDirectoryFromModel(model);
 
             // Push the path to get the key
             String key = mDatabase.child(directory).push().getKey();
@@ -150,80 +133,24 @@ public class FirebaseProvider {
 
         // Initialize the child variable that will be used as the directory to retrieve the data
         // from the Firebase Database
-        String child = null;
-
-        // Set the variable according to the FirebaseType
-        switch (type) {
-            case GUIDE:
-                child = GuideDatabase.GUIDES;
-                break;
-
-            case TRAIL:
-                child = GuideDatabase.TRAILS;
-                break;
-
-            case AUTHOR:
-                child = GuideDatabase.AUTHORS;
-                break;
-
-            case SECTION:
-                child = GuideDatabase.SECTIONS;
-                break;
-
-            case AREA:
-                child = GuideDatabase.AREAS;
-                break;
-
-            default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
-        }
+        final String directory = FirebaseProviderUtils.getDirectoryFromType(type);
 
         // Retrieve the record from the database
-        mDatabase.child(child).child(firebaseId).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child(directory).child(firebaseId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Init the variable that will hold the values from the database
-                BaseModel model;
-
-                // Cast the data based on the input FirebaseType
-                switch (type) {
-                    case GUIDE:
-                        model = dataSnapshot.getValue(Guide.class);
-                        break;
-
-                    case TRAIL:
-                        model = dataSnapshot.getValue(Trail.class);
-                        break;
-
-                    case AUTHOR:
-                        model = dataSnapshot.getValue(Author.class);
-                        break;
-
-                    case SECTION:
-                        model = dataSnapshot.getValue(Section.class);
-                        break;
-
-                    case AREA:
-                        model = dataSnapshot.getValue(Area.class);
-                        break;
-
-                    default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
-                }
-
-                System.out.println("Snapshot: " + dataSnapshot);
-
-                // Add the id to the data model
-                assertNotNull(model);
-                model.firebaseId = firebaseId;
+                BaseModel model = FirebaseProviderUtils.getModelFromSnapshot(type, dataSnapshot);
 
                 // Inform the observer that the model is ready
                 listener.onDataReady(model);
 
-                mDatabase.removeEventListener(this);
+                mDatabase.child(directory).child(firebaseId).removeEventListener(this);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                mDatabase.child(directory).child(firebaseId).removeEventListener(this);
             }
         });
     }
@@ -233,7 +160,7 @@ public class FirebaseProvider {
      *
      * @param listener    The listener used to pass the List of Guides returned from the database
      */
-    public void getRecentGuides(final FirebaseListListener listener) {
+    public void getRecentGuides(final FirebaseListener listener) {
         // Query for the most recent guides
         mDatabase.child(GuideDatabase.GUIDES)
                 .orderByChild(GuideContract.GuideEntry.DATE_ADDED)
@@ -241,26 +168,15 @@ public class FirebaseProvider {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Guide> guideList = new ArrayList<>();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    // Cast the data to a Guide Object
-                    Guide guide = snapshot.getValue(Guide.class);
+                Guide[] guides = (Guide[]) FirebaseProviderUtils.getModelsFromSnapshot(GUIDE, dataSnapshot);
 
-                    // Set the Guide's firebaseId
-                    assertNotNull(guide);
-                    guide.firebaseId = snapshot.getKey();
-
-                    // Add it to the List to be returned by the listener
-                    guideList.add(guide);
-                }
-
-                listener.onDataReady(guideList);
-                mDatabase.removeEventListener(this);
+                listener.onDataReady(guides);
+                mDatabase.child(GuideDatabase.GUIDES).removeEventListener(this);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                mDatabase.removeEventListener(this);
+                mDatabase.child(GuideDatabase.GUIDES).removeEventListener(this);
             }
         });
     }
@@ -273,35 +189,11 @@ public class FirebaseProvider {
      */
     public void deleteRecords(@FirebaseType int type, String... firebaseIds) {
         // Init the variable to hold the path of the type to be deleted
-        String child;
-
-        switch (type) {
-            case GUIDE:
-                child = GuideDatabase.GUIDES;
-                break;
-
-            case TRAIL:
-                child = GuideDatabase.TRAILS;
-                break;
-
-            case AUTHOR:
-                child = GuideDatabase.AUTHORS;
-                break;
-
-            case SECTION:
-                child = GuideDatabase.SECTIONS;
-                break;
-
-            case AREA:
-                child = GuideDatabase.AREAS;
-                break;
-
-            default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
-        }
+        String directory = FirebaseProviderUtils.getDirectoryFromType(type);
 
         // Iterate and delete each child that matches one of the ids within the path
         for (String firebaseId : firebaseIds) {
-            mDatabase.child(child).child(firebaseId).removeValue();
+            mDatabase.child(directory).child(firebaseId).removeValue();
         }
     }
 
@@ -362,8 +254,8 @@ public class FirebaseProvider {
         void onDataReady(BaseModel model);
     }
 
-    public interface FirebaseListListener {
-        void onDataReady(List<Guide> guideList);
+    public interface FirebaseListener {
+        void onDataReady(BaseModel[] models);
     }
 
     public interface GeofireListener {
