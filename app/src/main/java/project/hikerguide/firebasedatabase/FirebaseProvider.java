@@ -198,6 +198,47 @@ public class FirebaseProvider {
     }
 
     /**
+     * Searches for a FirebaseType for the name given the query.
+     *
+     * @param type        The FirebaseType to query for
+     * @param query       The input String to search for
+     * @param limit       The max number of items to return
+     * @param listener    Notifies the observer of the results
+     */
+    public void searchForRecords(@FirebaseType final int type, String query, int limit, final FirebaseListener listener) {
+        // Convert the query to lowercase because Firebase's sorting fucntion is case-sensitive
+        query = query.toLowerCase();
+
+        // Make the end limit of the sorting function only return items that start with the query
+        // Because "z" is highest-value character, it is added to the query so that it will return
+        // all items that begin with the query.
+        //
+        // e.g. Query: "yose" -> End: "yosez" -> This will return all results from "yosea" to
+        // "yosez" including "yosemite"
+        String endString = query + "z";
+
+        // Query the database, ordering by the lowerCaseName key
+        mDatabase.child(FirebaseProviderUtils.getDirectoryFromType(type))
+                .orderByChild("lowerCaseName")
+                .startAt(query)
+                .endAt(endString)
+                .limitToFirst(limit)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Notify the observer of the results
+                listener.onDataReady(FirebaseProviderUtils.getModelsFromSnapshot(type, dataSnapshot));
+                mDatabase.child(FirebaseProviderUtils.getDirectoryFromType(type)).removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                mDatabase.child(FirebaseProviderUtils.getDirectoryFromType(type)).removeEventListener(this);
+            }
+        });
+    }
+
+    /**
      * Queries the Firebase Database for all Guides that exist in the search area
      *
      * @param location    GeoLocation Object containing the coordinates to center the search around
