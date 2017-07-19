@@ -14,6 +14,7 @@ import project.hikerguide.data.GuideContract;
 public class Author extends BaseModel {
     // ** Constants ** //
     private static final String NAME = "name";
+    private static final String LOWER_CASE_NAME = "lowerCaseName";
     private static final String PROFILE_PICTURE = "profilePicture";
     private static final String SCORE = "score";
 
@@ -66,6 +67,7 @@ public class Author extends BaseModel {
 
         map.put(ID, id);
         map.put(NAME, name);
+        map.put(LOWER_CASE_NAME, name.toLowerCase());
         map.put(PROFILE_PICTURE, profilePicture);
         map.put(SCORE, score);
 

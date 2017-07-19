@@ -14,6 +14,7 @@ import project.hikerguide.data.GuideContract;
 public class Area extends BaseModel {
     // ** Constants ** //
     private static final String NAME = "name";
+    private static final String LOWER_CASE_NAME = "lowerCaseName";
 
     // ** Member Variables ** //
     public String name;
@@ -50,6 +51,7 @@ public class Area extends BaseModel {
 
         map.put(ID, id);
         map.put(NAME, name);
+        map.put(LOWER_CASE_NAME, name.toLowerCase());
 
         return map;
     }

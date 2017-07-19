@@ -15,6 +15,7 @@ public class Trail extends BaseModel {
     // ** Constants ** //
     private static final String AREA_ID = "areaId";
     private static final String NAME = "name";
+    private static final String LOWER_CASE_NAME = "lowerCaseName";
     private static final String NOTES = "notes";
 
     // ** Member Variables ** //
@@ -67,6 +68,7 @@ public class Trail extends BaseModel {
         map.put(ID, id);
         map.put(AREA_ID, areaId);
         map.put(NAME, name);
+        map.put(LOWER_CASE_NAME, name.toLowerCase());
         map.put(NOTES, notes);
 
         return map;
