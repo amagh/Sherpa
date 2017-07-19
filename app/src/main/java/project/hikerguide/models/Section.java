@@ -18,15 +18,21 @@ public class Section extends BaseModel{
     private static final String CONTENT = "content";
 
     // ** Member Variables ** //
-    public long guideId;
+    public String guideId;
     public int section;
     public String content;
 
     public Section() {}
 
-    public Section(long id, long guideId, int section, String content) {
+    public Section(long id, String guideId, int section, String content) {
         this.id = id;
         this.guideId = guideId;
+        this.section = section;
+        this.content = content;
+    }
+
+    public Section(long id, int section, String content) {
+        this.id = id;
         this.section = section;
         this.content = content;
     }
@@ -46,7 +52,7 @@ public class Section extends BaseModel{
 
         // Retrieve the values from the Cursor
         long id = cursor.getLong(idxId);
-        long guideId = cursor.getLong(idxGuideId);
+        String guideId = cursor.getString(idxGuideId);
         int section = cursor.getInt(idxSection);
         String content = cursor.getString(idxContent);
 

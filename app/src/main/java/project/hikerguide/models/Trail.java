@@ -18,15 +18,21 @@ public class Trail extends BaseModel {
     private static final String NOTES = "notes";
 
     // ** Member Variables ** //
-    public long areaId;
+    public String areaId;
     public String name;
     public String notes;
 
     public Trail() {}
 
-    public Trail(long id, long areaId, String name, String notes) {
+    public Trail(long id, String areaId, String name, String notes) {
         this.id = id;
         this.areaId = areaId;
+        this.name = name;
+        this.notes = notes;
+    }
+
+    public Trail(long id, String name, String notes) {
+        this.id = id;
         this.name = name;
         this.notes = notes;
     }
@@ -46,7 +52,7 @@ public class Trail extends BaseModel {
 
         // Retrieve the values from the Cursor
         long id = cursor.getLong(idxId);
-        long areaId = cursor.getLong(idxAreaId);
+        String areaId = cursor.getString(idxAreaId);
         String name = cursor.getString(idxName);
         String notes = cursor.getString(idxNotes);
 
