@@ -12,31 +12,35 @@ import net.simonvt.schematic.annotation.References;
  */
 
 public class GuideContract {
+    // Order of insertion into Firebase Database: AUTHOR = AREA > TRAIL > GUIDE > SECTION
+
     public interface GuideEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
+        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebase_id";
 
         @DataType(DataType.Type.INTEGER)
-        @References(table = GuideDatabase.TRAILS, column = TrailEntry._ID)
+        @References(table = GuideDatabase.TRAILS, column = TrailEntry.FIREBASE_ID)
         @NotNull String TRAIL_ID                                                    = "trail_id";
 
         @DataType(DataType.Type.INTEGER)
-        @References(table = GuideDatabase.AUTHORS, column = AuthorEntry._ID)
+        @References(table = GuideDatabase.AUTHORS, column = AuthorEntry.FIREBASE_ID)
         @NotNull String AUTHOR_ID                                                   = "author_id";
 
         @DataType(DataType.Type.TEXT) @NotNull String DATE_ADDED                    = "date_added";
         @DataType(DataType.Type.REAL) String RATING                                 = "rating";
         @DataType(DataType.Type.INTEGER) String REVIEWS                             = "reviews";
-        @DataType(DataType.Type.TEXT) @NotNull String GPX                           = "gpx";
+//        @DataType(DataType.Type.TEXT) @NotNull String GPX                           = "gpx";
         @DataType(DataType.Type.REAL) @NotNull String LATITUDE                      = "latitude";
         @DataType(DataType.Type.REAL) @NotNull String LONGITUDE                     = "longitude";
-        @DataType(DataType.Type.TEXT) @NotNull String IMAGE                         = "image";
+//        @DataType(DataType.Type.TEXT) @NotNull String IMAGE                         = "image";
     }
 
     public interface TrailEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
+        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebase_id";
 
         @DataType(DataType.Type.INTEGER)
-        @References(table = GuideDatabase.AUTHORS, column = AreaEntry._ID)
+        @References(table = GuideDatabase.AUTHORS, column = AreaEntry.FIREBASE_ID)
         @NotNull String AREA_ID                                                     = "area_id";
 
         @DataType(DataType.Type.TEXT) @NotNull String NAME                          = "name";
@@ -45,6 +49,7 @@ public class GuideContract {
 
     public interface AuthorEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
+        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebase_id";
         @DataType(DataType.Type.TEXT) @NotNull String NAME                          = "name";
         @DataType(DataType.Type.TEXT) String PROFILE_PICTURE                        = "profile_pic";
         @DataType(DataType.Type.INTEGER) String SCORE                               = "score";
@@ -52,9 +57,10 @@ public class GuideContract {
 
     public interface SectionEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
+        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebase_id";
 
         @DataType(DataType.Type.INTEGER)
-        @References(table = GuideDatabase.GUIDES, column = GuideEntry._ID)
+        @References(table = GuideDatabase.GUIDES, column = GuideEntry.FIREBASE_ID)
         @NotNull String GUIDE_ID                                                    = "guide_id";
         
         @DataType(DataType.Type.INTEGER) @NotNull String SECTION                    = "section";
@@ -63,6 +69,7 @@ public class GuideContract {
 
     public interface AreaEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
+        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebase_id";
         @DataType(DataType.Type.TEXT) @NotNull String NAME                          = "name";
     }
 }
