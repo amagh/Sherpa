@@ -1,6 +1,6 @@
 package project.hikerguide.models.abstractmodels;
 
-import project.hikerguide.models.ImageFile;
+import project.hikerguide.files.ImageFile;
 
 /**
  * Created by Alvin on 7/19/2017.
