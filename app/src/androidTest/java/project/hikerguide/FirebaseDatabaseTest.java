@@ -1,5 +1,7 @@
 package project.hikerguide;
 
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.firebase.geofire.GeoLocation;
@@ -40,10 +42,13 @@ import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.
 @RunWith(AndroidJUnit4.class)
 public class FirebaseDatabaseTest {
     // ** Member Variables ** //
+    Context mContext;
     FirebaseProvider mWriter;
 
     @Before
     public void setup() {
+        mContext = InstrumentationRegistry.getTargetContext();
+
         // Store the reference to the FirebaseProvider as a mem var
         mWriter = FirebaseProvider.getInstance();
         mWriter.deleteAllRecords();
@@ -207,7 +212,7 @@ public class FirebaseDatabaseTest {
     }
 
     public Guide insertGuide() {
-        Guide guide = TestUtilities.getGuide();
+        Guide guide = TestUtilities.getGuide(mContext);
         mWriter.insertRecord(guide);
 
         return guide;
@@ -221,7 +226,7 @@ public class FirebaseDatabaseTest {
     }
 
     public Author insertAuthor() {
-        Author author = TestUtilities.getAuthor();
+        Author author = TestUtilities.getAuthor(mContext);
         mWriter.insertRecord(author);
 
         return author;
