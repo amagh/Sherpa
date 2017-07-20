@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 
 import project.hikerguide.files.abstractfiles.BaseFile;
@@ -17,6 +18,7 @@ import project.hikerguide.files.abstractfiles.BaseFile;
 public class ImageFile extends BaseFile {
     // ** Constants ** //
     private static final String JPEG_EXT = ".jpg";
+    private static final String IMAGE_PATH = "/images";
 
     public ImageFile(String firebaseId, String pathname) {
         super(pathname, firebaseId + JPEG_EXT);
@@ -44,14 +46,40 @@ public class ImageFile extends BaseFile {
     }
 
     /**
+     * Creates a new File in the image subdirectory of the internal storage
+     *
+     * @param context       Interface to Global Context
+     * @param firebaseId    ID of the image to be downloaded
+     * @return A new ImageFile within the internal storage's image subdirectory
+     */
+    public static ImageFile getDestinationFile(Context context, String firebaseId) {
+        // Get a reference to the subdirectory
+        File imageDirectory = new File(context.getFilesDir() + IMAGE_PATH);
+
+        // Create the directory if it does not yet exist
+        if (!imageDirectory.exists()) {
+            imageDirectory.mkdir();
+        }
+
+        return new ImageFile(firebaseId, imageDirectory);
+    }
+
+    /**
      * Copies the image file from the directory it currently exists in to the internal storage
      *
      * @param context    Interface to global Context
      * @return True if copy operation was a success. False otherwise.
      */
     public boolean saveToInternalStorage(Context context) {
+        File imageDirectory = new File(context.getFilesDir() + IMAGE_PATH);
+        if (!imageDirectory.exists()) {
+            imageDirectory.mkdir();
+        }
+
         // Get a reference to the location that the new ImageFile will be saved
-        ImageFile file = new ImageFile(this.firebaseId, context.getFilesDir());
+        ImageFile file = new ImageFile(this.firebaseId, context.getFilesDir() + IMAGE_PATH);
+
+        System.out.println(file.getAbsolutePath());
 
         // Check to see if the file already exists in internal storage
         if (file.exists()) {

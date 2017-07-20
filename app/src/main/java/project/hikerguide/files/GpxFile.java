@@ -17,9 +17,10 @@ import project.hikerguide.files.abstractfiles.BaseFile;
 public class GpxFile extends BaseFile {
     // ** Constants ** //
     private static final String GPX_EXT = ".gpx";
+    private static final String GPX_PATH = "/gpx";
 
     public GpxFile(String firebaseId, String pathname) {
-        super(pathname, firebaseId + GPX_EXT);
+        super(pathname + GPX_PATH, firebaseId + GPX_EXT);
         this.firebaseId = firebaseId;
     }
 
@@ -44,14 +45,39 @@ public class GpxFile extends BaseFile {
     }
 
     /**
+     * Creates a new File in the gpx subdirectory of the internal storage
+     *
+     * @param context       Interface to Global Context
+     * @param firebaseId    ID of the gpx to be downloaded
+     * @return A new GpxFile within the internal storage's gpx subdirectory
+     */
+    public static GpxFile getDestinationFile(Context context, String firebaseId) {
+        // Get a reference to the subdirectory
+        File gpxDirectory = new File(context.getFilesDir() + GPX_PATH);
+
+        // Create the directory if it does not yet exist
+        if (!gpxDirectory.exists()) {
+            gpxDirectory.mkdir();
+        }
+
+        return new GpxFile(firebaseId, gpxDirectory);
+    }
+
+    /**
      * Copies the gpx file from the directory it currently exists in to the internal storage
      *
      * @param context    Interface to global Context
      * @return True if copy operation was a success. False otherwise.
      */
     public boolean saveToInternalStorage(Context context) {
+        File gpxDirectory = new File(context.getFilesDir() + GPX_PATH);
+
+        if (!gpxDirectory.exists()) {
+            gpxDirectory.mkdir();
+        }
+
         // Get a reference to the location that the new ImageFile will be saved
-        GpxFile file = new GpxFile(this.firebaseId, context.getFilesDir());
+        GpxFile file = new GpxFile(this.firebaseId, context.getFilesDir() + GPX_PATH);
 
         // Check to see if the file already exists in internal storage
         if (file.exists()) {
