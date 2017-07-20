@@ -9,6 +9,9 @@ import java.io.FileOutputStream;
 import java.net.URI;
 
 import project.hikerguide.files.abstractfiles.BaseFile;
+import project.hikerguide.utilities.SaveUtils;
+
+import static project.hikerguide.utilities.SaveUtils.GPX_PATH;
 
 /**
  * Created by Alvin on 7/19/2017.
@@ -17,10 +20,9 @@ import project.hikerguide.files.abstractfiles.BaseFile;
 public class GpxFile extends BaseFile {
     // ** Constants ** //
     private static final String GPX_EXT = ".gpx";
-    private static final String GPX_PATH = "/gpx";
 
     public GpxFile(String firebaseId, String pathname) {
-        super(pathname + GPX_PATH, firebaseId + GPX_EXT);
+        super(pathname);
         this.firebaseId = firebaseId;
     }
 
@@ -70,17 +72,13 @@ public class GpxFile extends BaseFile {
      * @return True if copy operation was a success. False otherwise.
      */
     public boolean saveToInternalStorage(Context context) {
-        File gpxDirectory = new File(context.getFilesDir() + GPX_PATH);
-
-        if (!gpxDirectory.exists()) {
-            gpxDirectory.mkdir();
-        }
+        SaveUtils.makeSubdirectories(context);
 
         // Get a reference to the location that the new ImageFile will be saved
         GpxFile file = new GpxFile(this.firebaseId, context.getFilesDir() + GPX_PATH);
 
         // Check to see if the file already exists in internal storage
-        if (file.exists()) {
+        if (file.exists() && this.equals(file)) {
             return true;
         }
 

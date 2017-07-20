@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.net.URI;
 
 import project.hikerguide.files.abstractfiles.BaseFile;
+import project.hikerguide.utilities.SaveUtils;
+
+import static project.hikerguide.utilities.SaveUtils.IMAGE_PATH;
 
 /**
  * Created by Alvin on 7/19/2017.
@@ -18,10 +21,9 @@ import project.hikerguide.files.abstractfiles.BaseFile;
 public class ImageFile extends BaseFile {
     // ** Constants ** //
     private static final String JPEG_EXT = ".jpg";
-    private static final String IMAGE_PATH = "/images";
 
     public ImageFile(String firebaseId, String pathname) {
-        super(pathname, firebaseId + JPEG_EXT);
+        super(pathname);
         this.firebaseId = firebaseId;
     }
 
@@ -71,18 +73,13 @@ public class ImageFile extends BaseFile {
      * @return True if copy operation was a success. False otherwise.
      */
     public boolean saveToInternalStorage(Context context) {
-        File imageDirectory = new File(context.getFilesDir() + IMAGE_PATH);
-        if (!imageDirectory.exists()) {
-            imageDirectory.mkdir();
-        }
+        SaveUtils.makeSubdirectories(context);
 
         // Get a reference to the location that the new ImageFile will be saved
         ImageFile file = new ImageFile(this.firebaseId, context.getFilesDir() + IMAGE_PATH);
 
-        System.out.println(file.getAbsolutePath());
-
         // Check to see if the file already exists in internal storage
-        if (file.exists()) {
+        if (file.exists() && this.equals(file)) {
             return true;
         }
 
