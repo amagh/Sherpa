@@ -17,6 +17,7 @@ public class Section extends BaseModelWithImage {
     private static final String GUIDE_ID = "guideId";
     private static final String SECTION = "section";
     private static final String CONTENT = "content";
+    private static final String HAS_IMAGE = "hasImage";
 
     // ** Member Variables ** //
     public String guideId;
@@ -69,6 +70,7 @@ public class Section extends BaseModelWithImage {
         map.put(GUIDE_ID, guideId);
         map.put(SECTION, section);
         map.put(CONTENT, content);
+        map.put(HAS_IMAGE, hasImage);
 
         return map;
     }

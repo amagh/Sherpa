@@ -1,7 +1,10 @@
 package project.hikerguide.models;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +25,7 @@ public class Guide extends BaseModelWithImage {
     private static final String REVIEWS = "reviews";
     private static final String LATITUDE = "latitude";
     private static final String LONGITUDE = "longitude";
+    private static final String HAS_IMAGE = "hasImage";
 
     // ** Member Variables ** //
     public String trailId;
@@ -32,7 +36,7 @@ public class Guide extends BaseModelWithImage {
     public double latitude;
     public double longitude;
 
-    private GpxFile gpxFile;
+    private Uri gpxUri;
 
     /**
      * Default constructor required for Firebase Database
@@ -101,15 +105,51 @@ public class Guide extends BaseModelWithImage {
         map.put(REVIEWS, reviews);
         map.put(LATITUDE, latitude);
         map.put(LONGITUDE, longitude);
+        map.put(HAS_IMAGE, hasImage);
 
         return map;
     }
 
-    public void setGpxFile(GpxFile gpxFile) {
-        this.gpxFile = gpxFile;
+    /**
+     * Sets the Uri describing a GPX file
+     *
+     * @param gpxUri    Uri corresponding to the location of a GPX file.
+     */
+//    public void setGpxUri(Uri gpxUri) {
+//        this.gpxUri = gpxUri;
+//    }
+
+    /**
+     * Converts a File to a Uri to be saved as a reference to the actual GPX File so that it may be
+     * accessed later
+     *
+     * @param gpxFile    File describing the location of a GPX file
+     */
+    public void setGpxUri(File gpxFile) {
+        this.gpxUri = Uri.fromFile(gpxFile);
     }
 
+    /**
+     * Converts the Objects gpxUri to a GpxFile so that it may be uploaded to Firebase Storage
+     *
+     * @return GpxFile corresponding to the original GPX file that was set to the Guide
+     */
     public GpxFile getGpxFile() {
-        return this.gpxFile;
+        return new GpxFile(this.firebaseId, this.gpxUri.getPath());
+    }
+
+    /**
+     * Generates a new GpxFile for downloading a GpxFile from Firebase Storage
+     *
+     * @param context    Interface to global Context
+     * @return GpxFile corresponding to where the File will be downloaded to Internal Storage
+     */
+    public GpxFile generateGpxFileForDownload(Context context) {
+        // Create the GpxFile
+        GpxFile gpxFile = GpxFile.getDestinationFile(context, this.firebaseId);
+
+        // Set the gpxUri to the File's path
+        setGpxUri(gpxFile);
+        return gpxFile;
     }
 }
