@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import java.util.HashSet;
 import java.util.Set;
 
-import project.hikerguide.firebasedatabase.FirebaseProvider;
+import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.Area;
 import project.hikerguide.models.Author;
 import project.hikerguide.models.abstractmodels.BaseModel;
@@ -29,11 +29,11 @@ import static junit.framework.Assert.assertNull;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.AREA;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.AUTHOR;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.GUIDE;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.SECTION;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AUTHOR;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.SECTION;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
 
 /**
  * Created by Alvin on 7/17/2017.
@@ -43,15 +43,15 @@ import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.
 public class FirebaseDatabaseTest {
     // ** Member Variables ** //
     Context mContext;
-    FirebaseProvider mWriter;
+    DatabaseProvider mDatabase;
 
     @Before
     public void setup() {
         mContext = InstrumentationRegistry.getTargetContext();
 
-        // Store the reference to the FirebaseProvider as a mem var
-        mWriter = FirebaseProvider.getInstance();
-        mWriter.deleteAllRecords();
+        // Store the reference to the DatabaseProvider as a mem var
+        mDatabase = DatabaseProvider.getInstance();
+        mDatabase.deleteAllRecords();
     }
 
     @Test
@@ -68,7 +68,7 @@ public class FirebaseDatabaseTest {
 
         for (int i = 0; i < types.length; i++) {
             // Retrieve the Guide from the FirebaseDatabase using the guide's id
-            mWriter.getRecord(types[i], models[i].firebaseId, new FirebaseProvider.FirebaseSingleListener() {
+            mDatabase.getRecord(types[i], models[i].firebaseId, new DatabaseProvider.FirebaseSingleListener() {
                 @Override
                 public void onDataReady(BaseModel model) {
                     // Assert that all values from the returned Guide are equal to the inserted Guide's
@@ -101,7 +101,7 @@ public class FirebaseDatabaseTest {
         final Guide guide = insertGuide();
 
         // Run a GeoQuery for the lat/long of the inserted Guide
-        mWriter.geoQuery(new GeoLocation(guide.latitude, guide.longitude), 1, new FirebaseProvider.GeofireListener() {
+        mDatabase.geoQuery(new GeoLocation(guide.latitude, guide.longitude), 1, new DatabaseProvider.GeofireListener() {
             @Override
             public void onKeyEntered(String guideId) {
                 // Ensure that the query returns the inserted Guide's ID
@@ -122,10 +122,10 @@ public class FirebaseDatabaseTest {
         final Guide[] guides = TestUtilities.getGuides();
 
         // Insert
-        mWriter.insertRecord(guides);
+        mDatabase.insertRecord(guides);
 
         // Query for the latest guides
-        mWriter.getRecentGuides(new FirebaseProvider.FirebaseListener() {
+        mDatabase.getRecentGuides(new DatabaseProvider.FirebaseListener() {
             @Override
             public void onDataReady(BaseModel[] models) {
                 // Validate each returned Guide against the guides inserted
@@ -151,7 +151,7 @@ public class FirebaseDatabaseTest {
         Guide[] guides = TestUtilities.getGuides();
 
         // Insert the guides into the database
-        mWriter.insertRecord(guides);
+        mDatabase.insertRecord(guides);
 
         // Get an array of the ids of each of the guides
         String[] firebaseIds = new String[guides.length];
@@ -160,7 +160,7 @@ public class FirebaseDatabaseTest {
         }
 
         // Delete all the records from the database
-        mWriter.deleteRecords(GUIDE, firebaseIds);
+        mDatabase.deleteRecords(GUIDE, firebaseIds);
 
         try {
             Thread.sleep(1000);
@@ -169,7 +169,7 @@ public class FirebaseDatabaseTest {
         }
 
         // Check to ensure that there are no guides left in the database
-        mWriter.getRecentGuides(new FirebaseProvider.FirebaseListener() {
+        mDatabase.getRecentGuides(new DatabaseProvider.FirebaseListener() {
             @Override
             public void onDataReady(BaseModel[] models) {
                 // Verify that there are no guides returned
@@ -187,9 +187,9 @@ public class FirebaseDatabaseTest {
     @Test
     public void testSearch() {
         Area[] areas = TestUtilities.getAreas();
-        mWriter.insertRecord(areas);
+        mDatabase.insertRecord(areas);
 
-        mWriter.searchForRecords(AREA, "Grand", 5, new FirebaseProvider.FirebaseListener() {
+        mDatabase.searchForRecords(AREA, "Grand", 5, new DatabaseProvider.FirebaseListener() {
             @Override
             public void onDataReady(BaseModel[] models) {
                 Set<String> expectedNames = new HashSet();
@@ -213,35 +213,35 @@ public class FirebaseDatabaseTest {
 
     public Guide insertGuide() {
         Guide guide = TestUtilities.getGuide(mContext);
-        mWriter.insertRecord(guide);
+        mDatabase.insertRecord(guide);
 
         return guide;
     }
 
     public Trail insertTrail() {
         Trail trail = TestUtilities.getTrail();
-        mWriter.insertRecord(trail);
+        mDatabase.insertRecord(trail);
 
         return trail;
     }
 
     public Author insertAuthor() {
         Author author = TestUtilities.getAuthor(mContext);
-        mWriter.insertRecord(author);
+        mDatabase.insertRecord(author);
 
         return author;
     }
 
     public Section insertSection() {
         Section section = TestUtilities.getSection();
-        mWriter.insertRecord(section);
+        mDatabase.insertRecord(section);
 
         return section;
     }
 
     public Area insertArea() {
         Area area = TestUtilities.getArea();
-        mWriter.insertRecord(area);
+        mDatabase.insertRecord(area);
 
         return area;
     }
@@ -249,6 +249,6 @@ public class FirebaseDatabaseTest {
     @After
     public void cleanup() {
         // Delete the test guide that was previously uploaded
-        mWriter.deleteAllRecords();
+        mDatabase.deleteAllRecords();
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 
 import project.hikerguide.files.GpxFile;
 import project.hikerguide.files.ImageFile;
-import project.hikerguide.firebasedatabase.FirebaseProvider;
+import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.Area;
 import project.hikerguide.models.Author;
@@ -29,10 +29,10 @@ import project.hikerguide.utilities.SaveUtils;
 
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.AREA;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.AUTHOR;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.GUIDE;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AUTHOR;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
 
 /**
  * Tests that storage and database are properly linked
@@ -43,13 +43,13 @@ public class FirebaseTest {
 
     // ** Member Variables ** //
     private Context mContext;
-    private FirebaseProvider mDatabase;
+    private DatabaseProvider mDatabase;
     private StorageProvider mStorage;
 
     @Before
     public void setUp() {
         mContext = InstrumentationRegistry.getTargetContext();
-        mDatabase = FirebaseProvider.getInstance();
+        mDatabase = DatabaseProvider.getInstance();
         mStorage = StorageProvider.getInstance();
     }
 
@@ -70,7 +70,7 @@ public class FirebaseTest {
         SaveUtils.saveGuide(area, author, trail, guide, sections);
 
         // Check to ensure the GeoQuery returns the inserted guide
-        mDatabase.geoQuery(new GeoLocation(guide.latitude, guide.longitude), 5.0, new FirebaseProvider.GeofireListener() {
+        mDatabase.geoQuery(new GeoLocation(guide.latitude, guide.longitude), 5.0, new DatabaseProvider.GeofireListener() {
             @Override
             public void onKeyEntered(String guideId) {
                 String errorWrongId = "Id of the Guide retrieved does not match the Id of the guide added";
@@ -90,7 +90,7 @@ public class FirebaseTest {
         // Validate the database models were properly inserted
         for (int i = 0; i < types.length; i++) {
             final BaseModel expected = models[i];
-            mDatabase.getRecord(types[i], expected.firebaseId, new FirebaseProvider.FirebaseSingleListener() {
+            mDatabase.getRecord(types[i], expected.firebaseId, new DatabaseProvider.FirebaseSingleListener() {
                 @Override
                 public void onDataReady(BaseModel model) {
                     TestUtilities.validateModelValues(expected, model);
@@ -105,7 +105,7 @@ public class FirebaseTest {
 
         // Validate all the sections
         for (final Section section : sections) {
-            mDatabase.getRecord(FirebaseProvider.FirebaseType.SECTION, section.firebaseId, new FirebaseProvider.FirebaseSingleListener() {
+            mDatabase.getRecord(DatabaseProvider.FirebaseType.SECTION, section.firebaseId, new DatabaseProvider.FirebaseSingleListener() {
                 @Override
                 public void onDataReady(BaseModel model) {
                     TestUtilities.validateModelValues(section, model);
@@ -169,7 +169,7 @@ public class FirebaseTest {
 
         // Check to ensure that a new Guide can be properly created from the database record
         final Guide returnedGuide = new Guide();
-        mDatabase.geoQuery(new GeoLocation(guide.latitude, guide.longitude), 6, new FirebaseProvider.GeofireListener() {
+        mDatabase.geoQuery(new GeoLocation(guide.latitude, guide.longitude), 6, new DatabaseProvider.GeofireListener() {
             @Override
             public void onKeyEntered(String guideId) {
                 returnedGuide.firebaseId = guideId;
@@ -210,7 +210,7 @@ public class FirebaseTest {
 
         // Query the Database for all the Sections for the Guide
         final List<Section> sectionList = new ArrayList<>();
-        mDatabase.getSectionsForGuide(returnedGuide, new FirebaseProvider.FirebaseListener() {
+        mDatabase.getSectionsForGuide(returnedGuide, new DatabaseProvider.FirebaseListener() {
             @Override
             public void onDataReady(BaseModel[] models) {
                 assertThat(models.length, not(0));

@@ -4,8 +4,7 @@ import android.content.Context;
 
 import java.io.File;
 
-import project.hikerguide.R;
-import project.hikerguide.firebasedatabase.FirebaseProvider;
+import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.Area;
 import project.hikerguide.models.Author;
@@ -47,8 +46,8 @@ public class SaveUtils {
             }
         }
 
-        // Get an instance of the FirebaseProvider
-        FirebaseProvider database = FirebaseProvider.getInstance();
+        // Get an instance of the DatabaseProvider
+        DatabaseProvider database = DatabaseProvider.getInstance();
         StorageProvider storage = StorageProvider.getInstance();
 
         // Insert the Area into the Firebase Database if needed

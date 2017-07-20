@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import project.hikerguide.data.GuideDatabase;
-import project.hikerguide.firebasedatabase.FirebaseProvider;
+import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.Area;
 import project.hikerguide.models.Author;
 import project.hikerguide.models.abstractmodels.BaseModel;
@@ -15,14 +15,14 @@ import project.hikerguide.models.Section;
 import project.hikerguide.models.Trail;
 
 import static junit.framework.Assert.assertNotNull;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.AREA;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.AUTHOR;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.GUIDE;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.SECTION;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AUTHOR;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.SECTION;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
 
 /**
- * Utility class for commonly used functions for the FirebaseProvider
+ * Utility class for commonly used functions for the DatabaseProvider
  */
 
 public class FirebaseProviderUtils {
@@ -33,7 +33,7 @@ public class FirebaseProviderUtils {
      * @param type    FirebaseType
      * @return The directory that corresponds to the type
      */
-    public static String getDirectoryFromType(@FirebaseProvider.FirebaseType int type) {
+    public static String getDirectoryFromType(@DatabaseProvider.FirebaseType int type) {
         switch (type) {
             case GUIDE:
                 return GuideDatabase.GUIDES;
@@ -86,7 +86,7 @@ public class FirebaseProviderUtils {
      * @param dataSnapshot    The DataSnapShot containing children of the FirebaseType
      * @return An Array of BaseModels corresponding to the FirebaseType parameter
      */
-    public static BaseModel[] getModelsFromSnapshot(@FirebaseProvider.FirebaseType int type, DataSnapshot dataSnapshot) {
+    public static BaseModel[] getModelsFromSnapshot(@DatabaseProvider.FirebaseType int type, DataSnapshot dataSnapshot) {
         // Initialize the List that will store all the BaseModels created from the DataSnapshots
         List<BaseModel> modelList = new ArrayList<>();
 
@@ -141,7 +141,7 @@ public class FirebaseProviderUtils {
      * @param dataSnapshot    The DataSnapshot describing a BaseModel
      * @return A BaseModel with the information contained within the DataSnapshot
      */
-    public static BaseModel getModelFromSnapshot(@FirebaseProvider.FirebaseType int type, DataSnapshot dataSnapshot) {
+    public static BaseModel getModelFromSnapshot(@DatabaseProvider.FirebaseType int type, DataSnapshot dataSnapshot) {
         BaseModel model;
 
         switch (type) {

@@ -24,19 +24,19 @@ import project.hikerguide.models.Guide;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
 import static junit.framework.Assert.assertNotNull;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.AREA;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.AUTHOR;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.GUIDE;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.SECTION;
-import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AUTHOR;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.SECTION;
+import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
 
 /**
  * Created by Alvin on 7/17/2017.
  */
 
-public class FirebaseProvider {
+public class DatabaseProvider {
     // ** Constants ** //
-    private static final String TAG = FirebaseProvider.class.getSimpleName();
+    private static final String TAG = DatabaseProvider.class.getSimpleName();
     private static final String GEOFIRE_PATH = "geofire";
     private static final String GUIDE_ID = "guideId";
     private static final int GUIDE_LIMIT = 20;
@@ -51,26 +51,26 @@ public class FirebaseProvider {
     }
 
     // ** Member Variables ** //
-    private static FirebaseProvider sProvider;
+    private static DatabaseProvider sProvider;
     private DatabaseReference mDatabase;
 
     /**
      * Private Constructor to enforce Singleton pattern
      */
-    private FirebaseProvider() {
+    private DatabaseProvider() {
         if (mDatabase == null) {
             mDatabase = FirebaseDatabase.getInstance().getReference();
         }
     }
 
     /**
-     * Instantiates a FirebaseProvider if not already instantiated and returns it
+     * Instantiates a DatabaseProvider if not already instantiated and returns it
      *
-     * @return The Singleton FirebaseProvider instance
+     * @return The Singleton DatabaseProvider instance
      */
-    public static synchronized FirebaseProvider getInstance() {
+    public static synchronized DatabaseProvider getInstance() {
         if (sProvider == null) {
-            sProvider = new FirebaseProvider();
+            sProvider = new DatabaseProvider();
         }
 
         return sProvider;
