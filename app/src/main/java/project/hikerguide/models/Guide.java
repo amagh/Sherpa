@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
+import project.hikerguide.files.GpxFile;
 import project.hikerguide.models.abstractmodels.BaseModelWithImage;
 
 /**
@@ -30,6 +31,8 @@ public class Guide extends BaseModelWithImage {
     public int reviews;
     public double latitude;
     public double longitude;
+
+    private GpxFile gpxFile;
 
     /**
      * Default constructor required for Firebase Database
@@ -100,5 +103,13 @@ public class Guide extends BaseModelWithImage {
         map.put(LONGITUDE, longitude);
 
         return map;
+    }
+
+    public void setGpxFile(GpxFile gpxFile) {
+        this.gpxFile = gpxFile;
+    }
+
+    public GpxFile getGpxFile() {
+        return this.gpxFile;
     }
 }
