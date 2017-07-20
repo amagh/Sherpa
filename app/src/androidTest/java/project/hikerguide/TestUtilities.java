@@ -1,6 +1,7 @@
 package project.hikerguide;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 
 import java.lang.reflect.Field;
@@ -9,6 +10,7 @@ import java.util.Set;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.models.Area;
 import project.hikerguide.models.Author;
+import project.hikerguide.files.ImageFile;
 import project.hikerguide.models.abstractmodels.BaseModel;
 import project.hikerguide.models.Guide;
 import project.hikerguide.models.Section;
@@ -174,5 +176,11 @@ public class TestUtilities {
         Area area9 = new Area(9, "Grand Teton");
 
         return new Area[] {area1, area2, area3, area4, area5, area6, area7, area8, area9};
+    }
+
+    public static ImageFile getImageFile(Context context) {
+        ImageFile file = new ImageFile("TestId", context.getFilesDir(), "test.jpg");
+
+        return file;
     }
 }
