@@ -38,6 +38,7 @@ public class FirebaseProvider {
     // ** Constants ** //
     private static final String TAG = FirebaseProvider.class.getSimpleName();
     private static final String GEOFIRE_PATH = "geofire";
+    private static final String GUIDE_ID = "guideId";
     private static final int GUIDE_LIMIT = 20;
 
     @IntDef({GUIDE, TRAIL, AUTHOR, SECTION, AREA})
@@ -239,6 +240,30 @@ public class FirebaseProvider {
                 mDatabase.child(FirebaseProviderUtils.getDirectoryFromType(type)).removeEventListener(this);
             }
         });
+    }
+
+    /**
+     * Returns all Sections that correspond to a Guide
+     *
+     * @param guide       Guide for which the returned Sections will correspond to
+     * @param listener    To pass the Sections to the observer
+     */
+    public void getSectionsForGuide(Guide guide, final FirebaseListener listener) {
+        // Search using the guide's ID
+        mDatabase.child(GuideDatabase.SECTIONS)
+                .orderByChild(GUIDE_ID)
+                .equalTo(guide.firebaseId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        listener.onDataReady(FirebaseProviderUtils.getModelsFromSnapshot(SECTION, dataSnapshot));
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        listener.onFailure(databaseError);
+                    }
+                });
     }
 
     /**
