@@ -28,46 +28,6 @@ import static project.hikerguide.firebasedatabase.FirebaseProvider.FirebaseType.
 public class FirebaseProviderUtils {
 
     /**
-     * Saves a completed guide to the Firebase Database
-     *
-     * @param area        Area corresponding to the trail detailed by the guide
-     * @param author      Author of the guide
-     * @param trail       Trail described by the guide
-     * @param guide       The Guide data model describing the details of the guide
-     * @param sections    An Array of Section data models detailing the trail taken by the guide
-     */
-    public static void saveGuide(Area area, Author author, Trail trail, Guide guide, Section... sections) {
-        // Get an instance of the FirebaseProvider
-        FirebaseProvider provider = FirebaseProvider.getInstance();
-
-        // Insert the Area into the Firebase Database if needed
-        if (area.firebaseId == null || area.firebaseId.isEmpty()) {
-            provider.insertRecord(area);
-        }
-
-        // Insert the Trail into the Firebase Database if needed
-        if (trail.firebaseId == null || trail.firebaseId.isEmpty()) {
-            trail.areaId = area.firebaseId;
-            provider.insertRecord(trail);
-        }
-
-        // Insert the Guide into the Firebase Database if needed
-        if (guide.firebaseId == null || trail.firebaseId.isEmpty()) {
-            guide.trailId = trail.firebaseId;
-            guide.authorId = author.firebaseId;
-            provider.insertRecord(guide);
-        }
-
-        // Set the guideId in each Section
-        for (Section section: sections) {
-            section.guideId = guide.firebaseId;
-        }
-
-        // Insert all Sections into the Firebase Database
-        provider.insertRecord(sections);
-    }
-
-    /**
      * Helper method for getting the directory of a type
      *
      * @param type    FirebaseType
