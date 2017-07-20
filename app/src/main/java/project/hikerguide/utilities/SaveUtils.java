@@ -18,6 +18,9 @@ import project.hikerguide.models.Trail;
  */
 
 public class SaveUtils {
+    // ** Constants ** //
+    public static final String GPX_PATH = "/gpx";
+    public static final String IMAGE_PATH = "/images";
 
     /**
      * Saves a completed guide to the Firebase Database
@@ -80,8 +83,7 @@ public class SaveUtils {
         database.insertRecord(sections);
 
         for (Section section : sections) {
-            if (section.getImageFile() != null) {
-
+            if (section.hasImage) {
                 storage.uploadFile(section.getImageFile());
             }
         }
@@ -95,12 +97,10 @@ public class SaveUtils {
      */
     public static void makeSubdirectories(Context context) {
         // Create the File for the image directory
-        String imagePath = context.getString(R.string.image_directory);
-        File imageDir = new File(context.getFilesDir() + imagePath);
+        File imageDir = new File(context.getFilesDir() + IMAGE_PATH);
 
         // Create a File for the gpx directory
-        String gpxPath = context.getString(R.string.gpx_directory);
-        File gpxDir = new File(context.getFilesDir() + gpxPath);
+        File gpxDir = new File(context.getFilesDir() + GPX_PATH);
 
         // Check to see whether the directories have been created and create them if needed
         if (!imageDir.exists()) {
