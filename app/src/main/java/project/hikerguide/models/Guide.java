@@ -19,22 +19,32 @@ import project.hikerguide.models.abstractmodels.BaseModelWithImage;
 public class Guide extends BaseModelWithImage {
     // ** Constants ** //
     private static final String TRAIL_ID = "trailId";
+    private static final String TRAIL_NAME = "trailName";
     private static final String AUTHOR_ID = "authorId";
+    private static final String AUTHOR_NAME = "authorName";
     private static final String DATE_ADDED = "dateAdded";
     private static final String RATING = "rating";
     private static final String REVIEWS = "reviews";
     private static final String LATITUDE = "latitude";
     private static final String LONGITUDE = "longitude";
     private static final String HAS_IMAGE = "hasImage";
+    private static final String DISTANCE = "distance";
+    private static final String DIFFICULTY = "difficulty";
+    private static final String AREA = "area";
 
     // ** Member Variables ** //
     public String trailId;
+    public String trailName;
     public String authorId;
+    public String authorName;
     public long dateAdded;
     public double rating;
     public int reviews;
     public double latitude;
     public double longitude;
+    public double distance;
+    public String difficulty;
+    public String area;
 
     private Uri gpxUri;
 
@@ -99,13 +109,18 @@ public class Guide extends BaseModelWithImage {
 
         map.put(ID, id);
         map.put(TRAIL_ID, trailId);
+        map.put(TRAIL_NAME, trailName);
         map.put(AUTHOR_ID, authorId);
+        map.put(AUTHOR_NAME, authorName);
         map.put(DATE_ADDED, dateAdded);
         map.put(RATING, rating);
         map.put(REVIEWS, reviews);
         map.put(LATITUDE, latitude);
         map.put(LONGITUDE, longitude);
         map.put(HAS_IMAGE, hasImage);
+        map.put(DISTANCE, distance);
+        map.put(DIFFICULTY, difficulty);
+        map.put(AREA, area);
 
         return map;
     }

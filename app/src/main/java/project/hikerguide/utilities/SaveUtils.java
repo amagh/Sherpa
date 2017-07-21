@@ -64,7 +64,9 @@ public class SaveUtils {
         // Insert the Guide into the Firebase Database if needed
         if (guide.firebaseId == null || trail.firebaseId.isEmpty()) {
             guide.trailId = trail.firebaseId;
+            guide.trailName = trail.name;
             guide.authorId = author.firebaseId;
+            guide.authorName = author.name;
             database.insertRecord(guide);
 
             // Upload the Image and Gpx File associated with the Guide

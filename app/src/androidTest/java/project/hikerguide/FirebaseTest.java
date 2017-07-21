@@ -221,4 +221,20 @@ public class FirebaseTest {
         mStorage.deleteFile(returnedGuide.getImageFile());
         mStorage.deleteFile(author.getImageFile());
     }
+
+    @Test
+    public void insertTestValues() {
+        // Generate data models to insert
+        final Area area = TestUtilities.getArea();
+        final Author author = TestUtilities.getAuthor(mContext);
+        final Trail trail = TestUtilities.getTrail();
+        final Guide guide = TestUtilities.getGuide(mContext);
+        Section[] sections = TestUtilities.getSections(mContext);
+
+        // Insert data into the database and storage
+        mDatabase.insertRecord(author);
+        mStorage.uploadFile(author.getImageFile());
+
+        SaveUtils.saveGuide(area, author, trail, guide, sections);
+    }
 }
