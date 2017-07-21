@@ -6,4 +6,13 @@
 
     <string name="image_directory">/images</string>
     <string name="gpx_directory">/gpx</string>
+
+    <string name="list_guide_title_text">Four Mile Trail</string>
+    <string name="list_guide_area_text">Yosemite Valley</string>
+    <string name="list_guide_distance_text">9.6 miles</string>
+    <string name="list_guide_rating_text">4.8\u2605</string>
+    <string name="list_guide_reviews_text">(45)</string>
+    <string name="list_guide_difficulty_text">Moderate</string>
+    <string name="list_guide_author_text">Christa</string>
+    <string name="list_guide_author_score_text">1200 pts</string>
 </resources>
