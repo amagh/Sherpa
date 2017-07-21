@@ -1,4 +1,4 @@
-package project.hikerguide.models.abstractmodels;
+package project.hikerguide.models.datamodels.abstractmodels;
 
 import java.util.Map;
 

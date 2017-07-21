@@ -7,12 +7,12 @@ import java.util.List;
 
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
-import project.hikerguide.models.Area;
-import project.hikerguide.models.Author;
-import project.hikerguide.models.abstractmodels.BaseModel;
-import project.hikerguide.models.Guide;
-import project.hikerguide.models.Section;
-import project.hikerguide.models.Trail;
+import project.hikerguide.models.datamodels.Area;
+import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
+import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.models.datamodels.Section;
+import project.hikerguide.models.datamodels.Trail;
 
 import static junit.framework.Assert.assertNotNull;
 import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;

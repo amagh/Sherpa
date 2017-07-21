@@ -1,4 +1,4 @@
-package project.hikerguide.models;
+package project.hikerguide.models.datamodels;
 
 import android.database.Cursor;
 
@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
-import project.hikerguide.models.abstractmodels.BaseModelWithImage;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 
 /**
  * Created by Alvin on 7/17/2017.
@@ -66,7 +66,7 @@ public class Section extends BaseModelWithImage {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(ID, id);
+        map.put(project.hikerguide.models.abstractmodels.BaseModel.ID, id);
         map.put(GUIDE_ID, guideId);
         map.put(SECTION, section);
         map.put(CONTENT, content);

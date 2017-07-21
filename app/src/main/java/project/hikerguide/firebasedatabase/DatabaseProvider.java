@@ -21,9 +21,9 @@ import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
-import project.hikerguide.models.Section;
-import project.hikerguide.models.abstractmodels.BaseModel;
-import project.hikerguide.models.Guide;
+import project.hikerguide.models.datamodels.Section;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
+import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
 import static junit.framework.Assert.assertNotNull;

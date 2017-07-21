@@ -1,4 +1,4 @@
-package project.hikerguide.models.abstractmodels;
+package project.hikerguide.models.datamodels.abstractmodels;
 
 import android.content.Context;
 import android.net.Uri;

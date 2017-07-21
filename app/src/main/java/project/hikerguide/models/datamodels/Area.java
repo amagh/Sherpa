@@ -1,4 +1,4 @@
-package project.hikerguide.models;
+package project.hikerguide.models.datamodels;
 
 import android.database.Cursor;
 
@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
-import project.hikerguide.models.abstractmodels.BaseModel;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 
 /**
  * Created by Alvin on 7/18/2017.

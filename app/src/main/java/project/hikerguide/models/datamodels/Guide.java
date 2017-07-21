@@ -1,4 +1,4 @@
-package project.hikerguide.models;
+package project.hikerguide.models.datamodels;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.files.GpxFile;
-import project.hikerguide.models.abstractmodels.BaseModelWithImage;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 
 /**
  * Created by Alvin on 7/17/2017.
@@ -107,7 +107,7 @@ public class Guide extends BaseModelWithImage {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(ID, id);
+        map.put(project.hikerguide.models.abstractmodels.BaseModel.ID, id);
         map.put(TRAIL_ID, trailId);
         map.put(TRAIL_NAME, trailName);
         map.put(AUTHOR_ID, authorId);
