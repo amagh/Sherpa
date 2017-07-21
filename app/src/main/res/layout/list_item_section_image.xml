@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/guide_details_section_margin"
+        android:layout_marginBottom="@dimen/guide_details_section_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin">
+
+        <ImageView
+            android:id="@+id/list_section_image_iv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/placeholder_section_image"/>
+
+        <TextView
+            android:id="@+id/list_section_image_caption_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Caption"
+            android:textStyle="italic"
+            app:layout_constraintTop_toBottomOf="@id/list_section_image_iv"
+            android:layout_marginTop="@dimen/text_vertical_margin"
+            tools:text="@string/list_section_image_caption_text"/>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

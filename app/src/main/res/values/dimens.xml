@@ -10,6 +10,7 @@
     <dimen name="card_vertical_separation">8dp</dimen>
     
     <dimen name="text_horizontal_margin">4dp</dimen>
+    <dimen name="text_vertical_margin">4dp</dimen>
 
     <dimen name="list_guide_author_pic_size">32dp</dimen>
     <dimen name="list_guide_favorite_size">32dp</dimen>
