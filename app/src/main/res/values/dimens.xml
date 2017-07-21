@@ -4,6 +4,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="guide_details_section_margin">8dp</dimen>
+    <dimen name="guide_details_internal_vertical_margin">8dp</dimen>
     
     <dimen name="card_vertical_padding">8dp</dimen>
     <dimen name="card_bottom_padding">8dp</dimen>
@@ -16,6 +17,9 @@
     <dimen name="list_guide_favorite_size">32dp</dimen>
     <dimen name="list_guide_favorite_padding">6dp</dimen>
     <dimen name="list_guide_favorite_end_margin">10dp</dimen>
+
+    <dimen name="list_guide_details_map_height">200dp</dimen>
+    <dimen name="list_guide_details_graph_height">100dp</dimen>
 
     <dimen name="block_text_line_spacing">1dp</dimen>
 </resources>
