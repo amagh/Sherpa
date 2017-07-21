@@ -117,7 +117,7 @@ public class ContentProviderTest {
             assertTrue(emptyCursor, cursor.moveToFirst());
 
             // Assert the Cursor contains as many columns as all the joined tables combined
-            assertEquals(22, cursor.getColumnCount());
+            assertEquals(26, cursor.getColumnCount());
         } finally {
             // Close the Cursor
             cursor.close();

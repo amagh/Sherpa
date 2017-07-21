@@ -98,7 +98,7 @@ class TestUtilities {
     static ContentValues getAuthorValues() {
         ContentValues values = new ContentValues();
         values.put(GuideContract.AuthorEntry.NAME, "John Muir");
-        values.put(GuideContract.AuthorEntry.PROFILE_PICTURE, "Firebase Profile URI");
+        values.put(GuideContract.AuthorEntry.HAS_IMAGE, 1);
         values.put(GuideContract.AuthorEntry.SCORE, 100);
 
         return values;
@@ -118,8 +118,7 @@ class TestUtilities {
         values.put(GuideContract.GuideEntry.AUTHOR_ID, 1);
         values.put(GuideContract.GuideEntry.TRAIL_ID, 1);
         values.put(GuideContract.GuideEntry.DATE_ADDED, System.currentTimeMillis());
-//        values.put(GuideContract.GuideEntry.GPX, "Firebase GPX URI");
-//        values.put(GuideContract.GuideEntry.IMAGE, "Firebase Image URI");
+        values.put(GuideContract.GuideEntry.HAS_IMAGE, 1);
         values.put(GuideContract.GuideEntry.LATITUDE, 37.734);
         values.put(GuideContract.GuideEntry.LONGITUDE, -119.602);
         values.put(GuideContract.GuideEntry.RATING, 5);
@@ -133,6 +132,7 @@ class TestUtilities {
         values.put(GuideContract.SectionEntry.GUIDE_ID, 1);
         values.put(GuideContract.SectionEntry.SECTION, 1);
         values.put(GuideContract.SectionEntry.CONTENT, "Description of the hike");
+        values.put(GuideContract.SectionEntry.HAS_IMAGE, 1);
 
         return values;
     }

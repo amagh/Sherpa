@@ -32,7 +32,7 @@ public class GuideContract {
 //        @DataType(DataType.Type.TEXT) @NotNull String GPX                           = "gpx";
         @DataType(DataType.Type.REAL) @NotNull String LATITUDE                      = "latitude";
         @DataType(DataType.Type.REAL) @NotNull String LONGITUDE                     = "longitude";
-//        @DataType(DataType.Type.TEXT) @NotNull String IMAGE                         = "image";
+        @DataType(DataType.Type.INTEGER) @NotNull String HAS_IMAGE                  = "has_image";
     }
 
     public interface TrailEntry {
@@ -51,7 +51,7 @@ public class GuideContract {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
         @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebase_id";
         @DataType(DataType.Type.TEXT) @NotNull String NAME                          = "name";
-        @DataType(DataType.Type.TEXT) String PROFILE_PICTURE                        = "profile_pic";
+        @DataType(DataType.Type.INTEGER) @NotNull String HAS_IMAGE                  = "has_image";
         @DataType(DataType.Type.INTEGER) String SCORE                               = "score";
     }
 
@@ -65,6 +65,7 @@ public class GuideContract {
         
         @DataType(DataType.Type.INTEGER) @NotNull String SECTION                    = "section";
         @DataType(DataType.Type.TEXT) @NotNull String CONTENT                       = "content";
+        @DataType(DataType.Type.INTEGER) @NotNull String HAS_IMAGE                  = "has_image";
     }
 
     public interface AreaEntry {
