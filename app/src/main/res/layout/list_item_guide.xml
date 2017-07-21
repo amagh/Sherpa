@@ -107,7 +107,7 @@
                 app:layout_constraintLeft_toRightOf="@id/list_guide_author_iv"
                 app:layout_constraintTop_toTopOf="@id/list_guide_author_iv"
                 app:layout_constraintBottom_toTopOf="@+id/list_guide_author_score_tv"
-                tools:text="@string/list_guide_author_text"/>
+                tools:text="@string/list_author_text"/>
 
             <TextView
                 android:id="@+id/list_guide_author_score_tv"
@@ -117,7 +117,7 @@
                 app:layout_constraintLeft_toLeftOf="@id/list_guide_author_tv"
                 app:layout_constraintTop_toBottomOf="@id/list_guide_author_tv"
                 app:layout_constraintBottom_toBottomOf="@+id/list_guide_author_iv"
-                tools:text="@string/list_guide_author_score_text"/>
+                tools:text="@string/list_author_score_text"/>
 
             <ImageView
                 android:id="@+id/list_guide_favorite_btn"
