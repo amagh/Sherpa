@@ -1,7 +1,7 @@
 package project.hikerguide.firebasedatabase;
 
+import android.net.Uri;
 import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
 import com.firebase.geofire.GeoFire;
@@ -14,11 +14,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
+import project.hikerguide.models.Section;
 import project.hikerguide.models.abstractmodels.BaseModel;
 import project.hikerguide.models.Guide;
 import project.hikerguide.utilities.FirebaseProviderUtils;
@@ -31,7 +34,12 @@ import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.
 import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
 
 /**
- * Created by Alvin on 7/17/2017.
+ * The Provider that will be used to interface with Firebase Database.
+ *
+ * Always access these methods on a separate thread. The thread accessing these methods will be
+ * blocked until results are returned.
+ *
+ * * * * * * * * * * * * * * * * DO NOT USE ON UI THREAD * * * * * * * * * * * * * * * * * * * * * *
  */
 
 public class DatabaseProvider {
@@ -85,7 +93,7 @@ public class DatabaseProvider {
      *
      * @param models    The data model Object describing the information to add to the database
      */
-    public BaseModel[] insertRecord(BaseModel... models) {
+    public void insertRecord(BaseModel... models) {
 
         // Init the Map that will be used to insert values into the Firebase Database
         Map<String, Object> childUpdates = new HashMap<>();
@@ -120,7 +128,6 @@ public class DatabaseProvider {
         }
 
         mDatabase.updateChildren(childUpdates);
-        return models;
     }
 
     /**
@@ -128,9 +135,11 @@ public class DatabaseProvider {
      *
      * @param type        The Firebase type corresponding to the data model to be retrieved
      * @param firebaseId  ID of the Guide to retrieve
-     * @param listener    Listener to pass the instance of the Guide that was retrieved
+     * @return The model matching the firebaseId in the signature
      */
-    public void getRecord(@FirebaseType final int type, final String firebaseId, @NonNull final FirebaseSingleListener listener) {
+    public BaseModel getRecord(@FirebaseType final int type, final String firebaseId) {
+
+        final DatabaseListener listener = new DatabaseListener();
 
         // Initialize the child variable that will be used as the directory to retrieve the data
         // from the Firebase Database
@@ -144,7 +153,7 @@ public class DatabaseProvider {
                 BaseModel model = FirebaseProviderUtils.getModelFromSnapshot(type, dataSnapshot);
 
                 // Inform the observer that the model is ready
-                listener.onDataReady(model);
+                listener.onSuccess(model);
 
                 mDatabase.child(directory).child(firebaseId).removeEventListener(this);
             }
@@ -155,14 +164,20 @@ public class DatabaseProvider {
                 mDatabase.child(directory).child(firebaseId).removeEventListener(this);
             }
         });
+
+        listener.pauseUntilComplete();
+        return listener.getModel();
     }
 
     /**
      * Retrieves a List of Guides that were most recently added to the database
      *
-     * @param listener    The listener used to pass the List of Guides returned from the database
+     * @return The most recently added Guides in the Firebase Database
      */
-    public void getRecentGuides(final FirebaseListener listener) {
+    public Guide[] getRecentGuides() {
+
+        final DatabaseListener listener = new DatabaseListener();
+
         // Query for the most recent guides
         mDatabase.child(GuideDatabase.GUIDES)
                 .orderByChild(GuideContract.GuideEntry.DATE_ADDED)
@@ -172,7 +187,7 @@ public class DatabaseProvider {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Guide[] guides = (Guide[]) FirebaseProviderUtils.getModelsFromSnapshot(GUIDE, dataSnapshot);
 
-                listener.onDataReady(guides);
+                listener.onSuccess(guides);
                 mDatabase.child(GuideDatabase.GUIDES).removeEventListener(this);
             }
 
@@ -182,6 +197,10 @@ public class DatabaseProvider {
                 mDatabase.child(GuideDatabase.GUIDES).removeEventListener(this);
             }
         });
+
+        listener.pauseUntilComplete();
+
+        return (Guide[]) listener.getModels();
     }
 
     /**
@@ -206,10 +225,11 @@ public class DatabaseProvider {
      * @param type        The FirebaseType to query for
      * @param query       The input String to search for
      * @param limit       The max number of items to return
-     * @param listener    Notifies the observer of the results
+     *
+     * @return The BaseModels that match the query
      */
-    public void searchForRecords(@FirebaseType final int type, String query, int limit, final FirebaseListener listener) {
-        // Convert the query to lowercase because Firebase's sorting fucntion is case-sensitive
+    public BaseModel[] searchForRecords(@FirebaseType final int type, String query, int limit) {
+        // Convert the query to lowercase because Firebase's sorting function is case-sensitive
         query = query.toLowerCase();
 
         // Make the end limit of the sorting function only return items that start with the query
@@ -219,6 +239,8 @@ public class DatabaseProvider {
         // e.g. Query: "yose" -> End: "yosez" -> This will return all results from "yosea" to
         // "yosez" including "yosemite"
         String endString = query + "z";
+
+        final DatabaseListener listener = new DatabaseListener();
 
         // Query the database, ordering by the lowerCaseName key
         mDatabase.child(FirebaseProviderUtils.getDirectoryFromType(type))
@@ -230,7 +252,7 @@ public class DatabaseProvider {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Notify the observer of the results
-                listener.onDataReady(FirebaseProviderUtils.getModelsFromSnapshot(type, dataSnapshot));
+                listener.onSuccess(FirebaseProviderUtils.getModelsFromSnapshot(type, dataSnapshot));
                 mDatabase.child(FirebaseProviderUtils.getDirectoryFromType(type)).removeEventListener(this);
             }
 
@@ -240,15 +262,21 @@ public class DatabaseProvider {
                 mDatabase.child(FirebaseProviderUtils.getDirectoryFromType(type)).removeEventListener(this);
             }
         });
+
+        listener.pauseUntilComplete();
+
+        return listener.getModels();
     }
 
     /**
      * Returns all Sections that correspond to a Guide
      *
      * @param guide       Guide for which the returned Sections will correspond to
-     * @param listener    To pass the Sections to the observer
+     * @return The Sections that belong to the Guide in the signature
      */
-    public void getSectionsForGuide(Guide guide, final FirebaseListener listener) {
+    public Section[] getSectionsForGuide(Guide guide) {
+        final DatabaseListener listener2 = new DatabaseListener();
+
         // Search using the guide's ID
         mDatabase.child(GuideDatabase.SECTIONS)
                 .orderByChild(GUIDE_ID)
@@ -256,14 +284,18 @@ public class DatabaseProvider {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        listener.onDataReady(FirebaseProviderUtils.getModelsFromSnapshot(SECTION, dataSnapshot));
+                        listener2.onSuccess(FirebaseProviderUtils.getModelsFromSnapshot(SECTION, dataSnapshot));
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        listener.onFailure(databaseError);
+                        listener2.onFailure(databaseError);
                     }
                 });
+
+        listener2.pauseUntilComplete();
+
+        return (Section[]) listener2.getModels();
     }
 
     /**
@@ -274,6 +306,7 @@ public class DatabaseProvider {
      * @param listener    GeofireListener to inform the observer which guides are in the area
      */
     public void geoQuery(GeoLocation location, double radius, final GeofireListener listener) {
+
         // Get a reference to the child for Geofire
         DatabaseReference firebaseRef = mDatabase.child(GEOFIRE_PATH);
         GeoFire geofire = new GeoFire(firebaseRef);
@@ -319,18 +352,126 @@ public class DatabaseProvider {
         mDatabase.child(GEOFIRE_PATH).removeValue();
     }
 
-    public interface FirebaseSingleListener {
-        void onDataReady(BaseModel model);
-        void onFailure(DatabaseError databaseError);
-    }
-
-    public interface FirebaseListener {
-        void onDataReady(BaseModel[] models);
-        void onFailure(DatabaseError databaseError);
-    }
+//    public interface FirebaseSingleListener {
+//        void onDataReady(BaseModel model);
+//        void onFailure(DatabaseError databaseError);
+//    }
+//
+//    public interface DatabaseListener {
+//        void onDataReady(BaseModel[] models);
+//        void onFailure(DatabaseError databaseError);
+//    }
 
     public interface GeofireListener {
         void onKeyEntered(String guideId);
         void onFailure(DatabaseError databaseError);
+    }
+
+    public class DatabaseListener {
+        // ** Member Variables ** //
+        private boolean status = false;
+        private boolean complete = false;
+        private BaseModel model;
+        private BaseModel[] models;
+        private List<BaseModel> modelList;
+        private Uri uri;
+
+        /**
+         * To be called when an operation is successful.
+         */
+        public synchronized void onSuccess() {
+            // Set the member variables to reflect the status of the operation
+            status = true;
+            complete = true;
+
+            models = new BaseModel[modelList.size()];
+            modelList.toArray(models);
+
+            // Notify any paused threads that the operation is complete
+            notifyAll();
+        }
+
+        /**
+         * To be called when an operation is successful.
+         */
+        public synchronized void onSuccess(BaseModel model) {
+            // Set the member variables to reflect the status of the operation
+            status = true;
+            complete = true;
+            this.model = model;
+
+            // Notify any paused threads that the operation is complete
+            notifyAll();
+        }
+
+        /**
+         * To be called when an operation is successful.
+         */
+        public synchronized void onSuccess(BaseModel[] models) {
+            // Set the member variables to reflect the status of the operation
+            status = true;
+            complete = true;
+            this.models = models;
+
+            // Notify any paused threads that the operation is complete
+            notifyAll();
+        }
+
+        public void addModel(BaseModel model) {
+            if (modelList == null) {
+                modelList = new ArrayList<>();
+            }
+
+            modelList.add(model);
+        }
+
+        public synchronized void onFailure(DatabaseError e) {
+            // Set the member variables to reflect the status of the operation
+            status = false;
+            complete = true;
+
+            // Notify any paused threads that the operation is complete
+            notifyAll();
+        }
+
+        /**
+         * Pauses the calling thread until the operation is complete
+         */
+        public synchronized void pauseUntilComplete() {
+            // Do not continue until the operation is complete
+            while (!complete) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        /**
+         * Gives the boolean status for whether the operation was successful
+         *
+         * @return True if successful. False if unsuccessful.
+         */
+        public boolean getStatus() {
+            return status;
+        }
+
+        /**
+         * Returns the Uri corresponding to the download link for a File
+         *
+         * @return Uri corresponding to the download link for a File
+         */
+        public Uri getDownloadUri() {
+            return uri;
+        }
+
+        public BaseModel getModel(){
+            return this.model;
+        }
+
+        public BaseModel[] getModels() {
+            return this.models;
+        }
     }
 }

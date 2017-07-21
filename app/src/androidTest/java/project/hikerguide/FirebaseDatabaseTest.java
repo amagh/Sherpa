@@ -68,29 +68,21 @@ public class FirebaseDatabaseTest {
 
         for (int i = 0; i < types.length; i++) {
             // Retrieve the Guide from the FirebaseDatabase using the guide's id
-            mDatabase.getRecord(types[i], models[i].firebaseId, new DatabaseProvider.FirebaseSingleListener() {
-                @Override
-                public void onDataReady(BaseModel model) {
-                    // Assert that all values from the returned Guide are equal to the inserted Guide's
-                    // values
-                    if (model instanceof Guide) {
-                        TestUtilities.validateModelValues(guide, model);
-                    } else if (model instanceof Trail) {
-                        TestUtilities.validateModelValues(trail, model);
-                    } else if (model instanceof Author) {
-                        TestUtilities.validateModelValues(author, model);
-                    } else if (model instanceof Section) {
-                        TestUtilities.validateModelValues(section, model);
-                    } else if (model instanceof Area) {
-                        TestUtilities.validateModelValues(area, model);
-                    }
-                }
+            BaseModel model = mDatabase.getRecord(types[i], models[i].firebaseId);
 
-                @Override
-                public void onFailure(DatabaseError databaseError) {
-                    assertNull(databaseError.getMessage(), databaseError);
-                }
-            });
+            // Assert that all values from the returned Guide are equal to the inserted Guide's
+            // values
+            if (model instanceof Guide) {
+                TestUtilities.validateModelValues(guide, model);
+            } else if (model instanceof Trail) {
+                TestUtilities.validateModelValues(trail, model);
+            } else if (model instanceof Author) {
+                TestUtilities.validateModelValues(author, model);
+            } else if (model instanceof Section) {
+                TestUtilities.validateModelValues(section, model);
+            } else if (model instanceof Area) {
+                TestUtilities.validateModelValues(area, model);
+            }
         }
     }
 
@@ -125,24 +117,15 @@ public class FirebaseDatabaseTest {
         mDatabase.insertRecord(guides);
 
         // Query for the latest guides
-        mDatabase.getRecentGuides(new DatabaseProvider.FirebaseListener() {
-            @Override
-            public void onDataReady(BaseModel[] models) {
-                // Validate each returned Guide against the guides inserted
-                for (BaseModel model : models) {
-                    for (Guide guide : guides) {
-                        if (guide.firebaseId.equals(model.firebaseId)) {
-                            TestUtilities.validateModelValues(guide, model);
-                        }
-                    }
+        Guide[] returnedGuides = mDatabase.getRecentGuides();
+
+        for (Guide returnedGuide : returnedGuides) {
+            for (Guide guide : returnedGuides) {
+                if (guide.firebaseId.equals(returnedGuide.firebaseId)) {
+                    TestUtilities.validateModelValues(guide, returnedGuide);
                 }
             }
-
-            @Override
-            public void onFailure(DatabaseError databaseError) {
-                assertNull(databaseError.getMessage(), databaseError);
-            }
-        });
+        }
     }
 
     @Test
@@ -169,19 +152,11 @@ public class FirebaseDatabaseTest {
         }
 
         // Check to ensure that there are no guides left in the database
-        mDatabase.getRecentGuides(new DatabaseProvider.FirebaseListener() {
-            @Override
-            public void onDataReady(BaseModel[] models) {
-                // Verify that there are no guides returned
-                String errorNotEmpty = "The size of the returned guide list is greater than 0";
-                assertEquals(errorNotEmpty, 0, models.length);
-            }
+        BaseModel[] models = mDatabase.getRecentGuides();
 
-            @Override
-            public void onFailure(DatabaseError databaseError) {
-                assertNull(databaseError.getMessage(), databaseError);
-            }
-        });
+        // Verify that there are no guides returned
+        String errorNotEmpty = "The size of the returned guide list is greater than 0";
+        assertEquals(errorNotEmpty, 0, models.length);
     }
 
     @Test
@@ -189,26 +164,18 @@ public class FirebaseDatabaseTest {
         Area[] areas = TestUtilities.getAreas();
         mDatabase.insertRecord(areas);
 
-        mDatabase.searchForRecords(AREA, "Grand", 5, new DatabaseProvider.FirebaseListener() {
-            @Override
-            public void onDataReady(BaseModel[] models) {
-                Set<String> expectedNames = new HashSet();
-                expectedNames.add("Grand Canyon");
-                expectedNames.add("Grand Teton");
+        BaseModel[] models = mDatabase.searchForRecords(AREA, "Grand", 5);
 
-                for (BaseModel model : models) {
-                    expectedNames.remove(((Area) model).name);
-                }
+        Set<String> expectedNames = new HashSet();
+        expectedNames.add("Grand Canyon");
+        expectedNames.add("Grand Teton");
 
-                String errorWrongNames = "The search query did not return all the names expected.";
-                assertEmpty(errorWrongNames, expectedNames);
-            }
+        for (BaseModel model : models) {
+            expectedNames.remove(((Area) model).name);
+        }
 
-            @Override
-            public void onFailure(DatabaseError databaseError) {
-                assertNull(databaseError.getMessage(), databaseError);
-            }
-        });
+        String errorWrongNames = "The search query did not return all the names expected.";
+        assertEmpty(errorWrongNames, expectedNames);
     }
 
     public Guide insertGuide() {

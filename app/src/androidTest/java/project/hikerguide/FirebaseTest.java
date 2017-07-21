@@ -90,32 +90,15 @@ public class FirebaseTest {
         // Validate the database models were properly inserted
         for (int i = 0; i < types.length; i++) {
             final BaseModel expected = models[i];
-            mDatabase.getRecord(types[i], expected.firebaseId, new DatabaseProvider.FirebaseSingleListener() {
-                @Override
-                public void onDataReady(BaseModel model) {
-                    TestUtilities.validateModelValues(expected, model);
-                }
 
-                @Override
-                public void onFailure(DatabaseError databaseError) {
-
-                }
-            });
+            BaseModel model = mDatabase.getRecord(types[i], expected.firebaseId);
+            TestUtilities.validateModelValues(expected, model);
         }
 
         // Validate all the sections
         for (final Section section : sections) {
-            mDatabase.getRecord(DatabaseProvider.FirebaseType.SECTION, section.firebaseId, new DatabaseProvider.FirebaseSingleListener() {
-                @Override
-                public void onDataReady(BaseModel model) {
-                    TestUtilities.validateModelValues(section, model);
-                }
-
-                @Override
-                public void onFailure(DatabaseError databaseError) {
-
-                }
-            });
+            BaseModel model = mDatabase.getRecord(DatabaseProvider.FirebaseType.SECTION, section.firebaseId);
+            TestUtilities.validateModelValues(section, model);
         }
 
         // Check to ensure the uploaded GpxFile exists
@@ -209,34 +192,10 @@ public class FirebaseTest {
         imageFile.delete();
 
         // Query the Database for all the Sections for the Guide
-        final List<Section> sectionList = new ArrayList<>();
-        mDatabase.getSectionsForGuide(returnedGuide, new DatabaseProvider.FirebaseListener() {
-            @Override
-            public void onDataReady(BaseModel[] models) {
-                assertThat(models.length, not(0));
-
-                for (Section section : (Section[]) models) {
-                    sectionList.add(section);
-                }
-            }
-
-            @Override
-            public void onFailure(DatabaseError databaseError) {
-                assertNull(databaseError);
-            }
-        });
-
-        // Wait to ensure that the query returns all the Sections
-        while(sectionList.size() == 0) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        Section[] returnedSections = mDatabase.getSectionsForGuide(returnedGuide);
 
         // Download and check the file sizes of the images associated with each Section
-        for (Section returnedSection : sectionList) {
+        for (Section returnedSection : returnedSections) {
             if (!returnedSection.hasImage) {
                 continue;
             }

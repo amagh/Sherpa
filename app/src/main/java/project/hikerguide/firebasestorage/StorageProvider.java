@@ -22,7 +22,12 @@ import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileTyp
 import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileType.IMAGE_FILE;
 
 /**
- * Created by Alvin on 7/18/2017.
+ * The Provider that will be used to interface with Firebase Storage.
+ *
+ * Always access these methods on a separate thread. The thread accessing these methods will be
+ * blocked until the download/upload completes.
+ *
+ * * * * * * * * * * * * * * * * DO NOT USE ON UI THREAD * * * * * * * * * * * * * * * * * * * * * *
  */
 
 public class StorageProvider {
