@@ -66,7 +66,7 @@ public class Section extends BaseModelWithImage {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(project.hikerguide.models.abstractmodels.BaseModel.ID, id);
+        map.put(ID, id);
         map.put(GUIDE_ID, guideId);
         map.put(SECTION, section);
         map.put(CONTENT, content);

@@ -107,7 +107,7 @@ public class Guide extends BaseModelWithImage {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(project.hikerguide.models.abstractmodels.BaseModel.ID, id);
+        map.put(ID, id);
         map.put(TRAIL_ID, trailId);
         map.put(TRAIL_NAME, trailName);
         map.put(AUTHOR_ID, authorId);

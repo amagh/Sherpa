@@ -61,7 +61,7 @@ public class Author extends BaseModelWithImage {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(project.hikerguide.models.abstractmodels.BaseModel.ID, id);
+        map.put(ID, id);
         map.put(NAME, name);
         map.put(LOWER_CASE_NAME, name.toLowerCase());
         map.put(HAS_IMAGE, hasImage);
