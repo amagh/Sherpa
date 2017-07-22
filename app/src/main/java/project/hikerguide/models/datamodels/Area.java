@@ -22,8 +22,7 @@ public class Area extends BaseModel {
 
     public Area() {}
 
-    public Area(long id, String name) {
-        this.id = id;
+    public Area(String name) {
         this.name = name;
     }
 
@@ -43,14 +42,13 @@ public class Area extends BaseModel {
         String name = cursor.getString(idxName);
 
         // Create a new Area with the values
-        return new Area(id, name);
+        return new Area(name);
     }
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(ID, id);
         map.put(NAME, name);
         map.put(LOWER_CASE_NAME, name.toLowerCase());
 

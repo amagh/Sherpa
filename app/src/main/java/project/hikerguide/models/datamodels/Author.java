@@ -25,14 +25,12 @@ public class Author extends BaseModelWithImage {
 
     public Author() {}
 
-    public Author(long id, String name, int score) {
-        this.id = id;
+    public Author(String name, int score) {
         this.name = name;
         this.score = score;
     }
 
-    public Author(long id, String name) {
-        this.id = id;
+    public Author(String name) {
         this.name = name;
     }
 
@@ -54,14 +52,13 @@ public class Author extends BaseModelWithImage {
         int score = cursor.getInt(idxScore);
 
         // Instantiate a new Author with the values
-        return new Author(id, name, score);
+        return new Author(name, score);
     }
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(ID, id);
         map.put(NAME, name);
         map.put(LOWER_CASE_NAME, name.toLowerCase());
         map.put(HAS_IMAGE, hasImage);

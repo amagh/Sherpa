@@ -146,56 +146,56 @@ class TestUtilities {
     }
 
     static Guide[] getGuides() {
-        Guide guide1 = new Guide(1, "a", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide2 = new Guide(2, "b", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide3 = new Guide(3, "c", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide4 = new Guide(4, "d", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide5 = new Guide(5, "f", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide6 = new Guide(6, "g", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide7 = new Guide(7, "h", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide8 = new Guide(8, "i", "1", System.currentTimeMillis(), 37.734, -119.602);
-        Guide guide9 = new Guide(9, "j", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide1 = new Guide("a", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide2 = new Guide("b", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide3 = new Guide("c", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide4 = new Guide("d", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide5 = new Guide("f", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide6 = new Guide("g", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide7 = new Guide("h", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide8 = new Guide("i", "1", System.currentTimeMillis(), 37.734, -119.602);
+        Guide guide9 = new Guide("j", "1", System.currentTimeMillis(), 37.734, -119.602);
 
         Guide[] guides = {guide1, guide2, guide3, guide4, guide5, guide6, guide7, guide8, guide9};
         return guides;
     }
 
     static Trail getTrail() {
-        return new Trail(1, "Four Mile Trail", null);
+        return new Trail("Four Mile Trail", null);
     }
 
     static Author getAuthor(Context context) {
-        Author author = new Author(1, "John Muir");
+        Author author = new Author("John Muir");
         author.setImageUri(downloadFile(context, "http://www.norcalhiker.com/JMT/Images/170.jpg"));
         return author;
     }
 
     static Section getSection() {
-        return new Section(1, "1", 1, "Description of hike");
+        return new Section("1", 1, "Description of hike");
     }
 
     public static Section[] getSections(Context context) {
-        Section section1 = new Section(1, 1, "The Four Mile Trail (actually 4.8 miles) is one of Yosemite Valley’s most strenuous trails. It climbs up to Glacier Point – an ascent of nearly 3300-ft in just under five miles. After the grueling uphill slog, hikers are rewarded with unparalleled views of Half Dome and the rest of Yosemite Valley. Glacier Point can also be reached by car or shuttle, but the view feels much more rewarding when you walk. We hiked this on a rainy Saturday in late September. Though summer is over, there were still plenty of people out and about. You can’t expect much solitude on this trail, but you can look forward to a great workout and some good people watching!");
-        Section section2 = new Section(2, 2, "Red Tape:  The park entrance fee is $20.  If you plan to stay in the Valley, reserve accommodations well in advance!  There is limited parking at the trailhead, but it is along the El Capitan shuttle route.  The shuttle runs from June through October, 9am to 6pm. When you enter the park, they will hand you a fairly decent map at the kiosk. The trail is on this map. There are no junctions, so it’s basically impossible to get lost.");
-        Section section3 = new Section(3, 3, "Trail Description: The hike described here is actually a repeat of the beginning portion of the 20-mile John Muir hike we completed last October. On that trip we hiked half this trail in the dark, then continued on towards Sentinel Dome, the Panorama Trail, Liberty Cap and the Mist Trail. This time around we decided to “take it easy” and enjoy the Four Mile Trail on its own.");
-        Section section4 = new Section(4, 4, "Getting ready to hike! Saturday morning in Curry Village.");
+        Section section1 = new Section(1, "The Four Mile Trail (actually 4.8 miles) is one of Yosemite Valley’s most strenuous trails. It climbs up to Glacier Point – an ascent of nearly 3300-ft in just under five miles. After the grueling uphill slog, hikers are rewarded with unparalleled views of Half Dome and the rest of Yosemite Valley. Glacier Point can also be reached by car or shuttle, but the view feels much more rewarding when you walk. We hiked this on a rainy Saturday in late September. Though summer is over, there were still plenty of people out and about. You can’t expect much solitude on this trail, but you can look forward to a great workout and some good people watching!");
+        Section section2 = new Section(2, "Red Tape:  The park entrance fee is $20.  If you plan to stay in the Valley, reserve accommodations well in advance!  There is limited parking at the trailhead, but it is along the El Capitan shuttle route.  The shuttle runs from June through October, 9am to 6pm. When you enter the park, they will hand you a fairly decent map at the kiosk. The trail is on this map. There are no junctions, so it’s basically impossible to get lost.");
+        Section section3 = new Section(3, "Trail Description: The hike described here is actually a repeat of the beginning portion of the 20-mile John Muir hike we completed last October. On that trip we hiked half this trail in the dark, then continued on towards Sentinel Dome, the Panorama Trail, Liberty Cap and the Mist Trail. This time around we decided to “take it easy” and enjoy the Four Mile Trail on its own.");
+        Section section4 = new Section(4, "Getting ready to hike! Saturday morning in Curry Village.");
         section4.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2014/09/01.jpg"));
-        Section section5 = new Section(5, 5, "We slept late, ate breakfast at the Curry Village Coffee Corner, then drove the loop around Yosemite Valley to reach the trailhead.  The trail has a huge sign, so it’s difficult to miss.  There was no parking (at 10:00 am on a Saturday), so we drove a little further up the road and parked at the Swinging Bridge Picnic Area.");
-        Section section6 = new Section(6, 6, "Somewhere near the beginning of the trail…");
+        Section section5 = new Section(5, "We slept late, ate breakfast at the Curry Village Coffee Corner, then drove the loop around Yosemite Valley to reach the trailhead.  The trail has a huge sign, so it’s difficult to miss.  There was no parking (at 10:00 am on a Saturday), so we drove a little further up the road and parked at the Swinging Bridge Picnic Area.");
+        Section section6 = new Section(6, "Somewhere near the beginning of the trail…");
         section6.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2014/09/02.jpg"));
-        Section section7 = new Section(7, 7, "We started up the trail and were quickly passed by several people walking much faster.  I think we are just slow, but I will blame our heavy packs.  We carried lots of food, a couple of beers, warm clothing and rain gear.  All proved to be very useful and/or delicious.  Many of the other hikers were wearing shorts (or jeans!!) and not carrying jackets.  It was cold and rainy – seems like poor preparation (but who am I to judge?)");
-        Section section8 = new Section(8, 8, "Moss on all the rocks.");
+        Section section7 = new Section(7, "We started up the trail and were quickly passed by several people walking much faster.  I think we are just slow, but I will blame our heavy packs.  We carried lots of food, a couple of beers, warm clothing and rain gear.  All proved to be very useful and/or delicious.  Many of the other hikers were wearing shorts (or jeans!!) and not carrying jackets.  It was cold and rainy – seems like poor preparation (but who am I to judge?)");
+        Section section8 = new Section(8, "Moss on all the rocks.");
         section8.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2014/09/03.jpg"));
-        Section section9 = new Section(9, 9, "The trail climbs at a steady, relentless grade with many switchbacks.  Soon we had glimpses of El Cap and the Valley through the trees.  About halfway up, we started catching views of Half Dome.  We also began encountering quite a few hikers coming down the trail. Some had taken the shuttle up and were now hiking down.  Others had already hiked to the top and were on their way back.  I’m not used to this because we are usually the first people to hit a trail!");
+        Section section9 = new Section(9, "The trail climbs at a steady, relentless grade with many switchbacks.  Soon we had glimpses of El Cap and the Valley through the trees.  About halfway up, we started catching views of Half Dome.  We also began encountering quite a few hikers coming down the trail. Some had taken the shuttle up and were now hiking down.  Others had already hiked to the top and were on their way back.  I’m not used to this because we are usually the first people to hit a trail!");
 
         return new Section[] {section1, section2, section3, section4, section5, section6, section7, section8, section9};
     }
 
-    static File downloadFile(Context context, String imageUrl) {
+    static File downloadFile(Context context, String url) {
         // Use OkHttp to get a connection to the URL
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url(imageUrl)
+                .url(url)
                 .build();
 
         try {
@@ -205,7 +205,7 @@ class TestUtilities {
             InputStream inStream = response.body().byteStream();
 
             // Create the output File where it will be saved
-            File outputFile = new File(context.getFilesDir(), Uri.parse(imageUrl).getLastPathSegment());
+            File outputFile = new File(context.getFilesDir(), Uri.parse(url).getLastPathSegment());
 
             // Open an OutputStream to the File
             FileOutputStream outStream = new FileOutputStream(outputFile);
@@ -232,19 +232,19 @@ class TestUtilities {
     }
 
     static Area getArea() {
-        return new Area(1, "Yosemite");
+        return new Area("Yosemite");
     }
 
     static Area[] getAreas() {
-        Area area1 = new Area(1, "Yosemite");
-        Area area2 = new Area(2, "Grand Canyon");
-        Area area3 = new Area(3, "Red Wood Forest");
-        Area area4 = new Area(4, "Yellowstone");
-        Area area5 = new Area(5, "Acadia");
-        Area area6 = new Area(6, "Glacier");
-        Area area7 = new Area(7, "Zion");
-        Area area8 = new Area(8, "Arches");
-        Area area9 = new Area(9, "Grand Teton");
+        Area area1 = new Area("Yosemite");
+        Area area2 = new Area("Grand Canyon");
+        Area area3 = new Area("Red Wood Forest");
+        Area area4 = new Area("Yellowstone");
+        Area area5 = new Area("Acadia");
+        Area area6 = new Area("Glacier");
+        Area area7 = new Area("Zion");
+        Area area8 = new Area("Arches");
+        Area area9 = new Area("Grand Teton");
 
         return new Area[] {area1, area2, area3, area4, area5, area6, area7, area8, area9};
     }

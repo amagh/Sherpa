@@ -26,15 +26,13 @@ public class Trail extends BaseModel {
 
     public Trail() {}
 
-    public Trail(long id, String areaId, String name, String notes) {
-        this.id = id;
+    public Trail(String areaId, String name, String notes) {
         this.areaId = areaId;
         this.name = name;
         this.notes = notes;
     }
 
-    public Trail(long id, String name, String notes) {
-        this.id = id;
+    public Trail(String name, String notes) {
         this.name = name;
         this.notes = notes;
     }
@@ -59,14 +57,13 @@ public class Trail extends BaseModel {
         String notes = cursor.getString(idxNotes);
 
         // Create a new Trail from the values
-        return new Trail(id, areaId, name, notes);
+        return new Trail(areaId, name, notes);
     }
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(ID, id);
         map.put(AREA_ID, areaId);
         map.put(NAME, name);
         map.put(LOWER_CASE_NAME, name.toLowerCase());

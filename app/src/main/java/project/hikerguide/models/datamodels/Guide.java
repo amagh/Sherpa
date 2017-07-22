@@ -4,10 +4,24 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import org.gavaghan.geodesy.Ellipsoid;
+import org.gavaghan.geodesy.GeodeticCalculator;
+import org.gavaghan.geodesy.GeodeticMeasurement;
+import org.gavaghan.geodesy.GlobalPosition;
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import io.ticofab.androidgpxparser.parser.GPXParser;
+import io.ticofab.androidgpxparser.parser.domain.Gpx;
+import io.ticofab.androidgpxparser.parser.domain.TrackPoint;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.files.GpxFile;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
@@ -53,8 +67,7 @@ public class Guide extends BaseModelWithImage {
      */
     public Guide() {}
 
-    public Guide(long id, String trailId, String authorId, long dateAdded, double latitude, double longitude) {
-        this.id = id;
+    public Guide(String trailId, String authorId, long dateAdded, double latitude, double longitude) {
         this.trailId = trailId;
         this.authorId = authorId;
         this.dateAdded = dateAdded;
@@ -63,7 +76,6 @@ public class Guide extends BaseModelWithImage {
     }
 
     public Guide(long id, long dateAdded, double latitude, double longitude) {
-        this.id = id;
         this.dateAdded = dateAdded;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -97,7 +109,7 @@ public class Guide extends BaseModelWithImage {
         double longitude = cursor.getDouble(idxLongitude);
 
         // Create a new Guide using the values from the Cursor
-        Guide guide = new Guide(id, trailId, authorId, dateAdded, latitude, longitude);
+        Guide guide = new Guide(trailId, authorId, dateAdded, latitude, longitude);
         guide.rating = rating;
         guide.reviews = reviews;
 
@@ -107,7 +119,6 @@ public class Guide extends BaseModelWithImage {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(ID, id);
         map.put(TRAIL_ID, trailId);
         map.put(TRAIL_NAME, trailName);
         map.put(AUTHOR_ID, authorId);

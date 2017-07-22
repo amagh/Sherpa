@@ -26,15 +26,13 @@ public class Section extends BaseModelWithImage {
 
     public Section() {}
 
-    public Section(long id, String guideId, int section, String content) {
-        this.id = id;
+    public Section(String guideId, int section, String content) {
         this.guideId = guideId;
         this.section = section;
         this.content = content;
     }
 
-    public Section(long id, int section, String content) {
-        this.id = id;
+    public Section(int section, String content) {
         this.section = section;
         this.content = content;
     }
@@ -59,14 +57,13 @@ public class Section extends BaseModelWithImage {
         String content = cursor.getString(idxContent);
 
         // Instantiate a new Section with the values
-        return new Section(id, guideId, section, content);
+        return new Section(guideId, section, content);
     }
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(ID, id);
         map.put(GUIDE_ID, guideId);
         map.put(SECTION, section);
         map.put(CONTENT, content);
