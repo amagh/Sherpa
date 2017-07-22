@@ -16,10 +16,10 @@ import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileTyp
 
 public class StorageProviderUtils {
     // ** Constants ** //
-    private static final String IMAGE_PATH = "images";
-    private static final String GPX_PATH = "gpx";
-    private static final String JPEG_EXT = ".jpg";
-    private static final String GPX_EXT = ".gpx";
+    public static final String IMAGE_PATH = "images";
+    public static final String GPX_PATH = "gpx";
+    public static final String JPEG_EXT = ".jpg";
+    public static final String GPX_EXT = ".gpx";
 
 //    public static String getDirectoryFromType(@StorageProvider.FirebaseFileType int type) {
 //        String directory;

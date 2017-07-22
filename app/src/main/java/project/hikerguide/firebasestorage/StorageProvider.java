@@ -20,6 +20,8 @@ import project.hikerguide.utilities.StorageProviderUtils;
 
 import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileType.GPX_FILE;
 import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileType.IMAGE_FILE;
+import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
+import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
 
 /**
  * The Provider that will be used to interface with Firebase Storage.
@@ -217,6 +219,17 @@ public class StorageProvider {
 
         // Generate the StorageReference using the directory and file extension
         return mStorage.child(directory).child(file.firebaseId + fileExtension);
+    }
+
+    /**
+     * Generates the StorageReference for an image based on the FirebaseId. This is used to load
+     * the image using FirebaseUI and Glide
+     *
+     * @param firebaseId    FirebaseId of the image
+     * @return StorageReference correlating to the FirebaseId in the signature
+     */
+    public StorageReference getReferenceForImage(String firebaseId) {
+        return mStorage.child(IMAGE_PATH).child(firebaseId + JPEG_EXT);
     }
 
     private class StorageListener {
