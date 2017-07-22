@@ -25,6 +25,8 @@ import io.ticofab.androidgpxparser.parser.domain.TrackPoint;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.files.GpxFile;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
+import project.hikerguide.utilities.GpxStats;
+import project.hikerguide.utilities.GpxUtils;
 
 /**
  * Created by Alvin on 7/17/2017.
@@ -152,6 +154,13 @@ public class Guide extends BaseModelWithImage {
      * @param gpxFile    File describing the location of a GPX file
      */
     public void setGpxUri(File gpxFile) {
+        GpxStats stats = GpxUtils.getGpxStats(gpxFile);
+
+        if (stats == null) {
+            throw new RuntimeException("Selected file does not contain proper GPS coordinates");
+        }
+
+        this.distance = stats.distance;
         this.gpxUri = Uri.fromFile(gpxFile);
     }
 
