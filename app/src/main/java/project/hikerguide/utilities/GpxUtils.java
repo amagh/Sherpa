@@ -53,10 +53,11 @@ public class GpxUtils {
                 for (int i = 0; i < points.size() - 1; i++) {
                     // Ellipsoid.WGS84 is the commonly accepted model for Earth
                     GeodeticMeasurement measurement = calculator.calculateGeodeticMeasurement(Ellipsoid.WGS84,
+                            // Note: Distance is calculated ignoring elevation
                             // First point
-                            new GlobalPosition(points.get(i).getLatitude(), points.get(i).getLongitude(), points.get(i).getElevation()),
+                            new GlobalPosition(points.get(i).getLatitude(), points.get(i).getLongitude(), 0),
                             // Second point
-                            new GlobalPosition(points.get(i + 1).getLatitude(), points.get(i + 1).getLongitude(), points.get(i + 1).getElevation()));
+                            new GlobalPosition(points.get(i + 1).getLatitude(), points.get(i + 1).getLongitude(), 0));
 
                     // Add the distance between the two points to the total distance
                     totalDistance += measurement.getPointToPointDistance();

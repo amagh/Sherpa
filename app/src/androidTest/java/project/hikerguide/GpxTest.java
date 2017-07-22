@@ -21,10 +21,10 @@ import static junit.framework.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class GpxTest {
     // ** Constants ** //
-    static final String GPX_URL = "http://www.norcalhiker.com/maps/FourMileTrail.gpx";
+    private static final String GPX_URL = "http://www.gpsvisualizer.com/download/convert/20170722025200-45110-data.gpx";
 
     @Test
-    public void testGetGpxDistance() {
+    public void testGetGpxStats() {
         // Get the Gpx File
         File file = TestUtilities.downloadFile(InstrumentationRegistry.getTargetContext(), GPX_URL);
 
@@ -34,7 +34,15 @@ public class GpxTest {
         String errorCalculatingStats = "GpxUtils was unable to calculate GpxStats for the Gpx File downloaded";
         assertNotNull(errorCalculatingStats, stats);
 
+        // Convert results to Imperial measurements
+        double distance = stats.distance / 1609.34;
+        double elevation = stats.elevation * 3.28084;
+
+        // Check stats are within margins of error compared to known distance and elevation
         String errorDistanceInaccurate = "Distance calculated is greater than 0.1 mile different than the expected distance.";
-        assertTrue(errorDistanceInaccurate, stats.distance > 9.5 && stats.distance < 9.7);
+        assertTrue(errorDistanceInaccurate, distance > 9.5 && distance < 9.7);
+
+        String errorElevationInaccurate = "Elevation calculated is greater than 100ft different than the expected elevation";
+        assertTrue(errorElevationInaccurate, elevation < 3300 && elevation > 3100);
     }
 }
