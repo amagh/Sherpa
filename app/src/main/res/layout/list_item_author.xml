@@ -4,6 +4,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+        <variable
+            name="vm"
+            type="project.hikerguide.models.viewmodels.AuthorViewModel" />
+    </data>
+
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,6 +35,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="@dimen/guide_details_internal_vertical_margin"
+            app:image="@{vm.image}"
             app:layout_constraintTop_toBottomOf="@id/list_author_heading_tv"
             tools:src="@drawable/placeholder_profile_image"/>
 
@@ -38,6 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/text_horizontal_margin"
             android:layout_marginStart="@dimen/text_horizontal_margin"
+            android:text="@{vm.name}"
             style="@style/TextAppearance.AppCompat.Body2"
             app:layout_constraintLeft_toRightOf="@id/list_author_iv"
             app:layout_constraintTop_toTopOf="@id/list_author_iv"
@@ -47,6 +55,7 @@
             android:id="@+id/list_author_score_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{vm.score}"
             style="@style/TextAppearance.AppCompat.Body1"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBaseline_toBaselineOf="@id/list_author_name_tv"

@@ -7,12 +7,14 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import project.hikerguide.R;
+import project.hikerguide.databinding.ListItemAuthorBinding;
 import project.hikerguide.databinding.ListItemGuideDetailsBinding;
 import project.hikerguide.databinding.ListItemSectionImageBinding;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
+import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.models.viewmodels.SectionViewModel;
 
@@ -109,6 +111,8 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter {
         public void bind(int position) {
             BaseModel model = mModels[position];
 
+            // Load the correct ViewModel into the ViewDataBinding based on the type of model for
+            // the position
             if (model instanceof Guide) {
                 ((ListItemGuideDetailsBinding) mBinding).setVm(
                         new GuideViewModel(mBinding.getRoot().getContext(), (Guide) model));
@@ -116,8 +120,12 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter {
                 ((ListItemSectionImageBinding) mBinding).setVm(
                         new SectionViewModel((Section) model));
             } else if (model instanceof Author) {
-
+                ((ListItemAuthorBinding) mBinding).setVm(
+                        new AuthorViewModel((Author) model));
             }
+
+            // Immediately bind the data into the Views
+            mBinding.executePendingBindings();
         }
     }
 }
