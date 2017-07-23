@@ -284,27 +284,27 @@ public class DatabaseProvider {
      * @return The Sections that belong to the Guide in the signature
      */
     public Section[] getSectionsForGuide(Guide guide) {
-        final DatabaseListener listener2 = new DatabaseListener();
+        final DatabaseListener listener = new DatabaseListener();
 
         // Search using the guide's ID
         mDatabase.child(GuideDatabase.SECTIONS)
-                .orderByChild(GUIDE_ID)
+                .orderByValue()
                 .equalTo(guide.firebaseId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        listener2.onSuccess(FirebaseProviderUtils.getModelsFromSnapshot(SECTION, dataSnapshot));
+                        listener.onSuccess(FirebaseProviderUtils.getModelsFromSnapshot(SECTION, dataSnapshot));
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        listener2.onFailure(databaseError);
+                        listener.onFailure(databaseError);
                     }
                 });
 
-        listener2.pauseUntilComplete();
+        listener.pauseUntilComplete();
 
-        return (Section[]) listener2.getModels();
+        return (Section[]) listener.getModels();
     }
 
     /**
