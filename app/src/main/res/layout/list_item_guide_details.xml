@@ -4,8 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <variable name="vm"
-                  type="project.hikerguide.models.viewmodels.GuideViewModel" />
+        <variable
+            name="vm"
+            type="project.hikerguide.models.viewmodels.GuideViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
