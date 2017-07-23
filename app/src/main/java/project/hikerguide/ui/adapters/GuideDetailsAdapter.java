@@ -8,14 +8,16 @@ import android.view.ViewGroup;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemGuideDetailsBinding;
+import project.hikerguide.databinding.ListItemSectionImageBinding;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
+import project.hikerguide.models.viewmodels.SectionViewModel;
 
 /**
- * Created by Nocturna on 7/22/2017.
+ * Created by Alvin on 7/22/2017.
  */
 
 public class GuideDetailsAdapter extends RecyclerView.Adapter {
@@ -64,6 +66,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         if (mModels != null) {
+            // There should be as many items to load as there are data models in mModels
             return mModels.length;
         }
 
@@ -74,7 +77,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
 
         if (position == 0) {
-            // The first item is reserved for the section details
+            // The first item is reserved for the guide details
             return GUIDE_VIEW_TYPE;
         } else if (position == mModels.length) {
             // The last item is for the author's details
@@ -110,7 +113,8 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter {
                 ((ListItemGuideDetailsBinding) mBinding).setVm(
                         new GuideViewModel(mBinding.getRoot().getContext(), (Guide) model));
             } else if (model instanceof Section) {
-
+                ((ListItemSectionImageBinding) mBinding).setVm(
+                        new SectionViewModel((Section) model));
             } else if (model instanceof Author) {
 
             }
