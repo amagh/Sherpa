@@ -106,8 +106,17 @@ public class DatabaseProvider {
             // Get the directory to insert the records into from the BaseModel's class
             directory = FirebaseProviderUtils.getDirectoryFromModel(model);
 
+            // Generate the DatabaseReference from the directory
+            DatabaseReference ref = mDatabase.child(directory);
+
+            if (directory == GuideDatabase.SECTIONS) {
+                // If inserting Sections into the database, create a subdirectory using the Guide's
+                // ID
+                ref = ref.child(((Section) model).guideId);
+            }
+
             // Push the path to get the key
-            String key = mDatabase.child(directory).push().getKey();
+            String key = ref.push().getKey();
 
             // Add the model's values to childUpdates
             childUpdates.put(getFirebasePath(directory, key), model.toMap());
