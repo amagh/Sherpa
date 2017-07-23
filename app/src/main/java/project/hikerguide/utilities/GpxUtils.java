@@ -2,7 +2,8 @@ package project.hikerguide.utilities;
 
 import android.net.Uri;
 
-import com.mapbox.mapboxsdk.annotations.Polyline;
+import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
@@ -12,8 +13,10 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.ticofab.androidgpxparser.parser.GPXParser;
@@ -26,6 +29,15 @@ import io.ticofab.androidgpxparser.parser.domain.TrackPoint;
 
 public class GpxUtils {
 
+    /**
+     * Uses Vincenty's formulate to calculate the distance traveled from a GPX file. Also
+     * calculates the max difference in altitude for the track. This means that if the trail starts
+     * and ends at the same point, it will still calculate the difference in altitude from the
+     * highest and lowest points on the trail.
+     *
+     * @param gpxFile    File corresponding to a GPX file that contains coordinates for a guide
+     * @return A GpxStats Object containing the calculates distance and elevation
+     */
     public static GpxStats getGpxStats(File gpxFile) {
         try {
             // Create a FileInputStream from the Gpx File
@@ -34,7 +46,7 @@ public class GpxUtils {
             // Parse to a Gpx
             Gpx parsedGpx = new GPXParser().parse(inStream);
 
-            // Cloes the FileInputStream
+            // Close the FileInputStream
             inStream.close();
 
             if (parsedGpx != null) {
@@ -98,5 +110,46 @@ public class GpxUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Creates a PolylineOptions that can be uesd to plot a Polyline a the MapboxMap. This will be
+     * used to show the trail that the Guide describes
+     *
+     * @param gpxFile    A File corresponding to a GPX file that contains coordinates for a guide
+     * @return A PolylineOptions that can be used to plot the trail of a guide
+     */
+    public static PolylineOptions getPolyline(File gpxFile) {
+        // Initialize the List that will be used to generate the Polyline
+        List<LatLng> trailPoints = new ArrayList<>();
+
+        try {
+            // Create a FileInputStream from the GPX file
+            FileInputStream inStream = new FileInputStream(gpxFile);
+
+            // Parse a Gpx from the FileInputStream
+            Gpx parsedGpx = new GPXParser().parse(inStream);
+
+            // Close the InputStream
+            inStream.close();
+
+            if (parsedGpx != null) {
+                // Get the individual points from the Gpx
+                List<TrackPoint> points = parsedGpx.getTracks().get(0).getTrackSegments().get(0).getTrackPoints();
+
+                // Iterate through and convert the point coordinates to a LatLng
+                for (TrackPoint point : points) {
+                    LatLng trailPoint = new LatLng(point.getLatitude(), point.getLongitude(), point.getElevation());
+
+                    // Add the LatLng to the List
+                    trailPoints.add(trailPoint);
+                }
+            }
+        } catch (XmlPullParserException | IOException e) {
+            e.printStackTrace();
+        }
+
+        // Create a PolylineOptions from the List
+        return new PolylineOptions().addAll(trailPoints);
     }
 }
