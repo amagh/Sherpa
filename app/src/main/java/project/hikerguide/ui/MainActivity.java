@@ -1,5 +1,6 @@
 package project.hikerguide.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -9,12 +10,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.mapbox.mapboxsdk.Mapbox;
+
 import project.hikerguide.R;
+import project.hikerguide.models.datamodels.Guide;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity {
+import static project.hikerguide.ui.GuideDetailsActivity.IntentKeys.GUIDE_KEY;
 
-    private TextView mTextMessage;
+public class MainActivity extends AppCompatActivity implements FragmentGuideList.OnGuideClickListener {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -55,6 +59,16 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        Mapbox.getInstance(this, getString(R.string.mapbox_token));
     }
 
+    @Override
+    public void onGuideClicked(Guide guide) {
+        // Create a new Intent to launch the GuideDetailsActivity and add the clicked Guide as an
+        // extra
+        Intent intent = new Intent(this, GuideDetailsActivity.class);
+        intent.putExtra(GUIDE_KEY, guide);
+        startActivity(intent);
+    }
 }

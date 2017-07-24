@@ -3,6 +3,7 @@ package project.hikerguide.ui.adapters;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import project.hikerguide.R;
@@ -17,6 +18,11 @@ import project.hikerguide.models.viewmodels.GuideViewModel;
 public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHolder> {
     // ** Member Variables ** //
     private Guide[] mGuides;
+    private ClickHandler mHandler;
+
+    public GuideAdapter(ClickHandler clickHandler) {
+        mHandler = clickHandler;
+    }
 
     @Override
     public GuideViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -55,7 +61,14 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
         }
     }
 
-    public class GuideViewHolder extends RecyclerView.ViewHolder {
+    /**
+     * For passing information about the clicked guide to the Activity/Fragment
+     */
+    public interface ClickHandler {
+        void onGuideClicked(Guide guide);
+    }
+
+    public class GuideViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // ** Member Variables ** //
         ListItemGuideBinding mBinding;
 
@@ -63,6 +76,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
             super(binding.getRoot());
 
             mBinding = binding;
+            mBinding.getRoot().setOnClickListener(this);
         }
 
         public void bind(int position) {
@@ -73,6 +87,15 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
             // DataBinding
             mBinding.setVm(new GuideViewModel(mBinding.getRoot().getContext(), guide));
             mBinding.executePendingBindings();
+        }
+
+        @Override
+        public void onClick(View view) {
+            // Get the position of the clicked Adapter
+            int position = getAdapterPosition();
+
+            // Pass the corresponding Guide through the Clickhandler
+            mHandler.onGuideClicked(mGuides[position]);
         }
     }
 }

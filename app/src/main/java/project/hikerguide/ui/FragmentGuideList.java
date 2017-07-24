@@ -36,7 +36,13 @@ public class FragmentGuideList extends Fragment implements LoaderManager.LoaderC
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_guide_list, container, false);
 
         // Initialize the GuideAdapter
-        mAdapter = new GuideAdapter();
+        mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
+            @Override
+            public void onGuideClicked(Guide guide) {
+                // Pass the clicked Guide to the Activity so it can start the GuideDetailsActivity
+                ((MainActivity) getActivity()).onGuideClicked(guide);
+            }
+        });
 
         // Set the Adapter and LayoutManager for the RecyclerView
         mBinding.guideListRv.setAdapter(mAdapter);
@@ -61,5 +67,9 @@ public class FragmentGuideList extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoaderReset(Loader<Guide[]> loader) {
 
+    }
+
+    public interface OnGuideClickListener {
+        void onGuideClicked(Guide guide);
     }
 }
