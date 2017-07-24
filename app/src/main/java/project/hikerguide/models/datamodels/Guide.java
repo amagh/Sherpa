@@ -3,25 +3,13 @@ package project.hikerguide.models.datamodels;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-
-import org.gavaghan.geodesy.Ellipsoid;
-import org.gavaghan.geodesy.GeodeticCalculator;
-import org.gavaghan.geodesy.GeodeticMeasurement;
-import org.gavaghan.geodesy.GlobalPosition;
-import org.xmlpull.v1.XmlPullParserException;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import io.ticofab.androidgpxparser.parser.GPXParser;
-import io.ticofab.androidgpxparser.parser.domain.Gpx;
-import io.ticofab.androidgpxparser.parser.domain.TrackPoint;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.files.GpxFile;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
@@ -32,7 +20,7 @@ import project.hikerguide.utilities.GpxUtils;
  * Created by Alvin on 7/17/2017.
  */
 
-public class Guide extends BaseModelWithImage {
+public class Guide extends BaseModelWithImage implements Parcelable {
     // ** Constants ** //
     private static final String TRAIL_ID = "trailId";
     private static final String TRAIL_NAME = "trailName";
@@ -186,5 +174,60 @@ public class Guide extends BaseModelWithImage {
         // Set the gpxUri to the File's path
         setGpxUri(gpxFile);
         return gpxFile;
+    }
+
+    //********************************************************************************************//
+    //***************************** Parcelable Related Methods ***********************************//
+    //********************************************************************************************//
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(trailId);
+        parcel.writeString(trailName);
+        parcel.writeString(authorId);
+        parcel.writeString(authorName);
+        parcel.writeLong(dateAdded);
+        parcel.writeDouble(rating);
+        parcel.writeInt(reviews);
+        parcel.writeDouble(latitude);
+        parcel.writeDouble(longitude);
+        parcel.writeDouble(distance);
+        parcel.writeString(difficulty);
+        parcel.writeString(area);
+        parcel.writeString(gpxUri.toString());
+    }
+
+    public static final Parcelable.Creator<Guide> CREATOR = new Parcelable.Creator<Guide>() {
+        @Override
+        public Guide createFromParcel(Parcel parcel) {
+            return new Guide(parcel);
+        }
+
+        @Override
+        public Guide[] newArray(int i) {
+            return new Guide[0];
+        }
+    };
+
+    private Guide(Parcel parcel) {
+        trailId = parcel.readString();
+        trailName = parcel.readString();
+        authorId = parcel.readString();
+        authorName = parcel.readString();
+        dateAdded = parcel.readLong();
+        rating = parcel.readDouble();
+        reviews = parcel.readInt();
+        latitude = parcel.readDouble();
+        longitude = parcel.readDouble();
+        distance = parcel.readDouble();
+        difficulty = parcel.readString();
+        area = parcel.readString();
+        gpxUri = Uri.parse(parcel.readString());
     }
 }
