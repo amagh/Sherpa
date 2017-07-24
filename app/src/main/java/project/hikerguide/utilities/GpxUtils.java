@@ -1,5 +1,7 @@
 package project.hikerguide.utilities;
 
+import android.support.annotation.NonNull;
+
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -111,18 +113,25 @@ public class GpxUtils {
     }
 
     /**
-     * Creates a PolylineOptions that can be uesd to plot a Polyline a the MapboxMap. This will be
-     * used to show the trail that the Guide describes
+     * Creates a PolylineOptions that can be used to visualize the GPX's coordinates on a MapboxMap.
+     * Also calculates the center of the trail so that the map can be centered as the correct
+     * coordinates.
      *
      * @param gpxFile    A File corresponding to a GPX file that contains coordinates for a guide
      * @return A PolylineOptions that can be used to plot the trail of a guide
      */
-    public static PolylineOptions getMapboxOptions(File gpxFile) {
+    public static MapboxOptions getMapboxOptions(@NonNull File gpxFile) {
         // Initialize the List that will be used to generate the Polyline
         List<LatLng> trailPoints = new ArrayList<>();
 
+        // Initialize the coordinates that will be used to calculate the center of the trail
+        double north = 0;
+        double south = 0;
+        double east = 0;
+        double west = 0;
+
         try {
-            // Create a FileInputStream from the GPX file
+            // Create an InputStream from gpxFile
             FileInputStream inStream = new FileInputStream(gpxFile);
 
             // Parse a Gpx from the FileInputStream
@@ -141,66 +150,29 @@ public class GpxUtils {
 
                     // Add the LatLng to the List
                     trailPoints.add(trailPoint);
-                }
-            }
-        } catch (XmlPullParserException | IOException e) {
-            e.printStackTrace();
-        }
 
-        // Create a PolylineOptions from the List
-        return new PolylineOptions().addAll(trailPoints);
-    }
-
-    /**
-     * Creates a PolylineOptions that can be uesd to plot a Polyline a the MapboxMap. This will be
-     * used to show the trail that the Guide describes
-     *
-     * @param inStream    An InputStream that corresponds to a .gpx File
-     * @return A PolylineOptions that can be used to plot the trail of a guide
-     */
-    public static MapboxOptions getMapboxOptions(InputStream inStream) {
-        // Initialize the List that will be used to generate the Polyline
-        List<LatLng> trailPoints = new ArrayList<>();
-
-        double north = 0;
-        double south = 0;
-        double east = 0;
-        double west = 0;
-
-        try {
-            // Parse a Gpx from the FileInputStream
-            Gpx parsedGpx = new GPXParser().parse(inStream);
-
-            // Close the InputStream
-            inStream.close();
-
-            if (parsedGpx != null) {
-                // Get the individual points from the Gpx
-                List<TrackPoint> points = parsedGpx.getTracks().get(0).getTrackSegments().get(0).getTrackPoints();
-
-                // Iterate through and convert the point coordinates to a LatLng
-                for (TrackPoint point : points) {
-                    LatLng trailPoint = new LatLng(point.getLatitude(), point.getLongitude(), point.getElevation());
-
-                    // Add the LatLng to the List
-                    trailPoints.add(trailPoint);
+                    double latitude = trailPoint.getLatitude();
+                    double longitude = trailPoint.getLongitude();
 
                     if (north == 0) {
-                        north = point.getLongitude();
-                        south = point.getLongitude();
-                        east = point.getLatitude();
-                        west = point.getLatitude();
+                        // For the first point, set all coordinates to the points coordinates
+                        north = longitude;
+                        south = longitude;
+                        east = latitude;
+                        west = latitude;
                     } else {
-                        if (point.getLongitude() > north) {
-                            north = point.getLongitude();
-                        } else if (point.getLongitude() < south) {
-                            south = point.getLongitude();
+                        // If the new coordinates are more extreme than the values set, then set the
+                        // values to the new coordinates
+                        if (north < longitude) {
+                            north = longitude;
+                        } else if (south > longitude) {
+                            south = longitude;
                         }
 
-                        if (point.getLatitude() > east) {
-                            east = point.getLatitude();
-                        } else if (point.getLatitude() < west) {
-                            west = point.getLatitude();
+                        if (east < latitude) {
+                            east = latitude;
+                        } else if (west > latitude) {
+                            west = latitude;
                         }
                     }
                 }
@@ -209,13 +181,95 @@ public class GpxUtils {
             e.printStackTrace();
         }
 
-        // Calculate the center of the trail
-        LatLng center = new LatLng((east - west) / 2, (north - south) / 2);
+        // Calculate the center coordinates as the average of the east-most and west-most
+        // coordinates for the Latitude and the average of the north-most and south-most
+        // coordinates for the Longitude
+        LatLng center = new LatLng((west + east) / 2, (north + south) / 2);
 
         // Create a PolylineOptions from the List
         PolylineOptions polylineOptions = new PolylineOptions().addAll(trailPoints);
 
-
         return new MapboxOptions(polylineOptions, center);
+    }
+
+    /**
+     * Creates a PolylineOptions that can be used to visualize the GPX's coordinates on a MapboxMap.
+     * Also calculates the center of the trail so that the map can be centered as the correct
+     * coordinates.
+     *
+     * @param inStream    InputStream
+     * @return
+     */
+    public static void getMapboxOptions(@NonNull final InputStream inStream, final MapboxOptions.MapboxListener listener) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Initialize the List that will be used to generate the Polyline
+                List<LatLng> trailPoints = new ArrayList<>();
+
+                // Initialize the coordinates that will be used to calculate the center of the trail
+                double north = 0;
+                double south = 0;
+                double east = 0;
+                double west = 0;
+
+                try {
+                    // Parse a Gpx from the InputStream
+                    Gpx parsedGpx = new GPXParser().parse(inStream);
+
+                    // Close the InputStream
+                    inStream.close();
+
+                    if (parsedGpx != null) {
+                        // Get the individual points from the Gpx
+                        List<TrackPoint> points = parsedGpx.getTracks().get(0).getTrackSegments().get(0).getTrackPoints();
+
+                        // Iterate through and convert the point coordinates to a LatLng
+                        for (TrackPoint point : points) {
+                            LatLng trailPoint = new LatLng(point.getLatitude(), point.getLongitude(), point.getElevation());
+
+                            // Add the LatLng to the List
+                            trailPoints.add(trailPoint);
+
+                            double latitude = trailPoint.getLatitude();
+                            double longitude = trailPoint.getLongitude();
+
+                            if (north == 0) {
+                                // For the first point, set all coordinates to the points coordinates
+                                north = longitude;
+                                south = longitude;
+                                east = latitude;
+                                west = latitude;
+                            } else {
+                                // If the new coordinates are more extreme than the values set, then set the
+                                // values to the new coordinates
+                                if (north < longitude) {
+                                    north = longitude;
+                                } else if (south > longitude) {
+                                    south = longitude;
+                                }
+
+                                if (east < latitude) {
+                                    east = latitude;
+                                } else if (west > latitude) {
+                                    west = latitude;
+                                }
+                            }
+                        }
+                    }
+                } catch (XmlPullParserException | IOException e) {
+                    e.printStackTrace();
+                }
+
+                // Calculate the center coordinates as the average of the east-most and west-most
+                // coordinates for the Latitude and the average of the north-most and south-most
+                // coordinates for the Longitude
+                LatLng center = new LatLng((west + east) / 2, (north + south) / 2);
+
+                // Create a PolylineOptions from the List
+                PolylineOptions polylineOptions = new PolylineOptions().addAll(trailPoints);
+                listener.onOptionReady(new MapboxOptions(polylineOptions, center));
+            }
+        }).run();
     }
 }

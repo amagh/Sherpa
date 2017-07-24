@@ -31,4 +31,8 @@ public class MapboxOptions {
     public LatLng getCenter() {
         return center;
     }
+
+    public interface MapboxListener {
+        void onOptionReady(MapboxOptions options);
+    }
 }
