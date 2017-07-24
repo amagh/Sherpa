@@ -19,6 +19,7 @@ import java.util.List;
 import io.ticofab.androidgpxparser.parser.GPXParser;
 import io.ticofab.androidgpxparser.parser.domain.Gpx;
 import io.ticofab.androidgpxparser.parser.domain.TrackPoint;
+import project.hikerguide.utilities.objects.MapboxOptions;
 
 /**
  * Created by Alvin on 7/21/2017.
@@ -116,7 +117,7 @@ public class GpxUtils {
      * @param gpxFile    A File corresponding to a GPX file that contains coordinates for a guide
      * @return A PolylineOptions that can be used to plot the trail of a guide
      */
-    public static PolylineOptions getPolyline(File gpxFile) {
+    public static PolylineOptions getMapboxOptions(File gpxFile) {
         // Initialize the List that will be used to generate the Polyline
         List<LatLng> trailPoints = new ArrayList<>();
 
@@ -148,5 +149,73 @@ public class GpxUtils {
 
         // Create a PolylineOptions from the List
         return new PolylineOptions().addAll(trailPoints);
+    }
+
+    /**
+     * Creates a PolylineOptions that can be uesd to plot a Polyline a the MapboxMap. This will be
+     * used to show the trail that the Guide describes
+     *
+     * @param inStream    An InputStream that corresponds to a .gpx File
+     * @return A PolylineOptions that can be used to plot the trail of a guide
+     */
+    public static MapboxOptions getMapboxOptions(InputStream inStream) {
+        // Initialize the List that will be used to generate the Polyline
+        List<LatLng> trailPoints = new ArrayList<>();
+
+        double north = 0;
+        double south = 0;
+        double east = 0;
+        double west = 0;
+
+        try {
+            // Parse a Gpx from the FileInputStream
+            Gpx parsedGpx = new GPXParser().parse(inStream);
+
+            // Close the InputStream
+            inStream.close();
+
+            if (parsedGpx != null) {
+                // Get the individual points from the Gpx
+                List<TrackPoint> points = parsedGpx.getTracks().get(0).getTrackSegments().get(0).getTrackPoints();
+
+                // Iterate through and convert the point coordinates to a LatLng
+                for (TrackPoint point : points) {
+                    LatLng trailPoint = new LatLng(point.getLatitude(), point.getLongitude(), point.getElevation());
+
+                    // Add the LatLng to the List
+                    trailPoints.add(trailPoint);
+
+                    if (north == 0) {
+                        north = point.getLongitude();
+                        south = point.getLongitude();
+                        east = point.getLatitude();
+                        west = point.getLatitude();
+                    } else {
+                        if (point.getLongitude() > north) {
+                            north = point.getLongitude();
+                        } else if (point.getLongitude() < south) {
+                            south = point.getLongitude();
+                        }
+
+                        if (point.getLatitude() > east) {
+                            east = point.getLatitude();
+                        } else if (point.getLatitude() < west) {
+                            west = point.getLatitude();
+                        }
+                    }
+                }
+            }
+        } catch (XmlPullParserException | IOException e) {
+            e.printStackTrace();
+        }
+
+        // Calculate the center of the trail
+        LatLng center = new LatLng((east - west) / 2, (north - south) / 2);
+
+        // Create a PolylineOptions from the List
+        PolylineOptions polylineOptions = new PolylineOptions().addAll(trailPoints);
+
+
+        return new MapboxOptions(polylineOptions, center);
     }
 }
