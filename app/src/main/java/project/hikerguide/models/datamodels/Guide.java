@@ -200,7 +200,10 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         parcel.writeDouble(distance);
         parcel.writeString(difficulty);
         parcel.writeString(area);
-        parcel.writeString(gpxUri.toString());
+
+        if (gpxUri != null) {
+            parcel.writeString(gpxUri.toString());
+        }
     }
 
     public static final Parcelable.Creator<Guide> CREATOR = new Parcelable.Creator<Guide>() {
@@ -228,6 +231,10 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         distance = parcel.readDouble();
         difficulty = parcel.readString();
         area = parcel.readString();
-        gpxUri = Uri.parse(parcel.readString());
+
+        String uriString = parcel.readString();
+        if (uriString != null) {
+            gpxUri = Uri.parse(uriString);
+        }
     }
 }
