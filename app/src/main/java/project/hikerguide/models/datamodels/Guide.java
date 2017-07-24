@@ -188,6 +188,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(firebaseId);
         parcel.writeString(trailId);
         parcel.writeString(trailName);
         parcel.writeString(authorId);
@@ -204,6 +205,10 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         if (gpxUri != null) {
             parcel.writeString(gpxUri.toString());
         }
+
+        if (imageUri != null) {
+            parcel.writeString(imageUri.toString());
+        }
     }
 
     public static final Parcelable.Creator<Guide> CREATOR = new Parcelable.Creator<Guide>() {
@@ -214,11 +219,12 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
         @Override
         public Guide[] newArray(int i) {
-            return new Guide[0];
+            return new Guide[i];
         }
     };
 
     private Guide(Parcel parcel) {
+        firebaseId = parcel.readString();
         trailId = parcel.readString();
         trailName = parcel.readString();
         authorId = parcel.readString();
@@ -232,9 +238,14 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         difficulty = parcel.readString();
         area = parcel.readString();
 
-        String uriString = parcel.readString();
-        if (uriString != null) {
-            gpxUri = Uri.parse(uriString);
+        String gpxUriString = parcel.readString();
+        if (gpxUriString != null) {
+            gpxUri = Uri.parse(gpxUriString);
+        }
+
+        String imageUriString = parcel.readString();
+        if (imageUriString != null) {
+            imageUri = Uri.parse(imageUriString);
         }
     }
 }

@@ -13,7 +13,7 @@ import project.hikerguide.files.ImageFile;
 
 public abstract class BaseModelWithImage extends BaseModel {
     // ** Member Variables ** //
-    private Uri imageUri;
+    protected Uri imageUri;
     public boolean hasImage;
 
 
