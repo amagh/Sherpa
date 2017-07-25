@@ -1,18 +1,19 @@
 package project.hikerguide.ui;
 
 import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ActivityGuideDetailsBinding;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.viewmodels.GuideViewModel;
+import project.hikerguide.ui.adapters.GuideDetailsAdapter;
 import timber.log.Timber;
 
 import static project.hikerguide.ui.GuideDetailsActivity.IntentKeys.GUIDE_KEY;
 
-public class GuideDetailsActivity extends AppCompatActivity {
+public class GuideDetailsActivity extends MapboxActivity {
     // ** Constants ** //
     public interface IntentKeys {
         String GUIDE_KEY = "guides";
@@ -21,6 +22,7 @@ public class GuideDetailsActivity extends AppCompatActivity {
     // ** Member Variables ** //
     private ActivityGuideDetailsBinding mBinding;
     private Guide mGuide;
+    private GuideDetailsAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,12 @@ public class GuideDetailsActivity extends AppCompatActivity {
             return;
         }
 
+        // Setup the Adapter
+        mAdapter = new GuideDetailsAdapter();
+
+        // Setup the RecyclerView
         mBinding.setVm(new GuideViewModel(this, mGuide));
+        mBinding.guideDetailsRv.setLayoutManager(new LinearLayoutManager(this));
+        mBinding.guideDetailsRv.setAdapter(mAdapter);
     }
 }
