@@ -176,7 +176,7 @@ public class GuideViewModel extends BaseObservable {
         return mGuide.longitude;
     }
 
-    @BindingAdapter({"bind:firebaseId", "bind:activity", "bind.latitude", "bind.longitude"})
+    @BindingAdapter({"bind:firebaseId", "bind:activity", "bind:latitude", "bind:longitude"})
     public static void loadGpxToMap(SmartMapView mapView, final String firebaseId, MapboxActivity activity, final double latitude, final double longitude) {
         // The MapView will retain it's internal LifeCycle regardless of how many times it's
         // rendered
@@ -214,7 +214,7 @@ public class GuideViewModel extends BaseObservable {
                                             // Set the camera to the correct position
                                             mapboxMap.setCameraPosition(new CameraPosition.Builder()
                                                     .target(new LatLng(latitude, longitude))
-                                                    .zoom(13)
+                                                    .zoom(11)
                                                     .build());
                                         }
                                     });

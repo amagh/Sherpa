@@ -32,6 +32,8 @@
             android:layout_height="@dimen/list_guide_details_map_height"
             app:firebaseId="@{vm.firebaseId}"
             app:activity="@{vm.activity}"
+            app:latitude="@{vm.latitude}"
+            app:longitude="@{vm.longitude}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"/>
 
