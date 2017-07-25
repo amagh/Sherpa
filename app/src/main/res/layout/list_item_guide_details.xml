@@ -42,6 +42,8 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/list_guide_details_graph_height"
             android:layout_marginTop="@dimen/guide_details_internal_vertical_margin"
+            app:firebaseId="@{vm.firebaseId}"
+            app:context="@{vm.context}"
             app:layout_constraintLeft_toLeftOf="@+id/list_guide_details_map"
             app:layout_constraintRight_toRightOf="@+id/list_guide_details_map"
             app:layout_constraintTop_toBottomOf="@+id/list_guide_details_map"/>
