@@ -2,6 +2,7 @@ package project.hikerguide.ui.adapters;
 
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -109,18 +110,58 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
      * @param guide       Guide whose details need to be shown
      * @param activity    MapboxActivity so that the MapView can follow its lifecycle
      */
-    public void setGuide(Guide guide, MapboxActivity activity) {
+    public void setGuide(Guide guide, @NonNull MapboxActivity activity) {
         mGuide = guide;
         mActivity = activity;
 
-        // Testing purposes only
-        mModels = new BaseModel[] {guide};
+        updateModels();
     }
 
-    public void swapModels(BaseModel[] models) {
-        mModels = models;
+    /**
+     * Sets the Sections to display
+     *
+     * @param sections    An Array of Sections corresponding to the Guide to display
+     */
+    public void setSections(Section[] sections) {
+        mSections = sections;
 
-        notifyDataSetChanged();
+        updateModels();
+    }
+
+    /**
+     * Sets the Author of the Guide to be displayed
+     *
+     * @param author    Author of the Guide
+     */
+    public void setAuthor(Author author) {
+        mAuthor = author;
+
+        updateModels();
+    }
+
+    /**
+     * Creates the Array that will actually be used by the Adapter to create ViewHolders from
+     */
+    private void updateModels() {
+
+        // Check to ensure all required items are present
+        if (mGuide != null && mSections != null && mAuthor != null) {
+
+            // Create a new Array 2 larger than the length of mSections to leave room for the Guide
+            // details and Author
+            mModels = new BaseModel[mSections.length + 2];
+
+            // First item is the Guide's details
+            mModels[0] = mGuide;
+
+            // Copy the mSections Array into the middle sections of mModels
+            System.arraycopy(mSections, 0, mModels, 1, mSections.length);
+
+            // Set the last item to the Author
+            mModels[mModels.length - 1] = mAuthor;
+
+            notifyDataSetChanged();
+        }
     }
 
     public class GuideDetailsViewHolder extends RecyclerView.ViewHolder {
