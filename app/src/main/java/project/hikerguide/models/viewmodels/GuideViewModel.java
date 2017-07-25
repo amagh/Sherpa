@@ -12,8 +12,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
@@ -164,8 +166,18 @@ public class GuideViewModel extends BaseObservable {
         return mActivity.get();
     }
 
-    @BindingAdapter({"bind:firebaseId", "bind:activity"})
-    public static void loadGpxToMap(SmartMapView mapView, final String firebaseId, MapboxActivity activity) {
+    @Bindable
+    public double getLatitude() {
+        return mGuide.latitude;
+    }
+
+    @Bindable
+    public double getLongitude() {
+        return mGuide.longitude;
+    }
+
+    @BindingAdapter({"bind:firebaseId", "bind:activity", "bind.latitude", "bind.longitude"})
+    public static void loadGpxToMap(SmartMapView mapView, final String firebaseId, MapboxActivity activity, final double latitude, final double longitude) {
         // The MapView will retain it's internal LifeCycle regardless of how many times it's
         // rendered
         mapView.startMapView(activity);
@@ -192,16 +204,16 @@ public class GuideViewModel extends BaseObservable {
                                 @Override
                                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                                     // Parse the GPX File to get the MapboxOptions
-                                    GpxUtils.getMapboxOptions(tempGpx, new MapboxOptions.MapboxListener() {
+                                    GpxUtils.getPolylineOptions(tempGpx, new MapboxOptions.MapboxListener() {
                                         @Override
-                                        public void onOptionReady(MapboxOptions options) {
+                                        public void onOptionReady(PolylineOptions options) {
                                             // Set the Polyline representing the trail
-                                            mapboxMap.addPolyline(options.getPolylineOptions()
+                                            mapboxMap.addPolyline(options
                                                     .width(3));
 
                                             // Set the camera to the correct position
                                             mapboxMap.setCameraPosition(new CameraPosition.Builder()
-                                                    .target(options.getCenter())
+                                                    .target(new LatLng(latitude, longitude))
                                                     .zoom(13)
                                                     .build());
                                         }
