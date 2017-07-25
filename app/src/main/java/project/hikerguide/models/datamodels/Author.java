@@ -15,12 +15,14 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 public class Author extends BaseModelWithImage {
     // ** Constants ** //
     private static final String NAME = "name";
+    private static final String DESCRIPTION = "description";
     private static final String LOWER_CASE_NAME = "lowerCaseName";
     private static final String HAS_IMAGE = "hasImage";
     private static final String SCORE = "score";
 
     // ** Member Variables ** //
     public String name;
+    public String description;
     public int score;
 
     public Author() {}
@@ -60,6 +62,7 @@ public class Author extends BaseModelWithImage {
         Map<String, Object> map = new HashMap<>();
 
         map.put(NAME, name);
+        map.put(DESCRIPTION, description);
         map.put(LOWER_CASE_NAME, name.toLowerCase());
         map.put(HAS_IMAGE, hasImage);
         map.put(SCORE, score);
