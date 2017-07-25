@@ -139,6 +139,7 @@ class TestUtilities {
 
     static Guide getGuide(Context context) {
         Guide guide = new Guide(1, System.currentTimeMillis(), 37.734, 119.602);
+        guide.difficulty = 3;
         guide.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2014/09/09.jpg"));
         guide.setGpxUri(downloadFile(context, "http://www.norcalhiker.com/maps/FourMileTrail.gpx"));
 

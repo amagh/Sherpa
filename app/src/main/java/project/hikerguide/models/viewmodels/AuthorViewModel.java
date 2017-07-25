@@ -1,5 +1,6 @@
 package project.hikerguide.models.viewmodels;
 
+import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -7,10 +8,15 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import project.hikerguide.R;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.datamodels.Author;
+
+import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
+import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
 
 /**
  * Created by Alvin on 7/23/2017.
@@ -19,12 +25,11 @@ import project.hikerguide.models.datamodels.Author;
 public class AuthorViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Author mAuthor;
-    private StorageProvider mStorage;
+    private Context mContext;
 
-    public AuthorViewModel(Author author) {
+    public AuthorViewModel(Context context, Author author) {
         mAuthor = author;
-
-        mStorage = StorageProvider.getInstance();
+        mContext = context;
     }
 
     @Bindable
@@ -34,7 +39,9 @@ public class AuthorViewModel extends BaseObservable {
 
     @Bindable
     public StorageReference getImage() {
-        return mStorage.getReferenceForImage(mAuthor.firebaseId);
+        return FirebaseStorage.getInstance().getReference()
+                .child(IMAGE_PATH)
+                .child(mAuthor.firebaseId + JPEG_EXT);
     }
 
     @BindingAdapter("bind:image")
@@ -47,6 +54,6 @@ public class AuthorViewModel extends BaseObservable {
 
     @Bindable
     public String getScore() {
-        return Integer.toString(mAuthor.score);
+        return mContext.getString(R.string.list_author_format_score, mAuthor.score);
     }
 }

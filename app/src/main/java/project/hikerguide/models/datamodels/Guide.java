@@ -47,7 +47,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     public double latitude;
     public double longitude;
     public double distance;
-    public String difficulty;
+    public int difficulty;
     public String area;
 
     private Uri gpxUri;
@@ -79,7 +79,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
      */
     public Guide createGuideFromCursor(Cursor cursor) {
         // Get the index of every column from the Cursor
-        int idxId = cursor.getColumnIndex(GuideContract.GuideEntry._ID);
         int idxTrailId = cursor.getColumnIndex(GuideContract.GuideEntry.TRAIL_ID);
         int idxAuthorId = cursor.getColumnIndex(GuideContract.GuideEntry.AUTHOR_ID);
         int idxDateAdded = cursor.getColumnIndex(GuideContract.GuideEntry.DATE_ADDED);
@@ -89,7 +88,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         int idxLongitude = cursor.getColumnIndex(GuideContract.GuideEntry.LONGITUDE);
 
         // Get the values from the Cursor
-        long id = cursor.getLong(idxId);
         String trailId = cursor.getString(idxTrailId);
         String authorId = cursor.getString(idxAuthorId);
         long dateAdded = cursor.getLong(idxDateAdded);
@@ -199,7 +197,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         parcel.writeDouble(latitude);
         parcel.writeDouble(longitude);
         parcel.writeDouble(distance);
-        parcel.writeString(difficulty);
+        parcel.writeInt(difficulty);
         parcel.writeString(area);
 
         if (gpxUri != null) {
@@ -235,7 +233,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         latitude = parcel.readDouble();
         longitude = parcel.readDouble();
         distance = parcel.readDouble();
-        difficulty = parcel.readString();
+        difficulty = parcel.readInt();
         area = parcel.readString();
 
         String gpxUriString = parcel.readString();
