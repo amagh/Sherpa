@@ -12,7 +12,7 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/guide_details_section_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginBottom="@dimen/guide_details_section_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
@@ -26,7 +26,7 @@
             app:layout_constraintGuide_percent=".5"
             android:orientation="vertical"/>
 
-        <com.mapbox.mapboxsdk.maps.MapView
+        <project.hikerguide.mapbox.SmartMapView
             android:id="@+id/list_guide_details_map"
             android:layout_width="0dp"
             android:layout_height="@dimen/list_guide_details_map_height"
