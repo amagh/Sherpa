@@ -109,10 +109,11 @@ public class DatabaseProvider {
             // Generate the DatabaseReference from the directory
             DatabaseReference ref = mDatabase.child(directory);
 
-            if (directory == GuideDatabase.SECTIONS) {
+            if (directory.equals(GuideDatabase.SECTIONS)) {
                 // If inserting Sections into the database, create a subdirectory using the Guide's
                 // ID
                 ref = ref.child(((Section) model).guideId);
+                directory = directory + "/" + ((Section) model).guideId;
             }
 
             // Push the path to get the key
