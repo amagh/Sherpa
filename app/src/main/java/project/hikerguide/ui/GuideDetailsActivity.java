@@ -1,27 +1,13 @@
 package project.hikerguide.ui;
 
+import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import project.hikerguide.R;
-import project.hikerguide.data.GuideDatabase;
-import project.hikerguide.firebasedatabase.DatabaseProvider;
-import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.databinding.ActivityGuideDetailsBinding;
 import project.hikerguide.models.datamodels.Guide;
-import project.hikerguide.models.datamodels.Section;
-import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
-import project.hikerguide.ui.adapters.GuideDetailsAdapter;
-import project.hikerguide.utilities.FirebaseProviderUtils;
+import project.hikerguide.models.viewmodels.GuideViewModel;
 import timber.log.Timber;
 
 import static project.hikerguide.ui.GuideDetailsActivity.IntentKeys.GUIDE_KEY;
@@ -32,9 +18,22 @@ public class GuideDetailsActivity extends AppCompatActivity {
         String GUIDE_KEY = "guides";
     }
 
+    // ** Member Variables ** //
+    private ActivityGuideDetailsBinding mBinding;
+    private Guide mGuide;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_guide_details);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_guide_details);
+
+        setSupportActionBar(mBinding.guideDetailsTb);
+
+        if ((mGuide = getIntent().getParcelableExtra(GUIDE_KEY)) == null) {
+            Timber.d("No Guide passed from MainActivity");
+            return;
+        }
+
+        mBinding.setVm(new GuideViewModel(this, mGuide));
     }
 }
