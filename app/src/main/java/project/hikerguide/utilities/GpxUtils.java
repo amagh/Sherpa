@@ -2,6 +2,7 @@ package project.hikerguide.utilities;
 
 import android.support.annotation.NonNull;
 
+import com.github.mikephil.charting.data.Entry;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -21,6 +22,8 @@ import java.util.List;
 import io.ticofab.androidgpxparser.parser.GPXParser;
 import io.ticofab.androidgpxparser.parser.domain.Gpx;
 import io.ticofab.androidgpxparser.parser.domain.TrackPoint;
+import project.hikerguide.utilities.objects.GpxStats;
+import project.hikerguide.utilities.objects.LineGraphOptions;
 import project.hikerguide.utilities.objects.MapboxOptions;
 
 /**
@@ -203,5 +206,98 @@ public class GpxUtils {
             }
         }).run();
 
+    }
+
+    /**
+     * Calculates the Entries that will be used to plot the elevation data for the LineGraph if the
+     * .gpx file includes elevation data. When the data has been calculated, it alerts the calling
+     * thread and passes the completed data through.
+     *
+     * @param gpxFile    .gpx file that wil be used to calculate the elevation chart data
+     * @param listener   Listener to alert the calling thread that calculations are complete
+     */
+    public static void getElevationChartData(final File gpxFile, final LineGraphOptions.ElevationDataListener listener) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Init List of Entries to return
+                List<Entry> elevationData = new ArrayList<>();
+
+                try {
+                    // Create InputStream from File
+                    InputStream inStream = new FileInputStream(gpxFile);
+
+                    // Parse the Gpx from the InputStream
+                    Gpx parsedGpx = new GPXParser().parse(inStream);
+
+                    if (parsedGpx == null) {
+                        // Unable to parse. Nothing to return
+                        listener.onElevationDataReady(null);
+                    }
+
+                    // Get the TrackPoints from the parsed Gpx
+                    List<TrackPoint> trackPoints = parsedGpx.getTracks().get(0).getTrackSegments().get(0).getTrackPoints();
+
+                    // Init the calculator that will be used to get the distance between each point
+                    GeodeticCalculator calculator = new GeodeticCalculator();
+
+                    // Keep track of total distance for X-coordinate
+                    double totalDistance = 0.0;
+
+                    // Iterate and get the distance traveled between each point and its elevation
+                    for (int i = 0; i < trackPoints.size() - 1; i++) {
+                        // X-Coordinate = distance traveled
+                        // Y-Coordinate = elevation at the end point
+                        // Setup
+                        double lat1 = trackPoints.get(i).getLatitude();
+                        double lon1 = trackPoints.get(i).getLongitude();
+                        double ele1 = trackPoints.get(i).getElevation();
+                        double lat2 = trackPoints.get(i + 1).getLatitude();
+                        double lon2 = trackPoints.get(i + 1).getLongitude();
+                        double ele2 = trackPoints.get(i + 1).getElevation();
+
+                        if (i == 0) {
+                            // First Entry: The X-coord is 0 for the start, and the starting elevation will
+                            // be used as the Y-coord
+                            elevationData.add(new Entry(0, (float) ele1));
+                        }
+
+                        // Calculate the distance between the two points
+                        GeodeticMeasurement measurement = calculator.calculateGeodeticMeasurement(
+                                Ellipsoid.WGS84,
+                                new GlobalPosition(lat1, lon1, 0),
+                                new GlobalPosition(lat2, lon2, 0));
+
+                        // Add the traveled distance to the total distance to keep track of the X-coord
+                        totalDistance += measurement.getPointToPointDistance();
+
+                        // Add the Entry to the List
+                        elevationData.add(new Entry((float) totalDistance, (float) ele2));
+                    }
+
+                } catch (XmlPullParserException | IOException e) {
+                    e.printStackTrace();
+                }
+
+                // Check to ensure the Gpx file has elevation data to plot
+                float elevationCheck = 0;
+                for (Entry entry : elevationData) {
+                    // Add the elevation of each Entry to the elevationCheck
+                    elevationCheck += entry.getY();
+
+                    // If there is any elevation, then the chart will be valid
+                    if (elevationCheck > 0) {
+                        break;
+                    }
+                }
+
+                if (elevationCheck == 0) {
+                    // If total elevation is zero, then there is no data to plot
+                    listener.onElevationDataReady(null);
+                } else {
+                    listener.onElevationDataReady(elevationData);
+                }
+            }
+        }).run();
     }
 }
