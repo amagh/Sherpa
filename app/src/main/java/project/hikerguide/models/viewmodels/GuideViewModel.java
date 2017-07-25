@@ -4,6 +4,7 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -82,12 +83,16 @@ public class GuideViewModel extends BaseObservable {
 
     @Bindable
     public String getDistance() {
-        return mContext.getString(R.string.list_guide_format_distance_imperial, mGuide.distance / METERS_PER_MILE);
+        return mContext.getString(
+                R.string.list_guide_format_distance_imperial,
+                mGuide.distance / METERS_PER_MILE);
     }
 
     @Bindable
     public String getElevation() {
-        return mContext.getString(R.string.list_guide_format_elevation_imperial, mGuide.elevation / METERS_PER_FEET);
+        return mContext.getString(
+                R.string.list_guide_format_elevation_imperial,
+                mGuide.elevation / METERS_PER_FEET);
     }
 
     @Bindable
@@ -195,6 +200,11 @@ public class GuideViewModel extends BaseObservable {
     @Bindable
     public Context getContext() {
         return mContext;
+    }
+
+    @Bindable
+    public int getElevationVisibility() {
+        return mGuide.elevation != 0 ? View.VISIBLE : View.GONE;
     }
 
     @BindingAdapter({"bind:firebaseId", "bind:activity", "bind:latitude", "bind:longitude"})

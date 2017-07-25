@@ -42,6 +42,7 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/list_guide_details_graph_height"
             android:layout_marginTop="@dimen/guide_details_internal_vertical_margin"
+            android:visibility="@{vm.elevationVisibility}"
             app:firebaseId="@{vm.firebaseId}"
             app:context="@{vm.context}"
             app:layout_constraintLeft_toLeftOf="@+id/list_guide_details_map"
@@ -76,6 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/list_guide_details_elevation_label"
+            android:visibility="@{vm.elevationVisibility}"
             style="@style/TextAppearance.AppCompat.Caption"
             app:layout_constraintBaseline_toBaselineOf="@id/list_guide_details_distance_label_tv"
             app:layout_constraintLeft_toLeftOf="@id/guideline" />
@@ -87,6 +89,7 @@
             android:layout_marginLeft="@dimen/text_horizontal_margin"
             android:layout_marginStart="@dimen/text_horizontal_margin"
             android:text="@{vm.elevation}"
+            android:visibility="@{vm.elevationVisibility}"
             style="@style/TextAppearance.AppCompat.Caption"
             app:layout_constraintBaseline_toBaselineOf="@id/list_guide_details_distance_label_tv"
             app:layout_constraintLeft_toRightOf="@id/list_guide_details_elevation_label_tv"
