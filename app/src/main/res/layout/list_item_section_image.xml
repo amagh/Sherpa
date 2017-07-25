@@ -34,11 +34,11 @@
             android:id="@+id/list_section_image_caption_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minLines="1"
             android:layout_marginTop="@dimen/text_vertical_margin"
             android:textStyle="italic"
             android:text="@{vm.content}"
             android:textColor="@android:color/black"
+            android:visibility="@{vm.contentVisibility}"
             style="@style/TextAppearance.AppCompat.Caption"
             tools:text="@string/list_section_image_caption_text"/>
 

@@ -34,6 +34,11 @@ public class SectionViewModel extends BaseObservable {
     }
 
     @Bindable
+    public int getContentVisibility() {
+        return mSection.content != null ? View.VISIBLE : View.GONE;
+    }
+
+    @Bindable
     public StorageReference getImage() {
         // Generate StorageReference for the image using the Section's FirebaseId
         return mStorage.getReferenceForImage(mSection.firebaseId);
