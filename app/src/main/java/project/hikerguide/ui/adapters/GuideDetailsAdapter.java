@@ -193,7 +193,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
                 }
             } else if (model instanceof Author) {
                 ((ListItemAuthorBinding) mBinding).setVm(
-                        new AuthorViewModel((Author) model));
+                        new AuthorViewModel(mActivity, (Author) model));
             }
 
             // Immediately bind the data into the Views
