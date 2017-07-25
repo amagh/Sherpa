@@ -130,11 +130,14 @@ public class GuideViewModel extends BaseObservable {
             // Since the MapView is added after the Activity has already started, the onCreate and
             // onStart a manually called
             mapView.onCreate(null);
-            mapView.onStart();
 
             // Attach the MapView to the Activity so it can follow the rest of the lifecycle
             activity.attachMapView(mapView);
+
+            started = true;
         }
+
+        mapView.onStart();
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
