@@ -27,7 +27,8 @@
     <string name="list_author_description_text">We (Christa and Rob) are from Northern California and we like to hike.  We’ve shared our photos and experiences so that others may find new parks, trails or places to visit.</string>
 
     <!-- Formatting for guide list item -->
-    <string name="list_guide_format_distance_imperial">%.2f miles</string>
+    <string name="list_guide_format_distance_imperial">%,.2f miles</string>
+    <string name="list_guide_format_elevation_imperial">%,.0f ft</string>
     <string name="list_guide_format_rating">%1.1f\u2605</string>
     <string name="list_guide_format_rating_zero">0\u2605</string>
     <string name="list_guide_format_reviews">(%d)</string>
