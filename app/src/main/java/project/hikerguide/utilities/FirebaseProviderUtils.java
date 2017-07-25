@@ -125,11 +125,6 @@ public class FirebaseProviderUtils {
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
         }
 
-//        for (int i = 0; i < models.length; i++) {
-//            models[i] = modelList.get(i);
-//            System.out.println(models[i].getClass());
-//        }
-
         // Copy the data to the created Array
         return modelList.toArray(models);
     }
