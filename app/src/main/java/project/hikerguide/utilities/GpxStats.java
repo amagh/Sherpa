@@ -7,4 +7,6 @@ package project.hikerguide.utilities;
 public class GpxStats {
     public double distance;
     public double elevation;
+    public double latitude;
+    public double longitude;
 }

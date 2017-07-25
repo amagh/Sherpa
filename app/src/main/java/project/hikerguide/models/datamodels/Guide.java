@@ -31,6 +31,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     private static final String REVIEWS = "reviews";
     private static final String LATITUDE = "latitude";
     private static final String LONGITUDE = "longitude";
+    private static final String ELEVATION = "elevation";
     private static final String HAS_IMAGE = "hasImage";
     private static final String DISTANCE = "distance";
     private static final String DIFFICULTY = "difficulty";
@@ -47,6 +48,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     public double latitude;
     public double longitude;
     public double distance;
+    public double elevation;
     public int difficulty;
     public String area;
 
@@ -65,10 +67,8 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         this.longitude = longitude;
     }
 
-    public Guide(long id, long dateAdded, double latitude, double longitude) {
+    public Guide(long dateAdded) {
         this.dateAdded = dateAdded;
-        this.latitude = latitude;
-        this.longitude = longitude;
     }
 
     /**
@@ -147,6 +147,9 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         }
 
         this.distance = stats.distance;
+        this.latitude = stats.latitude;
+        this.longitude = stats.longitude;
+        this.elevation = stats.elevation;
         this.gpxUri = Uri.fromFile(gpxFile);
     }
 
@@ -196,6 +199,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         parcel.writeInt(reviews);
         parcel.writeDouble(latitude);
         parcel.writeDouble(longitude);
+        parcel.writeDouble(elevation);
         parcel.writeDouble(distance);
         parcel.writeInt(difficulty);
         parcel.writeString(area);
@@ -232,6 +236,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         reviews = parcel.readInt();
         latitude = parcel.readDouble();
         longitude = parcel.readDouble();
+        elevation = parcel.readDouble();
         distance = parcel.readDouble();
         difficulty = parcel.readInt();
         area = parcel.readString();
