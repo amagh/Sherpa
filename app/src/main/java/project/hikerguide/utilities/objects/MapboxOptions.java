@@ -9,30 +9,16 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 
 public class MapboxOptions {
     private PolylineOptions options;
-    private LatLng center;
 
-    public MapboxOptions(PolylineOptions options, LatLng center) {
+    public MapboxOptions(PolylineOptions options) {
         this.options = options;
-        this.center = center;
-    }
-
-    public void setPolylineOptions(PolylineOptions options) {
-        this.options = options;
-    }
-
-    public void setCenter(LatLng center) {
-        this.center = center;
     }
 
     public PolylineOptions getPolylineOptions() {
         return options;
     }
 
-    public LatLng getCenter() {
-        return center;
-    }
-
     public interface MapboxListener {
-        void onOptionReady(MapboxOptions options);
+        void onOptionReady(PolylineOptions options);
     }
 }

@@ -58,6 +58,12 @@ public class GpxUtils {
                 double low = 0.0;
                 double high = 0.0;
 
+                // Initialize the coordinates that will be used to calculate the center of the trail
+                double north = 0;
+                double south = 0;
+                double east = 0;
+                double west = 0;
+
                 // Init the Geodetic Calculater (Uses Vincenty's formula for higher accuracy)
                 GeodeticCalculator calculator = new GeodeticCalculator();
 
@@ -85,15 +91,49 @@ public class GpxUtils {
                             low = points.get(i).getElevation();
                             high = points.get(i + 1).getElevation();
                         }
+
+                        // For the first point, set all coordinates to the points coordinates
+                        if (points.get(i).getLongitude() > points.get(i + 1).getLongitude()) {
+                            north = points.get(i).getLongitude();
+                            south = points.get(i + 1).getLongitude();
+                        } else {
+                            north = points.get(i + 1).getLongitude();
+                            south = points.get(i).getLongitude();
+                        }
+
+                        if (points.get(i).getLatitude() > points.get(i + 1).getLatitude()) {
+                            east = points.get(i).getLatitude();
+                            west = points.get(i + 1).getLatitude();
+                        } else {
+                            east = points.get(i + 1).getLatitude();
+                            west = points.get(i).getLatitude();
+                        }
+
                     } else {
                         // For all other iterations, set the high elevation if higher or low
                         // elevation if lower
                         double elevation = points.get(i + 1).getElevation();
 
+                        // Set the coordinates if they are more extreme than the previous coordinate
+                        double longitude = points.get(i + 1).getLongitude();
+                        double latitude = points.get(i + 1).getLatitude();
+
                         if (elevation < low) {
                             low = elevation;
                         } else if (elevation > high) {
                             high = elevation;
+                        }
+
+                        if (north < longitude) {
+                            north = longitude;
+                        } else if (south > longitude) {
+                            south = longitude;
+                        }
+
+                        if (east  < latitude) {
+                            east = latitude;
+                        } else if (west > latitude) {
+                            west = latitude;
                         }
                     }
                 }
@@ -102,6 +142,8 @@ public class GpxUtils {
                 GpxStats gpxStats = new GpxStats();
                 gpxStats.distance = totalDistance;
                 gpxStats.elevation = high - low;
+                gpxStats.latitude = (west + east) / 2;
+                gpxStats.longitude = (north + south) / 2;
 
                 return gpxStats;
             }
@@ -114,24 +156,16 @@ public class GpxUtils {
 
     /**
      * Creates a PolylineOptions that can be used to visualize the GPX's coordinates on a MapboxMap.
-     * Also calculates the center of the trail so that the map can be centered as the correct
-     * coordinates.
      *
      * @param gpxFile    A File corresponding to a GPX file that contains coordinates for a guide
      * @return A PolylineOptions that can be used to plot the trail of a guide
      */
-    public static void getMapboxOptions(@NonNull final File gpxFile, final MapboxOptions.MapboxListener listener) {
+    public static void getPolylineOptions(@NonNull final File gpxFile, final MapboxOptions.MapboxListener listener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 // Initialize the List that will be used to generate the Polyline
                 List<LatLng> trailPoints = new ArrayList<>();
-
-                // Initialize the coordinates that will be used to calculate the center of the trail
-                double north = 0;
-                double south = 0;
-                double east = 0;
-                double west = 0;
 
                 try {
                     // Create an InputStream from gpxFile
@@ -156,43 +190,16 @@ public class GpxUtils {
 
                             double latitude = trailPoint.getLatitude();
                             double longitude = trailPoint.getLongitude();
-
-                            if (north == 0) {
-                                // For the first point, set all coordinates to the points coordinates
-                                north = longitude;
-                                south = longitude;
-                                east = latitude;
-                                west = latitude;
-                            } else {
-                                // If the new coordinates are more extreme than the values set, then set the
-                                // values to the new coordinates
-                                if (north < longitude) {
-                                    north = longitude;
-                                } else if (south > longitude) {
-                                    south = longitude;
-                                }
-
-                                if (east < latitude) {
-                                    east = latitude;
-                                } else if (west > latitude) {
-                                    west = latitude;
-                                }
-                            }
                         }
                     }
                 } catch (XmlPullParserException | IOException e) {
                     e.printStackTrace();
                 }
 
-                // Calculate the center coordinates as the average of the east-most and west-most
-                // coordinates for the Latitude and the average of the north-most and south-most
-                // coordinates for the Longitude
-                LatLng center = new LatLng((west + east) / 2, (north + south) / 2);
-
                 // Create a PolylineOptions from the List
                 PolylineOptions polylineOptions = new PolylineOptions().addAll(trailPoints);
 
-                listener.onOptionReady(new MapboxOptions(polylineOptions, center));
+                listener.onOptionReady(polylineOptions);
             }
         }).run();
 
