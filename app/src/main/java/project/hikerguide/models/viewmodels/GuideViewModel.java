@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -379,6 +380,11 @@ public class GuideViewModel extends BaseObservable {
                 lineChart.getAxisRight().setGranularity(500f);
                 lineChart.getAxisLeft().setValueFormatter(new ElevationAxisFormatter(context));
                 lineChart.getAxisLeft().setGranularity(500f);
+
+                // Remove the description label from the chart
+                Description description = new Description();
+                description.setText("");
+                lineChart.setDescription(description);
 
                 // Disable zooming on the chart
                 lineChart.setDoubleTapToZoomEnabled(false);
