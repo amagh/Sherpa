@@ -21,7 +21,6 @@ public class SectionViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Section mSection;
     private StorageProvider mStorage;
-    private int imageVisibility;
 
     public SectionViewModel(Section section) {
         mSection = section;

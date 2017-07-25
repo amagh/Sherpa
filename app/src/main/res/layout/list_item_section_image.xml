@@ -10,9 +10,10 @@
             type="project.hikerguide.models.viewmodels.SectionViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_marginTop="@dimen/guide_details_section_margin"
         android:layout_marginBottom="@dimen/guide_details_section_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -22,26 +23,24 @@
 
         <ImageView
             android:id="@+id/list_section_image_iv"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
             app:image="@{vm.image}"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/placeholder_section_image"/>
 
         <TextView
             android:id="@+id/list_section_image_caption_tv"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minLines="1"
             android:layout_marginTop="@dimen/text_vertical_margin"
             android:textStyle="italic"
             android:text="@{vm.content}"
+            android:textColor="@android:color/black"
             style="@style/TextAppearance.AppCompat.Caption"
-            app:layout_constraintTop_toBottomOf="@id/list_section_image_iv"
             tools:text="@string/list_section_image_caption_text"/>
 
-    </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
 </layout>
