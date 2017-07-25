@@ -116,6 +116,8 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         map.put(REVIEWS, reviews);
         map.put(LATITUDE, latitude);
         map.put(LONGITUDE, longitude);
+        map.put(DISTANCE, distance);
+        map.put(ELEVATION, elevation);
         map.put(HAS_IMAGE, hasImage);
         map.put(DISTANCE, distance);
         map.put(DIFFICULTY, difficulty);
