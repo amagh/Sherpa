@@ -10,6 +10,7 @@ import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemAuthorBinding;
 import project.hikerguide.databinding.ListItemGuideDetailsBinding;
 import project.hikerguide.databinding.ListItemSectionImageBinding;
+import project.hikerguide.databinding.ListItemSectionTextBinding;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
@@ -22,7 +23,7 @@ import project.hikerguide.models.viewmodels.SectionViewModel;
  * Created by Alvin on 7/22/2017.
  */
 
-public class GuideDetailsAdapter extends RecyclerView.Adapter {
+public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapter.GuideDetailsViewHolder>{
     // ** Constants ** //
     private static final int GUIDE_VIEW_TYPE = 0;
     private static final int SECTION_VIEW_TYPE = 1;
@@ -33,7 +34,8 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter {
     private BaseModel[] mModels;
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public GuideDetailsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // Inflate the layout based on the viewType
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         int layoutId;
 
@@ -61,8 +63,9 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
+    public void onBindViewHolder(GuideDetailsViewHolder holder, int position) {
+        // Bind the data to the Views
+        holder.bind(position);
     }
 
     @Override
@@ -81,7 +84,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter {
         if (position == 0) {
             // The first item is reserved for the guide details
             return GUIDE_VIEW_TYPE;
-        } else if (position == mModels.length) {
+        } else if (position == mModels.length - 1) {
             // The last item is for the author's details
             return AUTHOR_VIEW_TYPE;
         } else if (!((Section) mModels[position]).hasImage){
@@ -117,8 +120,14 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter {
                 ((ListItemGuideDetailsBinding) mBinding).setVm(
                         new GuideViewModel(mBinding.getRoot().getContext(), (Guide) model));
             } else if (model instanceof Section) {
-                ((ListItemSectionImageBinding) mBinding).setVm(
-                        new SectionViewModel((Section) model));
+                // Load the correct ViewDataBinding depending on whether the section has an image
+                if (((Section) mModels[position]).hasImage) {
+                    ((ListItemSectionImageBinding) mBinding).setVm(
+                            new SectionViewModel((Section) model));
+                } else {
+                    ((ListItemSectionTextBinding) mBinding).setVm(
+                            new SectionViewModel((Section) model));
+                }
             } else if (model instanceof Author) {
                 ((ListItemAuthorBinding) mBinding).setVm(
                         new AuthorViewModel((Author) model));
