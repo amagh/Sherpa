@@ -86,6 +86,11 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @Bindable
+    public String getElevation() {
+        return mContext.getString(R.string.list_guide_format_elevation_imperial, mGuide.elevation / METERS_PER_FEET);
+    }
+
+    @Bindable
     public String getRating() {
         if (mGuide.reviews != 0) {
             return mContext.getString(R.string.list_guide_format_rating, mGuide.rating / mGuide.reviews);

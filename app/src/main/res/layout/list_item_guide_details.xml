@@ -86,6 +86,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/text_horizontal_margin"
             android:layout_marginStart="@dimen/text_horizontal_margin"
+            android:text="@{vm.elevation}"
             style="@style/TextAppearance.AppCompat.Caption"
             app:layout_constraintBaseline_toBaselineOf="@id/list_guide_details_distance_label_tv"
             app:layout_constraintLeft_toRightOf="@id/list_guide_details_elevation_label_tv"
