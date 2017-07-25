@@ -28,6 +28,6 @@ public class DistanceAxisFormatter implements IAxisValueFormatter {
     public String getFormattedValue(float value, AxisBase axis) {
 
         // Return the formatted String to be used as the axis labels
-        return mContext.getString(R.string.list_guide_format_distance_imperial, value);
+        return mContext.getString(R.string.list_guide_format_distance_chart_imperial, value);
     }
 }

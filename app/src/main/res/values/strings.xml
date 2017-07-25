@@ -28,6 +28,7 @@
 
     <!-- Formatting for guide list item -->
     <string name="list_guide_format_distance_imperial">%,.2f miles</string>
+    <string name="list_guide_format_distance_chart_imperial">%,.1f mi</string>
     <string name="list_guide_format_elevation_imperial">%,.0f ft</string>
     <string name="list_guide_format_rating">%1.1f\u2605</string>
     <string name="list_guide_format_rating_zero">0\u2605</string>
