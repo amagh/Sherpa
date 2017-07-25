@@ -9,10 +9,16 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.StorageReference;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+
+import java.lang.ref.WeakReference;
 
 import project.hikerguide.R;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.ui.MapboxActivity;
 
 /**
  * Created by Alvin on 7/21/2017.
@@ -23,9 +29,17 @@ public class GuideViewModel extends BaseObservable {
     private Context mContext;
     private Guide mGuide;
     private StorageProvider mStorage;
+    private WeakReference<MapboxActivity> mActivity;
+    private static boolean started = false;
 
     public GuideViewModel(Context context, Guide guide) {
         mContext = context;
+
+        // If the passesd Context is a MapboxActivity, then set the mem var to reference it
+        if (mContext instanceof MapboxActivity) {
+            mActivity = new WeakReference<>((MapboxActivity) mContext);
+        }
+
         mGuide = guide;
 
         mStorage = StorageProvider.getInstance();
@@ -96,5 +110,37 @@ public class GuideViewModel extends BaseObservable {
     @Bindable
     public String getAuthor() {
         return mGuide.authorName;
+    }
+
+    @Bindable
+    public String getFirebaseId() {
+        return mGuide.firebaseId;
+    }
+
+    @Bindable
+    public MapboxActivity getActivity() {
+        return mActivity.get();
+    }
+
+    @BindingAdapter({"bind:firebaseId", "bind:activity"})
+    public static void loadGpxToMap(MapView mapView, final String firebaseId, MapboxActivity activity) {
+        // The MapView will retain it's internal LifeCycle regardless of how many times it's
+        // rendered
+        if (!started) {
+            // Since the MapView is added after the Activity has already started, the onCreate and
+            // onStart a manually called
+            mapView.onCreate(null);
+            mapView.onStart();
+
+            // Attach the MapView to the Activity so it can follow the rest of the lifecycle
+            activity.attachMapView(mapView);
+        }
+
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+
+            }
+        });
     }
 }
