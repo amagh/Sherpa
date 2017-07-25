@@ -53,11 +53,11 @@ public class FirebaseTest {
     @Test
     public void testSaveNewGuide() {
         // Generate data models to insert into Firebase
-        final Area area = TestUtilities.getArea();
-        final Author author = TestUtilities.getAuthor(mContext);
-        final Trail trail = TestUtilities.getTrail();
-        final Guide guide = TestUtilities.getGuide(mContext);
-        Section[] sections = TestUtilities.getSections(mContext);
+        final Area area = TestUtilities.getArea1();
+        final Author author = TestUtilities.getAuthor1(mContext);
+        final Trail trail = TestUtilities.getTrail1();
+        final Guide guide = TestUtilities.getGuide1(mContext);
+        Section[] sections = TestUtilities.getSections1(mContext);
 
         // Insert the author into the database and their ImageFile into the Storage
         mDatabase.insertRecord(author);
@@ -135,11 +135,11 @@ public class FirebaseTest {
     @Test
     public void testDownloadFilesForGuide() {
         // Generate data models to insert
-        final Area area = TestUtilities.getArea();
-        final Author author = TestUtilities.getAuthor(mContext);
-        final Trail trail = TestUtilities.getTrail();
-        final Guide guide = TestUtilities.getGuide(mContext);
-        Section[] sections = TestUtilities.getSections(mContext);
+        final Area area = TestUtilities.getArea1();
+        final Author author = TestUtilities.getAuthor1(mContext);
+        final Trail trail = TestUtilities.getTrail1();
+        final Guide guide = TestUtilities.getGuide1(mContext);
+        Section[] sections = TestUtilities.getSections1(mContext);
 
         // Insert data into the database and storage
         mDatabase.insertRecord(author);
@@ -222,11 +222,11 @@ public class FirebaseTest {
     @Test
     public void insertTestValues() {
         // Generate data models to insert
-        final Area area = TestUtilities.getArea();
-        final Author author = TestUtilities.getAuthor(mContext);
-        final Trail trail = TestUtilities.getTrail();
-        final Guide guide = TestUtilities.getGuide(mContext);
-        Section[] sections = TestUtilities.getSections(mContext);
+        final Area area = TestUtilities.getArea1();
+        final Author author = TestUtilities.getAuthor1(mContext);
+        final Trail trail = TestUtilities.getTrail1();
+        final Guide guide = TestUtilities.getGuide1(mContext);
+        Section[] sections = TestUtilities.getSections1(mContext);
 
         // Insert data into the database and storage
         mDatabase.insertRecord(author);

@@ -179,21 +179,21 @@ public class FirebaseDatabaseTest {
     }
 
     public Guide insertGuide() {
-        Guide guide = TestUtilities.getGuide(mContext);
+        Guide guide = TestUtilities.getGuide1(mContext);
         mDatabase.insertRecord(guide);
 
         return guide;
     }
 
     public Trail insertTrail() {
-        Trail trail = TestUtilities.getTrail();
+        Trail trail = TestUtilities.getTrail1();
         mDatabase.insertRecord(trail);
 
         return trail;
     }
 
     public Author insertAuthor() {
-        Author author = TestUtilities.getAuthor(mContext);
+        Author author = TestUtilities.getAuthor1(mContext);
         mDatabase.insertRecord(author);
 
         return author;
@@ -207,7 +207,7 @@ public class FirebaseDatabaseTest {
     }
 
     public Area insertArea() {
-        Area area = TestUtilities.getArea();
+        Area area = TestUtilities.getArea1();
         mDatabase.insertRecord(area);
 
         return area;

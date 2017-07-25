@@ -137,11 +137,20 @@ class TestUtilities {
         return values;
     }
 
-    static Guide getGuide(Context context) {
-        Guide guide = new Guide(1, System.currentTimeMillis(), 37.734, 119.602);
+    static Guide getGuide1(Context context) {
+        Guide guide = new Guide(System.currentTimeMillis());
         guide.difficulty = 3;
         guide.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2014/09/09.jpg"));
         guide.setGpxUri(downloadFile(context, "http://www.norcalhiker.com/maps/FourMileTrail.gpx"));
+
+        return guide;
+    }
+
+    static Guide getGuide2(Context context) {
+        Guide guide = new Guide(System.currentTimeMillis());
+        guide.difficulty = 2;
+        guide.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2015/03/000.jpg"));
+        guide.setGpxUri(downloadFile(context, "http://www.norcalhiker.com/maps/Snow_Mtn.gpx"));
 
         return guide;
     }
@@ -161,11 +170,15 @@ class TestUtilities {
         return guides;
     }
 
-    static Trail getTrail() {
+    static Trail getTrail1() {
         return new Trail("Four Mile Trail", null);
     }
 
-    static Author getAuthor(Context context) {
+    static Trail getTrail2() {
+        return new Trail("Snow Mountain", null);
+    }
+
+    static Author getAuthor1(Context context) {
         Author author = new Author("John Muir");
         author.setImageUri(downloadFile(context, "http://www.norcalhiker.com/JMT/Images/170.jpg"));
         return author;
@@ -175,7 +188,7 @@ class TestUtilities {
         return new Section("1", 1, "Description of hike");
     }
 
-    public static Section[] getSections(Context context) {
+    public static Section[] getSections1(Context context) {
         Section section1 = new Section(1, "The Four Mile Trail (actually 4.8 miles) is one of Yosemite Valley’s most strenuous trails. It climbs up to Glacier Point – an ascent of nearly 3300-ft in just under five miles. After the grueling uphill slog, hikers are rewarded with unparalleled views of Half Dome and the rest of Yosemite Valley. Glacier Point can also be reached by car or shuttle, but the view feels much more rewarding when you walk. We hiked this on a rainy Saturday in late September. Though summer is over, there were still plenty of people out and about. You can’t expect much solitude on this trail, but you can look forward to a great workout and some good people watching!");
         Section section2 = new Section(2, "Red Tape:  The park entrance fee is $20.  If you plan to stay in the Valley, reserve accommodations well in advance!  There is limited parking at the trailhead, but it is along the El Capitan shuttle route.  The shuttle runs from June through October, 9am to 6pm. When you enter the park, they will hand you a fairly decent map at the kiosk. The trail is on this map. There are no junctions, so it’s basically impossible to get lost.");
         Section section3 = new Section(3, "Trail Description: The hike described here is actually a repeat of the beginning portion of the 20-mile John Muir hike we completed last October. On that trip we hiked half this trail in the dark, then continued on towards Sentinel Dome, the Panorama Trail, Liberty Cap and the Mist Trail. This time around we decided to “take it easy” and enjoy the Four Mile Trail on its own.");
@@ -190,6 +203,26 @@ class TestUtilities {
         Section section9 = new Section(9, "The trail climbs at a steady, relentless grade with many switchbacks.  Soon we had glimpses of El Cap and the Valley through the trees.  About halfway up, we started catching views of Half Dome.  We also began encountering quite a few hikers coming down the trail. Some had taken the shuttle up and were now hiking down.  Others had already hiked to the top and were on their way back.  I’m not used to this because we are usually the first people to hit a trail!");
 
         return new Section[] {section1, section2, section3, section4, section5, section6, section7, section8, section9};
+    }
+
+    static Section[] getSections2(Context context) {
+        Section section1 = new Section(1, "Last week, as I was making plans to visit the Snow Mountain Wilderness, I discovered that the vast majority of people I talked to had never heard of Snow Mountain. This is too bad because efforts are underway to create a Berryessa Snow Mountain National Monument. This would protect the land for future generations while improving coordination between the agencies who plan for fires, manage recreation and clear out invasive species and/or marijuana grow sites. There is already a lot of support for the proposed National Monument, but if more people knew about the area, there might be greater momentum behind the cause.");
+        Section section2 = new Section(2, "Basics: This hike begins at Deafy Glade (pronounced “Deefee”) and climbs 4000-ft to the east summit of Snow Mountain (7056′). It’s 14 miles, roundtrip. The steepest portion of the trail is in the first 3.5 miles – between Deafy Glade and Summit Spring. Alternatively, it’s possible to start at the Summit Spring trailhead. This shorter route is approximately 8 miles roundtrip but requires an extra 30 to 45 minutes of bumpy dirt-road driving. (The pavement ends just after the Deafy Glade trailhead.) Snow Mountain can be hiked or snowshoed year-round, but heavy snow in the winter will close the last few miles of the road to Summit Springs. This hike is dog friendly and great for backpacking.");
+        Section section3 = new Section(3, "Red Tape, Reservations and Camping: There are no permits, quotas or fees for hiking this peak. A campfire permit is required if you plan to use a stove while backpacking – check the Forest Service website. Bear cans are recommended but not required.");
+        Section section4 = new Section(4, "If you plan to car camp, Dixie Glade campground is located right next to the trailhead. It’s comprised of 8 sites that are first come, first served. There are also a handful of OHV campgrounds several miles before the trailhead including: Fouts, Mill Creek, and Gray Pine Group. These are outside of the wilderness area and in the heart of the OHV territory.");
+        Section section5 = new Section(5, "Directions to Trailhead: Exit I-5 at the town of Maxwell in Colusa County and head west along Maxwell Sites Road. Follow signs for Stonyford (making right turns onto Sites Lodoga Road then Lodoga Stonyford Road). Once you reach the town of Stonyford, turn left onto Market Street. One block later, turn left again on to Fouts Spring Road (aka M10). Follow Fouts Spring Road for the next 12 or 13 miles. The pavement ends at the Deafy Glade trailhead, shortly after the Dixie Glade campground.");
+        Section section6 = new Section(6, "Trail Description: Rob has wanted to climb Snow Mountain for quite some time. He always said “we should hike it when there’s snow!” Unfortunately, there is no snow this winter. Some friends invited us to go camping in the area, so we decided to join them and hike the peak – snow or no snow. We camped at the Gray Pine Group site in the heart of OHV territory. After a windy night, we woke up around sunrise and made the short drive to Deafy Glade. We signed the register and hit the trail by 8:30am.");
+        Section section7 = new Section(7, null);
+        section7.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2015/03/01.jpg"));
+        Section section8 = new Section(8, null);
+        section8.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2015/03/02.jpg"));
+        Section section9 = new Section(9, "The trail starts out deceivingly flat. It follows an old road as it contours around the hillside then eventually descends to South Fork Stony Creek (about 1 mile in). There is no bridge at this creek crossing. SummitPost describes the crossing as crotch-deep on a 6-ft person in mid-May. This would be challenging but we are in a drought. We hopped on a couple of rocks and were quickly across.");
+        Section section10 = new Section(10, null);
+        section10.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2015/03/03.jpg"));
+        Section section11 = new Section(11, null);
+        section11.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2015/03/03.jpg"));
+
+        return new Section[] {section1, section2, section3, section4, section5, section6, section7, section8, section9, section10, section11};
     }
 
     static File downloadFile(Context context, String url) {
@@ -232,8 +265,12 @@ class TestUtilities {
         return null;
     }
 
-    static Area getArea() {
-        return new Area("Yosemite");
+    static Area getArea1() {
+        return new Area("Yosemite Valley");
+    }
+
+    static Area getArea2() {
+        return new Area("Mendocino National Forest");
     }
 
     static Area[] getAreas() {
