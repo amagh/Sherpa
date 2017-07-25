@@ -67,6 +67,7 @@ public class SaveUtils {
             guide.trailName = trail.name;
             guide.authorId = author.firebaseId;
             guide.authorName = author.name;
+            guide.area = area.name;
             database.insertRecord(guide);
 
             // Upload the Image and Gpx File associated with the Guide
