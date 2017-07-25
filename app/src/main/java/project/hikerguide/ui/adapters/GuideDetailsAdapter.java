@@ -18,6 +18,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.models.viewmodels.SectionViewModel;
+import project.hikerguide.ui.MapboxActivity;
 
 /**
  * Created by Alvin on 7/22/2017.
@@ -31,7 +32,13 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
     private static final int AUTHOR_VIEW_TYPE = 3;
 
     // ** Member Variables ** //
+    private Guide mGuide;
+    private Section[] mSections;
+    private Author mAuthor;
+
     private BaseModel[] mModels;
+
+    private MapboxActivity mActivity;
 
     @Override
     public GuideDetailsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -96,6 +103,20 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
         }
     }
 
+    /**
+     * Sets the Guide whose details are to be shown
+     *
+     * @param guide       Guide whose details need to be shown
+     * @param activity    MapboxActivity so that the MapView can follow its lifecycle
+     */
+    public void setGuide(Guide guide, MapboxActivity activity) {
+        mGuide = guide;
+        mActivity = activity;
+
+        // Testing purposes only
+        mModels = new BaseModel[] {guide};
+    }
+
     public void swapModels(BaseModel[] models) {
         mModels = models;
 
@@ -118,7 +139,8 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
             // the position
             if (model instanceof Guide) {
                 ((ListItemGuideDetailsBinding) mBinding).setVm(
-                        new GuideViewModel(mBinding.getRoot().getContext(), (Guide) model));
+                        // Pass in the MapboxActivity for lifecycle purposes
+                        new GuideViewModel(mActivity, (Guide) model));
             } else if (model instanceof Section) {
                 // Load the correct ViewDataBinding depending on whether the section has an image
                 if (((Section) mModels[position]).hasImage) {

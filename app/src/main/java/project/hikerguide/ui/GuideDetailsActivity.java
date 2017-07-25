@@ -43,5 +43,8 @@ public class GuideDetailsActivity extends MapboxActivity {
         mBinding.setVm(new GuideViewModel(this, mGuide));
         mBinding.guideDetailsRv.setLayoutManager(new LinearLayoutManager(this));
         mBinding.guideDetailsRv.setAdapter(mAdapter);
+
+        // Add Guide for testing purposes only
+        mAdapter.setGuide(mGuide, this);
     }
 }
