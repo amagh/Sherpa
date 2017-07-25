@@ -13,7 +13,7 @@ import java.util.Map;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.files.GpxFile;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
-import project.hikerguide.utilities.GpxStats;
+import project.hikerguide.utilities.objects.GpxStats;
 import project.hikerguide.utilities.GpxUtils;
 
 /**

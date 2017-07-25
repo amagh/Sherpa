@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 
 import java.io.File;
 
-import project.hikerguide.utilities.GpxStats;
+import project.hikerguide.utilities.objects.GpxStats;
 import project.hikerguide.utilities.GpxUtils;
 
 import static junit.framework.Assert.assertNotNull;

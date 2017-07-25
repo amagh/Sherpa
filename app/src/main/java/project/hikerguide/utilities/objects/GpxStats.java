@@ -1,4 +1,4 @@
-package project.hikerguide.utilities;
+package project.hikerguide.utilities.objects;
 
 /**
  * Helper class for storing the Gpx's statistics
