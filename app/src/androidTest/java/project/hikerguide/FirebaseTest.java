@@ -222,16 +222,36 @@ public class FirebaseTest {
     @Test
     public void insertTestValues() {
         // Generate data models to insert
-        final Area area = TestUtilities.getArea1();
-        final Author author = TestUtilities.getAuthor1(mContext);
-        final Trail trail = TestUtilities.getTrail1();
-        final Guide guide = TestUtilities.getGuide1(mContext);
-        Section[] sections = TestUtilities.getSections1(mContext);
+        Area area1 = TestUtilities.getArea1();
+        Author author1 = TestUtilities.getAuthor1(mContext);
+        Trail trail1 = TestUtilities.getTrail1();
+        Guide guide1 = TestUtilities.getGuide1(mContext);
+        Section[] sections1 = TestUtilities.getSections1(mContext);
 
         // Insert data into the database and storage
-        mDatabase.insertRecord(author);
-        mStorage.uploadFile(author.getImageFile());
+        mDatabase.insertRecord(author1);
+        mStorage.uploadFile(author1.getImageFile());
 
-        SaveUtils.saveGuide(area, author, trail, guide, sections);
+        SaveUtils.saveGuide(area1, author1, trail1, guide1, sections1);
+
+        Area area2 = TestUtilities.getArea2();
+        Trail trail2 = TestUtilities.getTrail2();
+        Guide guide2 = TestUtilities.getGuide2(mContext);
+        Section[] sections2 = TestUtilities.getSections2(mContext);
+
+        SaveUtils.saveGuide(area2, author1, trail2, guide2, sections2);
+
+        Area area3 = TestUtilities.getArea3();
+        Trail trail3 = TestUtilities.getTrail3();
+        Guide guide3 = TestUtilities.getGuide3(mContext);
+        Section[] sections3 = TestUtilities.getSections3(mContext);
+
+        SaveUtils.saveGuide(area3, author1, trail3, guide3, sections3);
+
+        Trail trail4 = TestUtilities.getTrail4();
+        Guide guide4 = TestUtilities.getGuide4(mContext);
+        Section[] sections4 = TestUtilities.getSections4(mContext);
+
+        SaveUtils.saveGuide(area1, author1, trail4, guide4, sections4);
     }
 }

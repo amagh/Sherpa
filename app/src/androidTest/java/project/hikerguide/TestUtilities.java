@@ -155,6 +155,24 @@ class TestUtilities {
         return guide;
     }
 
+    static Guide getGuide3(Context context) {
+        Guide guide = new Guide(System.currentTimeMillis());
+        guide.difficulty = 3;
+        guide.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2016/01/00-1.jpg"));
+        guide.setGpxUri(downloadFile(context, "http://www.norcalhiker.com/maps/Falls_Trail.gpx"));
+
+        return guide;
+    }
+
+    static Guide getGuide4(Context context) {
+        Guide guide = new Guide(System.currentTimeMillis());
+        guide.difficulty = 4;
+        guide.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2013/10/032.jpg"));
+        guide.setGpxUri(downloadFile(context, "http://www.norcalhiker.com/maps/Muir_Hike.gpx"));
+
+        return guide;
+    }
+
     static Guide[] getGuides() {
         Guide guide1 = new Guide("a", "1", System.currentTimeMillis(), 37.734, -119.602);
         Guide guide2 = new Guide("b", "1", System.currentTimeMillis(), 37.734, -119.602);
@@ -176,6 +194,14 @@ class TestUtilities {
 
     static Trail getTrail2() {
         return new Trail("Snow Mountain", null);
+    }
+
+    static Trail getTrail3() {
+        return new Trail("Falls Trail Loop", null);
+    }
+
+    static Trail getTrail4() {
+        return new Trail("Four Mile Trail, Sentinel Dome, Panorama Trail, Liberty Cap and Mist Trail", null);
     }
 
     static Author getAuthor1(Context context) {
@@ -221,6 +247,47 @@ class TestUtilities {
         section10.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2015/03/03.jpg"));
         Section section11 = new Section(11, null);
         section11.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2015/03/03.jpg"));
+
+        return new Section[] {section1, section2, section3, section4, section5, section6, section7, section8, section9, section10, section11};
+    }
+
+    static Section[] getSections3(Context context) {
+        Section section1 = new Section(1, "For anyone who has hiked in Mount Diablo’s blistering summer heat, it seems almost impossible that there could be even a single waterfall on that mountain, much less an entire trail dedicated to numerous falls.  The Falls Trail is a 1.15 mile point-to-point trail located somewhere amongst the maze of paths on Mount Diablo’s north slope.  We hiked the Falls Trail as part of a 7-mile loop, beginning and ending at the Mitchell Canyon Visitor Center.");
+        Section section2 = new Section(2, "Trailhead Directions and Red Tape: The visitor center parking area is located at the south end of Mitchell Canyon Road in Clayton, CA. Google Map link to trailhead. Parking is $6 and the gate opens at 8:00 am.  It’s also possible to hike from the trailhead at the Regency Gate.");
+        Section section3 = new Section(3, "Trail Description: It rained for most of last week (thanks El Niño), making Saturday the perfect time for a waterfall hike.  I always heard there were waterfalls at Mount Diablo, but I had never actually seen any of them before.");
+        Section section4 = new Section(4, null);
+        section4.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2016/01/01-1-768x576.jpg"));
+        Section section5 = new Section(5, "Flowers near the Donner Cabin site.");
+        section5.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2016/01/03-1-768x500.jpg"));
+        Section section6 = new Section(6, "In stark contrast to the wider dirt roads, the Falls Trail is a narrow single track path with steep drop-offs to the side.  It was fortunately far less muddy so we had good traction.  We could see several falls as we contoured around the hillside.");
+        Section section7 = new Section(7, null);
+        section7.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2016/01/04-768x576.jpg"));
+        Section section8 = new Section(8, null);
+        section8.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2016/01/05-1-768x576.jpg"));
+        Section section9 = new Section(9, null);
+        section9.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2016/01/06-1-768x576.jpg"));
+        Section section10 = new Section(10, "Somewhere halfway down the trail, we came around a bend and found a woman precariously clinging to an unstable slope about 20 feet above us.  We asked if she was okay and mentioned that maybe she had gotten off the trail a little…?  Her friend quickly appeared and explained that we could reach an even better waterfall if we scrambled up the slide.  With little hesitation, we made our way up the same stupid slope.  It was definitely worth it.  A narrow and somewhat unstable path took us to the best waterfall on the entire trail.  We would have completely walked past this had we not run into these people.  Rob thanked them on our way down.");
+        Section section11 = new Section(11, null);
+        section11.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2016/01/07-1.jpg"));
+
+        return new Section[] {section1, section2, section3, section4, section5, section6, section7, section8, section9, section10, section11};
+    }
+
+    static Section[] getSections4(Context context) {
+        Section section1 = new Section(1, "In John Muir’s book The Yosemite, there is a chapter near the end entitled “How Best to Spend One’s Yosemite Time”. The chapter describes several hikes, just as a modern blog would. He describes two single day excursions, two 2-day excursions, a 3-day excursion, and a grand several week excursion (not the JMT). This post focuses on the first listed single day excursion – the quintessential day hike in Yosemite. It’s about 20 miles total, with about 6,500 feet of elevation gain – longer and more difficult than a round trip up Half Dome.");
+        Section section2 = new Section(2, "We first attempted this hike several months ago in August.  We failed.  Even though we made it to the trailhead before sunrise, Christa was carsick (after the drive in from the Wawona Hotel) and it was very hot, humid and buggy.  We made another attempt in October – this time we succeeded!  Completing this hike requires an early start, a bit of luck, and a lot of determination.  The following text is John Muir’s description (in its entirety) annotated with my comments and photos.");
+        Section section3 = new Section(3, "\"If I were so time poor as to have only one day to spend in Yosemite I should start at daybreak, say at three o clock in midsummer, with a pocketful of any sort of dry breakfast stuff, for Glacier Point, Sentinel Dome, the head of Illilouette Fall, Nevada Fall, the top of Liberty Cap, Vernal Fall, and the wild boulder choked River Canõn.\"");
+        Section section4 = new Section(4, "Wow.  All day with just a pocket full of dry breakfast stuff?  We’re going to need a little more food than that.  Also, on the longest day of the year, sunrise or “daybreak” is at 5:35am. So 3:00am would be a bit before daybreak in my book.  Nonetheless, we began our hike at 5:50am in October – about an hour and a half before sunrise, just as Muir is suggesting.");
+        Section section5 = new Section(5, "Lunch for the day.");
+        section5.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2013/10/012.jpg"));
+        Section section6 = new Section(6, "For the record, we ate all of the following on our hike: three dried fruit leathers, two bagel sandwiches, two cans of Hop ‘Ottin IPA, one Superfood ProBar, half a pound of dark chocolate covered pretzels, a handful of coffee almonds, and one package of ProBar Bolt energy chews (they taste like gummy bears). Additionally, before we left in the morning, we each ate a bagel with cream cheese and drank a Starbucks Doubleshot®. A little more than a pocket full of dry breakfast stuff.");
+        Section section7 = new Section(7, "We are not used to hiking with headlamps. Christa kept blinding me with her light.  I considered hiking with just the light of the moon and stars, but it was pretty dark around our feet. The lights kept us from tripping over the uneven trail surface. Despite the blinding headlamps, El Capitan and other valley features were impressive in the half-moon light.  We heard owls hooting, but otherwise the valley was silent. It actually spooked me a bit – I expected to see the eyes of an unidentified animal (bear) shining back at me, but all was quiet this morning.  We got a little lost between the Lodge and the Four Mile Trail, but we managed to find the trailhead in the dark.");
+        Section section8 = new Section(8, "\"The trail leaves the Valley at the base of the Sentinel Rock, and as you slowly saunter from point to point along its many accommodating zigzags nearly all the Valley rocks and falls are seen in striking, ever changing combinations. At an elevation of about five hundred feet a particularly fine, wide sweeping view down the Valley is obtained, past the sheer face of the Sentinel and between the Cathedral Rocks and El Capitan.\"");
+        section8.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2016/01/05-1-768x576.jpg"));
+        Section section9 = new Section(9, null);
+        section9.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2013/10/032.jpg"));
+        Section section10 = new Section(10, "\"At a height of about 1500 feet the great Half Dome comes full in sight, overshadowing every other feature of the Valley to the eastward.\"");
+        Section section11 = new Section(11, "The view from the Four Mile Trail is epic. If you have a decent set of legs and you’re in Yosemite, I advise you to hike up to Glacier Point and Sentinal Dome via the Four Mile Trail.");
 
         return new Section[] {section1, section2, section3, section4, section5, section6, section7, section8, section9, section10, section11};
     }
@@ -271,6 +338,10 @@ class TestUtilities {
 
     static Area getArea2() {
         return new Area("Mendocino National Forest");
+    }
+
+    static Area getArea3() {
+        return new Area("Mount Diablo State Park");
     }
 
     static Area[] getAreas() {
