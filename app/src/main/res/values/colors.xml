@@ -28,7 +28,8 @@
 
     <array name="track_color_array">
         <item>@color/black</item>
-        
+        <item>@color/grey_700</item>
+        <item>@color/blue_grey_500</item>
         <item>@color/brown_900</item>
         <item>@color/green_900</item>
         <item>@color/teal_700</item>
