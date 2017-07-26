@@ -29,6 +29,7 @@ import com.google.firebase.storage.StorageReference;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -65,6 +66,8 @@ public class FragmentSearch extends MapboxFragment {
     // ** Constants ** //
     private static final int PLACES_REQUEST_CODE = 6498;
 
+
+
     // ** Member Variables ** //
     private FragmentSearchBinding mBinding;
     private MapboxMap mMapboxMap;
@@ -93,6 +96,25 @@ public class FragmentSearch extends MapboxFragment {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
+
+                mMapboxMap.setOnCameraIdleListener(new MapboxMap.OnCameraIdleListener() {
+                    @Override
+                    public void onCameraIdle() {
+                        System.out.println("IDLE");
+
+                        // Get the camera's position
+                        LatLng position = mMapboxMap.getCameraPosition().target;
+
+                        // Create a GeoLocation that can be used to search Firebase Database for
+                        // guides in the nearby area
+                        GeoLocation location = new GeoLocation(
+                                position.getLatitude(),
+                                position.getLongitude());
+
+                        // Use GeoFire to query for Guides in the area that was searched
+                        queryGeoFire(location);
+                    }
+                });
             }
         });
 
@@ -136,18 +158,11 @@ public class FragmentSearch extends MapboxFragment {
 
                 if (mMapboxMap != null) {
                     // Move the camera to the correct position
-                    mMapboxMap.setCameraPosition(new CameraPosition.Builder()
+                    mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                             .target(target)
-                            .zoom(12)
-                            .build());
+                            .zoom(10)
+                            .build()), 3000);
                 }
-
-                // Create a GeoLocation that can be used to search Firebase Database for guides in
-                // the nearby area
-                GeoLocation location = new GeoLocation(result.latitude, result.longitude);
-
-                // Use GeoFire to query for Guides in the area that was searched
-                queryGeoFire(location);
             }
         }
 
@@ -173,50 +188,7 @@ public class FragmentSearch extends MapboxFragment {
 
             mAdapter.setGuides(mGuideList);
 
-            mGeoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-                @Override
-                public void onKeyEntered(String key, GeoLocation location) {
-
-                    // Initialize the list to hold the Guides
-                    if (mGuideList == null) {
-                        mGuideList = new ArrayList<>();
-                    }
-
-                    // Init a List to hold the PolylineOptions if it is null
-                    if (mGuidePolylineMap == null) {
-                        mGuidePolylineMap = new HashMap<>();
-                    }
-
-                    // Get the Guide data model that entered the search area
-                    getGuide(key);
-                }
-
-                @Override
-                public void onKeyExited(String key) {
-
-                    // Remove the Guide and its Polyline track
-                    mAdapter.removeGuide(key);
-                    mGuidePolylineMap.remove(key);
-
-                    // Update the colors of the lines so they match the new position of the Guides
-                    updatePolylineColors();
-                }
-
-                @Override
-                public void onKeyMoved(String key, GeoLocation location) {
-
-                }
-
-                @Override
-                public void onGeoQueryReady() {
-
-                }
-
-                @Override
-                public void onGeoQueryError(DatabaseError error) {
-
-                }
-            });
+            mGeoQuery.addGeoQueryEventListener(geoQueryEventListener);
         } else {
             // Set the center to the new location
             mGeoQuery.setCenter(location);
@@ -344,4 +316,50 @@ public class FragmentSearch extends MapboxFragment {
                     .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(firebaseId)));
         }
     }
+
+    private final GeoQueryEventListener geoQueryEventListener = new GeoQueryEventListener() {
+        @Override
+        public void onKeyEntered(String key, GeoLocation location) {
+
+            // Initialize the list to hold the Guides
+            if (mGuideList == null) {
+                mGuideList = new ArrayList<>();
+            }
+
+            // Init a List to hold the PolylineOptions if it is null
+            if (mGuidePolylineMap == null) {
+                mGuidePolylineMap = new HashMap<>();
+            }
+
+            // Get the Guide data model that entered the search area
+            getGuide(key);
+        }
+
+        @Override
+        public void onKeyExited(String key) {
+
+            // Remove the Guide and its Polyline track
+            mAdapter.removeGuide(key);
+            mMapboxMap.removePolyline(mGuidePolylineMap.get(key).getPolyline());
+            mGuidePolylineMap.remove(key);
+
+            // Update the colors of the lines so they match the new position of the Guides
+            updatePolylineColors();
+        }
+
+        @Override
+        public void onKeyMoved(String key, GeoLocation location) {
+
+        }
+
+        @Override
+        public void onGeoQueryReady() {
+
+        }
+
+        @Override
+        public void onGeoQueryError(DatabaseError error) {
+
+        }
+    };
 }
