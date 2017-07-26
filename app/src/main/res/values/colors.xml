@@ -38,4 +38,7 @@
         <item>@color/red_900</item>
         <item>@color/pink_900</item>
     </array>
+
+    <!-- For highlighting a single track -->
+    <color name="yellow_a200">#FFFF00</color>
 </resources>
