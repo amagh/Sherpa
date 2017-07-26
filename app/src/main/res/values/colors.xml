@@ -41,4 +41,6 @@
 
     <!-- For highlighting a single track -->
     <color name="yellow_a200">#FFFF00</color>
+    <color name="colorHighlight">@color/yellow_a200</color>
+
 </resources>
