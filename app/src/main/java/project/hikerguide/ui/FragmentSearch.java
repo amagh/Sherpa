@@ -2,6 +2,7 @@ package project.hikerguide.ui;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.ui.adapters.GuideAdapter;
+import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.SaveUtils;
@@ -59,9 +61,10 @@ public class FragmentSearch extends MapboxFragment {
     private static final int PLACES_REQUEST_CODE = 6498;
 
     // ** Member Variables ** //
-    FragmentSearchBinding mBinding;
-    MapboxMap mMapboxMap;
-    GuideAdapter mAdapter;
+    private FragmentSearchBinding mBinding;
+    private MapboxMap mMapboxMap;
+    private GuideAdapter mAdapter;
+    private int mColorPosition;
 
     public FragmentSearch() {
     }
@@ -160,7 +163,8 @@ public class FragmentSearch extends MapboxFragment {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
                 // Get the Guide data model that entered the search area
-                getGuide(key);
+                getGuide(key, mColorPosition);
+                mColorPosition++;
             }
 
             @Override
@@ -185,7 +189,14 @@ public class FragmentSearch extends MapboxFragment {
         });
     }
 
-    private void getGuide(String firebaseId) {
+    /**
+     * Retrievs a Guide data model from the Firebase Database
+     *
+     * @param firebaseId       The ID of the guide to be retrieved
+     * @param colorPosition    The position of the Guide that will be used to generate its track's
+     *                         color
+     */
+    private void getGuide(String firebaseId, final int colorPosition) {
 
         // Get a reference to the Guide in the Firebase Database using the firebaseId
         final DatabaseReference guideReference = FirebaseDatabase.getInstance().getReference()
@@ -204,7 +215,7 @@ public class FragmentSearch extends MapboxFragment {
                 mAdapter.addGuide(guide);
 
                 // Get the GPX File for the Guide
-                getGpxForGuide(guide);
+                getGpxForGuide(guide, colorPosition);
 
                 // Remove the Listener
                 guideReference.removeEventListener(this);
@@ -220,9 +231,11 @@ public class FragmentSearch extends MapboxFragment {
     /**
      * Downloads the GPX File for a Guide
      *
-     * @param guide    Guide whose GPX File is to be downloaded
+     * @param guide         Guide whose GPX File is to be downloaded
+     * @param colorPosition The position of the Guide in the Adapter that will be used to generate
+     *                      its track's color
      */
-    private void getGpxForGuide(Guide guide) {
+    private void getGpxForGuide(Guide guide, final int colorPosition) {
 
         // Create a file in the temp files directory that has a constant name so it can be
         // referenced later without downloading another copy while it exists in the cache
@@ -241,7 +254,7 @@ public class FragmentSearch extends MapboxFragment {
                     @Override
                     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                         // Add the Polyline representing the trail to the map
-                        addPolylineOptionsToMap(tempGpxFile);
+                        addPolylineOptionsToMap(tempGpxFile, colorPosition);
                     }
                 });
 
@@ -251,9 +264,11 @@ public class FragmentSearch extends MapboxFragment {
     /**
      * Adds a Polyline representing a Guide's trail as calculated by its GPX File
      *
-     * @param gpxFile    GPX File containing coordinates representing a trail
+     * @param gpxFile           GPX File containing coordinates representing a trail
+     * @param colorPosition    The position of the Guide that will be used to generate its track's
+     *                         color
      */
-    private void addPolylineOptionsToMap(File gpxFile) {
+    private void addPolylineOptionsToMap(File gpxFile, final int colorPosition) {
 
         // Generate the MapboxOptions that will contain the Polyline
         GpxUtils.getMapboxOptions(gpxFile, new GpxUtils.MapboxOptionsListener() {
@@ -262,7 +277,9 @@ public class FragmentSearch extends MapboxFragment {
 
                 // Add the Polyline to the MapboxMap
                 mMapboxMap.addPolyline(polylineOptions
-                        .width(2));
+                        .width(2)
+                        // Set the color using the the colorPosition and the ColorGenerator
+                        .color(ColorGenerator.getColor(getActivity(), colorPosition)));
             }
         });
     }

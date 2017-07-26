@@ -157,7 +157,9 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
                         .setVm(new GuideViewModel(mBinding.getRoot().getContext(), guide));
             } else {
                 ((ListItemGuideSearchBinding) mBinding)
-                        .setVm(new GuideViewModel(mBinding.getRoot().getContext(), guide));
+                        // Add the position to the Constructor so that color position matches the
+                        // color given the track.
+                        .setVm(new GuideViewModel(mBinding.getRoot().getContext(), guide, position));
             }
             mBinding.executePendingBindings();
         }

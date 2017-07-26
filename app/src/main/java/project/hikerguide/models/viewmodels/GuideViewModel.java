@@ -4,6 +4,8 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -31,6 +33,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import project.hikerguide.R;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.mapbox.SmartMapView;
@@ -38,6 +41,7 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.mpandroidchart.DistanceAxisFormatter;
 import project.hikerguide.mpandroidchart.ElevationAxisFormatter;
 import project.hikerguide.ui.MapboxActivity;
+import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.SaveUtils;
 
@@ -61,6 +65,7 @@ public class GuideViewModel extends BaseObservable {
     private Context mContext;
     private Guide mGuide;
     private WeakReference<MapboxActivity> mActivity;
+    private int mColorPosition;
 
     public GuideViewModel(Context context, Guide guide) {
         mContext = context;
@@ -71,6 +76,18 @@ public class GuideViewModel extends BaseObservable {
         }
 
         mGuide = guide;
+    }
+
+    public GuideViewModel(Context context, Guide guide, int colorPosition) {
+        mContext = context;
+
+        // If the passesd Context is a MapboxActivity, then set the mem var to reference it
+        if (mContext instanceof MapboxActivity) {
+            mActivity = new WeakReference<>((MapboxActivity) mContext);
+        }
+
+        mGuide = guide;
+        mColorPosition = colorPosition;
     }
 
     @Bindable
@@ -274,6 +291,17 @@ public class GuideViewModel extends BaseObservable {
             addElevationDataToLineChart(tempGpx, lineChart, context);
         }
 
+    }
+
+    @Bindable
+    public int getColor() {
+        return ColorGenerator.getColor(mContext, mColorPosition);
+    }
+
+    @BindingAdapter("bind:color")
+    public static void setTrackColor(CircleImageView imageView, int color) {
+        // Set the color swatch to match the Guide's track's color
+        imageView.setImageDrawable(new ColorDrawable(color));
     }
 
     /**

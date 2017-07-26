@@ -8,7 +8,33 @@
     <color name="green_500">#4CAF50</color>
     <color name="green_700">#388E3C</color>
     <color name="green_900">#1B5E20</color>
+
     <color name="red_a200">#FF5252</color>
     <color name="grey_400">#BDBDBD</color>
     <color name="white_alpha_75">#BFFFFFFF</color>
+
+    <!-- Muted Colors for Tracks -->
+    <color name="black">#000000</color>
+    <color name="grey_700">#616161</color>
+    <color name="blue_grey_500">#607D8B</color>
+    <color name="brown_900">#3E2723</color>
+
+    <color name="teal_700">#00796B</color>
+    <color name="blue_900">#0D47A1</color>
+    <color name="deep_purple_900">#311B92</color>
+
+    <color name="red_900">#B71C1C</color>
+    <color name="pink_900">#880E4F</color>
+
+    <array name="track_color_array">
+        <item>@color/black</item>
+        
+        <item>@color/brown_900</item>
+        <item>@color/green_900</item>
+        <item>@color/teal_700</item>
+        <item>@color/blue_900</item>
+        <item>@color/deep_purple_900</item>
+        <item>@color/red_900</item>
+        <item>@color/pink_900</item>
+    </array>
 </resources>
