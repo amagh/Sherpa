@@ -59,8 +59,6 @@ public class GuideViewModel extends BaseObservable {
     private static final double METERS_PER_MILE = 1609.34;
     private static final double METERS_PER_FEET = 0.3048;
 
-    private static final float TWENTY_MI_IN_KM = 32186.9f;
-
     // ** Member Variables ** //
     private Context mContext;
     private Guide mGuide;
