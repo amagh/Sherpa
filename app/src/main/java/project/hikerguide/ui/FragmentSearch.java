@@ -69,8 +69,9 @@ public class FragmentSearch extends MapboxFragment {
     private FragmentSearchBinding mBinding;
     private MapboxMap mMapboxMap;
     private GuideAdapter mAdapter;
+    private GeoQuery mGeoQuery;
     private List<Guide> mGuideList;
-    private Map<Guide, PolylineOptions> mGuidePolylineMap;
+    private Map<String, PolylineOptions> mGuidePolylineMap;
 
     public FragmentSearch() {
     }
@@ -112,6 +113,8 @@ public class FragmentSearch extends MapboxFragment {
 
         // Set the GuideAdapter to use the search layout
         mAdapter.setUseSearchLayout(true);
+
+        // Set the LayoutManager and Adapter for the RecyclerView
         mBinding.searchResultsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mBinding.searchResultsRv.setAdapter(mAdapter);
 
@@ -122,6 +125,7 @@ public class FragmentSearch extends MapboxFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACES_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
+
                 // Get the Place selected by the user
                 Place place = PlaceAutocomplete.getPlace(getActivity(), data);
 
@@ -161,48 +165,62 @@ public class FragmentSearch extends MapboxFragment {
         DatabaseReference firebaseRef = FirebaseDatabase.getInstance().getReference()
                 .child(GEOFIRE_PATH);
 
-        // Use GeoFire to build a query
-        GeoFire geofire = new GeoFire(firebaseRef);
-        GeoQuery geoQuery = geofire.queryAtLocation(location, 10);
+        if (mGeoQuery == null) {
 
-        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-            @Override
-            public void onKeyEntered(String key, GeoLocation location) {
+            // Use GeoFire to build a query
+            GeoFire geofire = new GeoFire(firebaseRef);
+            mGeoQuery = geofire.queryAtLocation(location, 10);
 
-                // Initialize the list to hold the Guides
-                if (mGuideList == null) {
-                    mGuideList = new ArrayList<>();
+            mAdapter.setGuides(mGuideList);
+
+            mGeoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+                @Override
+                public void onKeyEntered(String key, GeoLocation location) {
+
+                    // Initialize the list to hold the Guides
+                    if (mGuideList == null) {
+                        mGuideList = new ArrayList<>();
+                    }
+
+                    // Init a List to hold the PolylineOptions if it is null
+                    if (mGuidePolylineMap == null) {
+                        mGuidePolylineMap = new HashMap<>();
+                    }
+
+                    // Get the Guide data model that entered the search area
+                    getGuide(key);
                 }
 
-                // Init a List to hold the PolylineOptions if it is null
-                if (mGuidePolylineMap == null) {
-                    mGuidePolylineMap = new HashMap<>();
+                @Override
+                public void onKeyExited(String key) {
+
+                    // Remove the Guide and its Polyline track
+                    mAdapter.removeGuide(key);
+                    mGuidePolylineMap.remove(key);
+
+                    // Update the colors of the lines so they match the new position of the Guides
+                    updatePolylineColors();
                 }
 
-                // Get the Guide data model that entered the search area
-                getGuide(key);
-            }
+                @Override
+                public void onKeyMoved(String key, GeoLocation location) {
 
-            @Override
-            public void onKeyExited(String key) {
+                }
 
-            }
+                @Override
+                public void onGeoQueryReady() {
 
-            @Override
-            public void onKeyMoved(String key, GeoLocation location) {
+                }
 
-            }
+                @Override
+                public void onGeoQueryError(DatabaseError error) {
 
-            @Override
-            public void onGeoQueryReady() {
-                mAdapter.setGuides(mGuideList);
-            }
-
-            @Override
-            public void onGeoQueryError(DatabaseError error) {
-
-            }
-        });
+                }
+            });
+        } else {
+            // Set the center to the new location
+            mGeoQuery.setCenter(location);
+        }
     }
 
     /**
@@ -279,7 +297,7 @@ public class FragmentSearch extends MapboxFragment {
     /**
      * Adds a Polyline representing a Guide's trail as calculated by its GPX File
      *
-     * @param  guide    Guide associated with the GPX File
+     * @param guide     Guide associated with the GPX File
      * @param gpxFile   GPX File containing coordinates representing a trail
      */
     private void addPolylineOptionsToMap(final Guide guide, File gpxFile) {
@@ -289,13 +307,13 @@ public class FragmentSearch extends MapboxFragment {
             @Override
             public void onOptionReady(MarkerOptions markerOptions, PolylineOptions polylineOptions) {
 
-                mGuidePolylineMap.put(guide, polylineOptions);
+                mGuidePolylineMap.put(guide.firebaseId, polylineOptions);
 
                 // Add the Polyline to the MapboxMap
                 mMapboxMap.addPolyline(polylineOptions
                         .width(2)
                         // Set the color using the the colorPosition and the ColorGenerator
-                        .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(guide))));
+                        .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(guide.firebaseId))));
             }
         });
     }
@@ -313,6 +331,17 @@ public class FragmentSearch extends MapboxFragment {
             startActivityForResult(intent, PLACES_REQUEST_CODE);
         } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Updates the Polyline so that their colors match the colors of their Guide based on the
+     * position of the Guide in mAdapter
+     */
+    private void updatePolylineColors() {
+        for (String firebaseId : mGuidePolylineMap.keySet()) {
+            mGuidePolylineMap.get(firebaseId)
+                    .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(firebaseId)));
         }
     }
 }

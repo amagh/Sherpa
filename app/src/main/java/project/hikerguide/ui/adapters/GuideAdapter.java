@@ -119,15 +119,36 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     }
 
     /**
+     * Removes a Guide from the Adapter's List
+     *
+     * @param firebaseId    The FirebaseId of the Guide to be removed
+     */
+    public void removeGuide(String firebaseId) {
+        // Iterate through the List until a match to the FirebaseId is found
+        for (Guide guide : mGuideList) {
+            if (guide.firebaseId.equals(firebaseId)) {
+                // Get the position of the item to be removed
+                int position = mGuideList.indexOf(guide);
+
+                // Remove the item and notify
+                mGuideList.remove(position);
+                notifyItemRemoved(position);
+                return;
+            }
+        }
+    }
+
+
+    /**
      * Retrieves the position of a Guide in the Adapter
      *
-     * @param guide    The Guide to be matched against the List in the Adapter
+     * @param firebaseId    The FirebaseId of the Guide to be queried for its position
      * @return The position of the Guide in the Adapter's List. Returns -1 if no match is found.
      */
-    public int getPosition(Guide guide) {
+    public int getPosition(String firebaseId) {
         // Iterate through the List and try to find a match
         for (int i = 0; i < mGuideList.size(); i++) {
-            if (mGuideList.get(i).equals(guide)) {
+            if (mGuideList.get(i).firebaseId.equals(firebaseId)) {
                 // If it matches, return the position of the Guide
                 return i;
             }
