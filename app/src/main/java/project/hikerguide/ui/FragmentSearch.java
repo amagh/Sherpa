@@ -42,13 +42,7 @@ public class FragmentSearch extends MapboxFragment {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false);
 
         // Launch the AutoCompleteSearchWidget
-        try {
-            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-                    .build(getActivity());
-            startActivityForResult(intent, PLACES_REQUEST_CODE);
-        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        }
+        launchPlacesSearch();
 
         // Attach the MapView to the Fragment's Lifecycle
         attachMapView(mBinding.searchMv);
@@ -59,6 +53,14 @@ public class FragmentSearch extends MapboxFragment {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
+            }
+        });
+
+        // Set an OnClickListener to launch the PlaceAutocompleteSearchWidget when clicked
+        mBinding.searchSv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchPlacesSearch();
             }
         });
 
@@ -88,6 +90,22 @@ public class FragmentSearch extends MapboxFragment {
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * Launches the Places AutoCompleteSearch Widget in an overlay for searching for areas by name
+     */
+    private void launchPlacesSearch() {
+        try {
+            // Build the Intent to launch the Widget in overlay mode
+            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                    .build(getActivity());
+
+            // Start Intent
+            startActivityForResult(intent, PLACES_REQUEST_CODE);
+        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
     }
 
 }
