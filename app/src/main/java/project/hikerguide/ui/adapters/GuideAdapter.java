@@ -62,6 +62,34 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     }
 
     /**
+     * Adds a Guide to the Array of Guides to be displayed
+     *
+     * @param guide    Guide to be added
+     */
+    public void addGuide(Guide guide) {
+        // Check whether mGuides has already been instantiated
+        if (mGuides == null) {
+            // Has not been. Create a new Array and put the Guide from the signature into it
+            mGuides = new Guide[] {guide};
+        } else {
+            // Guide Array already exists. Create a new Array one size larger than the one that
+            // already exists
+            Guide[] newGuides = new Guide[mGuides.length + 1];
+
+            // Copy the current Array of Guides into the new one
+            System.arraycopy(mGuides, 0, newGuides, 0, mGuides.length);
+
+            // Add the Guide from the paramter to the new Array
+            newGuides[newGuides.length - 1] = guide;
+
+            // Set the mem var to the new Array
+            mGuides = newGuides;
+        }
+
+        notifyItemInserted(mGuides.length - 1);
+    }
+
+    /**
      * For passing information about the clicked guide to the Activity/Fragment
      */
     public interface ClickHandler {
