@@ -38,7 +38,6 @@ import project.hikerguide.mpandroidchart.DistanceAxisFormatter;
 import project.hikerguide.mpandroidchart.ElevationAxisFormatter;
 import project.hikerguide.ui.MapboxActivity;
 import project.hikerguide.utilities.GpxUtils;
-import project.hikerguide.utilities.objects.LineGraphOptions;
 
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
@@ -310,7 +309,7 @@ public class GuideViewModel extends BaseObservable {
     private static void addElevationDataToLineChart(File gpxFile, final LineChart lineChart, final Context context) {
 
         // Calculate the Entries for the LineChart from the .gpx data
-        GpxUtils.getElevationChartData(gpxFile, new LineGraphOptions.ElevationDataListener() {
+        GpxUtils.getElevationChartData(gpxFile, new GpxUtils.ElevationDataListener() {
             @Override
             public void onElevationDataReady(List<Entry> elevationData) {
                 if (elevationData == null) {

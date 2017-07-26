@@ -24,7 +24,6 @@ import io.ticofab.androidgpxparser.parser.GPXParser;
 import io.ticofab.androidgpxparser.parser.domain.Gpx;
 import io.ticofab.androidgpxparser.parser.domain.TrackPoint;
 import project.hikerguide.utilities.objects.GpxStats;
-import project.hikerguide.utilities.objects.LineGraphOptions;
 
 /**
  * Created by Alvin on 7/21/2017.
@@ -227,7 +226,7 @@ public class GpxUtils {
      * @param gpxFile    .gpx file that wil be used to calculate the elevation chart data
      * @param listener   Listener to alert the calling thread that calculations are complete
      */
-    public static void getElevationChartData(final File gpxFile, final LineGraphOptions.ElevationDataListener listener) {
+    public static void getElevationChartData(final File gpxFile, final ElevationDataListener listener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -314,5 +313,9 @@ public class GpxUtils {
 
     public interface MapboxOptionsListener {
         void onOptionReady(MarkerOptions markerOptions, PolylineOptions polylineOptions);
+    }
+
+    public interface ElevationDataListener {
+        void onElevationDataReady(List<Entry> elevationData);
     }
 }
