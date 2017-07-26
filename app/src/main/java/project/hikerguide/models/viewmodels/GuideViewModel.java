@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -38,7 +39,6 @@ import project.hikerguide.mpandroidchart.ElevationAxisFormatter;
 import project.hikerguide.ui.MapboxActivity;
 import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.objects.LineGraphOptions;
-import project.hikerguide.utilities.objects.MapboxOptions;
 
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
@@ -238,12 +238,12 @@ public class GuideViewModel extends BaseObservable {
                                 @Override
                                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                                     // Parse the GPX File to get the MapboxOptions
-                                    addPolylineOptionsToMapView(tempGpx, mapboxMap, latitude, longitude);
+                                    addMapOptionsToMap(tempGpx, mapboxMap, latitude, longitude);
                                 }
                             });
                 } else {
-                    // Parse the GPX File to get the MapboxOptions
-                    addPolylineOptionsToMapView(tempGpx, mapboxMap, latitude, longitude);
+                    // Parse the GPX File to get the Mapbox PolyLine and Marker
+                    addMapOptionsToMap(tempGpx, mapboxMap, latitude, longitude);
                 }
 
 
@@ -283,15 +283,19 @@ public class GuideViewModel extends BaseObservable {
      * @param latitude     Latitude coordinate where the map should be centered
      * @param longitude    Longitude coordinate where the map should centered
      */
-    private static void addPolylineOptionsToMapView(File gpxFile, final MapboxMap mapboxMap,
-                                                   final double latitude, final double longitude) {
+    private static void addMapOptionsToMap(File gpxFile, final MapboxMap mapboxMap,
+                                           final double latitude, final double longitude) {
 
-        // Parse the GPX File to get the MapboxOptions
-        GpxUtils.getPolylineOptions(gpxFile, new MapboxOptions.MapboxListener() {
+        // Parse the GPX File to get the Mapbox PolyLine and Marker
+        GpxUtils.getMapboxOptions(gpxFile, new GpxUtils.MapboxOptionsListener() {
             @Override
-            public void onOptionReady(PolylineOptions options) {
+            public void onOptionReady(MarkerOptions markerOptions, PolylineOptions polylineOptions) {
+                // Set the Marker for the start of the trail
+                mapboxMap.addMarker(markerOptions
+                        .setTitle(markerOptions.getPosition().getLatitude() + ", " + markerOptions.getPosition().getLongitude()));
+
                 // Set the Polyline representing the trail
-                mapboxMap.addPolyline(options
+                mapboxMap.addPolyline(polylineOptions
                         .width(3));
 
                 // Set the camera to the correct position

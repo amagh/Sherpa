@@ -3,6 +3,7 @@ package project.hikerguide.utilities;
 import android.support.annotation.NonNull;
 
 import com.github.mikephil.charting.data.Entry;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -24,7 +25,6 @@ import io.ticofab.androidgpxparser.parser.domain.Gpx;
 import io.ticofab.androidgpxparser.parser.domain.TrackPoint;
 import project.hikerguide.utilities.objects.GpxStats;
 import project.hikerguide.utilities.objects.LineGraphOptions;
-import project.hikerguide.utilities.objects.MapboxOptions;
 
 /**
  * Created by Alvin on 7/21/2017.
@@ -158,17 +158,21 @@ public class GpxUtils {
     }
 
     /**
-     * Creates a PolylineOptions that can be used to visualize the GPX's coordinates on a MapboxMap.
+     * Creates a PolylineOptions that can be used to visualize the GPX's coordinates on a
+     * MapboxMap. Also creates a Marker to be used to indicate the start of a trail.
      *
      * @param gpxFile    A File corresponding to a GPX file that contains coordinates for a guide
      * @return A PolylineOptions that can be used to plot the trail of a guide
      */
-    public static void getPolylineOptions(@NonNull final File gpxFile, final MapboxOptions.MapboxListener listener) {
+    public static void getMapboxOptions(@NonNull final File gpxFile, final MapboxOptionsListener listener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 // Initialize the List that will be used to generate the Polyline
                 List<LatLng> trailPoints = new ArrayList<>();
+
+                // Get a reference of the LatLng that will be used to mark the start of the trail
+                LatLng start = null;
 
                 try {
                     // Create an InputStream from gpxFile
@@ -179,6 +183,8 @@ public class GpxUtils {
 
                     // Close the InputStream
                     inStream.close();
+
+
 
                     if (parsedGpx != null) {
                         // Get the individual points from the Gpx
@@ -191,18 +197,23 @@ public class GpxUtils {
                             // Add the LatLng to the List
                             trailPoints.add(trailPoint);
 
-                            double latitude = trailPoint.getLatitude();
-                            double longitude = trailPoint.getLongitude();
+                            if (start == null) {
+                                // Set the LatLng to be used for the starting coordinate
+                                start = new LatLng(point.getLatitude(), point.getLongitude());
+                            }
                         }
                     }
                 } catch (XmlPullParserException | IOException e) {
                     e.printStackTrace();
                 }
 
+                // Create a MarkerOptions for marking the beginning of the trail
+                MarkerOptions markerOptions = new MarkerOptions().position(start);
+
                 // Create a PolylineOptions from the List
                 PolylineOptions polylineOptions = new PolylineOptions().addAll(trailPoints);
 
-                listener.onOptionReady(polylineOptions);
+                listener.onOptionReady(markerOptions, polylineOptions);
             }
         }).run();
 
@@ -299,5 +310,9 @@ public class GpxUtils {
                 }
             }
         }).run();
+    }
+
+    public interface MapboxOptionsListener {
+        void onOptionReady(MarkerOptions markerOptions, PolylineOptions polylineOptions);
     }
 }
