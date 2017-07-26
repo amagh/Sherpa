@@ -7,6 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemGuideBinding;
 import project.hikerguide.databinding.ListItemGuideSearchBinding;
@@ -23,7 +26,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     private static final int SEARCH_VIEW_TYPE = 1;
 
     // ** Member Variables ** //
-    private Guide[] mGuides;
+    private List<Guide> mGuideList;
     private ClickHandler mHandler;
     private boolean useSearchLayout;
 
@@ -60,8 +63,8 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     @Override
     public int getItemCount() {
         // Return the length of mGuides if it is not null
-        if (mGuides != null) {
-            return mGuides.length;
+        if (mGuideList != null) {
+            return mGuideList.size();
         }
         return 0;
     }
@@ -76,16 +79,23 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
         }
     }
 
+    @Override
+    public long getItemId(int position) {
+        // Use the hashcode of the FirebaseId as the Id for the Adapter. This will allow a
+        // completely different list of Guides to be set and animated correctly.
+        return mGuideList.get(position).firebaseId.hashCode();
+    }
+
     /**
      * Sets the resources that will be used to populate the Views in the RecyclerView
      *
-     * @param guides    Array of Guides that describing the Guides to populate
+     * @param guideList    A List of Guides to be used to bind data to the ViewHolders
      */
-    public void setGuides(Guide[] guides) {
-        // Set the mem var to the array paramter
-        mGuides = guides;
+    public void setGuides(List<Guide> guideList) {
+        // Set the mem var to the List parameter
+        mGuideList = guideList;
 
-        if (mGuides != null) {
+        if (mGuideList != null) {
             // Notify of change in data
             notifyDataSetChanged();
         }
@@ -97,26 +107,33 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
      * @param guide    Guide to be added
      */
     public void addGuide(Guide guide) {
-        // Check whether mGuides has already been instantiated
-        if (mGuides == null) {
-            // Has not been. Create a new Array and put the Guide from the signature into it
-            mGuides = new Guide[] {guide};
-        } else {
-            // Guide Array already exists. Create a new Array one size larger than the one that
-            // already exists
-            Guide[] newGuides = new Guide[mGuides.length + 1];
-
-            // Copy the current Array of Guides into the new one
-            System.arraycopy(mGuides, 0, newGuides, 0, mGuides.length);
-
-            // Add the Guide from the paramter to the new Array
-            newGuides[newGuides.length - 1] = guide;
-
-            // Set the mem var to the new Array
-            mGuides = newGuides;
+        // Check whether mGuideList has already been instantiated
+        if (mGuideList == null) {
+            // Has not been. Create a new List and put the Guide from the signature into it
+            mGuideList = new ArrayList<>();
         }
 
-        notifyItemInserted(mGuides.length - 1);
+        // Add the Guide to the List
+        mGuideList.add(guide);
+        notifyItemInserted(mGuideList.size() - 1);
+    }
+
+    /**
+     * Retrieves the position of a Guide in the Adapter
+     *
+     * @param guide    The Guide to be matched against the List in the Adapter
+     * @return The position of the Guide in the Adapter's List. Returns -1 if no match is found.
+     */
+    public int getPosition(Guide guide) {
+        // Iterate through the List and try to find a match
+        for (int i = 0; i < mGuideList.size(); i++) {
+            if (mGuideList.get(i).equals(guide)) {
+                // If it matches, return the position of the Guide
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     /**
@@ -148,7 +165,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
 
         public void bind(int position) {
             // Get the guide from the correlated position
-            Guide guide = mGuides[position];
+            Guide guide = mGuideList.get(position);
 
             // Initialize a GuideViewModel using the Guide from the array and set it to the
             // DataBinding
@@ -169,8 +186,8 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
             // Get the position of the clicked Adapter
             int position = getAdapterPosition();
 
-            // Pass the corresponding Guide through the Clickhandler
-            mHandler.onGuideClicked(mGuides[position]);
+            // Pass the corresponding Guide through the ClickHandler
+            mHandler.onGuideClicked(mGuideList.get(position));
         }
     }
 }

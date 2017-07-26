@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Arrays;
+
 import project.hikerguide.R;
 import project.hikerguide.databinding.FragmentGuideListBinding;
 import project.hikerguide.models.datamodels.Guide;
@@ -61,7 +63,7 @@ public class FragmentGuideList extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Guide[]> loader, Guide[] data) {
         // Set the retrieved Guides in the Adapter
-        mAdapter.setGuides(data);
+        mAdapter.setGuides(Arrays.asList(data));
     }
 
     @Override

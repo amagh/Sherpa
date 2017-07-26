@@ -2,9 +2,9 @@ package project.hikerguide.ui;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +34,11 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import project.hikerguide.R;
 import project.hikerguide.data.GuideDatabase;
@@ -64,7 +69,8 @@ public class FragmentSearch extends MapboxFragment {
     private FragmentSearchBinding mBinding;
     private MapboxMap mMapboxMap;
     private GuideAdapter mAdapter;
-    private int mColorPosition;
+    private List<Guide> mGuideList;
+    private Map<Guide, PolylineOptions> mGuidePolylineMap;
 
     public FragmentSearch() {
     }
@@ -81,7 +87,7 @@ public class FragmentSearch extends MapboxFragment {
         attachMapView(mBinding.searchMv);
         mBinding.searchMv.onCreate(savedInstanceState);
 
-        // Get a reference of the MapboxMap
+        // Get a reference of the MapboxMap to manipulate camera position and add Polylines
         mBinding.searchMv.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
@@ -162,9 +168,19 @@ public class FragmentSearch extends MapboxFragment {
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
+
+                // Initialize the list to hold the Guides
+                if (mGuideList == null) {
+                    mGuideList = new ArrayList<>();
+                }
+
+                // Init a List to hold the PolylineOptions if it is null
+                if (mGuidePolylineMap == null) {
+                    mGuidePolylineMap = new HashMap<>();
+                }
+
                 // Get the Guide data model that entered the search area
-                getGuide(key, mColorPosition);
-                mColorPosition++;
+                getGuide(key);
             }
 
             @Override
@@ -179,7 +195,7 @@ public class FragmentSearch extends MapboxFragment {
 
             @Override
             public void onGeoQueryReady() {
-
+                mAdapter.setGuides(mGuideList);
             }
 
             @Override
@@ -190,13 +206,11 @@ public class FragmentSearch extends MapboxFragment {
     }
 
     /**
-     * Retrievs a Guide data model from the Firebase Database
+     * Retrieves a Guide data model from the Firebase Database
      *
      * @param firebaseId       The ID of the guide to be retrieved
-     * @param colorPosition    The position of the Guide that will be used to generate its track's
-     *                         color
      */
-    private void getGuide(String firebaseId, final int colorPosition) {
+    private void getGuide(String firebaseId) {
 
         // Get a reference to the Guide in the Firebase Database using the firebaseId
         final DatabaseReference guideReference = FirebaseDatabase.getInstance().getReference()
@@ -215,7 +229,7 @@ public class FragmentSearch extends MapboxFragment {
                 mAdapter.addGuide(guide);
 
                 // Get the GPX File for the Guide
-                getGpxForGuide(guide, colorPosition);
+                getGpxForGuide(guide);
 
                 // Remove the Listener
                 guideReference.removeEventListener(this);
@@ -232,10 +246,8 @@ public class FragmentSearch extends MapboxFragment {
      * Downloads the GPX File for a Guide
      *
      * @param guide         Guide whose GPX File is to be downloaded
-     * @param colorPosition The position of the Guide in the Adapter that will be used to generate
-     *                      its track's color
      */
-    private void getGpxForGuide(Guide guide, final int colorPosition) {
+    private void getGpxForGuide(final Guide guide) {
 
         // Create a file in the temp files directory that has a constant name so it can be
         // referenced later without downloading another copy while it exists in the cache
@@ -248,38 +260,42 @@ public class FragmentSearch extends MapboxFragment {
                 .child(GPX_PATH)
                 .child(guide.firebaseId + GPX_EXT);
 
-        // Download the file
-        gpxReference.getFile(tempGpxFile)
-                .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        // Add the Polyline representing the trail to the map
-                        addPolylineOptionsToMap(tempGpxFile, colorPosition);
-                    }
-                });
-
-
+        // Check if the File has been previously downloaded
+        if (tempGpxFile.length() == 0) {
+            // Download the file
+            gpxReference.getFile(tempGpxFile)
+                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            // Add the Polyline representing the trail to the map
+                            addPolylineOptionsToMap(guide, tempGpxFile);
+                        }
+                    });
+        } else {
+            addPolylineOptionsToMap(guide, tempGpxFile);
+        }
     }
 
     /**
      * Adds a Polyline representing a Guide's trail as calculated by its GPX File
      *
-     * @param gpxFile           GPX File containing coordinates representing a trail
-     * @param colorPosition    The position of the Guide that will be used to generate its track's
-     *                         color
+     * @param  guide    Guide associated with the GPX File
+     * @param gpxFile   GPX File containing coordinates representing a trail
      */
-    private void addPolylineOptionsToMap(File gpxFile, final int colorPosition) {
+    private void addPolylineOptionsToMap(final Guide guide, File gpxFile) {
 
         // Generate the MapboxOptions that will contain the Polyline
         GpxUtils.getMapboxOptions(gpxFile, new GpxUtils.MapboxOptionsListener() {
             @Override
             public void onOptionReady(MarkerOptions markerOptions, PolylineOptions polylineOptions) {
 
+                mGuidePolylineMap.put(guide, polylineOptions);
+
                 // Add the Polyline to the MapboxMap
                 mMapboxMap.addPolyline(polylineOptions
                         .width(2)
                         // Set the color using the the colorPosition and the ColorGenerator
-                        .color(ColorGenerator.getColor(getActivity(), colorPosition)));
+                        .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(guide))));
             }
         });
     }
@@ -299,5 +315,4 @@ public class FragmentSearch extends MapboxFragment {
             e.printStackTrace();
         }
     }
-
 }
