@@ -45,7 +45,7 @@ import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.
 public class DatabaseProvider {
     // ** Constants ** //
     private static final String TAG = DatabaseProvider.class.getSimpleName();
-    private static final String GEOFIRE_PATH = "geofire";
+    public static final String GEOFIRE_PATH = "geofire";
     private static final String GUIDE_ID = "guideId";
     private static final int GUIDE_LIMIT = 20;
 
