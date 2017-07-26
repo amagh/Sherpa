@@ -7,24 +7,15 @@
     <string name="image_directory">/images</string>
     <string name="gpx_directory">/gpx</string>
 
-    <string name="list_guide_title_text">Four Mile Trail</string>
-    <string name="list_guide_area_text">Yosemite Valley</string>
-    <string name="list_guide_distance_text">9.6 miles</string>
-    <string name="list_guide_rating_text">4.8\u2605</string>
-    <string name="list_guide_reviews_text">(45)</string>
-    <string name="list_guide_difficulty_text">Moderate</string>
-
-    <string name="list_section_text">The Four Mile Trail (actually 4.8 miles) is one of Yosemite Valley’s most strenuous trails. It climbs up to Glacier Point – an ascent of nearly 3300-ft in just under five miles. After the grueling uphill slog, hikers are rewarded with unparalleled views of Half Dome and the rest of Yosemite Valley. Glacier Point can also be reached by car or shuttle, but the view feels much more rewarding when you walk. We hiked this on a rainy Saturday in late September. Though summer is over, there were still plenty of people out and about. You can’t expect much solitude on this trail, but you can look forward to a great workout and some good people watching!</string>
-    <string name="list_section_image_caption_text">Getting ready to hike! Saturday morning in Curry Village.</string>
-
+    <!-- Strings for guide details -->
     <string name="list_guide_details_distance_label">Total distance:</string>
     <string name="list_guide_details_elevation_label">Peak elevation \u0394: </string>
-    <string name="list_guide_details_elevation_text">3226 ft</string>
 
+    <!-- Strings for author -->
     <string name="list_author_heading">About the Author</string>
-    <string name="list_author_text">Christa</string>
-    <string name="list_author_score_text">1200 pts</string>
-    <string name="list_author_description_text">We (Christa and Rob) are from Northern California and we like to hike.  We’ve shared our photos and experiences so that others may find new parks, trails or places to visit.</string>
+
+    <!-- Strings for Search Activity -->
+    <string name="search_label">Search</string>
 
     <!-- Formatting for guide list item -->
     <string name="list_guide_format_distance_imperial">%,.2f miles</string>
@@ -43,4 +34,21 @@
     <string name="difficulty_hard">Hard</string>
     <string name="difficulty_expert">Expert</string>
     <string name="difficulty_extreme">Extreme</string>
+
+    <!-- Dummy text for testing purposes -->
+    <string name="list_guide_title_text">Four Mile Trail</string>
+    <string name="list_guide_area_text">Yosemite Valley</string>
+    <string name="list_guide_distance_text">9.6 miles</string>
+    <string name="list_guide_rating_text">4.8\u2605</string>
+    <string name="list_guide_reviews_text">(45)</string>
+    <string name="list_guide_difficulty_text">Moderate</string>
+
+    <string name="list_section_text">The Four Mile Trail (actually 4.8 miles) is one of Yosemite Valley’s most strenuous trails. It climbs up to Glacier Point – an ascent of nearly 3300-ft in just under five miles. After the grueling uphill slog, hikers are rewarded with unparalleled views of Half Dome and the rest of Yosemite Valley. Glacier Point can also be reached by car or shuttle, but the view feels much more rewarding when you walk. We hiked this on a rainy Saturday in late September. Though summer is over, there were still plenty of people out and about. You can’t expect much solitude on this trail, but you can look forward to a great workout and some good people watching!</string>
+    <string name="list_section_image_caption_text">Getting ready to hike! Saturday morning in Curry Village.</string>
+
+    <string name="list_guide_details_elevation_text">3226 ft</string>
+
+    <string name="list_author_text">Christa</string>
+    <string name="list_author_score_text">1200 pts</string>
+    <string name="list_author_description_text">We (Christa and Rob) are from Northern California and we like to hike.  We’ve shared our photos and experiences so that others may find new parks, trails or places to visit.</string>
 </resources>

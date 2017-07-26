@@ -22,4 +22,13 @@
     <dimen name="list_guide_details_graph_height">100dp</dimen>
 
     <dimen name="block_text_line_spacing">1dp</dimen>
+
+    <dimen name="search_widget_text_size">21sp</dimen>
+    <dimen name="search_widget_text_horizontal_margin">71dp</dimen>
+    <dimen name="search_widget_icon_size">24dp</dimen>
+    <dimen name="search_widget_icon_horizontal_margin">18dp</dimen>
+    <dimen name="search_widget_height">50dp</dimen>
+    <dimen name="search_widget_horizontal_margin">8dp</dimen>
+    <dimen name="search_widget_vertical_margin">8dp</dimen>
+    <dimen name="search_map_height">300dp</dimen>
 </resources>
