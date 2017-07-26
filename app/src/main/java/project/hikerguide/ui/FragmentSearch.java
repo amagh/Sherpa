@@ -100,6 +100,9 @@ public class FragmentSearch extends MapboxFragment {
 
             }
         });
+
+        // Set the GuideAdapter to use the search layout
+        mAdapter.setUseSearchLayout(true);
         mBinding.searchResultsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mBinding.searchResultsRv.setAdapter(mAdapter);
 

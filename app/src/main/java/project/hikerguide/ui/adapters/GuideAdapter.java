@@ -1,6 +1,7 @@
 package project.hikerguide.ui.adapters;
 
 import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemGuideBinding;
+import project.hikerguide.databinding.ListItemGuideSearchBinding;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 
@@ -16,9 +18,14 @@ import project.hikerguide.models.viewmodels.GuideViewModel;
  */
 
 public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHolder> {
+    // ** Constants ** //
+    private static final int NORMAL_VIEW_TYPE = 0;
+    private static final int SEARCH_VIEW_TYPE = 1;
+
     // ** Member Variables ** //
     private Guide[] mGuides;
     private ClickHandler mHandler;
+    private boolean useSearchLayout;
 
     public GuideAdapter(ClickHandler clickHandler) {
         mHandler = clickHandler;
@@ -27,8 +34,21 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     @Override
     public GuideViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        int layoutId = -1;
 
-        ListItemGuideBinding binding = DataBindingUtil.inflate(inflater, R.layout.list_item_guide, parent, false);
+        // Set the layout based on the ViewType returned
+        switch (viewType) {
+            case NORMAL_VIEW_TYPE:
+                layoutId = R.layout.list_item_guide;
+                break;
+
+            case SEARCH_VIEW_TYPE:
+                layoutId = R.layout.list_item_guide_search;
+                break;
+        }
+
+        // Create the ViewDataBinding by inflating the layout
+        ViewDataBinding binding = DataBindingUtil.inflate(inflater, layoutId, parent, false);
         return new GuideViewHolder(binding);
     }
 
@@ -44,6 +64,16 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
             return mGuides.length;
         }
         return 0;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        // Only use search layout in FragmentSearch
+        if (!useSearchLayout) {
+            return NORMAL_VIEW_TYPE;
+        } else {
+            return SEARCH_VIEW_TYPE;
+        }
     }
 
     /**
@@ -90,6 +120,15 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     }
 
     /**
+     * Sets whether the Adapter should use the search layout for guides
+     *
+     * @param useSearchLayout    Boolean value for whether search layout should be enabled
+     */
+    public void setUseSearchLayout(boolean useSearchLayout) {
+        this.useSearchLayout = useSearchLayout;
+    }
+
+    /**
      * For passing information about the clicked guide to the Activity/Fragment
      */
     public interface ClickHandler {
@@ -98,9 +137,9 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
 
     public class GuideViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // ** Member Variables ** //
-        ListItemGuideBinding mBinding;
+        ViewDataBinding mBinding;
 
-        public GuideViewHolder(ListItemGuideBinding binding) {
+        public GuideViewHolder(ViewDataBinding binding) {
             super(binding.getRoot());
 
             mBinding = binding;
@@ -113,7 +152,13 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
 
             // Initialize a GuideViewModel using the Guide from the array and set it to the
             // DataBinding
-            mBinding.setVm(new GuideViewModel(mBinding.getRoot().getContext(), guide));
+            if (!useSearchLayout) {
+                ((ListItemGuideBinding) mBinding)
+                        .setVm(new GuideViewModel(mBinding.getRoot().getContext(), guide));
+            } else {
+                ((ListItemGuideSearchBinding) mBinding)
+                        .setVm(new GuideViewModel(mBinding.getRoot().getContext(), guide));
+            }
             mBinding.executePendingBindings();
         }
 
