@@ -32,12 +32,14 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import project.hikerguide.R;
+import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.mapbox.SmartMapView;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.mpandroidchart.DistanceAxisFormatter;
 import project.hikerguide.mpandroidchart.ElevationAxisFormatter;
 import project.hikerguide.ui.MapboxActivity;
 import project.hikerguide.utilities.GpxUtils;
+import project.hikerguide.utilities.SaveUtils;
 
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
@@ -52,7 +54,7 @@ public class GuideViewModel extends BaseObservable {
     // ** Constants ** //
     private static final double METERS_PER_MILE = 1609.34;
     private static final double METERS_PER_FEET = 0.3048;
-    private static final File TEMP_DIRECTORY = new File(System.getProperty("java.io.tmpdir", "."));
+
     private static final float TWENTY_MI_IN_KM = 32186.9f;
 
     // ** Member Variables ** //
@@ -225,7 +227,7 @@ public class GuideViewModel extends BaseObservable {
                 mapboxMap.setStyleUrl(Style.OUTDOORS);
 
                 // Create a temporary File where the GPX will be downloaded
-                final File tempGpx = new File(TEMP_DIRECTORY, firebaseId + GPX_EXT);
+                final File tempGpx = SaveUtils.createTempFile(StorageProvider.FirebaseFileType.GPX_FILE, firebaseId);
 
                 if (tempGpx.length() == 0) {
                     // Download the GPX File
@@ -254,7 +256,7 @@ public class GuideViewModel extends BaseObservable {
     public static void loadElevationData(final LineChart lineChart, final String firebaseId, final Context context) {
 
         // Create a temporary File where the GPX will be downloaded
-        final File tempGpx = new File(TEMP_DIRECTORY, firebaseId + GPX_EXT);
+        final File tempGpx = SaveUtils.createTempFile(StorageProvider.FirebaseFileType.GPX_FILE, firebaseId);
 
         if (tempGpx.length() == 0) {
             // Download the GPX File
