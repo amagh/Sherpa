@@ -44,6 +44,11 @@ public class FragmentGuideList extends Fragment implements LoaderManager.LoaderC
                 // Pass the clicked Guide to the Activity so it can start the GuideDetailsActivity
                 ((MainActivity) getActivity()).onGuideClicked(guide);
             }
+
+            @Override
+            public void onGuideLongClicked(Guide guide) {
+
+            }
         });
 
         // Set the Adapter and LayoutManager for the RecyclerView

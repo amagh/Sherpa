@@ -16,6 +16,8 @@ import project.hikerguide.databinding.ListItemGuideSearchBinding;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 
+import static project.hikerguide.utilities.ColorGenerator.HIGHLIGHT_POSITION;
+
 /**
  * Created by Alvin on 7/21/2017.
  */
@@ -29,6 +31,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     private List<Guide> mGuideList;
     private ClickHandler mHandler;
     private boolean useSearchLayout;
+    private String mHighlighted;
 
     public GuideAdapter(ClickHandler clickHandler) {
         mHandler = clickHandler;
@@ -138,7 +141,6 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
         }
     }
 
-
     /**
      * Retrieves the position of a Guide in the Adapter
      *
@@ -171,9 +173,10 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
      */
     public interface ClickHandler {
         void onGuideClicked(Guide guide);
+        void onGuideLongClicked(Guide guide);
     }
 
-    public class GuideViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class GuideViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         // ** Member Variables ** //
         ViewDataBinding mBinding;
 
@@ -182,6 +185,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
 
             mBinding = binding;
             mBinding.getRoot().setOnClickListener(this);
+            mBinding.getRoot().setOnLongClickListener(this);
         }
 
         public void bind(int position) {
@@ -194,6 +198,11 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
                 ((ListItemGuideBinding) mBinding)
                         .setVm(new GuideViewModel(mBinding.getRoot().getContext(), guide));
             } else {
+                if (guide.firebaseId.equals(mHighlighted)) {
+                    // If Guide's track is highlighted, then set the color swatch appropriately
+                    position = HIGHLIGHT_POSITION;
+                }
+
                 ((ListItemGuideSearchBinding) mBinding)
                         // Add the position to the Constructor so that color position matches the
                         // color given the track.
@@ -209,6 +218,52 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
 
             // Pass the corresponding Guide through the ClickHandler
             mHandler.onGuideClicked(mGuideList.get(position));
+
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+
+            // Only usable while searching
+            if (useSearchLayout) {
+                // Get the position of the clicked ViewHolder
+                int position = getAdapterPosition();
+
+                // Get the associated Guide
+                Guide guide = mGuideList.get(position);
+
+                // Check to see if any other Guide is currently highlighted
+                if (mHighlighted != null) {
+                    if (mHighlighted.equals(guide.firebaseId)) {
+
+                        // If the selected Guide is already highlighted, un-highlight it
+                        mHighlighted = null;
+                        notifyItemChanged(position);
+                    } else {
+
+                        // Get the position of the previously highlighted Guide
+                        int previousHighlightedPosition = GuideAdapter.this.getPosition(mHighlighted);
+
+                        // Set the clicked Guide as highlighted
+                        mHighlighted = guide.firebaseId;
+
+                        // Update the ViewHolders
+                        notifyItemChanged(previousHighlightedPosition);
+                        notifyItemChanged(position);
+                    }
+                } else {
+
+                    // Set the selected Guide as the highlighted and update the ViewHolder
+                    mHighlighted = guide.firebaseId;
+                    notifyItemChanged(position);
+                }
+
+                // Pass the information about the long-pressed guide to the observer
+                mHandler.onGuideLongClicked(guide);
+                return true;
+            }
+
+            return false;
         }
     }
 }

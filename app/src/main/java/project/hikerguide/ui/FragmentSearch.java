@@ -3,6 +3,7 @@ package project.hikerguide.ui;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -75,6 +76,7 @@ public class FragmentSearch extends MapboxFragment {
     private GeoQuery mGeoQuery;
     private List<Guide> mGuideList;
     private Map<String, PolylineOptions> mGuidePolylineMap;
+    private String highlightedId;
 
     public FragmentSearch() {
     }
@@ -100,7 +102,6 @@ public class FragmentSearch extends MapboxFragment {
                 mMapboxMap.setOnCameraIdleListener(new MapboxMap.OnCameraIdleListener() {
                     @Override
                     public void onCameraIdle() {
-                        System.out.println("IDLE");
 
                         // Get the camera's position
                         LatLng position = mMapboxMap.getCameraPosition().target;
@@ -130,6 +131,36 @@ public class FragmentSearch extends MapboxFragment {
             @Override
             public void onGuideClicked(Guide guide) {
 
+            }
+
+            @Override
+            public void onGuideLongClicked(Guide guide) {
+
+                // Highlight the track when the user long-clicks a guide to make it more visible
+                if (highlightedId != null) {
+
+                    // Reset the color of the previously highlighted track
+                    mGuidePolylineMap.get(highlightedId)
+                            .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(highlightedId)))
+                            .width(2);
+
+                    if (guide.firebaseId.equals(highlightedId)) {
+
+                        // If the highlighted track is the same as the one that was long-pressed,
+                        // set the variable for the highlighted track to null to de-select it
+                        highlightedId = null;
+                        return;
+                    }
+                }
+
+                // Set the variable for the highlighted track to the Firebaseid of the long-pressed
+                // item
+                highlightedId = guide.firebaseId;
+
+                // Highlight the selected track
+                mGuidePolylineMap.get(guide.firebaseId)
+                        .color(ContextCompat.getColor(getActivity(), R.color.yellow_a200))
+                        .width(4);
             }
         });
 
@@ -161,7 +192,7 @@ public class FragmentSearch extends MapboxFragment {
                     mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                             .target(target)
                             .zoom(10)
-                            .build()), 3000);
+                            .build()), 1500);
                 }
             }
         }
