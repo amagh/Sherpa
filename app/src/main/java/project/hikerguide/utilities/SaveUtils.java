@@ -12,14 +12,20 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.Trail;
 
+import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileType.GPX_FILE;
+import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileType.IMAGE_FILE;
+import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
+import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
+import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
+import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
+
 /**
  * Created by Alvin on 7/19/2017.
  */
 
 public class SaveUtils {
     // ** Constants ** //
-    public static final String GPX_PATH = "/gpx";
-    public static final String IMAGE_PATH = "/images";
+    private static final File TEMP_DIRECTORY = new File(System.getProperty("java.io.tmpdir", "."));
 
     /**
      * Saves a completed guide to the Firebase Database
@@ -112,6 +118,37 @@ public class SaveUtils {
         if (!gpxDir.exists()) {
             gpxDir.mkdir();
         }
+    }
 
+    /**
+     * Creates a temporary file for either an image or a GPX file that has a reproducible location
+     * so that it can be referenced later so long as it exists in the cache
+     *
+     * @param type          Type of File to create the temporary File for - used to generate the
+     *                      file extension
+     * @param firebaseId    To be used as the Filename
+     * @return File stored in the temporary file's location with the FirebaeId as the name and the
+     * correct file extension according to the type
+     */
+    public static File createTempFile(@StorageProvider.FirebaseFileType int type, String firebaseId) {
+
+        // Get a reference to the String that will be used for the file extension
+        String fileExtension;
+
+        // Set the file extension based on the type of File
+        switch (type) {
+            case GPX_FILE:
+                fileExtension = GPX_EXT;
+                break;
+
+            case IMAGE_FILE:
+                fileExtension = JPEG_EXT;
+                break;
+
+            default: throw new UnsupportedOperationException("Unknown File Type: " + type);
+        }
+
+        return new File(TEMP_DIRECTORY, firebaseId + fileExtension);
     }
 }
+

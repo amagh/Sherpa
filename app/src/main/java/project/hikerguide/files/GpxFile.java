@@ -11,7 +11,7 @@ import java.net.URI;
 import project.hikerguide.files.abstractfiles.BaseFile;
 import project.hikerguide.utilities.SaveUtils;
 
-import static project.hikerguide.utilities.SaveUtils.GPX_PATH;
+import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
 
 /**
  * Created by Alvin on 7/19/2017.
