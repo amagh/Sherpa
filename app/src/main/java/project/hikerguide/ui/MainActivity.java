@@ -34,8 +34,8 @@ public class MainActivity extends AppCompatActivity implements FragmentGuideList
                     fragment = new FragmentGuideList();
                     break;
                 case R.id.navigation_dashboard:
-//                    mTextMessage.setText(R.string.title_dashboard);
-                    return true;
+                    fragment = new FragmentSearch();
+                    break;
                 case R.id.navigation_notifications:
 //                    mTextMessage.setText(R.string.title_notifications);
                     return true;
