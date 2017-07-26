@@ -9,4 +9,5 @@
     <color name="green_700">#388E3C</color>
     <color name="green_900">#1B5E20</color>
     <color name="red_a200">#FF5252</color>
+    <color name="white_alpha_75">#BFFFFFFF</color>
 </resources>
