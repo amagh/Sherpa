@@ -31,6 +31,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -99,6 +100,9 @@ public class FragmentSearch extends MapboxFragment {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
+
+                // Set map style
+                mMapboxMap.setStyle(Style.OUTDOORS);
 
                 mMapboxMap.setOnCameraIdleListener(new MapboxMap.OnCameraIdleListener() {
                     @Override
