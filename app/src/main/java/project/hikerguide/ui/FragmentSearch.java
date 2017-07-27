@@ -56,6 +56,7 @@ import project.hikerguide.utilities.SaveUtils;
 
 import static android.app.Activity.RESULT_OK;
 import static project.hikerguide.firebasedatabase.DatabaseProvider.GEOFIRE_PATH;
+import static project.hikerguide.ui.GuideDetailsActivity.IntentKeys.GUIDE_KEY;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
 
@@ -131,6 +132,11 @@ public class FragmentSearch extends MapboxFragment {
             @Override
             public void onGuideClicked(Guide guide) {
 
+                // Launch the Activity detailing the Guide when the user clicks on it
+                Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
+                intent.putExtra(GUIDE_KEY, guide);
+
+                startActivity(intent);
             }
 
             @Override
