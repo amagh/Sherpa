@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/list_section_text_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/guide_details_section_margin"
+        android:layout_marginBottom="@dimen/guide_details_section_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:hint="Guide Details"
+        android:lineSpacingExtra="@dimen/block_text_line_spacing"
+        android:inputType="textAutoCorrect|textCapSentences"
+        android:imeOptions="actionNext"
+        style="@style/TextAppearance.AppCompat.Body1"/>
+
+</layout>
