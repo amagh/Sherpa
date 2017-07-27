@@ -194,7 +194,11 @@ public class GuideViewModel extends BaseObservable {
 
     @Bindable
     public File getGpx() {
+
+        // Check whether to use the online copy of the GPX file or a locally stored file.
         if (mGuide.firebaseId == null) {
+
+            // Create a new File from the Uri stored in the Guide
             return new File(mGuide.getGpxUri().getPath());
         } else {
 
@@ -211,7 +215,8 @@ public class GuideViewModel extends BaseObservable {
                         .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                // Parse the GPX File to get the MapboxOptions
+                                // Notify change so this method is called again, but this time it
+                                // will return the downloaded File
                                 notifyPropertyChanged(BR.gpx);
                             }
                         });
@@ -279,6 +284,11 @@ public class GuideViewModel extends BaseObservable {
                         .target(new LatLng(latitude, longitude))
                         .build());
 
+                if (gpx == null) {
+                    // GPX File has not been loaded yet. Do nothing.
+                    return;
+                }
+
                 // Parse the GPX File to get the Mapbox PolyLine and Marker
                 addMapOptionsToMap(gpx, mapboxMap);
             }
@@ -287,6 +297,11 @@ public class GuideViewModel extends BaseObservable {
 
     @BindingAdapter({"bind:gpx", "bind:context"})
     public static void loadElevationData(final LineChart lineChart, final File gpx, final Context context) {
+
+        if (gpx == null) {
+            // GPX File has not been loaded yet. Do nothing.
+            return;
+        }
 
         // Parse the GPX data to get the elevation profile and add it the LineChart
         addElevationDataToLineChart(gpx, lineChart, context);
