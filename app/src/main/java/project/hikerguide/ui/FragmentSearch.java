@@ -142,31 +142,8 @@ public class FragmentSearch extends MapboxFragment {
             @Override
             public void onGuideLongClicked(Guide guide) {
 
-                // Highlight the track when the user long-clicks a guide to make it more visible
-                if (highlightedId != null) {
-
-                    // Reset the color of the previously highlighted track
-                    mGuidePolylineMap.get(highlightedId)
-                            .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(highlightedId)))
-                            .width(2);
-
-                    if (guide.firebaseId.equals(highlightedId)) {
-
-                        // If the highlighted track is the same as the one that was long-pressed,
-                        // set the variable for the highlighted track to null to de-select it
-                        highlightedId = null;
-                        return;
-                    }
-                }
-
-                // Set the variable for the highlighted track to the Firebaseid of the long-pressed
-                // item
-                highlightedId = guide.firebaseId;
-
-                // Highlight the selected track
-                mGuidePolylineMap.get(guide.firebaseId)
-                        .color(ContextCompat.getColor(getActivity(), R.color.yellow_a200))
-                        .width(4);
+                // Highlight the trail associated with the long-pressed Guide
+                highLightPolylineForGuide(guide);
             }
         });
 
@@ -352,6 +329,46 @@ public class FragmentSearch extends MapboxFragment {
             mGuidePolylineMap.get(firebaseId)
                     .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(firebaseId)));
         }
+    }
+
+    /**
+     * Highlights a Polyline associated with a Guide to make it more visible on the map
+     *
+     * @param guide    Guide that was long-pressed by the user
+     */
+    private void highLightPolylineForGuide(Guide guide) {
+
+        // Highlight the track when the user long-clicks a guide to make it more visible
+        if (highlightedId != null) {
+
+            // Reset the color of the previously highlighted track
+            mGuidePolylineMap.get(highlightedId)
+                    .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(highlightedId)))
+                    .width(2);
+
+            if (guide.firebaseId.equals(highlightedId)) {
+
+                // If the highlighted track is the same as the one that was long-pressed,
+                // set the variable for the highlighted track to null to de-select it
+                highlightedId = null;
+                return;
+            }
+        }
+
+        // Set the variable for the highlighted track to the Firebaseid of the long-pressed
+        // item
+        highlightedId = guide.firebaseId;
+
+        // Highlight the selected track
+        PolylineOptions highlightedPolyLine = mGuidePolylineMap.get(guide.firebaseId);
+        highlightedPolyLine
+                .color(ContextCompat.getColor(getActivity(), R.color.yellow_a200))
+                .width(4);
+
+        // Remove and re-add the Polyline to set it to the top of the map and ensure it
+        // isn't obscured by other Polylines
+        mMapboxMap.removePolyline(highlightedPolyLine.getPolyline());
+        mMapboxMap.addPolyline(highlightedPolyLine);
     }
 
     private final GeoQueryEventListener geoQueryEventListener = new GeoQueryEventListener() {
