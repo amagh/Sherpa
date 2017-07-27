@@ -155,6 +155,10 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         this.gpxUri = Uri.fromFile(gpxFile);
     }
 
+    public Uri getGpxUri() {
+        return gpxUri;
+    }
+
     /**
      * Converts the Objects gpxUri to a GpxFile so that it may be uploaded to Firebase Storage
      *

@@ -32,6 +32,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import project.hikerguide.BR;
 import project.hikerguide.R;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.mapbox.SmartMapView;
@@ -192,10 +193,34 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @Bindable
-    public StorageReference getGpx() {
-        return FirebaseStorage.getInstance().getReference()
-                .child(GPX_PATH)
-                .child(mGuide.firebaseId + GPX_EXT);
+    public File getGpx() {
+        if (mGuide.firebaseId == null) {
+            return new File(mGuide.getGpxUri().getPath());
+        } else {
+
+            // Create a temporary File where the GPX will be downloaded
+            final File tempGpx = SaveUtils.createTempFile(StorageProvider.FirebaseFileType.GPX_FILE, mGuide.firebaseId);
+
+            if (tempGpx.length() == 0) {
+
+                // Download the GPX File
+                FirebaseStorage.getInstance().getReference()
+                        .child(GPX_PATH)
+                        .child(mGuide.firebaseId + GPX_EXT)
+                        .getFile(tempGpx)
+                        .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                // Parse the GPX File to get the MapboxOptions
+                                notifyPropertyChanged(BR.gpx);
+                            }
+                        });
+
+                return null;
+            } else {
+                return tempGpx;
+            }
+        }
     }
 
     @Bindable
@@ -224,7 +249,7 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @BindingAdapter({"bind:gpx", "bind:activity", "bind:latitude", "bind:longitude"})
-    public static void loadGpxToMap(SmartMapView mapView, final StorageReference gpx,
+    public static void loadGpxToMap(final SmartMapView mapView, final File gpx,
                                     MapboxActivity activity, final double latitude, final double longitude) {
 
         // The MapView will retain it's internal LifeCycle regardless of how many times it's
@@ -242,59 +267,29 @@ public class GuideViewModel extends BaseObservable {
                     return;
                 }
 
+                // In the case of creating a new Guide without a GPX loaded, show the world map
+                if (latitude == 0 && longitude == 0) {
+                    mapboxMap.setCameraPosition(new CameraPosition.Builder()
+                            .zoom(0)
+                            .build());
+                }
+
                 // Set the camera to the correct position
                 mapboxMap.setCameraPosition(new CameraPosition.Builder()
                         .target(new LatLng(latitude, longitude))
                         .build());
 
-                // Parse the FirebaseId from the file name on Firebase Storage
-                String firebaseId = gpx.getName().replace(GPX_EXT, "");
-
-                // Create a temporary File where the GPX will be downloaded
-                final File tempGpx = SaveUtils.createTempFile(StorageProvider.FirebaseFileType.GPX_FILE, firebaseId);
-
-                if (tempGpx.length() == 0) {
-
-                    // Download the GPX File
-                    gpx.getFile(tempGpx)
-                            .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                    // Parse the GPX File to get the MapboxOptions
-                                    addMapOptionsToMap(tempGpx, mapboxMap);
-                                }
-                            });
-                } else {
-                    // Parse the GPX File to get the Mapbox PolyLine and Marker
-                    addMapOptionsToMap(tempGpx, mapboxMap);
-                }
+                // Parse the GPX File to get the Mapbox PolyLine and Marker
+                addMapOptionsToMap(gpx, mapboxMap);
             }
         });
     }
 
     @BindingAdapter({"bind:gpx", "bind:context"})
-    public static void loadElevationData(final LineChart lineChart, final StorageReference gpx, final Context context) {
+    public static void loadElevationData(final LineChart lineChart, final File gpx, final Context context) {
 
-        // Parse the FirebaseId from the file name on Firebase Storage
-        String firebaseId = gpx.getName().replace(GPX_EXT, "");
-
-        // Create a temporary File where the GPX will be downloaded
-        final File tempGpx = SaveUtils.createTempFile(StorageProvider.FirebaseFileType.GPX_FILE, firebaseId);
-
-        if (tempGpx.length() == 0) {
-
-            // Download the GPX File
-            gpx.getFile(tempGpx)
-                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            addElevationDataToLineChart(tempGpx, lineChart, context);
-                        }
-                    });
-        } else {
-            addElevationDataToLineChart(tempGpx, lineChart, context);
-        }
-
+        // Parse the GPX data to get the elevation profile and add it the LineChart
+        addElevationDataToLineChart(gpx, lineChart, context);
     }
 
     @Bindable
