@@ -11,17 +11,10 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -29,7 +22,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import project.hikerguide.BR;
@@ -37,12 +29,9 @@ import project.hikerguide.R;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.mapbox.SmartMapView;
 import project.hikerguide.models.datamodels.Guide;
-import project.hikerguide.mpandroidchart.DistanceAxisFormatter;
-import project.hikerguide.mpandroidchart.ElevationAxisFormatter;
 import project.hikerguide.ui.MapboxActivity;
 import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.ConversionUtils;
-import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.SaveUtils;
 
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
@@ -198,8 +187,15 @@ public class GuideViewModel extends BaseObservable {
         // Check whether to use the online copy of the GPX file or a locally stored file.
         if (mGuide.firebaseId == null) {
 
-            // Create a new File from the Uri stored in the Guide
-            return new File(mGuide.getGpxUri().getPath());
+            if (mGuide.getGpxUri() == null) {
+
+                // No Uri set yet.
+                return null;
+            } else {
+
+                // Create a new File from the Uri stored in the Guide
+                return new File(mGuide.getGpxUri().getPath());
+            }
         } else {
 
             // Create a temporary File where the GPX will be downloaded
