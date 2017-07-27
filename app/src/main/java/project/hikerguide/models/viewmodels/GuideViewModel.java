@@ -40,9 +40,12 @@ import project.hikerguide.mpandroidchart.DistanceAxisFormatter;
 import project.hikerguide.mpandroidchart.ElevationAxisFormatter;
 import project.hikerguide.ui.MapboxActivity;
 import project.hikerguide.utilities.ColorGenerator;
+import project.hikerguide.utilities.ConversionUtils;
 import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.SaveUtils;
 
+import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
+import static project.hikerguide.utilities.MapUtils.addMapOptionsToMap;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
 import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
@@ -53,9 +56,7 @@ import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
  */
 
 public class GuideViewModel extends BaseObservable {
-    // ** Constants ** //
-    private static final double METERS_PER_MILE = 1609.34;
-    private static final double METERS_PER_FEET = 0.3048;
+
 
     // ** Member Variables ** //
     private Context mContext;
@@ -100,14 +101,14 @@ public class GuideViewModel extends BaseObservable {
     public String getDistance() {
         return mContext.getString(
                 R.string.list_guide_format_distance_imperial,
-                mGuide.distance / METERS_PER_MILE);
+                ConversionUtils.convertDistance(mContext, mGuide.distance));
     }
 
     @Bindable
     public String getElevation() {
         return mContext.getString(
                 R.string.list_guide_format_elevation_imperial,
-                mGuide.elevation / METERS_PER_FEET);
+                ConversionUtils.convertElevation(mContext, mGuide.elevation));
     }
 
     @Bindable
@@ -307,119 +308,4 @@ public class GuideViewModel extends BaseObservable {
         imageView.setImageDrawable(new ColorDrawable(color));
     }
 
-    /**
-     * Adds a PolylineOptions representing the track from a .gpx file to a MapboxMap
-     *
-     * @param gpxFile      .gpx file containing a track to be plotted on the MapboxMap
-     * @param mapboxMap    MapboxMap where the PolylineOptions will be drawn on
-     */
-    private static void addMapOptionsToMap(File gpxFile, final MapboxMap mapboxMap) {
-
-        // Parse the GPX File to get the Mapbox PolyLine and Marker
-        GpxUtils.getMapboxOptions(gpxFile, new GpxUtils.MapboxOptionsListener() {
-            @Override
-            public void onOptionReady(MarkerOptions markerOptions, PolylineOptions polylineOptions) {
-                // Set the Marker for the start of the trail
-                mapboxMap.addMarker(markerOptions);
-
-                // Set the Polyline representing the trail
-                mapboxMap.addPolyline(polylineOptions
-                        .width(3));
-            }
-        });
-    }
-
-    private static void addElevationDataToLineChart(File gpxFile, final LineChart lineChart, final Context context) {
-
-        // Calculate the Entries for the LineChart from the .gpx data
-        GpxUtils.getElevationChartData(gpxFile, new GpxUtils.ElevationDataListener() {
-            @Override
-            public void onElevationDataReady(List<Entry> elevationData) {
-                if (elevationData == null) {
-                    return;
-                }
-
-                for (Entry entry : elevationData) {
-                    // Convert to imperial
-                    entry.setX((float) (entry.getX() / METERS_PER_MILE));
-                    entry.setY((float) (entry.getY() / METERS_PER_FEET));
-                }
-
-                float totalDistance = elevationData.get(elevationData.size() - 1).getX();
-
-                // Set the number of labels to display on the chart based on the total distance of
-                // the trail
-                float interval = 2.5f;      // 2.5 mi interval as minimum
-
-                // Calculate how many labels there would be if the interval were 2.5 miles. Use
-                // floor instead of round() because fractions of a label can't be shown
-                int numLabels = (int) Math.floor(totalDistance / interval);
-
-                while (numLabels > 6) {
-                    // Double the interval until there are less than 6 labels in the graph
-                    // 2.5 mi > 5.0 mi > 10 mi > 20 mi etc
-                    interval *= 2;
-                    numLabels = (int) Math.floor(totalDistance / interval);
-                }
-
-                // Init the Array of labels to show
-                float[] labels = new float[numLabels + 1];
-
-                // Set the first and last items as 0 (beginning) and the total distance of the
-                // trail respectively
-                labels[0] = 0;
-
-                // Init the distance variable that will be used to calculate the labels
-                float distance = interval;
-
-                for (int i = 1; i < numLabels + 1; i++) {
-                    // Set the label
-                    labels[i] = distance;
-
-                    // Increment the label by the interval amount
-                    distance += interval;
-                }
-
-                // Convert the data to a LineDataSet that can be applied to the LineChart
-                LineDataSet dataSet = new LineDataSet(elevationData, null);
-
-                // Remove the indicators for individual points
-                dataSet.setDrawCircles(false);
-
-                // Set the color of the line
-                dataSet.setColor(context.getResources().getColor(R.color.green_700));
-
-                // Set width of line
-                dataSet.setLineWidth(2);
-
-                // Disable the legend
-                lineChart.getLegend().setEnabled(false);
-
-                // Set up the X-Axis
-                lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-                lineChart.getXAxis().setValueFormatter(new DistanceAxisFormatter(context));
-                lineChart.getXAxis().setShowSpecificLabelPositions(true);
-                lineChart.getXAxis().setSpecificLabelPositions(labels);
-
-                // Set up the Y-Axes
-                lineChart.getAxisRight().setValueFormatter(new ElevationAxisFormatter(context));
-                lineChart.getAxisRight().setGranularity(500f);
-                lineChart.getAxisLeft().setValueFormatter(new ElevationAxisFormatter(context));
-                lineChart.getAxisLeft().setGranularity(500f);
-
-                // Remove the description label from the chart
-                Description description = new Description();
-                description.setText("");
-                lineChart.setDescription(description);
-
-                // Disable zooming on the chart
-                lineChart.setDoubleTapToZoomEnabled(false);
-                lineChart.setPinchZoom(false);
-
-                // Set the data to the chart and invalidate to refresh it.
-                lineChart.setData(new LineData(dataSet));
-                lineChart.invalidate();
-            }
-        });
-    }
 }
