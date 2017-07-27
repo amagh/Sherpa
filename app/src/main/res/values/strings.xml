@@ -35,6 +35,9 @@
     <string name="difficulty_expert">Expert</string>
     <string name="difficulty_extreme">Extreme</string>
 
+    <!-- Mapbox related Strings -->
+    <string name="outdoors_style">mapbox://styles/mapbox/outdoors-v10</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
     <string name="list_guide_area_text">Yosemite Valley</string>

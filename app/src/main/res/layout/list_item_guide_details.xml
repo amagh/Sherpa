@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
         <variable
             name="vm"
@@ -35,7 +36,9 @@
             app:latitude="@{vm.latitude}"
             app:longitude="@{vm.longitude}"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"/>
+            app:layout_constraintRight_toRightOf="parent"
+            app:mapbox_cameraZoom="12"
+            app:mapbox_styleUrl="@string/outdoors_style"/>
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/list_guide_details_elevation_lc"

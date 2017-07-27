@@ -232,19 +232,27 @@ public class GuideViewModel extends BaseObservable {
         // rendered
         mapView.startMapView(activity);
 
-        // Attach the MapView to the Activity so it can follow the rest of the lifecycle
-//        activity.attachMapView(mapView);
-
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(final MapboxMap mapboxMap) {
-                // Set the Map Style to the outdoor view with elevation
-                mapboxMap.setStyleUrl(Style.OUTDOORS);
+
+                // Check to make sure the Polyline hasn't already been added the MapboxMap
+                // e.g. when scrolling the RecyclerView, the View will be reloaded from memory, so
+                // it does not need to re-position the camera or add the Polyline again.
+                if (mapboxMap.getPolylines().size() > 0) {
+                    return;
+                }
+
+                // Set the camera to the correct position
+                mapboxMap.setCameraPosition(new CameraPosition.Builder()
+                        .target(new LatLng(latitude, longitude))
+                        .build());
 
                 // Create a temporary File where the GPX will be downloaded
                 final File tempGpx = SaveUtils.createTempFile(StorageProvider.FirebaseFileType.GPX_FILE, firebaseId);
 
                 if (tempGpx.length() == 0) {
+
                     // Download the GPX File
                     FirebaseStorage.getInstance().getReference()
                             .child(GPX_PATH)
@@ -261,8 +269,6 @@ public class GuideViewModel extends BaseObservable {
                     // Parse the GPX File to get the Mapbox PolyLine and Marker
                     addMapOptionsToMap(tempGpx, mapboxMap, latitude, longitude);
                 }
-
-
             }
         });
     }
@@ -274,6 +280,7 @@ public class GuideViewModel extends BaseObservable {
         final File tempGpx = SaveUtils.createTempFile(StorageProvider.FirebaseFileType.GPX_FILE, firebaseId);
 
         if (tempGpx.length() == 0) {
+
             // Download the GPX File
             FirebaseStorage.getInstance().getReference()
                     .child(GPX_PATH)
@@ -325,11 +332,7 @@ public class GuideViewModel extends BaseObservable {
                 mapboxMap.addPolyline(polylineOptions
                         .width(3));
 
-                // Set the camera to the correct position
-                mapboxMap.setCameraPosition(new CameraPosition.Builder()
-                        .target(new LatLng(latitude, longitude))
-                        .zoom(11)
-                        .build());
+
             }
         });
     }
