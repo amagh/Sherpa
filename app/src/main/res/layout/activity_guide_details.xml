@@ -33,7 +33,7 @@
                 <ImageView
                     android:id="@+id/guide_details_iv"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="@dimen/guide_details_image_height"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"
                     app:image="@{vm.image}"
