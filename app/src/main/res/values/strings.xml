@@ -6,6 +6,13 @@
 
     <string name="image_directory">/images</string>
     <string name="gpx_directory">/gpx</string>
+    <string name="gpx_label">GPX</string>
+
+    <!-- User preferences -->
+    <string name="pref_units_key">units</string>
+    <string name="pref_units_imperial">imperial</string>
+    <string name="pref_units_metric">metric</string>
+    <string name="pref_units_default">@string/pref_units_imperial</string>
 
     <!-- Strings for guide details -->
     <string name="list_guide_details_distance_label">Total distance:</string>
