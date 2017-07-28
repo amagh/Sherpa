@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/fab_add_section_text"
+        android:title=""
+        android:icon="@drawable/ic_create"
+        android:orderInCategory="1" />
+
+    <item
+        android:id="@+id/fab_add_section_image"
+        android:title=""
+        android:icon="@drawable/ic_image"
+        android:orderInCategory="1" />
+
+    <item
+        android:id="@+id/fab_add_gpx"
+        android:title=""
+        android:icon="@drawable/ic_directions"
+        android:orderInCategory="1" />
+
+</menu>
