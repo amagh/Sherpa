@@ -35,4 +35,6 @@
 
     <dimen name="list_section_icon_size">32dp</dimen>
     <dimen name="list_section_icon_padding">4dp</dimen>
+
+    <dimen name="sign_in_text_padding">8dp</dimen>
 </resources>
