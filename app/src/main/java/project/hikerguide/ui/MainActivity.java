@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements FragmentGuideList
                     fragment = new FragmentSearch();
                     break;
                 case R.id.navigation_notifications:
-//                    mTextMessage.setText(R.string.title_notifications);
+                    launchActivity();
                     return true;
 
                 default: return false;
@@ -69,6 +69,11 @@ public class MainActivity extends AppCompatActivity implements FragmentGuideList
         // extra
         Intent intent = new Intent(this, GuideDetailsActivity.class);
         intent.putExtra(GUIDE_KEY, guide);
+        startActivity(intent);
+    }
+
+    private void launchActivity() {
+        Intent intent = new Intent(this, CreateGuideActivity.class);
         startActivity(intent);
     }
 }
