@@ -9,11 +9,14 @@ import android.support.design.internal.NavigationMenu;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.MenuItem;
 import android.view.View;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import droidninja.filepicker.FilePickerBuilder;
@@ -28,7 +31,12 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.adapters.EditGuideDetailsAdapter;
+import timber.log.Timber;
 
+import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
+import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
+import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
+import static android.support.v7.widget.helper.ItemTouchHelper.UP;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 
 /**
@@ -43,11 +51,13 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     private ActivityCreateGuideBinding mBinding;
     private EditGuideDetailsAdapter mAdapter;
     private List<BaseModel> mModelList;
+    private ItemTouchHelper mItemTouchHelper;
     private int mFilePickerModelPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Timber.d("onCreate");
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_create_guide);
 
         initRecyclerView();
@@ -78,6 +88,10 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         // Set the LayoutManager and Adapter to the RecyclerView
         mBinding.guideDetailsRv.setLayoutManager(new LinearLayoutManager(this));
         mBinding.guideDetailsRv.setAdapter(mAdapter);
+
+        // Init and set the ItemTouchHelper
+        mItemTouchHelper = new ItemTouchHelper(mItemTouchCallback);
+        mItemTouchHelper.attachToRecyclerView(mBinding.guideDetailsRv);
     }
 
     /**
@@ -251,5 +265,74 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     @Override
     public void onMenuClosed() {
 
+    }
+
+    ItemTouchHelper.Callback mItemTouchCallback = new ItemTouchHelper.SimpleCallback(UP|DOWN, LEFT|RIGHT) {
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            // Get the start/end positions
+            int start = viewHolder.getAdapterPosition();
+            int end = target.getAdapterPosition();
+
+            // If the re-order involves the Guide, disallow it
+            if (end == 0) {
+                mAdapter.notifyItemMoved(end, start);
+                return false;
+            }
+
+            // Move the Model within the Adapter
+            if (start < end) {
+                for (int i = start; i < end; i++) {
+                    Collections.swap(mModelList, i, i + 1);
+                }
+            } else {
+                for (int i = start; i > end; i--) {
+                    Collections.swap(mModelList, i, i - 1);
+                }
+            }
+
+            mAdapter.notifyItemMoved(start, end);
+            return true;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+        }
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            // Drag is handled by touch pads
+            return false;
+        }
+
+        @Override
+        public boolean isItemViewSwipeEnabled() {
+            // Delete is handled by delete icon
+            return false;
+        }
+    };
+
+    /**
+     * Triggers the re-ordering function of the ItemTouchHelper
+     *
+     * @param model    Model that was selected to be re-ordered
+     */
+    public void reorderModel(BaseModel model) {
+
+        // Get the position of the Model in the Adapter
+        int position = mModelList.indexOf(model);
+
+        // Trigger the startDrag() of the ItemTouchHelper, passing in the ViewHolder for the position
+        mItemTouchHelper.startDrag(mBinding.guideDetailsRv.findViewHolderForAdapterPosition(position));
+    }
+
+    /**
+     * Removes a model from the Adapter
+     *
+     * @param model    Model to be removed
+     */
+    public void removeModel(BaseModel model) {
+        mAdapter.removeModel(model);
     }
 }

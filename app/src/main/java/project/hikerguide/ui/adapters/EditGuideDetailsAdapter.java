@@ -153,6 +153,25 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
         }
     }
 
+    /**
+     * Removes a Model from the Adapter
+     *
+     * @param model    Model to be removed
+     */
+    public void removeModel(BaseModel model) {
+
+        // Get the position of the model to be removed
+        int position = mModelList.indexOf(model);
+
+        // Check to exist that the model exists in the List
+        if (position != -1) {
+
+            // Remove the model and notify
+            mModelList.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
     class EditViewHolder extends RecyclerView.ViewHolder {
         // ** Member Variables ** //
         ViewDataBinding mBinding;
@@ -175,7 +194,7 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
 
             } else if (model instanceof Section) {
 
-                SectionViewModel vm = new SectionViewModel((Section) model);
+                SectionViewModel vm = new SectionViewModel(mActivity, (Section) model);
 
                 if (((Section) model).hasImage) {
                     ((ListItemSectionImageEditBinding) mBinding).setVm(vm);

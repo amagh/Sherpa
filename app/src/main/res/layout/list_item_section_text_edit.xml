@@ -22,8 +22,8 @@
             android:layout_height="@dimen/list_section_icon_size"
             android:padding="@dimen/list_section_icon_padding"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_reorder"
-            android:onTouch="@{vm.onReorderTouch}"/>
+            android:onTouch="@{vm.onReorderTouch}"
+            android:src="@drawable/ic_reorder"/>
 
         <EditText
             android:id="@+id/list_section_text_tv"
@@ -44,6 +44,7 @@
             android:layout_height="@dimen/list_section_icon_size"
             android:padding="@dimen/list_section_icon_padding"
             android:layout_gravity="center_vertical"
+            android:onClick="@{vm.onDeleteClick}"
             android:src="@drawable/ic_delete"/>
 
     </LinearLayout>
