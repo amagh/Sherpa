@@ -5,6 +5,7 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -146,17 +147,39 @@ public class GuideViewModel extends BaseObservable {
 
     @Bindable
     public StorageReference getImage() {
+
+        // If Guide does not have FirebaseId, return null
+        if (mGuide.firebaseId == null) return null;
+
         return FirebaseStorage.getInstance().getReference()
                 .child(IMAGE_PATH)
                 .child(mGuide.firebaseId + JPEG_EXT);
     }
 
-    @BindingAdapter("bind:image")
-    public static void loadImage(ImageView imageView, StorageReference image) {
-        Glide.with(imageView.getContext())
-                .using(new FirebaseImageLoader())
-                .load(image)
-                .into(imageView);
+    @Bindable
+    public Uri getImageUri() {
+        return mGuide.getImageUri();
+    }
+
+
+    @BindingAdapter({"bind:image", "bind:imageUri"})
+    public static void loadImage(ImageView imageView, StorageReference image, Uri imageUri) {
+
+        // Check whether to load image from File or from Firebase Storage
+        if (image == null) {
+
+            // No StorageReference, load local file using the File's Uri
+            Glide.with(imageView.getContext())
+                    .load(imageUri)
+                    .into(imageView);
+        } else {
+
+            // Load from Firebase Storage
+            Glide.with(imageView.getContext())
+                    .using(new FirebaseImageLoader())
+                    .load(image)
+                    .into(imageView);
+        }
     }
 
     @Bindable
@@ -261,13 +284,6 @@ public class GuideViewModel extends BaseObservable {
             @Override
             public void onMapReady(final MapboxMap mapboxMap) {
 
-                // Check to make sure the Polyline hasn't already been added the MapboxMap
-                // e.g. when scrolling the RecyclerView, the View will be reloaded from memory, so
-                // it does not need to re-position the camera or add the Polyline again.
-                if (mapboxMap.getPolylines().size() > 0) {
-                    return;
-                }
-
                 // In the case of creating a new Guide without a GPX loaded, show the world map
                 if (latitude == 0 && longitude == 0) {
                     mapboxMap.setCameraPosition(new CameraPosition.Builder()
@@ -279,6 +295,13 @@ public class GuideViewModel extends BaseObservable {
                 mapboxMap.setCameraPosition(new CameraPosition.Builder()
                         .target(new LatLng(latitude, longitude))
                         .build());
+
+                // Check to make sure the Polyline hasn't already been added the MapboxMap
+                // e.g. when scrolling the RecyclerView, the View will be reloaded from memory, so
+                // it does not need to re-position the camera or add the Polyline again.
+                if (mapboxMap.getPolylines().size() > 0) {
+                    return;
+                }
 
                 if (gpx == null) {
                     // GPX File has not been loaded yet. Do nothing.
