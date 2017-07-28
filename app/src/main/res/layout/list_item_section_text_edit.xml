@@ -9,22 +9,45 @@
             type="project.hikerguide.models.viewmodels.SectionViewModel" />
     </data>
 
-    <EditText
-        android:id="@+id/list_section_text_tv"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/guide_details_section_margin"
         android:layout_marginBottom="@dimen/guide_details_section_margin"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:scrollHorizontally="false"
-        android:hint="Guide Details"
-        android:lineSpacingExtra="@dimen/block_text_line_spacing"
-        android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
-        android:text="@={vm.content}"
-        app:imeAction="@{vm.imeAction}"
-        style="@style/TextAppearance.AppCompat.Body1"/>
+        android:background="?android:colorBackground">
+
+        <ImageView
+            android:id="@+id/list_section_tp"
+            android:layout_width="@dimen/list_section_icon_size"
+            android:layout_height="@dimen/list_section_icon_size"
+            android:padding="@dimen/list_section_icon_padding"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_reorder"
+            android:onTouch="@{vm.onReorderTouch}"/>
+
+        <EditText
+            android:id="@+id/list_section_text_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scrollHorizontally="false"
+            android:hint="@string/list_section_text_hint"
+            android:lineSpacingExtra="@dimen/block_text_line_spacing"
+            android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
+            android:text="@={vm.content}"
+            app:imeAction="@{vm.imeAction}"
+            style="@style/TextAppearance.AppCompat.Body1"/>
+
+        <ImageView
+            android:id="@+id/list_section_del"
+            android:layout_width="@dimen/list_section_icon_size"
+            android:layout_height="@dimen/list_section_icon_size"
+            android:padding="@dimen/list_section_icon_padding"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_delete"/>
+
+    </LinearLayout>
+
+
 
 </layout>

@@ -13,36 +13,58 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginTop="@dimen/guide_details_section_margin"
         android:layout_marginBottom="@dimen/guide_details_section_margin"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin">
+        android:background="?android:colorBackground">
 
         <ImageView
-            android:id="@+id/list_section_image_iv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="fitXY"
-            android:adjustViewBounds="true"
-            app:image="@{vm.image}"
-            app:imageUri="@{vm.imageUri}"
-            tools:src="@color/bg_gray"/>
+            android:id="@+id/list_section_tp"
+            android:layout_width="@dimen/list_section_icon_size"
+            android:layout_height="@dimen/list_section_icon_size"
+            android:padding="@dimen/list_section_icon_padding"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_reorder"
+            android:onTouch="@{vm.onReorderTouch}"/>
 
-        <EditText
-            android:id="@+id/list_section_image_caption_tv"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/text_vertical_margin"
-            android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
-            android:textStyle="italic"
-            android:textColor="@android:color/black"
-            android:hint="Image Caption"
-            android:text="@={vm.content}"
-            app:imeAction="@{vm.imeAction}"
-            style="@style/TextAppearance.AppCompat.Caption"/>
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/list_section_image_iv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+                android:onClick="@{vm.onSectionImageClick}"
+                app:image="@{vm.image}"
+                app:imageUri="@{vm.imageUri}"
+                tools:src="@color/bg_gray"/>
+
+            <EditText
+                android:id="@+id/list_section_image_caption_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/text_vertical_margin"
+                android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
+                android:textStyle="italic"
+                android:textColor="@android:color/black"
+                android:hint="@string/list_section_caption_hint"
+                android:text="@={vm.content}"
+                app:imeAction="@{vm.imeAction}"
+                style="@style/TextAppearance.AppCompat.Caption"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/list_section_del"
+            android:layout_width="@dimen/list_section_icon_size"
+            android:layout_height="@dimen/list_section_icon_size"
+            android:padding="@dimen/list_section_icon_padding"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_delete"/>
 
     </LinearLayout>
 </layout>

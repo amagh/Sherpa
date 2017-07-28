@@ -32,4 +32,7 @@
     <dimen name="search_widget_horizontal_margin">8dp</dimen>
     <dimen name="search_widget_vertical_margin">8dp</dimen>
     <dimen name="search_map_height">300dp</dimen>
+
+    <dimen name="list_section_icon_size">32dp</dimen>
+    <dimen name="list_section_icon_padding">4dp</dimen>
 </resources>

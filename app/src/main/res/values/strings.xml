@@ -21,8 +21,12 @@
     <!-- Strings for author -->
     <string name="list_author_heading">About the Author</string>
 
+    <!-- Strings for sections -->
+    <string name="list_section_text_hint">Write your adventure!</string>
+    <string name="list_section_caption_hint">Caption (Optional)</string>
+
     <!-- Strings for Search Activity -->
-    <string name="search_label">Search</string>
+    <string name="search_label">Search</string>'
 
     <!-- Formatting for guide list item -->
     <string name="list_guide_format_distance_imperial">%,.2f miles</string>
