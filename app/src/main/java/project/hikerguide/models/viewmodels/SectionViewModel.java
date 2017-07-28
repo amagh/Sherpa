@@ -4,7 +4,10 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.net.Uri;
+import android.text.InputType;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.android.databinding.library.baseAdapters.BR;
@@ -87,6 +90,23 @@ public class SectionViewModel extends BaseObservable {
                     .load(image)
                     .into(imageView);
         }
+    }
+
+    @Bindable
+    public int getImeAction() {
+        if (mSection.hasImage) {
+            return EditorInfo.IME_ACTION_DONE;
+        } else {
+            return EditorInfo.IME_ACTION_NEXT;
+        }
+    }
+
+    @BindingAdapter("bind:imeAction")
+    public static void setupEditText(EditText editText, int imeAction) {
+
+        // Work around for multiline EditText with IME option
+        editText.setImeOptions(imeAction);
+        editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
     }
 
 }

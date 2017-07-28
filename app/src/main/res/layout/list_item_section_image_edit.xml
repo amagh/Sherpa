@@ -36,12 +36,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/text_vertical_margin"
-            android:inputType="textAutoCorrect|textCapSentences"
-            android:imeOptions="actionDone"
+            android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
             android:textStyle="italic"
             android:textColor="@android:color/black"
             android:hint="Image Caption"
             android:text="@={vm.content}"
+            app:imeAction="@{vm.imeAction}"
             style="@style/TextAppearance.AppCompat.Caption"/>
 
     </LinearLayout>
