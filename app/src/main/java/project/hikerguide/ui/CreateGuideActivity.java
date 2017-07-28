@@ -5,12 +5,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.internal.NavigationMenu;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,7 +35,7 @@ import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
  * Created by Alvin on 7/27/2017.
  */
 
-public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.MenuListener{
+public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.MenuListener {
     // ** Constants ** //
     public static final int PERMISSION_REQUEST_EXT_STORAGE = 9687;
 
@@ -70,6 +67,9 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         mBinding.fabDial.setMenuListener(this);
     }
 
+    /**
+     * Initializes the components required for the RecyclerView
+     */
     private void initRecyclerView() {
 
         // Init the Adapter
@@ -198,6 +198,11 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         }
     }
 
+    /**
+     * For adding the hero image to the Guide
+     *
+     * @param view    The ImageView in the Collapsing Toolbar
+     */
     public void onHeroImageClick(View view) {
 
         // Set the position to the first position as that is the only position the Guide should
@@ -247,5 +252,4 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     public void onMenuClosed() {
 
     }
-
 }

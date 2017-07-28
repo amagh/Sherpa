@@ -133,7 +133,7 @@ public class SaveUtils {
     public static File createTempFile(@StorageProvider.FirebaseFileType int type, String firebaseId) {
 
         // Get a reference to the String that will be used for the file extension
-        String fileExtension;
+        String fileExtension = "";
 
         // Set the file extension based on the type of File
         switch (type) {
@@ -144,8 +144,6 @@ public class SaveUtils {
             case IMAGE_FILE:
                 fileExtension = JPEG_EXT;
                 break;
-
-            default: throw new UnsupportedOperationException("Unknown File Type: " + type);
         }
 
         return new File(TEMP_DIRECTORY, firebaseId + fileExtension);
