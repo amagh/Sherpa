@@ -23,6 +23,7 @@
         android:hint="Guide Details"
         android:lineSpacingExtra="@dimen/block_text_line_spacing"
         android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
+        android:text="@={vm.content}"
         app:imeAction="@{vm.imeAction}"
         style="@style/TextAppearance.AppCompat.Body1"/>
 
