@@ -10,9 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import project.hikerguide.R;
+import project.hikerguide.databinding.ListItemGuideDetailsBinding;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
+import project.hikerguide.models.viewmodels.GuideViewModel;
+import project.hikerguide.ui.CreateGuideActivity;
 
 /**
  * Created by Alvin on 7/26/2017.
@@ -25,7 +28,12 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
     private static final int EDIT_SECTION_IMAGE_VIEW_TYPE   = 2;
 
     // ** Member Variables ** //
+    private CreateGuideActivity mActivity;
     private List<BaseModel> mModelList;
+
+    public EditGuideDetailsAdapter(CreateGuideActivity activity) {
+        mActivity = activity;
+    }
 
     @Override
     public EditViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -39,7 +47,7 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
         // Set the layout based on the ViewType
         switch (viewType) {
             case EDIT_GUIDE_VIEW_TYPE:
-                layoutId = R.layout.list_item_guide_details_edit;
+                layoutId = R.layout.list_item_guide_details;
                 break;
 
             case EDIT_SECTION_VIEW_TYPE:
@@ -89,6 +97,16 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
         }
 
         return super.getItemViewType(position);
+    }
+
+    /**
+     * Setter for the List of BaseModels to be displayed by the Adapter
+     *
+     * @param modelList    List containing BaseModels whose data is to be displayed by the Adapter
+     */
+    public void setModelList(List<BaseModel> modelList) {
+        mModelList = modelList;
+        notifyDataSetChanged();
     }
 
     /**
@@ -143,7 +161,14 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
         }
 
         private void bind(int position) {
+            // Retrieve the corresponding model for the position of the ViewHolder
+            BaseModel model = mModelList.get(position);
 
+            // Load the Correct ViewModel based on the type of BaseModel
+            if (model instanceof Guide) {
+                GuideViewModel vm = new GuideViewModel(mActivity, (Guide) model);
+                ((ListItemGuideDetailsBinding) mBinding).setVm(vm);
+            }
         }
     }
 }
