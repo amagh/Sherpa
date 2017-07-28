@@ -11,10 +11,13 @@ import java.util.List;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemGuideDetailsBinding;
+import project.hikerguide.databinding.ListItemSectionImageEditBinding;
+import project.hikerguide.databinding.ListItemSectionTextEditBinding;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
+import project.hikerguide.models.viewmodels.SectionViewModel;
 import project.hikerguide.ui.CreateGuideActivity;
 
 /**
@@ -164,10 +167,21 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
             // Retrieve the corresponding model for the position of the ViewHolder
             BaseModel model = mModelList.get(position);
 
-            // Load the Correct ViewModel based on the type of BaseModel
+            // Init the ViewModel and set it to the ViewDataBinding based on the type of BaseModel
             if (model instanceof Guide) {
+
                 GuideViewModel vm = new GuideViewModel(mActivity, (Guide) model);
                 ((ListItemGuideDetailsBinding) mBinding).setVm(vm);
+
+            } else if (model instanceof Section) {
+
+                SectionViewModel vm = new SectionViewModel((Section) model);
+
+                if (((Section) model).hasImage) {
+                    ((ListItemSectionImageEditBinding) mBinding).setVm(vm);
+                } else {
+                    ((ListItemSectionTextEditBinding) mBinding).setVm(vm);
+                }
             }
         }
     }
