@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.hikerguide.models.viewmodels.AccountViewModel" />
+    </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -13,19 +20,20 @@
             android:layout_width="128dp"
             android:layout_height="128dp"
             android:layout_marginTop="120dp"
+            android:src="@drawable/placeholder_icon"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:src="@drawable/placeholderIcon"/>
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <EditText
             android:id="@+id/sign_in_email_tv"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
             android:layout_marginTop="64dp"
-            android:hint="Email"
+            android:hint="@string/sign_in_email_hint"
             android:inputType="textEmailAddress"
             android:imeOptions="actionNext"
+            android:text="@={vm.email}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/sign_in_iv"
@@ -34,47 +42,57 @@
         <EditText
             android:id="@+id/sign_in_password_confirm_tv"
             android:layout_marginTop="32dp"
-            android:hint="Password"
+            android:hint="@string/sign_in_password_hint"
             android:inputType="textPassword"
             android:imeOptions="actionNext"
             android:visibility="gone"
+            android:text="@={vm.passwordConfirm}"
             app:layout_constraintLeft_toLeftOf="@id/sign_in_email_tv"
             app:layout_constraintRight_toRightOf="@id/sign_in_email_tv"
             app:layout_constraintTop_toBottomOf="@id/sign_in_email_tv"
-            style="@style/EditText.SignIn"/>
+            app:passwordConfirmVisibility="@{vm.passwordConfirmVisibility}"
+            style="@style/EditText.SignIn"
+            tools:visibility="visible"
+            tools:hint="@string/sign_in_password_hint"/>
 
         <EditText
             android:id="@+id/sign_in_password_tv"
             android:layout_marginTop="32dp"
-            android:hint="Password"
             android:inputType="textPassword"
             android:imeOptions="actionGo"
+            android:text="@={vm.password}"
+            android:hint="@{vm.passwordHint}"
             app:layout_constraintLeft_toLeftOf="@id/sign_in_email_tv"
             app:layout_constraintRight_toRightOf="@id/sign_in_email_tv"
             app:layout_constraintTop_toBottomOf="@id/sign_in_password_confirm_tv"
-            style="@style/EditText.SignIn"/>
+            style="@style/EditText.SignIn"
+            tools:hint="@string/sign_in_password_confirm"/>
 
         <Button
             android:layout_width="128dp"
             android:layout_height="wrap_content"
-            android:text="Sign in"
-            android:layout_marginTop="32dp"
-            app:backgroundTint="@color/colorPrimary"
-            android:background="@color/colorPrimary"
             android:textColor="@android:color/white"
+            android:text="@{vm.signInButtonText}"
+            android:layout_marginTop="32dp"
+            android:background="@color/colorPrimary"
+            android:onClick="@{vm.onClickSignIn}"
             app:layout_constraintLeft_toLeftOf="@id/sign_in_email_tv"
             app:layout_constraintRight_toRightOf="@id/sign_in_email_tv"
-            app:layout_constraintTop_toBottomOf="@id/sign_in_password_tv"/>
+            app:layout_constraintTop_toBottomOf="@id/sign_in_password_tv"
+            tools:text="@string/sign_in_button_text"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimaryDark"
-            android:text="create account"
+            android:text="@{vm.createAccountButtonText}"
             android:textColor="@android:color/white"
+            android:onClick="@{vm.onClickCreateAccount}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:visibility="visible"
+            tools:text="@string/create_account_button_text"/>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

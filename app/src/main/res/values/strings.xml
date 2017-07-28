@@ -28,6 +28,14 @@
     <!-- Strings for Search Activity -->
     <string name="search_label">Search</string>'
 
+    <!-- Strings for Account Info -->
+    <string name="sign_in_email_hint">Email</string>
+    <string name="sign_in_password_hint">Password</string>
+    <string name="sign_in_password_confirm">Password (Confirm)</string>
+    <string name="sign_in_button_text">Sign In</string>
+    <string name="return_to_sign_in_button_text">Return to Account Sign In</string>
+    <string name="create_account_button_text">Create Account</string>
+
     <!-- Formatting for guide list item -->
     <string name="list_guide_format_distance_imperial">%,.2f miles</string>
     <string name="list_guide_format_distance_chart_imperial">%,.1f mi</string>
