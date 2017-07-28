@@ -36,6 +36,10 @@ public abstract class BaseModelWithImage extends BaseModel {
         this.imageUri = Uri.fromFile(imageFile);
     }
 
+    public Uri getImageUri() {
+        return imageUri;
+    }
+
     /**
      * Creates and returns the ImageFile corresponding to the model's imageUri
      *
