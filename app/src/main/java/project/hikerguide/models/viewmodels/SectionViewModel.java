@@ -16,7 +16,6 @@ import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.datamodels.Section;
 
 import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
@@ -29,12 +28,9 @@ import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
 public class SectionViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Section mSection;
-    private StorageProvider mStorage;
 
     public SectionViewModel(Section section) {
         mSection = section;
-
-        mStorage = StorageProvider.getInstance();
     }
 
     @Bindable
@@ -42,7 +38,6 @@ public class SectionViewModel extends BaseObservable {
         return mSection.content;
     }
 
-    @Bindable
     public void setContent(String content) {
         mSection.content = content;
 
@@ -94,19 +89,14 @@ public class SectionViewModel extends BaseObservable {
 
     @Bindable
     public int getImeAction() {
-        if (mSection.hasImage) {
-            return EditorInfo.IME_ACTION_DONE;
-        } else {
-            return EditorInfo.IME_ACTION_NEXT;
-        }
+        return EditorInfo.IME_ACTION_DONE;
     }
 
-    @BindingAdapter("bind:imeAction")
+    @BindingAdapter({"bind:imeAction"})
     public static void setupEditText(EditText editText, int imeAction) {
 
         // Work around for multiline EditText with IME option
         editText.setImeOptions(imeAction);
         editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
     }
-
 }
