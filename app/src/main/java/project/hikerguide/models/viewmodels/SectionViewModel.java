@@ -116,8 +116,10 @@ public class SectionViewModel extends BaseObservable {
      */
     public void onSectionImageClick(View view) {
 
-        // Stub
-        System.out.println(view.getContext());
+        // Trigger the replacement of the image
+        if (mActivity != null) {
+            mActivity.onSectionImageClick(mSection);
+        }
     }
 
     /**

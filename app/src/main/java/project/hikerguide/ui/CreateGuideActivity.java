@@ -181,7 +181,10 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                     String imagePath = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA).get(0);
 
                     // If nothing is selected, do nothing
-                    if (imagePath == null) return;
+                    if (imagePath == null) {
+                        mFilePickerModelPosition = -1;
+                        return;
+                    }
 
                     // mFilePickerModelPosition is the same as the size of the list, that means
                     // that the user has chosen to add a new Section with image
@@ -197,8 +200,6 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                     // Notify the item based on the position of mFilePickerModelPosition of the change
                     if (mFilePickerModelPosition == 0) {
                         mBinding.getVm().notifyPropertyChanged(BR.imageUri);
-                    } else if (mFilePickerModelPosition == mModelList.size() - 1) {
-                        mAdapter.notifyItemInserted(mModelList.size() - 1);
                     } else {
                         mAdapter.notifyItemChanged(mFilePickerModelPosition);
                     }
@@ -225,6 +226,22 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
         // Open the FilePicker to allow the user to select the image they want to use
         openFilePicker(FilePickerConst.FILE_TYPE_MEDIA);
+    }
+
+    /**
+     * Handles the clicking of an image of a Section by triggering the replacement of the image
+     *
+     * @param section    Section whose image is to be changed
+     */
+    public void onSectionImageClick(Section section) {
+
+        // Set the mem var to the position of the Model in the Adapter
+        mFilePickerModelPosition = mModelList.indexOf(section);
+
+        if (mFilePickerModelPosition != -1) {
+            // Open the FilePicker
+            openFilePicker(FilePickerConst.FILE_TYPE_MEDIA);
+        }
     }
 
     @Override
