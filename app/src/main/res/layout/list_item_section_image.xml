@@ -28,6 +28,7 @@
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
             app:image="@{vm.image}"
+            app:imageUri="@{vm.imageUri}"
             tools:src="@drawable/placeholder_section_image"/>
 
         <TextView
