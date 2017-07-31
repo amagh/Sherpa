@@ -64,6 +64,7 @@ dependencies {
     compile 'org.gavaghan:geodesy:1.1.3'
     compile 'com.droidninja:filepicker:2.0.7'
     compile 'io.github.yavski:fab-speed-dial:1.0.6'
+    compile 'at.wirecube:additive_animations:1.3'
 
     annotationProcessor 'net.simonvt.schematic:schematic-compiler:0.7.0'
     compile 'net.simonvt.schematic:schematic:0.7.0'
