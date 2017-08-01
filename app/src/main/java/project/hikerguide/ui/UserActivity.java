@@ -3,12 +3,9 @@ package project.hikerguide.ui;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +25,7 @@ import project.hikerguide.databinding.ActivityUserBinding;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
+import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
@@ -48,7 +46,6 @@ public class UserActivity extends AppCompatActivity {
     private Author mAuthor;
     private AuthorDetailsAdapter mAdapter;
     private List<BaseModel> mModelList;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +128,7 @@ public class UserActivity extends AppCompatActivity {
 
                 // Add the Author to the Adapter so their info can be displayed
                 mAdapter.addModel(mAuthor);
+                mBinding.setVm(new AuthorViewModel(UserActivity.this, mAuthor));
             }
 
             @Override

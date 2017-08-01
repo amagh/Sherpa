@@ -21,6 +21,7 @@ import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.ui.UserActivity;
 
+import static project.hikerguide.utilities.StorageProviderUtils.BACKDROP_SUFFIX;
 import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
 import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
 
@@ -75,6 +76,21 @@ public class AuthorViewModel extends BaseObservable {
         Glide.with(imageView.getContext())
                 .using(new FirebaseImageLoader())
                 .load(image)
+                .into(imageView);
+    }
+
+    @Bindable
+    public StorageReference getBackdrop() {
+        return FirebaseStorage.getInstance().getReference()
+                .child(IMAGE_PATH)
+                .child(mAuthor.firebaseId + BACKDROP_SUFFIX + JPEG_EXT);
+    }
+
+    @BindingAdapter("bind:backdrop")
+    public static void loadBackdrop(ImageView imageView, StorageReference backdrop) {
+        Glide.with(imageView.getContext())
+                .using(new FirebaseImageLoader())
+                .load(backdrop)
                 .into(imageView);
     }
 

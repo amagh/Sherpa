@@ -20,6 +20,7 @@ public class StorageProviderUtils {
     public static final String GPX_PATH = "gpx";
     public static final String JPEG_EXT = ".jpg";
     public static final String GPX_EXT = ".gpx";
+    public static final String BACKDROP_SUFFIX = "_bd";
 
 //    public static String getDirectoryFromType(@StorageProvider.FirebaseFileType int type) {
 //        String directory;
