@@ -35,6 +35,14 @@
                 android:value=".ui.MainActivity" />
         </activity>
 
+        <activity
+            android:name=".ui.AccountActivity"
+            android:windowSoftInputMode="adjustPan">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.MainActivity" />
+        </activity>
+
         <provider
             android:name=".data.generated.GuideProvider"
             android:authorities="project.hikerguide.data"/>
