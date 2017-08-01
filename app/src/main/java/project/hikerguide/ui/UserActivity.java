@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -13,13 +14,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import project.hikerguide.R;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.databinding.ActivityUserBinding;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
+import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
-import timber.log.Timber;
+
+import static project.hikerguide.ui.UserActivity.BundleKeys.AUTHOR_KEY;
 
 /**
  * Created by Alvin on 7/31/2017.
@@ -27,31 +34,61 @@ import timber.log.Timber;
 
 public class UserActivity extends AppCompatActivity {
     // ** Constants ** //
+    public interface BundleKeys {
+        String AUTHOR_KEY = "author";
+    }
 
     // ** Member Variables ** //
-    ActivityUserBinding mBinding;
-    Author mAuthor;
+    private ActivityUserBinding mBinding;
+    private Author mAuthor;
+    private AuthorDetailsAdapter mAdapter;
+    private List<BaseModel> mModelList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_user);
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+        initRecyclerView();
 
-        checkUser();
+        if (getIntent().getParcelableExtra(AUTHOR_KEY) == null) {
+
+            // User is checking their own profile
+            loadUserSelfProfile();
+
+            // Enable option to edit their profile
+            mAdapter.enableEditing();
+        }
+
     }
 
     /**
-     * Checks that the Firebase User has been added to the Firebase Database
+     * Initializes components for ReyclerView to function
      */
-    private void checkUser() {
+    private void initRecyclerView() {
+        // Init the Adapter
+        mAdapter = new AuthorDetailsAdapter();
+
+        // Set the LayoutManager and Adapter
+        mBinding.userRv.setLayoutManager(new LinearLayoutManager(this));
+        mBinding.userRv.setAdapter(mAdapter);
+
+        // Init the List of Models
+        mModelList = new ArrayList<>();
+
+        // Set the List in the Adapter
+        mAdapter.setModelList(mModelList);
+    }
+
+    /**
+     * Checks that the Firebase User has been added to the Firebase Database and loads their
+     * profile from Firebase Databse.
+     */
+    private void loadUserSelfProfile() {
         // Get an instance of the FirebaseUser
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user == null) {
             // No valid user, send to the AccountActivity to sign in
@@ -68,20 +105,27 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                // Convert the DataSnapshot to an Author Object
-                mAuthor = (Author) FirebaseProviderUtils
-                        .getModelFromSnapshot(DatabaseProvider.FirebaseType.AUTHOR, dataSnapshot);
+                // Check to ensure that the DataSnapshot is valid
+                if (dataSnapshot.exists()) {
+
+                    // Convert the DataSnapshot to an Author Object
+                    mAuthor = (Author) FirebaseProviderUtils
+                            .getModelFromSnapshot(DatabaseProvider.FirebaseType.AUTHOR, dataSnapshot);
+                }
 
                 // Remove Listener
                 authorRef.removeEventListener(this);
 
-                if (mAuthor == null || mAuthor.name == null) {
+                if (mAuthor == null) {
 
-                    // Author has not set a display name at minimum yet
-                    // TODO: Start profile Activity
+                    mAuthor = new Author();
+
+                    // If the Author does not exist in the Firebase Database, add them
+                    authorRef.setValue(mAuthor);
                 }
 
-
+                // Add the Author to the Adapter so their info can be displayed
+                mAdapter.addModel(mAuthor);
             }
 
             @Override
@@ -91,5 +135,21 @@ public class UserActivity extends AppCompatActivity {
                 authorRef.removeEventListener(this);
             }
         });
+    }
+
+    private void checkUser() {
+
+    }
+
+    /**
+     * Switches the layout used by the AuthorDetailsAdapter to one with EditText so the user can
+     * change the info on their profile
+     */
+    private void editAuthorDetails() {
+
+    }
+
+    private void updateAuthorValues() {
+
     }
 }
