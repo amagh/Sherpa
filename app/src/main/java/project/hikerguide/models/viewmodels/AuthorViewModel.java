@@ -4,7 +4,10 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.text.InputType;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.android.databinding.library.baseAdapters.BR;
@@ -39,6 +42,10 @@ public class AuthorViewModel extends BaseObservable {
         return mAuthor.name;
     }
 
+    public void setName(String name) {
+        mAuthor.name = name;
+    }
+
     @Bindable
     public StorageReference getImage() {
         return FirebaseStorage.getInstance().getReference()
@@ -64,6 +71,10 @@ public class AuthorViewModel extends BaseObservable {
         return mAuthor.description;
     }
 
+    public void setDescription(String description) {
+        mAuthor.description = description;
+    }
+
     @Bindable
     public int getEditVisibility() {
         return mEditVisibility;
@@ -84,7 +95,24 @@ public class AuthorViewModel extends BaseObservable {
         imageView.setVisibility(editVisibility);
     }
 
+    @Bindable
+    public int getImeAction() {
+        return EditorInfo.IME_ACTION_DONE;
+    }
+
+    @BindingAdapter({"bind:imeAction"})
+    public static void setupEditText(EditText editText, int imeAction) {
+
+        // Work around for multiline EditText with IME option
+        editText.setImeOptions(imeAction);
+        editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
+    }
+
     public void onClickEdit(View view) {
+
+    }
+
+    public void onClickAccept(View view) {
 
     }
 
@@ -98,4 +126,5 @@ public class AuthorViewModel extends BaseObservable {
 
         notifyPropertyChanged(BR.editVisibility);
     }
+
 }

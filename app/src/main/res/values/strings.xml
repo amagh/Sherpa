@@ -51,6 +51,9 @@
 
     <!-- Formatting for author list item -->
     <string name="list_author_format_score">%,d pts</string>
+    <string name="author_display_name_hint">Display Name (required for guides)</string>
+    <string name="author_description_hint">Description (Optional)</string>
+    <string name="author_edit_accept">Accept</string>
 
     <!-- Formatting for difficulty rating -->
     <string name="difficulty_easy">Easy</string>

@@ -24,8 +24,8 @@
             android:layout_marginTop="16dp"
             android:padding="4dp"
             android:layout_gravity="end"
-            android:src="@drawable/ic_create"
-            android:tint="@color/grey_400"
+            android:src="@drawable/ic_close"
+            android:tint="@color/red_900"
             android:onClick="@{vm.onClickEdit}"
             app:editVisibility="@{vm.editVisibility}"/>
 
@@ -59,9 +59,18 @@
             android:text="@={vm.description}"
             android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
             android:hint="@string/author_description_hint"
-            app:imeAction="@{vm::imeAction}"
+            app:imeAction="@{vm.imeAction}"
             style="@style/TextAppearance.AppCompat.Body1"
             tools:text="@string/list_author_description_text"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:text="@string/author_edit_accept"
+            android:textColor="@color/colorPrimary"
+            android:onClick="@{vm::onClickAccept}"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
 
     </LinearLayout>
 
