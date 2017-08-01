@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.hikerguide.models.viewmodels.AuthorViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/card_vertical_separation"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="16dp"
+            android:padding="4dp"
+            android:layout_gravity="end"
+            android:src="@drawable/ic_create"
+            android:tint="@color/grey_400"
+            android:onClick="@{vm.onClickEdit}"
+            app:editVisibility="@{vm.editVisibility}"/>
+
+        <EditText
+            android:id="@+id/list_author_name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@={vm.name}"
+            android:inputType="textCapWords"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
+            android:hint="@string/author_display_name_hint"
+            style="@style/TextAppearance.AppCompat.Headline"
+            tools:text="@string/list_author_text"/>
+
+        <TextView
+            android:id="@+id/list_author_score_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/text_vertical_margin"
+            android:layout_gravity="center_horizontal"
+            android:text="@{vm.score}"
+            tools:text="@string/list_author_score_text"/>
+
+        <EditText
+            android:id="@+id/list_author_description_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:text="@={vm.description}"
+            android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
+            android:hint="@string/author_description_hint"
+            app:imeAction="@{vm::imeAction}"
+            style="@style/TextAppearance.AppCompat.Body1"
+            tools:text="@string/list_author_description_text"/>
+
+    </LinearLayout>
+
+</layout>
