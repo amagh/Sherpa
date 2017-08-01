@@ -12,7 +12,7 @@ import java.util.List;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemGuideBinding;
-import project.hikerguide.databinding.ListItemGuideSearchBinding;
+import project.hikerguide.databinding.ListItemGuideCompactBinding;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 
@@ -49,7 +49,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
                 break;
 
             case SEARCH_VIEW_TYPE:
-                layoutId = R.layout.list_item_guide_search;
+                layoutId = R.layout.list_item_guide_compact;
                 break;
         }
 
@@ -203,7 +203,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
                     position = HIGHLIGHT_POSITION;
                 }
 
-                ((ListItemGuideSearchBinding) mBinding)
+                ((ListItemGuideCompactBinding) mBinding)
                         // Add the position to the Constructor so that color position matches the
                         // color given the track.
                         .setVm(new GuideViewModel(mBinding.getRoot().getContext(), guide, position));
