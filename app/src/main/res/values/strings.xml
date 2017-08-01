@@ -50,7 +50,7 @@
     <string name="list_guide_format_reviews">(%d)</string>
 
     <!-- Formatting for author list item -->
-    <string name="list_author_format_score">%d pts</string>
+    <string name="list_author_format_score">%,d pts</string>
 
     <!-- Formatting for difficulty rating -->
     <string name="difficulty_easy">Easy</string>
