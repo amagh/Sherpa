@@ -12,6 +12,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -20,14 +21,17 @@ import java.util.List;
 import java.util.Map;
 
 import project.hikerguide.R;
+import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.databinding.ActivityUserBinding;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.ui.UserActivity.BundleKeys.AUTHOR_KEY;
 
@@ -129,6 +133,9 @@ public class UserActivity extends AppCompatActivity {
                 // Add the Author to the Adapter so their info can be displayed
                 mAdapter.addModel(mAuthor);
                 mBinding.setVm(new AuthorViewModel(UserActivity.this, mAuthor));
+
+                // Load the Guides that the Author has created into the Adapter
+                loadGuidesForAuthor();
             }
 
             @Override
@@ -142,6 +149,47 @@ public class UserActivity extends AppCompatActivity {
 
     private void checkUser() {
 
+    }
+
+    /**
+     * Queries the Firebase Database and loads Guides that have been authored by the user
+     */
+    private void loadGuidesForAuthor() {
+
+        // Check to make sure mAuthor has been loaded
+        if (mAuthor == null) return;
+
+        // Query the Firebase Database
+        final Query guideQuery = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.GUIDES)
+                .orderByChild(GuideContract.GuideEntry.AUTHOR_ID);
+
+        guideQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        // Check that the returned values are valid
+                        if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
+                            Guide[] guides = (Guide[]) FirebaseProviderUtils
+                                    .getModelsFromSnapshot(DatabaseProvider.FirebaseType.GUIDE, dataSnapshot);
+
+                            // Add each Guide to the Adapter
+                            for (Guide guide : guides) {
+                                mAdapter.addModel(guide);
+                            }
+                        }
+
+                        // Remove Listener
+                        guideQuery.removeEventListener(this);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                        // Remove Listener
+                        guideQuery.removeEventListener(this);
+                    }
+                });
     }
 
     /**

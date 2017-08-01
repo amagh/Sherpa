@@ -175,6 +175,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
                 }
             } else if (model instanceof Guide) {
                 GuideViewModel vm = new GuideViewModel(mBinding.getRoot().getContext(), (Guide) model);
+                ((ListItemGuideCompactBinding) mBinding).setVm(vm);
             }
         }
     }
