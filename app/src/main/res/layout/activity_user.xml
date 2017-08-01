@@ -50,12 +50,14 @@
             android:id="@+id/user_rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@android:color/white"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="4dp"
             android:background="@color/grey_400"
+            app:layout_behavior=".ui.behaviors.VanishingBehavior"
             app:layout_anchor="@id/appbar"
             app:layout_anchorGravity="bottom" />
 
@@ -64,6 +66,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@drawable/ic_account_circle"
+            app:layout_behavior=".ui.behaviors.VanishingBehavior"
             app:image="@{vm.image}"
             app:layout_anchor="@id/appbar"
             app:layout_anchorGravity="bottom|center_horizontal"
