@@ -10,12 +10,14 @@ import java.util.List;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemAuthorDetailsBinding;
+import project.hikerguide.databinding.ListItemAuthorDetailsEditBinding;
 import project.hikerguide.databinding.ListItemGuideCompactBinding;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
+import project.hikerguide.ui.UserActivity;
 
 /**
  * Created by Alvin on 8/1/2017.
@@ -23,13 +25,19 @@ import project.hikerguide.models.viewmodels.GuideViewModel;
 
 public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdapter.AuthorDetailsViewHolder> {
     // ** Constants ** //
-    private static final int AUTHOR_VIEW_TYPE   = 0;
-    private static final int GUIDE_VIEW_TYPE    = 1;
+    private static final int AUTHOR_VIEW_TYPE       = 0;
+    private static final int AUTHOR_EDIT_VIEW_TYPE  = 1;
+    private static final int GUIDE_VIEW_TYPE        = 2;
 
     // ** Member Variables ** //
+    private UserActivity mActivity;
     private List<BaseModel> mModelList;
     private boolean mEnableEdit = false;
     private boolean mIsInEditMode = false;
+
+    public AuthorDetailsAdapter(UserActivity activity) {
+        mActivity = activity;
+    }
 
     @Override
     public AuthorDetailsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -42,6 +50,10 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
         switch (viewType) {
             case AUTHOR_VIEW_TYPE:
                 layoutId = R.layout.list_item_author_details;
+                break;
+
+            case AUTHOR_EDIT_VIEW_TYPE:
+                layoutId = R.layout.list_item_author_details_edit;
                 break;
 
             case GUIDE_VIEW_TYPE:
@@ -75,7 +87,11 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
         BaseModel model = mModelList.get(position);
 
         if (model instanceof Author) {
-            return AUTHOR_VIEW_TYPE;
+            if (!mIsInEditMode) {
+                return AUTHOR_VIEW_TYPE;
+            } else {
+                return AUTHOR_EDIT_VIEW_TYPE;
+            }
         } else if (model instanceof Guide) {
             return GUIDE_VIEW_TYPE;
         } else {
@@ -108,8 +124,24 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
         notifyItemInserted(mModelList.size() - 1);
     }
 
+    /**
+     * Enables the edit button on the ViewHolder for the Author
+     */
     public void enableEditing() {
         mEnableEdit = true;
+    }
+
+    /**
+     * Switches the layout used for the Author BaseModel between one for display or one for editing.
+     */
+    public void switchAuthorLayout() {
+        if (mIsInEditMode) {
+            mIsInEditMode = false;
+        } else {
+            mIsInEditMode = true;
+        }
+
+        notifyItemChanged(0);
     }
 
     class AuthorDetailsViewHolder extends RecyclerView.ViewHolder {
@@ -129,14 +161,18 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
 
             // Cast the Model and ViewDataBinding based on the type of BaseModel
             if (model instanceof Author) {
-                AuthorViewModel vm = new AuthorViewModel(mBinding.getRoot().getContext(), (Author) model);
+                AuthorViewModel vm = new AuthorViewModel(mActivity, (Author) model);
 
                 if (mEnableEdit) {
                     // Enable editing of info if user is viewing their own profile
                     vm.enableEditing();
                 }
 
-                ((ListItemAuthorDetailsBinding) mBinding).setVm(vm);
+                if (!mIsInEditMode) {
+                    ((ListItemAuthorDetailsBinding) mBinding).setVm(vm);
+                } else {
+                    ((ListItemAuthorDetailsEditBinding) mBinding).setVm(vm);
+                }
             } else if (model instanceof Guide) {
                 GuideViewModel vm = new GuideViewModel(mBinding.getRoot().getContext(), (Guide) model);
             }

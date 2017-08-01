@@ -7,6 +7,7 @@ import android.databinding.BindingAdapter;
 import android.text.InputType;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -18,6 +19,7 @@ import com.google.firebase.storage.StorageReference;
 
 import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.ui.UserActivity;
 
 import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
 import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
@@ -31,6 +33,7 @@ public class AuthorViewModel extends BaseObservable {
     private Author mAuthor;
     private Context mContext;
     private int mEditVisibility = View.INVISIBLE;
+    private boolean mAccepted = false;
 
     public AuthorViewModel(Context context, Author author) {
         mAuthor = author;
@@ -38,12 +41,26 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @Bindable
-    public String getName() {
-        return mAuthor.name;
+    public Author getAuthor() {
+        return mAuthor;
     }
 
-    public void setName(String name) {
-        mAuthor.name = name;
+    @Bindable
+    public UserActivity getActivity() {
+
+        // Check that the passed Context is instance of UserActivity
+        if (mContext instanceof UserActivity) {
+
+            // Cast and return mContext
+            return (UserActivity) mContext;
+        } else {
+            return null;
+        }
+    }
+
+    @Bindable
+    public String getName() {
+        return mAuthor.name;
     }
 
     @Bindable
@@ -71,10 +88,6 @@ public class AuthorViewModel extends BaseObservable {
         return mAuthor.description;
     }
 
-    public void setDescription(String description) {
-        mAuthor.description = description;
-    }
-
     @Bindable
     public int getEditVisibility() {
         return mEditVisibility;
@@ -96,24 +109,40 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @Bindable
-    public int getImeAction() {
-        return EditorInfo.IME_ACTION_DONE;
+    public boolean getAccepted() {
+        return mAccepted;
     }
 
-    @BindingAdapter({"bind:imeAction"})
-    public static void setupEditText(EditText editText, int imeAction) {
+    @BindingAdapter({"bind:nameTv", "bind:descriptionTv", "bind:author", "bind:activity", "bind:accepted"})
+    public static void saveInfo(Button button, EditText nameEditText, EditText descriptionEditText,
+                                Author author, UserActivity activity, boolean accepted) {
 
-        // Work around for multiline EditText with IME option
-        editText.setImeOptions(imeAction);
-        editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
+        // Check to see that the accept Button has been clicked as this function runs the first
+        // time the ViewModel is loaded as well
+        if (activity != null && accepted) {
+            // Set the Author parameters to match the text that the user has altered
+            author.name = nameEditText.getText().toString();
+            author.description = descriptionEditText.getText().toString();
+
+            // Update the Author's values in the Firebase Database and switch the layout
+            activity.updateAuthorValues();
+            activity.switchAuthorLayout();
+        }
     }
 
     public void onClickEdit(View view) {
 
+        // Switch the layout between edit and display
+        if (mContext instanceof UserActivity) {
+            ((UserActivity) mContext).switchAuthorLayout();
+        }
     }
 
     public void onClickAccept(View view) {
 
+        // Switch the variable to indicate that the user has clicked accept
+        mAccepted = true;
+        notifyPropertyChanged(BR.accepted);
     }
 
     /**

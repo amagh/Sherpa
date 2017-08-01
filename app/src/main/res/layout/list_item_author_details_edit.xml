@@ -59,7 +59,6 @@
             android:text="@{vm.description}"
             android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
             android:hint="@string/author_description_hint"
-            app:imeAction="@{vm.imeAction}"
             style="@style/TextAppearance.AppCompat.Body1"
             tools:text="@string/list_author_description_text"/>
 
@@ -70,6 +69,11 @@
             android:text="@string/author_edit_accept"
             android:textColor="@color/colorPrimary"
             android:onClick="@{vm::onClickAccept}"
+            app:nameTv="@{listAuthorNameTv}"
+            app:descriptionTv="@{listAuthorDescriptionTv}"
+            app:author="@{vm.author}"
+            app:activity="@{vm.activity}"
+            app:accepted="@{vm.accepted}"
             style="@style/Widget.AppCompat.Button.Borderless"/>
 
     </LinearLayout>

@@ -3,9 +3,12 @@ package project.hikerguide.ui;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -15,7 +18,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import project.hikerguide.R;
 import project.hikerguide.data.GuideDatabase;
@@ -69,7 +74,7 @@ public class UserActivity extends AppCompatActivity {
      */
     private void initRecyclerView() {
         // Init the Adapter
-        mAdapter = new AuthorDetailsAdapter();
+        mAdapter = new AuthorDetailsAdapter(this);
 
         // Set the LayoutManager and Adapter
         mBinding.userRv.setLayoutManager(new LinearLayoutManager(this));
@@ -145,11 +150,23 @@ public class UserActivity extends AppCompatActivity {
      * Switches the layout used by the AuthorDetailsAdapter to one with EditText so the user can
      * change the info on their profile
      */
-    private void editAuthorDetails() {
-
+    public void switchAuthorLayout() {
+        mAdapter.switchAuthorLayout();
     }
 
-    private void updateAuthorValues() {
+    /**
+     * Updates the user's values in FirebaseDatabase with their newly updated values
+     */
+    public void updateAuthorValues() {
 
+        // Get the directory where the Author's info is stored on the FirebaseDatabase
+        String directory = GuideDatabase.AUTHORS + "/" + mAuthor.firebaseId;
+
+        // Create a Map for the update procedure
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(directory, mAuthor.toMap());
+
+        // Update the values
+        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
     }
 }
