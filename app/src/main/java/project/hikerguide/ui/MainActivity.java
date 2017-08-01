@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements FragmentGuideList
     }
 
     private void launchActivity() {
-        Intent intent = new Intent(this, AccountActivity.class);
+        Intent intent = new Intent(this, UserActivity.class);
         startActivity(intent);
     }
 }
