@@ -46,7 +46,11 @@ public abstract class BaseModelWithImage extends BaseModel {
      * @return ImageFile corresponding to the model's imageUri
      */
     public ImageFile getImageFile() {
-        return new ImageFile(this.firebaseId, this.imageUri.getPath());
+        if (this.imageUri != null) {
+            return new ImageFile(this.firebaseId, this.imageUri.getPath());
+        } else {
+            return null;
+        }
     }
 
     /**
