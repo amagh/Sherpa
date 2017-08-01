@@ -66,6 +66,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/text_vertical_margin"
+            android:text="@{vm.description}"
             style="@style/TextAppearance.AppCompat.Caption"
             app:layout_constraintLeft_toLeftOf="@id/list_author_name_tv"
             app:layout_constraintRight_toRightOf="parent"
