@@ -35,6 +35,11 @@
     <string name="sign_in_button_text">Sign In</string>
     <string name="return_to_sign_in_button_text">Return to Sign In</string>
     <string name="create_account_button_text">Create Account</string>
+    <string name="invalid_email_error">Please enter a valid email address.</string>
+    <string name="no_password_error">Enter a password for your account.</string>
+    <string name="no_password_match">Passwords do not match. Please try again.</string>
+    <string name="invalid_password_length_error">Password must be at least 8 characters.</string>
+    <string name="authentication_error">Authentication failed. Please try again.</string>
 
     <!-- Formatting for guide list item -->
     <string name="list_guide_format_distance_imperial">%,.2f miles</string>
