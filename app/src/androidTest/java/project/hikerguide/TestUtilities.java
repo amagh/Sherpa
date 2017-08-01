@@ -78,7 +78,6 @@ class TestUtilities {
         for (Field field : fields) {
             String errorValueDifferent = "Values in the returned data model (" + returned.firebaseId + ") do not match the values inserted (" + expected.firebaseId + "). " + field.toString();
             try {
-                System.out.println("Field: " + field.toString() + " | Expected: " + field.get(expected) + " | Actual: " + field.get(returned));
                 assertEquals(errorValueDifferent, field.get(expected), field.get(returned));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();

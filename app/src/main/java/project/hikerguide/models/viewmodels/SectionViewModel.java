@@ -77,8 +77,6 @@ public class SectionViewModel extends BaseObservable {
     @BindingAdapter({"bind:image", "bind:imageUri"})
     public static void loadImage(ImageView imageView, StorageReference image, Uri imageUri) {
 
-        System.out.println(imageUri);
-
         // Check whether to load image from File or from Firebase Storage
         if (image == null) {
 

@@ -198,7 +198,6 @@ public class FirebaseTest {
             }
 
             imageFile = returnedSection.generateImageFileForDownload(mContext);
-            System.out.println(imageFile.firebaseId + " - " + imageFile.getAbsolutePath());
             assertTrue(errorDownloading, mStorage.downloadFile(imageFile));
 
             for (Section section : sections) {
