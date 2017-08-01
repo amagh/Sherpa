@@ -36,5 +36,14 @@
     <dimen name="list_section_icon_size">32dp</dimen>
     <dimen name="list_section_icon_padding">4dp</dimen>
 
+    <dimen name="account_button_width">128dp</dimen>
     <dimen name="sign_in_text_padding">8dp</dimen>
+    <dimen name="sign_in_logo_size">128dp</dimen>
+    <dimen name="sign_in_logo_top_margin">120dp</dimen>
+    <dimen name="sign_in_email_text_top_margin">64dp</dimen>
+    <dimen name="sign_in_password_confirmation_top_margin">32dp</dimen>
+    <dimen name="sign_in_password_top_margin">96dp</dimen>
+    <dimen name="sign_in_button_top_margin">96dp</dimen>
+    <dimen name="sign_in_text_horizontal_margin">32dp</dimen>
+    <dimen name="create_account_button_top_margin">32dp</dimen>
 </resources>
