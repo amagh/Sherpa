@@ -56,6 +56,12 @@
             style="@style/TextAppearance.AppCompat.Body1"
             tools:text="@string/list_author_description_text"/>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:background="@color/grey_400" />
+
     </LinearLayout>
 
 </layout>
