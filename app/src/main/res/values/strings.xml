@@ -65,6 +65,10 @@
     <!-- Mapbox related Strings -->
     <string name="outdoors_style">mapbox://styles/mapbox/outdoors-v10</string>
 
+    <!-- Create Guide Menu Strings -->
+    <string name="menu_publish_title">Publish Guide</string>
+    <string name="menu_save_title">Save Draft</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
     <string name="list_guide_area_text">Yosemite Valley</string>
