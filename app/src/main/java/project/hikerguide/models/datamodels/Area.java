@@ -18,9 +18,11 @@ public class Area extends BaseModel {
     private static final String LOWER_CASE_NAME = "lowerCaseName";
     private static final String LATITUDE        = "latitude";
     private static final String LONGITUDE       = "longitude";
+    private static final String STATE           = "state";
 
     // ** Member Variables ** //
     public String name;
+    public String state;
     public double latitude;
     public double longitude;
 
@@ -57,6 +59,7 @@ public class Area extends BaseModel {
         map.put(LOWER_CASE_NAME, name.toLowerCase());
         map.put(LATITUDE, latitude);
         map.put(LONGITUDE, longitude);
+        map.put(STATE, state);
 
         return map;
     }
