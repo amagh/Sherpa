@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.hikerguide.models.viewmodels.SearchViewModel" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <project.hikerguide.mapbox.SmartMapView
+            android:id="@+id/area_mv"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/search_map_height"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/area_search_cv"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/search_widget_height"
+            android:layout_marginLeft="@dimen/search_widget_horizontal_margin"
+            android:layout_marginStart="@dimen/search_widget_horizontal_margin"
+            android:layout_marginRight="@dimen/search_widget_horizontal_margin"
+            android:layout_marginEnd="@dimen/search_widget_horizontal_margin"
+            android:layout_marginTop="@dimen/search_widget_vertical_margin"
+            android:alpha=".75"
+            app:cardBackgroundColor="@android:color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
+
+            <ImageView
+                android:id="@+id/area_search_iv"
+                android:layout_width="@dimen/search_widget_icon_size"
+                android:layout_height="@dimen/search_widget_icon_size"
+                android:layout_marginLeft="@dimen/search_widget_icon_horizontal_margin"
+                android:layout_marginStart="@dimen/search_widget_icon_horizontal_margin"
+                android:src="@drawable/places_ic_search"
+                android:layout_gravity="center_vertical"/>
+
+            <ImageView
+                android:id="@+id/area_close_iv"
+                android:layout_width="@dimen/search_widget_icon_size"
+                android:layout_height="@dimen/search_widget_icon_size"
+                android:layout_marginLeft="@dimen/search_widget_icon_horizontal_margin"
+                android:layout_marginStart="@dimen/search_widget_icon_horizontal_margin"
+                android:src="@drawable/ic_close"
+                android:layout_gravity="center_vertical"
+                android:tint="@color/grey_400"
+                android:alpha="0"
+                />
+
+            <EditText
+                android:id="@+id/area_search_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="@dimen/search_widget_text_horizontal_margin"
+                android:layout_marginStart="@dimen/search_widget_text_horizontal_margin"
+                android:hint="@string/search_label"
+                android:textSize="@dimen/search_widget_text_size"
+                android:fontFamily="sans-serif"
+                android:textColorHint="@color/grey_400"
+                android:text="@={vm.query}"
+                android:onFocusChanged="@{vm.onFocusChanged}"
+                app:searchIv="@{areaSearchIv}"
+                app:closeIv="@{areaCloseIv}"
+                app:backgroundTint="@android:color/transparent"/>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/area_rv"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:adapter="@{vm.adapter}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/area_mv"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>
