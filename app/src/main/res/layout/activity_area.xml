@@ -69,7 +69,7 @@
                 android:fontFamily="sans-serif"
                 android:textColorHint="@color/grey_400"
                 android:text="@={vm.query}"
-                android:onFocusChanged="@{vm.onFocusChanged}"
+                app:onFocusChangeListener="@{vm.onFocusChanged}"
                 app:searchIv="@{areaSearchIv}"
                 app:closeIv="@{areaCloseIv}"
                 app:backgroundTint="@android:color/transparent"/>
