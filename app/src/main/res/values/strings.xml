@@ -71,7 +71,7 @@
 
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
-    <string name="list_guide_area_text">Yosemite Valley</string>
+
     <string name="list_guide_distance_text">9.6 miles</string>
     <string name="list_guide_rating_text">4.8\u2605</string>
     <string name="list_guide_reviews_text">(45)</string>
@@ -85,4 +85,7 @@
     <string name="list_author_text">Christa</string>
     <string name="list_author_score_text">1200 pts</string>
     <string name="list_author_description_text">We (Christa and Rob) are from Northern California and we like to hike.  We’ve shared our photos and experiences so that others may find new parks, trails or places to visit.</string>
+
+    <string name="list_area_text">Yosemite National Park</string>
+    <string name="list_area_state_text">California</string>
 </resources>
