@@ -73,6 +73,7 @@
                 android:fontFamily="sans-serif"
                 android:textColorHint="@color/grey_400"
                 android:text="@={vm.query}"
+                android:inputType="textAutoCorrect"
                 android:onFocusChange="@{vm.onFocusChanged}"
                 app:backgroundTint="@android:color/transparent"/>
 
