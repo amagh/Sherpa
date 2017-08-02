@@ -7,7 +7,6 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by Alvin on 8/1/2017.
@@ -40,5 +39,5 @@ public class VanishingBehavior extends CoordinatorLayout.Behavior<View> {
         }
 
         return true;
-}
+    }
 }
