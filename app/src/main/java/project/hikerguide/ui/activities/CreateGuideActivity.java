@@ -1,4 +1,4 @@
-package project.hikerguide.ui;
+package project.hikerguide.ui.activities;
 
 import android.Manifest;
 import android.content.Intent;

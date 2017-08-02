@@ -1,4 +1,4 @@
-package project.hikerguide.ui;
+package project.hikerguide.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,17 +8,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.Mapbox;
 
 import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Guide;
-import timber.log.Timber;
+import project.hikerguide.ui.fragments.GuideListFragment;
+import project.hikerguide.ui.fragments.SearchFragment;
 
-import static project.hikerguide.ui.GuideDetailsActivity.IntentKeys.GUIDE_KEY;
-
-public class MainActivity extends AppCompatActivity implements FragmentGuideList.OnGuideClickListener {
+public class MainActivity extends AppCompatActivity implements GuideListFragment.OnGuideClickListener {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -31,10 +29,10 @@ public class MainActivity extends AppCompatActivity implements FragmentGuideList
 
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    fragment = new FragmentGuideList();
+                    fragment = new GuideListFragment();
                     break;
                 case R.id.navigation_dashboard:
-                    fragment = new FragmentSearch();
+                    fragment = new SearchFragment();
                     break;
                 case R.id.navigation_notifications:
                     launchActivity();
@@ -68,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements FragmentGuideList
         // Create a new Intent to launch the GuideDetailsActivity and add the clicked Guide as an
         // extra
         Intent intent = new Intent(this, GuideDetailsActivity.class);
-        intent.putExtra(GUIDE_KEY, guide);
+        intent.putExtra(GuideDetailsActivity.IntentKeys.GUIDE_KEY, guide);
         startActivity(intent);
     }
 

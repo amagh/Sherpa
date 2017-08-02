@@ -1,4 +1,4 @@
-package project.hikerguide.ui;
+package project.hikerguide.ui.fragments;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -16,21 +16,21 @@ import project.hikerguide.R;
 import project.hikerguide.databinding.FragmentGuideListBinding;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.sync.SyncGuidesTaskLoader;
+import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
-import timber.log.Timber;
 
 /**
  * Created by Alvin on 7/21/2017.
  */
 
-public class FragmentGuideList extends Fragment implements LoaderManager.LoaderCallbacks<Guide[]>{
+public class GuideListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Guide[]>{
     // ** Constants ** //
     private static final int GUIDES_LOADER = 4349;
     // ** Member Variables ** //
     private FragmentGuideListBinding mBinding;
     private GuideAdapter mAdapter;
 
-    public FragmentGuideList() {}
+    public GuideListFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

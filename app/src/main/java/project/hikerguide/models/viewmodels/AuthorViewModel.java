@@ -4,9 +4,7 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
-import android.text.InputType;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -19,7 +17,7 @@ import com.google.firebase.storage.StorageReference;
 
 import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
-import project.hikerguide.ui.UserActivity;
+import project.hikerguide.ui.activities.UserActivity;
 
 import static project.hikerguide.utilities.StorageProviderUtils.BACKDROP_SUFFIX;
 import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;

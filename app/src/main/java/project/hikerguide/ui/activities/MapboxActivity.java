@@ -1,4 +1,4 @@
-package project.hikerguide.ui;
+package project.hikerguide.ui.activities;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

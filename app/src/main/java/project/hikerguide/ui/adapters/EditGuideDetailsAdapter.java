@@ -18,7 +18,7 @@ import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.models.viewmodels.SectionViewModel;
-import project.hikerguide.ui.CreateGuideActivity;
+import project.hikerguide.ui.activities.CreateGuideActivity;
 
 /**
  * Created by Alvin on 7/26/2017.

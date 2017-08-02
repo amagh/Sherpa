@@ -19,7 +19,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import project.hikerguide.models.datamodels.Section;
-import project.hikerguide.ui.CreateGuideActivity;
+import project.hikerguide.ui.activities.CreateGuideActivity;
 
 import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
 import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;

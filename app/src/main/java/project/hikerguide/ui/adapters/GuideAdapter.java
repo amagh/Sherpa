@@ -74,7 +74,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
 
     @Override
     public int getItemViewType(int position) {
-        // Only use search layout in FragmentSearch
+        // Only use search layout in SearchFragment
         if (!useSearchLayout) {
             return NORMAL_VIEW_TYPE;
         } else {

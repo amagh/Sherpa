@@ -1,4 +1,4 @@
-package project.hikerguide.ui;
+package project.hikerguide.ui.activities;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -23,7 +23,7 @@ import project.hikerguide.ui.adapters.GuideDetailsAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
-import static project.hikerguide.ui.GuideDetailsActivity.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.ui.activities.GuideDetailsActivity.IntentKeys.GUIDE_KEY;
 
 public class GuideDetailsActivity extends MapboxActivity {
     // ** Constants ** //

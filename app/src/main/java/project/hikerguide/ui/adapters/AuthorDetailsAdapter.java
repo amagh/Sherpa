@@ -12,13 +12,12 @@ import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemAuthorDetailsBinding;
 import project.hikerguide.databinding.ListItemAuthorDetailsEditBinding;
 import project.hikerguide.databinding.ListItemGuideBinding;
-import project.hikerguide.databinding.ListItemGuideCompactBinding;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
-import project.hikerguide.ui.UserActivity;
+import project.hikerguide.ui.activities.UserActivity;
 
 /**
  * Created by Alvin on 8/1/2017.

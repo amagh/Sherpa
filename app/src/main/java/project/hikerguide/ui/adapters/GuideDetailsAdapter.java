@@ -19,7 +19,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.models.viewmodels.SectionViewModel;
-import project.hikerguide.ui.MapboxActivity;
+import project.hikerguide.ui.activities.MapboxActivity;
 
 /**
  * Created by Alvin on 7/22/2017.

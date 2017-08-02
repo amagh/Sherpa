@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 
-import project.hikerguide.ui.MapboxActivity;
+import project.hikerguide.ui.activities.MapboxActivity;
 
 /**
  * Created by Alvin on 7/24/2017.

@@ -1,4 +1,4 @@
-package project.hikerguide.ui;
+package project.hikerguide.ui.activities;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -32,9 +32,8 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
-import timber.log.Timber;
 
-import static project.hikerguide.ui.UserActivity.BundleKeys.AUTHOR_KEY;
+import static project.hikerguide.ui.activities.UserActivity.BundleKeys.AUTHOR_KEY;
 
 /**
  * Created by Alvin on 7/31/2017.

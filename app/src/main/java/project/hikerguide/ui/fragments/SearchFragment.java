@@ -1,11 +1,10 @@
-package project.hikerguide.ui;
+package project.hikerguide.ui.fragments;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +40,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import project.hikerguide.R;
 import project.hikerguide.data.GuideDatabase;
@@ -49,6 +47,7 @@ import project.hikerguide.databinding.FragmentSearchBinding;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.FirebaseProviderUtils;
@@ -57,7 +56,7 @@ import project.hikerguide.utilities.SaveUtils;
 
 import static android.app.Activity.RESULT_OK;
 import static project.hikerguide.firebasedatabase.DatabaseProvider.GEOFIRE_PATH;
-import static project.hikerguide.ui.GuideDetailsActivity.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.ui.activities.GuideDetailsActivity.IntentKeys.GUIDE_KEY;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
 
@@ -65,7 +64,7 @@ import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
  * Created by Alvin on 7/25/2017.
  */
 
-public class FragmentSearch extends MapboxFragment {
+public class SearchFragment extends MapboxFragment {
     // ** Constants ** //
     private static final int PLACES_REQUEST_CODE = 6498;
 
@@ -80,7 +79,7 @@ public class FragmentSearch extends MapboxFragment {
     private Map<String, PolylineOptions> mGuidePolylineMap;
     private String highlightedId;
 
-    public FragmentSearch() {
+    public SearchFragment() {
     }
 
     @Override

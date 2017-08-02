@@ -30,7 +30,7 @@ import project.hikerguide.R;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.mapbox.SmartMapView;
 import project.hikerguide.models.datamodels.Guide;
-import project.hikerguide.ui.MapboxActivity;
+import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.ConversionUtils;
 import project.hikerguide.utilities.SaveUtils;
