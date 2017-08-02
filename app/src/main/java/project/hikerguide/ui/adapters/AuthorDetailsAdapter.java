@@ -11,6 +11,7 @@ import java.util.List;
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemAuthorDetailsBinding;
 import project.hikerguide.databinding.ListItemAuthorDetailsEditBinding;
+import project.hikerguide.databinding.ListItemGuideBinding;
 import project.hikerguide.databinding.ListItemGuideCompactBinding;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
@@ -57,7 +58,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
                 break;
 
             case GUIDE_VIEW_TYPE:
-                layoutId = R.layout.list_item_guide_compact;
+                layoutId = R.layout.list_item_guide;
                 break;
         }
 
@@ -154,6 +155,11 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
             mBinding = binding;
         }
 
+        /**
+         * Binds the data from the BaseModel to the ViewModel referenced by the View
+         *
+         * @param position    The position of the ViewHolder binding the data
+         */
         public void bind(int position) {
 
             // Get reference to the Model to be displayed
@@ -175,7 +181,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
                 }
             } else if (model instanceof Guide) {
                 GuideViewModel vm = new GuideViewModel(mBinding.getRoot().getContext(), (Guide) model);
-                ((ListItemGuideCompactBinding) mBinding).setVm(vm);
+                ((ListItemGuideBinding) mBinding).setVm(vm);
             }
         }
     }
