@@ -14,11 +14,15 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 
 public class Area extends BaseModel {
     // ** Constants ** //
-    private static final String NAME = "name";
+    private static final String NAME            = "name";
     private static final String LOWER_CASE_NAME = "lowerCaseName";
+    private static final String LATITUDE        = "latitude";
+    private static final String LONGITUDE       = "longitude";
 
     // ** Member Variables ** //
     public String name;
+    public double latitude;
+    public double longitude;
 
     public Area() {}
 
@@ -51,6 +55,8 @@ public class Area extends BaseModel {
 
         map.put(NAME, name);
         map.put(LOWER_CASE_NAME, name.toLowerCase());
+        map.put(LATITUDE, latitude);
+        map.put(LONGITUDE, longitude);
 
         return map;
     }
