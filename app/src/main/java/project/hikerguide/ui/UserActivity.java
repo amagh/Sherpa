@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -214,5 +215,9 @@ public class UserActivity extends AppCompatActivity {
 
         // Update the values
         FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+    }
+
+    public void onClickFab(View view) {
+        startActivity(new Intent(this, CreateGuideActivity.class));
     }
 }
