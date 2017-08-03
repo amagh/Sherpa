@@ -11,6 +11,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -59,6 +61,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         super.onCreate(savedInstanceState);
         Timber.d("onCreate");
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_create_guide);
+        setSupportActionBar(mBinding.guideDetailsTb);
 
         initRecyclerView();
 
@@ -329,6 +332,29 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
             return false;
         }
     };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_create_guide, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_publish:
+
+                return true;
+
+            case R.id.menu_save:
+
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     /**
      * Triggers the re-ordering function of the ItemTouchHelper
