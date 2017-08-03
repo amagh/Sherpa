@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import project.hikerguide.R;
@@ -30,6 +31,7 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
     // ** Member Variables ** //
     private List<Object> mAreaList;
     private ClickHandler mClickHandler;
+    private boolean mShowSearchMore = false;
 
     public AreaAdapter(ClickHandler clickHandler) {
         mClickHandler = clickHandler;
@@ -62,6 +64,9 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
 
     @Override
     public void onBindViewHolder(AreaViewHolder holder, int position) {
+        if (position == mAreaList.size()) {
+            return;
+        }
 
         // Bind the Data to the View
         holder.bind(position);
@@ -70,11 +75,10 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
     @Override
     public int getItemCount() {
         if (mAreaList != null) {
-            if (mAreaList.size() > 0 && mAreaList.get(0) instanceof Area) {
+            if (mShowSearchMore) {
                 return mAreaList.size() + 1;
-            } else {
-                return mAreaList.size();
             }
+            return mAreaList.size();
         }
 
         return 0;
@@ -84,20 +88,39 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
     public int getItemViewType(int position) {
 
         // Return the ViewType based on the type of Objects stored in the List
-        if (mAreaList.get(position) == null) {
+        if (position == mAreaList.size()) {
             return SEARCH_MORE_VIEW_TYPE;
         } else if (mAreaList.get(position) instanceof Area) {
             return AREA_VIEW_TYPE;
         } else if (mAreaList.get(position) instanceof PlaceModel) {
             return PLACE_VIEW_TYPE;
         }
+
         return super.getItemViewType(position);
     }
 
     public void setAreaList(List<Object> areaList) {
         mAreaList = areaList;
 
+        // Hide the search more list item
+        mShowSearchMore = false;
+
         notifyDataSetChanged();
+    }
+
+    /**
+     * Adds an additional list item to allow users to search Google Places for their query
+     */
+    public void showSearchMore() {
+        if (!mShowSearchMore) {
+            mShowSearchMore = true;
+
+            if (mAreaList == null) {
+                mAreaList = new ArrayList<>();
+            }
+
+            notifyItemInserted(mAreaList.size() - 1);
+        }
     }
 
     public interface ClickHandler {
@@ -138,6 +161,11 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
 
             // Get the position that was clicked
             int position = getAdapterPosition();
+
+            if (position == mAreaList.size()) {
+                mClickHandler.onClickArea(null);
+                return;
+            }
 
             // Pass the Area associated with the ViewHolder to the ClickHandler
             mClickHandler.onClickArea(mAreaList.get(position));

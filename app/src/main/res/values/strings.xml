@@ -26,7 +26,9 @@
     <string name="list_section_caption_hint">Caption (Optional)</string>
 
     <!-- Strings for Search Activity -->
-    <string name="search_label">Search</string>'
+    <string name="search_label">Search</string>
+    <string name="search_more_text">Can\'t find the park or area you are searching for?</string>
+    <string name="search_more_text_2">Click here to find more</string>
 
     <!-- Strings for Account Info -->
     <string name="sign_in_email_hint">Email</string>

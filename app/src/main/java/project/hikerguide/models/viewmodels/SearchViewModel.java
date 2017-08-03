@@ -4,6 +4,7 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
@@ -37,7 +38,6 @@ import project.hikerguide.BR;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.mapbox.SmartMapView;
-import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.ui.adapters.AreaAdapter;
@@ -49,6 +49,9 @@ import timber.log.Timber;
  */
 
 public class SearchViewModel extends BaseObservable implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    // ** Constants ** //
+    private static final int SEARCH_DELAY = 1500;
+
     // ** Member Variables ** //
     private AreaAdapter mAdapter;
     private MapboxActivity mActivity;
@@ -68,7 +71,9 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
             mAdapter = new AreaAdapter(new AreaAdapter.ClickHandler() {
                 @Override
                 public void onClickArea(Object object) {
-
+                    if (object == null) {
+                        queryGooglePlaces(mQuery);
+                    }
                 }
             });
         }
@@ -179,6 +184,7 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
         firebaseQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                int delay = 0;
 
                 // Check that the DataSnapshot is valid
                 if (dataSnapshot.exists()) {
@@ -186,7 +192,17 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
                     // Convert to a List of Areas and then pass it to the Adapter
                     Object[] areas = (Object[]) FirebaseProviderUtils.getModelsFromSnapshot(DatabaseProvider.FirebaseType.AREA, dataSnapshot);
                     mAdapter.setAreaList(Arrays.asList(areas));
+
+                    delay = SEARCH_DELAY;
                 }
+
+                // Show option to search for more after 1.5s
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.showSearchMore();
+                    }
+                }, delay);
 
                 // Remove Listener
                 firebaseQuery.removeEventListener(this);
