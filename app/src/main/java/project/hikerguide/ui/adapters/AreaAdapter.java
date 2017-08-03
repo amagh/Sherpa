@@ -17,6 +17,7 @@ import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.models.viewmodels.AreaViewModel;
 import project.hikerguide.models.viewmodels.PlaceViewModel;
+import project.hikerguide.models.viewmodels.SearchViewModel;
 
 /**
  * Created by Alvin on 8/2/2017.
@@ -31,9 +32,11 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
     // ** Member Variables ** //
     private List<Object> mAreaList;
     private ClickHandler mClickHandler;
+    private SearchViewModel mViewModel;
     private boolean mShowSearchMore = false;
 
-    public AreaAdapter(ClickHandler clickHandler) {
+    public AreaAdapter(SearchViewModel viewModel, ClickHandler clickHandler) {
+        mViewModel = viewModel;
         mClickHandler = clickHandler;
     }
 
@@ -146,10 +149,10 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
 
             // Check the type of Object it is and load the proper ViewModel
             if (object instanceof Area) {
-                AreaViewModel vm = new AreaViewModel((Area) object);
+                AreaViewModel vm = new AreaViewModel((Area) object, mViewModel);
                 ((ListItemAreaBinding) mBinding).setVm(vm);
             } else if (object instanceof PlaceModel) {
-                PlaceViewModel vm = new PlaceViewModel((PlaceModel) object);
+                PlaceViewModel vm = new PlaceViewModel((PlaceModel) object, mViewModel);
                 ((ListItemPlaceBinding) mBinding).setVm(vm);
             }
 

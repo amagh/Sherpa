@@ -20,6 +20,8 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -28,6 +30,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +62,7 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     private AreaAdapter mAdapter;
     private MapboxActivity mActivity;
     private String mQuery;
+    private com.mapbox.mapboxsdk.geometry.LatLng mLatLng;
     private boolean mSearchHasFocus = false;
     private GoogleApiClient mGoogleApiClient;
 
@@ -68,11 +75,13 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     @Bindable
     public AreaAdapter getAdapter() {
         if (mAdapter == null) {
-            mAdapter = new AreaAdapter(new AreaAdapter.ClickHandler() {
+            mAdapter = new AreaAdapter(this, new AreaAdapter.ClickHandler() {
                 @Override
                 public void onClickArea(Object object) {
                     if (object == null) {
                         queryGooglePlaces(mQuery);
+                    } else {
+                        // Start TrailActivity
                     }
                 }
             });
@@ -99,6 +108,11 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     }
 
     @Bindable
+    public com.mapbox.mapboxsdk.geometry.LatLng getLatLng() {
+        return mLatLng;
+    }
+
+    @Bindable
     public String getQuery() {
         return mQuery;
     }
@@ -116,7 +130,6 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     }
 
     public void onFocusChanged(View view, boolean hasFocus) {
-        Timber.d("Focus: " + hasFocus);
         mSearchHasFocus = hasFocus;
 
         notifyPropertyChanged(BR.hasFocus);
@@ -170,6 +183,26 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
 
         // Start the Map's LifeCycle and attach it to the Activity LifeCycle
         mapView.startMapView(activity);
+    }
+
+    @BindingAdapter("bind:latLng")
+    public static void moveCamera(SmartMapView mapView, final com.mapbox.mapboxsdk.geometry.LatLng latLng) {
+
+        // Do not move the Camera if there are no valid coordinates
+        if (latLng == null || (latLng.getLatitude() == 0 && latLng.getLongitude() == 0)) {
+            return;
+        }
+
+        // Animate the camera movement to the new location
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+                        .target(latLng)
+                        .zoom(8)
+                        .build()), 1500);
+            }
+        });
     }
 
     private void queryFirebaseDatabase(String query) {
@@ -259,6 +292,24 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
                 }
             }
         });
+    }
+
+    void changeMapCamera(String placeId) {
+        Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId).setResultCallback(new ResultCallback<PlaceBuffer>() {
+            @Override
+            public void onResult(@NonNull PlaceBuffer places) {
+                if (places.getStatus().isSuccess() && places.getCount() > 0) {
+                    Place place = places.get(0);
+                    LatLng location = place.getLatLng();
+                    changeMapCamera(new com.mapbox.mapboxsdk.geometry.LatLng(location.latitude, location.longitude));
+                }
+            }
+        });
+    }
+
+    void changeMapCamera(com.mapbox.mapboxsdk.geometry.LatLng latLng) {
+        mLatLng = latLng;
+        notifyPropertyChanged(BR.latLng);
     }
 
     @Override

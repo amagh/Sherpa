@@ -20,7 +20,8 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:activity="@{vm.activity}"/>
+            app:activity="@{vm.activity}"
+            app:latLng="@{vm.latLng}"/>
 
         <android.support.v7.widget.CardView
             android:id="@+id/area_search_cv"

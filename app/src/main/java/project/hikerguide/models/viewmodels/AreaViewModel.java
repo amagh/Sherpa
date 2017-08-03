@@ -4,6 +4,8 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.geometry.LatLng;
+
 import project.hikerguide.models.datamodels.Area;
 
 /**
@@ -13,9 +15,18 @@ import project.hikerguide.models.datamodels.Area;
 public class AreaViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Area mArea;
+    private SearchViewModel mViewModel;
+    private int mLatLngVisibility;
 
-    public AreaViewModel(Area area) {
+    public AreaViewModel(Area area, SearchViewModel viewModel) {
         mArea = area;
+        mViewModel = viewModel;
+
+        if (mArea.latitude != 0 && mArea.longitude != 0) {
+            mLatLngVisibility = View.VISIBLE;
+        } else {
+            mLatLngVisibility = View.GONE;
+        }
     }
 
     @Bindable
@@ -28,7 +39,13 @@ public class AreaViewModel extends BaseObservable {
         return mArea.state;
     }
 
-    public void onClickGeoLocation(View view) {
+    @Bindable
+    public int getLatLngVisibility() {
+        return mLatLngVisibility;
+    }
 
+    public void onClickGeolocation(View view) {
+        LatLng latLng = new LatLng(mArea.latitude, mArea.longitude);
+        mViewModel.changeMapCamera(latLng);
     }
 }

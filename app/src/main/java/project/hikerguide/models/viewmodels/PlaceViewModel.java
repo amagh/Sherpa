@@ -13,9 +13,11 @@ import project.hikerguide.models.datamodels.PlaceModel;
 public class PlaceViewModel extends BaseObservable {
     // ** Member Variables ** //
     private PlaceModel mPlaceModel;
+    private SearchViewModel mViewModel;
 
-    public PlaceViewModel(PlaceModel placeModel) {
+    public PlaceViewModel(PlaceModel placeModel, SearchViewModel viewModel) {
         mPlaceModel = placeModel;
+        mViewModel = viewModel;
     }
 
     @Bindable
@@ -28,8 +30,8 @@ public class PlaceViewModel extends BaseObservable {
         return mPlaceModel.secondaryText;
     }
 
-    public void onClickGeoLocation(View view) {
-
+    public void onClickGeolocation(View view) {
+        mViewModel.changeMapCamera(mPlaceModel.placeId);
     }
 
 }
