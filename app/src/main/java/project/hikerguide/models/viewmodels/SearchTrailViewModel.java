@@ -16,15 +16,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.BR;
+import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
+import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.ui.adapters.TrailAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 8/3/2017.
@@ -33,12 +38,17 @@ import project.hikerguide.utilities.FirebaseProviderUtils;
 public class SearchTrailViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Activity mActivity;
+    private Area mArea;
     private TrailAdapter mAdapter;
+    private List<Trail> mTrailList;
     private String mQuery;
     private boolean mSearchHasFocus = false;
 
-    public SearchTrailViewModel(Activity activity) {
+    public SearchTrailViewModel(Activity activity, Area area) {
         mActivity = activity;
+        mArea = area;
+
+        getTrailsFromFirebase();
     }
 
     @Bindable
@@ -49,10 +59,11 @@ public class SearchTrailViewModel extends BaseObservable {
     public void setQuery(String query) {
         mQuery = query;
 
-        if (mQuery.length() > 2) {
-            queryFirebase(query);
+        // Filter the List by the query
+        if (mQuery.length() > 0) {
+            filter(mQuery);
         } else {
-            mAdapter.setTrailList(null);
+            resetAdapterList();
         }
     }
 
@@ -110,17 +121,14 @@ public class SearchTrailViewModel extends BaseObservable {
                 .start();
     }
 
-    private void queryFirebase(String query) {
-
-        // Convert the query to lowercase
-        query = query.toLowerCase();
+    private void getTrailsFromFirebase() {
 
         // Query the Firebase Database
         final Query trailQuery = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.TRAILS)
-                .orderByChild("lowerCaseName")
-                .startAt(query)
-                .endAt(query + "z");
+                // TODO: Replace hardcoded String
+                .orderByChild("areaId")
+                .equalTo(mArea.firebaseId);
 
         trailQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -133,7 +141,8 @@ public class SearchTrailViewModel extends BaseObservable {
                     Trail[] trails = (Trail[]) FirebaseProviderUtils.getModelsFromSnapshot(DatabaseProvider.FirebaseType.TRAIL, dataSnapshot);
 
                     // Pass the Trails to the Adapter
-                    mAdapter.setTrailList(Arrays.asList(trails));
+                    mTrailList = Arrays.asList(trails);
+                    resetAdapterList();
                 }
 
                 // Remove Listener
@@ -155,7 +164,6 @@ public class SearchTrailViewModel extends BaseObservable {
         notifyPropertyChanged(BR.hasFocus);
     }
 
-
     public void onClickClear(View view) {
 
         // Set the focus to false
@@ -166,5 +174,36 @@ public class SearchTrailViewModel extends BaseObservable {
 
         notifyPropertyChanged(BR.query);
         notifyPropertyChanged(BR.hasFocus);
+    }
+
+    /**
+     * Replaces the contents of the Adapter with the master list of all trails in the Area
+     */
+    private void resetAdapterList() {
+        mAdapter.replaceAll(mTrailList);
+    }
+
+    /**
+     * Filters the list of Trails for only those that match the query
+     *
+     * @param query    Query to filter for
+     */
+    private void filter(String query) {
+
+        // Convert to lower case
+        String queryLowerCase = query.toLowerCase();
+
+        // Create a List that will contain all the Trails that match the query
+        List<Trail> filteredTrailList = new ArrayList<>();
+
+        // Iterate through and check each Trail for those that match
+        for (Trail trail : mTrailList) {
+            if (trail.name.toLowerCase().contains(queryLowerCase)) {
+                filteredTrailList.add(trail);
+            }
+        }
+
+        // Replace the contents of the Adapter with the filtered List
+        mAdapter.replaceAll(filteredTrailList);
     }
 }

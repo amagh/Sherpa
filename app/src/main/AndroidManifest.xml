@@ -60,6 +60,10 @@
         <activity android:name=".ui.activities.AreaActivity">
 
         </activity>
+
+        <activity android:name=".ui.activities.TrailActivity">
+
+        </activity>
     </application>
 
 </manifest>
