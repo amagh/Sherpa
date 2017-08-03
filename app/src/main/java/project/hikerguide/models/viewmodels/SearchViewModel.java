@@ -205,6 +205,11 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
         });
     }
 
+    /**
+     * Queries the Firebase Database for a matching Area
+     *
+     * @param query    The query for the Firebase Database
+     */
     private void queryFirebaseDatabase(String query) {
 
         // Build a Query for the Firebase Database
@@ -250,6 +255,9 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
         });
     }
 
+    /**
+     * Initializes the GoogleApiClient to use the Places API
+     */
     private void initGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(mActivity)
                 .addApi(Places.GEO_DATA_API)
@@ -260,6 +268,11 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
         mGoogleApiClient.connect();
     }
 
+    /**
+     * Query the Google Places API for a Place that matches
+     *
+     * @param query    Query for the Google Places API
+     */
     private void queryGooglePlaces(String query) {
 
         // Max LatLngBounds possible
@@ -294,11 +307,22 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
         });
     }
 
+    /**
+     * Moves the camera to the coordinates provided by Google Places API for a given PlaceId
+     *
+     * @param placeId    PlaceId of the PlaceModel to move the camera to
+     */
     void changeMapCamera(String placeId) {
+
+        // Query Places API to get the Place
         Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId).setResultCallback(new ResultCallback<PlaceBuffer>() {
             @Override
             public void onResult(@NonNull PlaceBuffer places) {
+
+                // Check to ensure results are valid
                 if (places.getStatus().isSuccess() && places.getCount() > 0) {
+
+                    // Get the Place, generate the LatLng and move the camera
                     Place place = places.get(0);
                     LatLng location = place.getLatLng();
                     changeMapCamera(new com.mapbox.mapboxsdk.geometry.LatLng(location.latitude, location.longitude));
@@ -307,6 +331,11 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
         });
     }
 
+    /**
+     * Causes the camera in the MapView to move to a given coordinate
+     *
+     * @param latLng    The coordinates to move the camera to
+     */
     void changeMapCamera(com.mapbox.mapboxsdk.geometry.LatLng latLng) {
         mLatLng = latLng;
         notifyPropertyChanged(BR.latLng);
