@@ -1,6 +1,7 @@
 package project.hikerguide.models.viewmodels;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -22,14 +23,16 @@ import java.util.List;
 
 import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.BR;
-import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Trail;
+import project.hikerguide.ui.activities.CreateGuideActivity;
 import project.hikerguide.ui.adapters.TrailAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
-import timber.log.Timber;
+
+import static project.hikerguide.ui.activities.CreateGuideActivity.IntentKeys.AREA_KEY;
+import static project.hikerguide.ui.activities.CreateGuideActivity.IntentKeys.TRAIL_KEY;
 
 /**
  * Created by Alvin on 8/3/2017.
@@ -75,7 +78,21 @@ public class SearchTrailViewModel extends BaseObservable {
     @Bindable
     public TrailAdapter getAdapter() {
         if (mAdapter == null) {
-            mAdapter = new TrailAdapter();
+            mAdapter = new TrailAdapter(new TrailAdapter.ClickHandler() {
+                @Override
+                public void onClickTrail(Trail trail) {
+
+                    // Create Intent to start CreateGuideActivity
+                    Intent intent = new Intent(mActivity, CreateGuideActivity.class);
+
+                    // Add the Area and Trail to the Intent
+                    intent.putExtra(AREA_KEY, mArea);
+                    intent.putExtra(TRAIL_KEY, trail);
+
+                    // Start the Activity
+                    mActivity.startActivity(intent);
+                }
+            });
         }
 
         return mAdapter;

@@ -53,7 +53,7 @@ import project.hikerguide.ui.adapters.AreaAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
-import static project.hikerguide.ui.activities.TrailActivity.IntentKeys.AREA;
+import static project.hikerguide.ui.activities.TrailActivity.IntentKeys.AREA_KEY;
 
 /**
  * Created by Alvin on 8/2/2017.
@@ -89,7 +89,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                         // Start TrailActivity
                         if (object instanceof Area) {
                             Intent intent = new Intent(mActivity, TrailActivity.class);
-                            intent.putExtra(AREA, (Area) object);
+                            intent.putExtra(AREA_KEY, (Area) object);
                             mActivity.startActivity(intent);
                         } else if (object instanceof PlaceModel) {
                             startTrailActivityWithPlaceModel((PlaceModel) object);
@@ -382,7 +382,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                             places.release();
 
                             Intent intent = new Intent(mActivity, TrailActivity.class);
-                            intent.putExtra(AREA, area);
+                            intent.putExtra(AREA_KEY, area);
                             mActivity.startActivity(intent);
                         }
                     }

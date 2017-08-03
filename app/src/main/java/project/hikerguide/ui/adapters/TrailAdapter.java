@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -57,6 +58,11 @@ public class TrailAdapter extends RecyclerView.Adapter<TrailAdapter.TrailViewHol
     };
 
     private final SortedList<Trail> mTrailList = new SortedList<>(Trail.class, mCallback);
+    private final ClickHandler mClickHandler;
+
+    public TrailAdapter(ClickHandler clickHandler) {
+        mClickHandler = clickHandler;
+    }
 
     @Override
     public TrailViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -103,7 +109,11 @@ public class TrailAdapter extends RecyclerView.Adapter<TrailAdapter.TrailViewHol
         mTrailList.endBatchedUpdates();
     }
 
-    class TrailViewHolder extends RecyclerView.ViewHolder {
+    public interface ClickHandler {
+        void onClickTrail(Trail trail);
+    }
+
+    class TrailViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // ** Member Variables ** //
         private ListItemTrailBinding mBinding;
 
@@ -111,6 +121,18 @@ public class TrailAdapter extends RecyclerView.Adapter<TrailAdapter.TrailViewHol
             super(binding.getRoot());
 
             mBinding = binding;
+            mBinding.getRoot().setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+
+            // Get the Trail that was Clicked
+            int position = getAdapterPosition();
+            Trail trail = mTrailList.get(position);
+
+            // Pass the Trail through the ClickHandler
+            mClickHandler.onClickTrail(trail);
         }
 
         void bind(int position) {
