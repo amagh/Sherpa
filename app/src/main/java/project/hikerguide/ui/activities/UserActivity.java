@@ -216,7 +216,12 @@ public class UserActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
     }
 
+    /**
+     * Click response for FAB
+     *
+     * @param view    FAB that was clicked
+     */
     public void onClickFab(View view) {
-        startActivity(new Intent(this, CreateGuideActivity.class));
+        startActivity(new Intent(this, AreaActivity.class));
     }
 }
