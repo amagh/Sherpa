@@ -313,6 +313,8 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                         placeList.add(placeModel);
                     }
 
+                    autocompletePredictions.release();
+
                     mAdapter.setAreaList(placeList);
                 }
             }
@@ -338,6 +340,8 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                     Place place = places.get(0);
                     LatLng location = place.getLatLng();
                     changeMapCamera(new com.mapbox.mapboxsdk.geometry.LatLng(location.latitude, location.longitude));
+
+                    places.release();
                 }
             }
         });
@@ -374,6 +378,8 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                             Timber.d("State: " + area.state);
                             area.latitude = latLng.latitude;
                             area.longitude = latLng.longitude;
+
+                            places.release();
 
                             Intent intent = new Intent(mActivity, TrailActivity.class);
                             intent.putExtra(AREA, area);
