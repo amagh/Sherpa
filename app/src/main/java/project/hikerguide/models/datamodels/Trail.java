@@ -1,6 +1,8 @@
 package project.hikerguide.models.datamodels;
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +14,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
  * Created by Alvin on 7/17/2017.
  */
 
-public class Trail extends BaseModel {
+public class Trail extends BaseModel implements Parcelable {
     // ** Constants ** //
     private static final String AREA_ID = "areaId";
     private static final String NAME = "name";
@@ -70,5 +72,40 @@ public class Trail extends BaseModel {
         map.put(NOTES, notes);
 
         return map;
+    }
+
+    //********************************************************************************************//
+    //***************************** Parcelable Related Methods ***********************************//
+    //********************************************************************************************//
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(firebaseId);
+        parcel.writeString(name);
+        parcel.writeString(notes);
+    }
+
+    public static final Parcelable.Creator<Trail> CREATOR = new Parcelable.Creator<Trail>() {
+        @Override
+        public Trail createFromParcel(Parcel parcel) {
+            return new Trail(parcel);
+        }
+
+        @Override
+        public Trail[] newArray(int i) {
+            return new Trail[i];
+        }
+    };
+
+    private Trail(Parcel parcel) {
+        firebaseId = parcel.readString();
+        name = parcel.readString();
+        notes = parcel.readString();
     }
 }
