@@ -23,8 +23,9 @@ import project.hikerguide.models.viewmodels.PlaceViewModel;
 
 public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder> {
     // ** Constants ** //
-    private static final int AREA_VIEW_TYPE     = 0;
-    private static final int PLACE_VIEW_TYPE    = 1;
+    private static final int AREA_VIEW_TYPE         = 0;
+    private static final int PLACE_VIEW_TYPE        = 1;
+    private static final int SEARCH_MORE_VIEW_TYPE  = 2;
 
     // ** Member Variables ** //
     private List<Object> mAreaList;
@@ -48,6 +49,10 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
             case PLACE_VIEW_TYPE:
                 layoutId = R.layout.list_item_place;
                 break;
+
+            case SEARCH_MORE_VIEW_TYPE:
+                layoutId = R.layout.list_item_search_more;
+                break;
         }
 
         // Init the ViewDataBinding
@@ -65,7 +70,11 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
     @Override
     public int getItemCount() {
         if (mAreaList != null) {
-            return mAreaList.size();
+            if (mAreaList.size() > 0 && mAreaList.get(0) instanceof Area) {
+                return mAreaList.size() + 1;
+            } else {
+                return mAreaList.size();
+            }
         }
 
         return 0;
@@ -75,7 +84,9 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
     public int getItemViewType(int position) {
 
         // Return the ViewType based on the type of Objects stored in the List
-        if (mAreaList.get(position) instanceof Area) {
+        if (mAreaList.get(position) == null) {
+            return SEARCH_MORE_VIEW_TYPE;
+        } else if (mAreaList.get(position) instanceof Area) {
             return AREA_VIEW_TYPE;
         } else if (mAreaList.get(position) instanceof PlaceModel) {
             return PLACE_VIEW_TYPE;
