@@ -11,16 +11,23 @@ import java.util.List;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemAreaBinding;
+import project.hikerguide.databinding.ListItemPlaceBinding;
 import project.hikerguide.models.datamodels.Area;
+import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.models.viewmodels.AreaViewModel;
+import project.hikerguide.models.viewmodels.PlaceViewModel;
 
 /**
  * Created by Alvin on 8/2/2017.
  */
 
 public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder> {
+    // ** Constants ** //
+    private static final int AREA_VIEW_TYPE     = 0;
+    private static final int PLACE_VIEW_TYPE    = 1;
+
     // ** Member Variables ** //
-    private List<Area> mAreaList;
+    private List<Object> mAreaList;
     private ClickHandler mClickHandler;
 
     public AreaAdapter(ClickHandler clickHandler) {
@@ -29,13 +36,22 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
 
     @Override
     public AreaViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         // Init the variables for DataBinding
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        int layoutId = R.layout.list_item_area;
+        int layoutId = -1;
+
+        switch (viewType) {
+            case AREA_VIEW_TYPE:
+                layoutId = R.layout.list_item_area;
+                break;
+
+            case PLACE_VIEW_TYPE:
+                layoutId = R.layout.list_item_place;
+                break;
+        }
 
         // Init the ViewDataBinding
-        ListItemAreaBinding binding = DataBindingUtil.inflate(inflater, layoutId, parent, false);
+        ViewDataBinding binding = DataBindingUtil.inflate(inflater, layoutId, parent, false);
         return new AreaViewHolder(binding);
     }
 
@@ -55,15 +71,33 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
         return 0;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+
+        // Return the ViewType based on the type of Objects stored in the List
+        if (mAreaList.get(position) instanceof Area) {
+            return AREA_VIEW_TYPE;
+        } else if (mAreaList.get(position) instanceof PlaceModel) {
+            return PLACE_VIEW_TYPE;
+        }
+        return super.getItemViewType(position);
+    }
+
+    public void setAreaList(List<Object> areaList) {
+        mAreaList = areaList;
+
+        notifyDataSetChanged();
+    }
+
     public interface ClickHandler {
-        void onClickArea(Area area);
+        void onClickArea(Object object);
     }
 
     class AreaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // ** Member Variables ** //
-        ListItemAreaBinding mBinding;
+        ViewDataBinding mBinding;
 
-        public AreaViewHolder(ListItemAreaBinding binding) {
+        public AreaViewHolder(ViewDataBinding binding) {
             super(binding.getRoot());
 
             mBinding = binding;
@@ -73,11 +107,19 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
 
         private void bind(int position) {
 
-            // Get reference to the Area at the corresponding position
-            Area area = mAreaList.get(position);
+            // Get reference to the Object at the corresponding position
+            Object object = mAreaList.get(position);
 
-            AreaViewModel vm = new AreaViewModel(area);
-            mBinding.setVm(vm);
+            // Check the type of Object it is and load the proper ViewModel
+            if (object instanceof Area) {
+                AreaViewModel vm = new AreaViewModel((Area) object);
+                ((ListItemAreaBinding) mBinding).setVm(vm);
+            } else if (object instanceof PlaceModel) {
+                PlaceViewModel vm = new PlaceViewModel((PlaceModel) object);
+                ((ListItemPlaceBinding) mBinding).setVm(vm);
+            }
+
+
         }
 
         @Override

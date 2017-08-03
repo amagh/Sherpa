@@ -3,7 +3,9 @@ package project.hikerguide.models.viewmodels;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
-import android.os.Handler;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,25 +13,32 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.AutocompletePrediction;
+import com.google.android.gms.location.places.AutocompletePredictionBuffer;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.BR;
-import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.mapbox.SmartMapView;
 import project.hikerguide.models.datamodels.Area;
+import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.ui.adapters.AreaAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
@@ -39,15 +48,18 @@ import timber.log.Timber;
  * Created by Alvin on 8/2/2017.
  */
 
-public class SearchViewModel extends BaseObservable {
+public class SearchViewModel extends BaseObservable implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     // ** Member Variables ** //
     private AreaAdapter mAdapter;
     private MapboxActivity mActivity;
     private String mQuery;
     private boolean mSearchHasFocus = false;
+    private GoogleApiClient mGoogleApiClient;
 
     public SearchViewModel(MapboxActivity activity) {
         mActivity = activity;
+
+        initGoogleApiClient();
     }
 
     @Bindable
@@ -55,7 +67,7 @@ public class SearchViewModel extends BaseObservable {
         if (mAdapter == null) {
             mAdapter = new AreaAdapter(new AreaAdapter.ClickHandler() {
                 @Override
-                public void onClickArea(Area area) {
+                public void onClickArea(Object object) {
 
                 }
             });
@@ -102,6 +114,19 @@ public class SearchViewModel extends BaseObservable {
         Timber.d("Focus: " + hasFocus);
         mSearchHasFocus = hasFocus;
 
+        notifyPropertyChanged(BR.hasFocus);
+    }
+
+
+    public void onClickClear(View view) {
+
+        // Set the focus to false
+        mSearchHasFocus = false;
+
+        // Clear the query
+        mQuery = null;
+
+        notifyPropertyChanged(BR.query);
         notifyPropertyChanged(BR.hasFocus);
     }
 
@@ -159,7 +184,7 @@ public class SearchViewModel extends BaseObservable {
                 if (dataSnapshot.exists()) {
 
                     // Convert to a List of Areas and then pass it to the Adapter
-                    Area[] areas = (Area[]) FirebaseProviderUtils.getModelsFromSnapshot(DatabaseProvider.FirebaseType.AREA, dataSnapshot);
+                    Object[] areas = (Object[]) FirebaseProviderUtils.getModelsFromSnapshot(DatabaseProvider.FirebaseType.AREA, dataSnapshot);
                     mAdapter.setAreaList(Arrays.asList(areas));
                 }
 
@@ -176,15 +201,62 @@ public class SearchViewModel extends BaseObservable {
         });
     }
 
-    public void onClickClear(View view) {
+    private void initGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(mActivity)
+                .addApi(Places.GEO_DATA_API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
 
-        // Set the focus to false
-        mSearchHasFocus = false;
+        mGoogleApiClient.connect();
+    }
 
-        // Clear the query
-        mQuery = null;
+    private void queryGooglePlaces(String query) {
 
-        notifyPropertyChanged(BR.query);
-        notifyPropertyChanged(BR.hasFocus);
+        // Max LatLngBounds possible
+        LatLngBounds bounds = new LatLngBounds(
+                new LatLng(-85, 180),   // Max NE bound
+                new LatLng(85, -180));  // Max SW bound
+
+        // Query Places API
+        PendingResult<AutocompletePredictionBuffer> result = Places.GeoDataApi
+                .getAutocompletePredictions(mGoogleApiClient, query, bounds, null);
+
+        result.setResultCallback(new ResultCallback<AutocompletePredictionBuffer>() {
+            @Override
+            public void onResult(@NonNull AutocompletePredictionBuffer autocompletePredictions) {
+                if (autocompletePredictions.getStatus().isSuccess() && autocompletePredictions.getCount() > 0) {
+                    List<Object> placeList = new ArrayList<>();
+
+                    for (AutocompletePrediction prediction : autocompletePredictions) {
+
+                        // Create a new PlaceModel from the List and populate it with info
+                        PlaceModel placeModel = new PlaceModel();
+                        placeModel.primaryText = prediction.getPrimaryText(null).toString();
+                        placeModel.secondaryText = prediction.getSecondaryText(null).toString();
+                        placeModel.placeId = prediction.getPlaceId();
+
+                        placeList.add(placeModel);
+                    }
+
+                    mAdapter.setAreaList(placeList);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Timber.d("Connected to GoogleApiClient");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 }
