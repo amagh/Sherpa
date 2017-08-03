@@ -54,6 +54,11 @@
             android:authorities="project.hikerguide.data"/>
 
         <activity android:name=".ui.activities.GuideDetailsActivity">
+
+        </activity>
+
+        <activity android:name=".ui.activities.AreaActivity">
+
         </activity>
     </application>
 
