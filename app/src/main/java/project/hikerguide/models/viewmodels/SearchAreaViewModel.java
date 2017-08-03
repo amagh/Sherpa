@@ -1,5 +1,6 @@
 package project.hikerguide.models.viewmodels;
 
+import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -44,11 +45,15 @@ import project.hikerguide.BR;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.mapbox.SmartMapView;
+import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.ui.activities.MapboxActivity;
+import project.hikerguide.ui.activities.TrailActivity;
 import project.hikerguide.ui.adapters.AreaAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
+
+import static project.hikerguide.ui.activities.TrailActivity.IntentKeys.AREA;
 
 /**
  * Created by Alvin on 8/2/2017.
@@ -82,6 +87,13 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                         queryGooglePlaces(mQuery);
                     } else {
                         // Start TrailActivity
+                        if (object instanceof Area) {
+                            Intent intent = new Intent(mActivity, TrailActivity.class);
+                            intent.putExtra(AREA, (Area) object);
+                            mActivity.startActivity(intent);
+                        } else if (object instanceof PlaceModel) {
+                            startTrailActivityWithPlaceModel((PlaceModel) object);
+                        }
                     }
                 }
             });
@@ -329,6 +341,46 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                 }
             }
         });
+    }
+
+    /**
+     * Starts the TrailActivity after converting the PlaceModel to an Area so it can be passed in
+     * the Intent
+     *
+     * @param placeModel    PlaceModel to be converted to Area to be passed via Intent
+     */
+    private void startTrailActivityWithPlaceModel(PlaceModel placeModel) {
+
+        // Query the Places API to get the details required for the Area data model
+        Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeModel.placeId)
+                .setResultCallback(new ResultCallback<PlaceBuffer>() {
+                    @Override
+                    public void onResult(@NonNull PlaceBuffer places) {
+
+                        // Check that the result is valid
+                        if (places.getStatus().isSuccess() && places.getCount() > 0) {
+
+                            // Init a new Area
+                            Area area = new Area();
+
+                            // Get the Place
+                            Place place = places.get(0);
+
+                            // Add the details to the new Area and pass it to the Intent
+                            LatLng latLng = place.getLatLng();
+                            area.name = place.getName().toString();
+                            area.state = place.getAddress().toString();
+
+                            Timber.d("State: " + area.state);
+                            area.latitude = latLng.latitude;
+                            area.longitude = latLng.longitude;
+
+                            Intent intent = new Intent(mActivity, TrailActivity.class);
+                            intent.putExtra(AREA, area);
+                            mActivity.startActivity(intent);
+                        }
+                    }
+                });
     }
 
     /**
