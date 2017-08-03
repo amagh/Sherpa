@@ -1,6 +1,8 @@
 package project.hikerguide.models.datamodels;
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +14,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
  * Created by Alvin on 7/18/2017.
  */
 
-public class Area extends BaseModel {
+public class Area extends BaseModel implements Parcelable {
     // ** Constants ** //
     private static final String NAME            = "name";
     private static final String LOWER_CASE_NAME = "lowerCaseName";
@@ -62,5 +64,44 @@ public class Area extends BaseModel {
         map.put(STATE, state);
 
         return map;
+    }
+
+    //********************************************************************************************//
+    //***************************** Parcelable Related Methods ***********************************//
+    //********************************************************************************************//
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(firebaseId);
+        parcel.writeString(name);
+        parcel.writeString(state);
+        parcel.writeDouble(latitude);
+        parcel.writeDouble(longitude);
+    }
+
+    public static final Parcelable.Creator<Area> CREATOR = new Parcelable.Creator<Area>() {
+        @Override
+        public Area createFromParcel(Parcel parcel) {
+            return new Area(parcel);
+        }
+
+        @Override
+        public Area[] newArray(int i) {
+            return new Area[i];
+        }
+    };
+
+    private Area(Parcel parcel) {
+        firebaseId = parcel.readString();
+        name = parcel.readString();
+        state = parcel.readString();
+        latitude = parcel.readDouble();
+        longitude = parcel.readDouble();
     }
 }
