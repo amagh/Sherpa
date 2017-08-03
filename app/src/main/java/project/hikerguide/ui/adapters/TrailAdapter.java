@@ -43,6 +43,12 @@ public class TrailAdapter extends RecyclerView.Adapter<TrailAdapter.TrailViewHol
         return 0;
     }
 
+    public void setTrailList(List<Trail> trailList) {
+        mTrailList = trailList;
+
+        notifyDataSetChanged();
+    }
+
     class TrailViewHolder extends RecyclerView.ViewHolder {
         // ** Member Variables ** //
         private ListItemTrailBinding mBinding;
