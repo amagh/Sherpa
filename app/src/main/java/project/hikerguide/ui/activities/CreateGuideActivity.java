@@ -48,6 +48,10 @@ import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.MenuListener {
     // ** Constants ** //
     public static final int PERMISSION_REQUEST_EXT_STORAGE = 9687;
+    public interface IntentKeys {
+        public String AREA_KEY  = "area";
+        public String TRAIL_KEY = "trail";
+    }
 
     // ** Member Variables ** //
     private ActivityCreateGuideBinding mBinding;

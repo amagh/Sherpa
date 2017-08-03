@@ -9,7 +9,7 @@ import project.hikerguide.databinding.ActivityTrailBinding;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.viewmodels.SearchTrailViewModel;
 
-import static project.hikerguide.ui.activities.TrailActivity.IntentKeys.AREA;
+import static project.hikerguide.ui.activities.TrailActivity.IntentKeys.AREA_KEY;
 
 /**
  * Created by Alvin on 8/3/2017.
@@ -18,7 +18,7 @@ import static project.hikerguide.ui.activities.TrailActivity.IntentKeys.AREA;
 public class TrailActivity extends AppCompatActivity {
     // ** Constants ** //
     public interface IntentKeys {
-        String AREA = "area";
+        String AREA_KEY = "area";
     }
 
     // ** Member Variables ** //
@@ -31,8 +31,8 @@ public class TrailActivity extends AppCompatActivity {
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_trail);
 
-        if (getIntent().getParcelableExtra(AREA) != null) {
-            mArea = getIntent().getParcelableExtra(AREA);
+        if (getIntent().getParcelableExtra(AREA_KEY) != null) {
+            mArea = getIntent().getParcelableExtra(AREA_KEY);
         }
 
         SearchTrailViewModel vm = new SearchTrailViewModel(this, mArea);

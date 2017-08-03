@@ -28,7 +28,7 @@ import static project.hikerguide.ui.activities.GuideDetailsActivity.IntentKeys.G
 public class GuideDetailsActivity extends MapboxActivity {
     // ** Constants ** //
     public interface IntentKeys {
-        String GUIDE_KEY = "guides";
+        String GUIDE_KEY = "guide";
     }
 
     // ** Member Variables ** //
