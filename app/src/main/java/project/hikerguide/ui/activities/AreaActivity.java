@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ActivityAreaBinding;
-import project.hikerguide.models.viewmodels.SearchViewModel;
+import project.hikerguide.models.viewmodels.SearchAreaViewModel;
 
 /**
  * Created by Alvin on 8/1/2017.
@@ -21,7 +21,7 @@ public class AreaActivity extends MapboxActivity {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_area);
 
         // Initialize ViewModel for the layout
-        SearchViewModel vm = new SearchViewModel(this);
+        SearchAreaViewModel vm = new SearchAreaViewModel(this);
         mBinding.setVm(vm);
     }
 

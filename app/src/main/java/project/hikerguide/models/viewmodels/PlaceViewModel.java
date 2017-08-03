@@ -13,9 +13,9 @@ import project.hikerguide.models.datamodels.PlaceModel;
 public class PlaceViewModel extends BaseObservable {
     // ** Member Variables ** //
     private PlaceModel mPlaceModel;
-    private SearchViewModel mViewModel;
+    private SearchAreaViewModel mViewModel;
 
-    public PlaceViewModel(PlaceModel placeModel, SearchViewModel viewModel) {
+    public PlaceViewModel(PlaceModel placeModel, SearchAreaViewModel viewModel) {
         mPlaceModel = placeModel;
         mViewModel = viewModel;
     }

@@ -17,7 +17,7 @@ import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.models.viewmodels.AreaViewModel;
 import project.hikerguide.models.viewmodels.PlaceViewModel;
-import project.hikerguide.models.viewmodels.SearchViewModel;
+import project.hikerguide.models.viewmodels.SearchAreaViewModel;
 
 /**
  * Created by Alvin on 8/2/2017.
@@ -32,10 +32,10 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
     // ** Member Variables ** //
     private List<Object> mAreaList;
     private ClickHandler mClickHandler;
-    private SearchViewModel mViewModel;
+    private SearchAreaViewModel mViewModel;
     private boolean mShowSearchMore = false;
 
-    public AreaAdapter(SearchViewModel viewModel, ClickHandler clickHandler) {
+    public AreaAdapter(SearchAreaViewModel viewModel, ClickHandler clickHandler) {
         mViewModel = viewModel;
         mClickHandler = clickHandler;
     }

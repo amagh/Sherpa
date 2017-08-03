@@ -54,7 +54,7 @@ import timber.log.Timber;
  * Created by Alvin on 8/2/2017.
  */
 
-public class SearchViewModel extends BaseObservable implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SearchAreaViewModel extends BaseObservable implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     // ** Constants ** //
     private static final int SEARCH_DELAY = 1500;
 
@@ -66,7 +66,7 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     private boolean mSearchHasFocus = false;
     private GoogleApiClient mGoogleApiClient;
 
-    public SearchViewModel(MapboxActivity activity) {
+    public SearchAreaViewModel(MapboxActivity activity) {
         mActivity = activity;
 
         initGoogleApiClient();

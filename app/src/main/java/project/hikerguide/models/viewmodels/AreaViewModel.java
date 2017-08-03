@@ -15,10 +15,10 @@ import project.hikerguide.models.datamodels.Area;
 public class AreaViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Area mArea;
-    private SearchViewModel mViewModel;
+    private SearchAreaViewModel mViewModel;
     private int mLatLngVisibility;
 
-    public AreaViewModel(Area area, SearchViewModel viewModel) {
+    public AreaViewModel(Area area, SearchAreaViewModel viewModel) {
         mArea = area;
         mViewModel = viewModel;
 
