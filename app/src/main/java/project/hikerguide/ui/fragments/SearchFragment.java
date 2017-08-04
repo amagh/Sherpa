@@ -56,7 +56,7 @@ import project.hikerguide.utilities.SaveUtils;
 
 import static android.app.Activity.RESULT_OK;
 import static project.hikerguide.firebasedatabase.DatabaseProvider.GEOFIRE_PATH;
-import static project.hikerguide.ui.activities.GuideDetailsActivity.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
 
