@@ -23,7 +23,7 @@
             android:layout_height="@dimen/list_section_icon_size"
             android:padding="@dimen/list_section_icon_padding"
             android:layout_gravity="center_vertical"
-            android:onTouch="@{vm.onReorderTouch}"
+            android:onTouch="@{vm::onReorderTouch}"
             android:src="@drawable/ic_reorder"/>
 
         <LinearLayout
@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:scaleType="fitXY"
                 android:adjustViewBounds="true"
-                android:onClick="@{vm.onSectionImageClick}"
+                android:onClick="@{vm::onSectionImageClick}"
                 app:image="@{vm.image}"
                 app:imageUri="@{vm.imageUri}"
                 tools:src="@color/bg_gray"/>
@@ -64,7 +64,7 @@
             android:layout_height="@dimen/list_section_icon_size"
             android:padding="@dimen/list_section_icon_padding"
             android:layout_gravity="center_vertical"
-            android:onClick="@{vm.onDeleteClick}"
+            android:onClick="@{vm::onDeleteClick}"
             android:src="@drawable/ic_delete"/>
 
     </LinearLayout>

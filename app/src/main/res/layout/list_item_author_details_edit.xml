@@ -26,7 +26,7 @@
             android:layout_gravity="end"
             android:src="@drawable/ic_close"
             android:tint="@color/red_900"
-            android:onClick="@{vm.onClickEdit}"
+            android:onClick="@{vm::onClickEdit}"
             app:editVisibility="@{vm.editVisibility}"/>
 
         <EditText

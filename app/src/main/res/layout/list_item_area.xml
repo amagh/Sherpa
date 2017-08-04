@@ -54,7 +54,7 @@
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:src="@drawable/ic_directions"
             android:tint="@color/grey_400"
-            android:onClick="@{vm.onClickGeolocation}"
+            android:onClick="@{vm::onClickGeolocation}"
             android:visibility="@{vm.latLngVisibility}"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
