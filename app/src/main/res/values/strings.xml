@@ -71,6 +71,9 @@
     <string name="menu_publish_title">Publish Guide</string>
     <string name="menu_save_title">Save Draft</string>
 
+    <!-- Add Trail Dialog Strings -->
+    <string name="add_trail_hint">Trail name</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 
