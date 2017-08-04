@@ -16,6 +16,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,6 +47,8 @@ import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static android.support.v7.widget.helper.ItemTouchHelper.UP;
 import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
 import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.IntentKeys.SECTION_KEY;
 import static project.hikerguide.utilities.IntentKeys.TRAIL_KEY;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 
@@ -62,7 +65,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     private Area mArea;
     private Trail mTrail;
     private Author mAuthor;
-    private List<Section> mSectionList;
+    private ArrayList<Section> mSectionList;
 
     private ActivityCreateGuideBinding mBinding;
     private EditGuideDetailsAdapter mAdapter;
@@ -384,8 +387,26 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_publish:
-                validateGuide();
-                validateSections();
+                boolean valid = true;
+
+                boolean sectionsValid = validateSections();
+                boolean guideValid = validateGuide();
+
+                if (!sectionsValid || !guideValid) {
+                    valid = false;
+                }
+
+                if (valid) {
+                    Intent intent = new Intent(this, PublishActivity.class);
+                    intent.putExtra(AUTHOR_KEY, mAuthor);
+                    intent.putExtra(AREA_KEY, mArea);
+                    intent.putExtra(TRAIL_KEY, mTrail);
+                    intent.putExtra(GUIDE_KEY, mGuide);
+                    intent.putParcelableArrayListExtra(SECTION_KEY, mSectionList);
+
+                    startActivity(intent);
+                }
+
                 return true;
 
             case R.id.menu_save:
@@ -422,7 +443,9 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     /**
      * Checks to ensure that all required items for the Guide model exists
      */
-    private void validateGuide() {
+    private boolean validateGuide() {
+
+        boolean valid = true;
 
         // Check that the hero image for the Guide has been set
         if (!mGuide.hasImage) {
@@ -433,6 +456,8 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
             // Show an error icon over the missing hero image
             mBinding.getVm().setShowImageError(true);
+
+            valid = false;
         }
 
         // Check that the .gpx file has been set
@@ -456,13 +481,17 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                     binding.getVm().setShowGpxError(true);
                 }
             }, 100);
+
+            valid = false;
         }
+
+        return valid;
     }
 
     /**
      * Checks that all Sections have been filled out and removes any empty Sections
      */
-    private void validateSections() {
+    private boolean validateSections() {
 
         // Create a new ArrayList of Sections so that they can be passed on to the PublishActivity
         mSectionList = new ArrayList<>();
@@ -501,5 +530,14 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         for (Section section : emptySections) {
             mAdapter.removeModel(section);
         }
+
+        // Check that there is at least one valid Section
+        if (mSectionList.size() == 0) {
+
+            // Show a Toast to indicate to the user to add a Section before publishing
+            Toast.makeText(this, getString(R.string.create_guide_no_sections_error), Toast.LENGTH_LONG).show();
+        }
+
+        return mSectionList.size() > 0;
     }
 }
