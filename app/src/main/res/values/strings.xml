@@ -67,9 +67,10 @@
     <!-- Mapbox related Strings -->
     <string name="outdoors_style">mapbox://styles/mapbox/outdoors-v10</string>
 
-    <!-- Create Guide Menu Strings -->
+    <!-- Create Guide Strings -->
     <string name="menu_publish_title">Publish Guide</string>
     <string name="menu_save_title">Save Draft</string>
+    <string name="create_guide_image_missing_error_text">Please add an image</string>
 
     <!-- Add Trail Dialog Strings -->
     <string name="add_trail_hint">Trail name</string>

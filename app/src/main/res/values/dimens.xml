@@ -46,4 +46,6 @@
     <dimen name="sign_in_button_top_margin">96dp</dimen>
     <dimen name="sign_in_text_horizontal_margin">32dp</dimen>
     <dimen name="create_account_button_top_margin">32dp</dimen>
+
+    <dimen name="create_guide_hero_icon_size">48dp</dimen>
 </resources>
