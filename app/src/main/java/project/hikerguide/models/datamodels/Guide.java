@@ -254,6 +254,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
         String imageUriString = parcel.readString();
         if (imageUriString != null) {
+            hasImage = true;
             imageUri = Uri.parse(imageUriString);
         }
     }

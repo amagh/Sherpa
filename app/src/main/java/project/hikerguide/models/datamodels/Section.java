@@ -115,7 +115,8 @@ public class Section extends BaseModelWithImage implements Parcelable {
         content = parcel.readString();
 
         String imageUriString = parcel.readString();
-        if (imageUri != null) {
+        if (imageUriString != null) {
+            hasImage = true;
             imageUri = Uri.parse(imageUriString);
         }
     }
