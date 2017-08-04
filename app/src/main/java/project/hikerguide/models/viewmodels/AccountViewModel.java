@@ -89,7 +89,7 @@ public class AccountViewModel extends BaseObservable {
         return progressVisibility;
     }
 
-    @BindingAdapter({"app:passwordTv", "app:confirmTv", "app:signInBtn", "app:createAccountBtn", "bind:switchBtnText", "bind:uiMode"})
+    @BindingAdapter({"passwordTv", "confirmTv", "signInBtn", "createAccountBtn", "switchBtnText", "uiMode"})
     public static void switchUi(Button switchUiButton, final EditText passwordTv, final EditText confirmTv,
                                 Button signInButton, Button createAccountButton, String switchBtnText, @UiModes int uiMode) {
 

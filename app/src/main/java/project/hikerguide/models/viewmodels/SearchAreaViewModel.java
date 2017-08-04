@@ -110,7 +110,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
         return mActivity;
     }
 
-    @BindingAdapter({"bind:adapter", "bind:activity"})
+    @BindingAdapter({"adapter", "activity"})
     public static void setAdapter(RecyclerView recyclerView, AreaAdapter adapter, MapboxActivity activity) {
 
         recyclerView.setAdapter(adapter);
@@ -163,7 +163,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
         notifyPropertyChanged(BR.hasFocus);
     }
 
-    @BindingAdapter({"app:searchTv", "app:searchIv", "app:closeIv", "bind:hasFocus"})
+    @BindingAdapter({"searchTv", "searchIv", "closeIv", "hasFocus"})
     public static void animateFocus(CardView cardView, EditText searchTv, ImageView searchIv, ImageView closeIv, boolean hasFocus) {
 
         float cardAlpha     = 0.75f;
@@ -193,14 +193,14 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                 .start();
     }
 
-    @BindingAdapter("bind:activity")
+    @BindingAdapter("activity")
     public static void initMap(SmartMapView mapView, MapboxActivity activity) {
 
         // Start the Map's LifeCycle and attach it to the Activity LifeCycle
         mapView.startMapView(activity);
     }
 
-    @BindingAdapter("bind:latLng")
+    @BindingAdapter("latLng")
     public static void moveCamera(SmartMapView mapView, final com.mapbox.mapboxsdk.geometry.LatLng latLng) {
 
         // Do not move the Camera if there are no valid coordinates

@@ -92,7 +92,7 @@ public class SearchTrailViewModel extends BaseObservable {
         return mAdapter;
     }
 
-    @BindingAdapter({"bind:activity", "bind:adapter"})
+    @BindingAdapter({"activity", "adapter"})
     public static void initRecyclerView(RecyclerView recyclerView, Activity activity, TrailAdapter adapter) {
 
         // Setup the RecyclerView
@@ -105,7 +105,7 @@ public class SearchTrailViewModel extends BaseObservable {
         return mSearchHasFocus;
     }
 
-    @BindingAdapter({"app:searchIv", "app:closeIv", "bind:hasFocus"})
+    @BindingAdapter({"searchIv", "closeIv", "hasFocus"})
     public static void animateFocus(EditText searchTv, ImageView searchIv, ImageView closeIv, boolean hasFocus) {
 
         float searchAlpha   = 0;

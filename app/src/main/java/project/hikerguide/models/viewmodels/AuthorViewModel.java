@@ -69,7 +69,7 @@ public class AuthorViewModel extends BaseObservable {
                 .child(mAuthor.firebaseId + JPEG_EXT);
     }
 
-    @BindingAdapter("bind:image")
+    @BindingAdapter("image")
     public static void loadImage(ImageView imageView, StorageReference image) {
         Glide.with(imageView.getContext())
                 .using(new FirebaseImageLoader())
@@ -84,7 +84,7 @@ public class AuthorViewModel extends BaseObservable {
                 .child(mAuthor.firebaseId + BACKDROP_SUFFIX + JPEG_EXT);
     }
 
-    @BindingAdapter("bind:backdrop")
+    @BindingAdapter("backdrop")
     public static void loadBackdrop(ImageView imageView, StorageReference backdrop) {
         Glide.with(imageView.getContext())
                 .using(new FirebaseImageLoader())
@@ -107,7 +107,7 @@ public class AuthorViewModel extends BaseObservable {
         return mEditVisibility;
     }
 
-    @BindingAdapter("bind:editVisibility")
+    @BindingAdapter("editVisibility")
     public static void setEditVisibility(ImageView imageView, int editVisibility) {
 
         // Enable/disable click on ImageView depending on whether use is viewing their own profile.
@@ -127,7 +127,7 @@ public class AuthorViewModel extends BaseObservable {
         return mAccepted;
     }
 
-    @BindingAdapter({"bind:nameTv", "bind:descriptionTv", "bind:author", "bind:activity", "bind:accepted"})
+    @BindingAdapter({"nameTv", "descriptionTv", "author", "activity", "accepted"})
     public static void saveInfo(Button button, EditText nameEditText, EditText descriptionEditText,
                                 Author author, UserActivity activity, boolean accepted) {
 

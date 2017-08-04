@@ -74,7 +74,7 @@ public class SectionViewModel extends BaseObservable {
                 .child(mSection.firebaseId + JPEG_EXT);
     }
 
-    @BindingAdapter({"bind:image", "bind:imageUri"})
+    @BindingAdapter({"image", "imageUri"})
     public static void loadImage(ImageView imageView, StorageReference image, Uri imageUri) {
 
         // Check whether to load image from File or from Firebase Storage
@@ -99,7 +99,7 @@ public class SectionViewModel extends BaseObservable {
         return EditorInfo.IME_ACTION_DONE;
     }
 
-    @BindingAdapter({"bind:imeAction"})
+    @BindingAdapter({"imeAction"})
     public static void setupEditText(EditText editText, int imeAction) {
 
         // Work around for multiline EditText with IME option

@@ -162,7 +162,7 @@ public class GuideViewModel extends BaseObservable {
     }
 
 
-    @BindingAdapter({"bind:image", "bind:imageUri"})
+    @BindingAdapter({"image", "imageUri"})
     public static void loadImage(ImageView imageView, StorageReference image, Uri imageUri) {
 
         // Check whether to load image from File or from Firebase Storage
@@ -189,7 +189,7 @@ public class GuideViewModel extends BaseObservable {
                 .child(mGuide.authorId + JPEG_EXT);
     }
 
-    @BindingAdapter("bind:authorImage")
+    @BindingAdapter("authorImage")
     public static void loadAuthorImage(ImageView imageView, StorageReference authorImage) {
         Glide.with(imageView.getContext())
                 .using(new FirebaseImageLoader())
@@ -272,7 +272,7 @@ public class GuideViewModel extends BaseObservable {
         return mGuide.elevation != 0 ? View.VISIBLE : View.GONE;
     }
 
-    @BindingAdapter({"bind:gpx", "bind:activity", "bind:latitude", "bind:longitude"})
+    @BindingAdapter({"gpx", "activity", "latitude", "longitude"})
     public static void loadGpxToMap(final SmartMapView mapView, final File gpx,
                                     MapboxActivity activity, final double latitude, final double longitude) {
 
@@ -314,7 +314,7 @@ public class GuideViewModel extends BaseObservable {
         });
     }
 
-    @BindingAdapter({"bind:gpx", "bind:context"})
+    @BindingAdapter({"gpx", "context"})
     public static void loadElevationData(final LineChart lineChart, final File gpx, final Context context) {
 
         if (gpx == null) {
@@ -331,7 +331,7 @@ public class GuideViewModel extends BaseObservable {
         return ColorGenerator.getColor(mContext, mColorPosition);
     }
 
-    @BindingAdapter("bind:color")
+    @BindingAdapter("color")
     public static void setTrackColor(CircleImageView imageView, int color) {
         // Set the color swatch to match the Guide's track's color
         imageView.setImageDrawable(new ColorDrawable(color));
