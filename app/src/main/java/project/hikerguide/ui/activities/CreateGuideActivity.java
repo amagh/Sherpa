@@ -65,7 +65,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     private Area mArea;
     private Trail mTrail;
     private Author mAuthor;
-    private ArrayList<Section> mSectionList;
+    private Section[] mSections;
 
     private ActivityCreateGuideBinding mBinding;
     private EditGuideDetailsAdapter mAdapter;
@@ -402,7 +402,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                     intent.putExtra(AREA_KEY, mArea);
                     intent.putExtra(TRAIL_KEY, mTrail);
                     intent.putExtra(GUIDE_KEY, mGuide);
-                    intent.putParcelableArrayListExtra(SECTION_KEY, mSectionList);
+                    intent.putExtra(SECTION_KEY, mSections);
 
                     startActivity(intent);
                 }
@@ -493,9 +493,6 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
      */
     private boolean validateSections() {
 
-        // Create a new ArrayList of Sections so that they can be passed on to the PublishActivity
-        mSectionList = new ArrayList<>();
-
         // Used to set the Section ordering
         int order = 0;
 
@@ -516,9 +513,6 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
                 // Increment the ordering for the next Section
                 order++;
-
-                // Add the Section to the List
-                mSectionList.add(section);
             } else {
 
                 // Empty Section, add it to the List of Section to be removed
@@ -532,12 +526,21 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         }
 
         // Check that there is at least one valid Section
-        if (mSectionList.size() == 0) {
+        if (mModelList.size() == 1) {
 
             // Show a Toast to indicate to the user to add a Section before publishing
             Toast.makeText(this, getString(R.string.create_guide_no_sections_error), Toast.LENGTH_LONG).show();
+            return false;
         }
 
-        return mSectionList.size() > 0;
+        // Initialize the memvar for Sections to be passed through
+        mSections = new Section[mModelList.size() - 1];
+
+        // Add all valid Sections to mSections
+        for (int i = 1; i < mModelList.size(); i++) {
+            mSections[i - 1] = (Section) mModelList.get(i);
+        }
+
+        return true;
     }
 }
