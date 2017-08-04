@@ -1,7 +1,11 @@
 package project.hikerguide.models.datamodels;
 
 import android.database.Cursor;
+import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +16,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
  * Created by Alvin on 7/17/2017.
  */
 
-public class Section extends BaseModelWithImage {
+public class Section extends BaseModelWithImage implements Parcelable {
     // ** Constants ** //
     private static final String GUIDE_ID = "guideId";
     private static final String SECTION = "section";
@@ -70,5 +74,49 @@ public class Section extends BaseModelWithImage {
         map.put(HAS_IMAGE, hasImage);
 
         return map;
+    }
+
+    //********************************************************************************************//
+    //***************************** Parcelable Related Methods ***********************************//
+    //********************************************************************************************//
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(firebaseId);
+        parcel.writeInt(section);
+        parcel.writeString(content);
+
+        if (hasImage) {
+            parcel.writeString(getImageUri().toString());
+        }
+    }
+
+    public static final Parcelable.Creator<Section> CREATOR = new Parcelable.Creator<Section>() {
+        @Override
+        public Section createFromParcel(Parcel parcel) {
+            return new Section(parcel);
+        }
+
+        @Override
+        public Section[] newArray(int i) {
+            return new Section[i];
+        }
+    };
+
+    private Section(Parcel parcel) {
+        firebaseId = parcel.readString();
+        section = parcel.readInt();
+        content = parcel.readString();
+
+        String imageUriString = parcel.readString();
+        if (imageUri != null) {
+            imageUri = Uri.parse(imageUriString);
+        }
     }
 }
