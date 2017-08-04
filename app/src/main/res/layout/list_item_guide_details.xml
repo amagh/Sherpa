@@ -55,7 +55,7 @@
             android:id="@+id/guide_details_map_error_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Please add a GPX file"
+            android:text="@string/create_guide_gpx_missing_error_text"
             android:textColor="@android:color/white"
             android:visibility="gone"
             app:layout_constraintLeft_toLeftOf="parent"
