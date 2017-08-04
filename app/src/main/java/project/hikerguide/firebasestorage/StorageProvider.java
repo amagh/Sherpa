@@ -68,7 +68,7 @@ public class StorageProvider {
         final StorageListener listener = new StorageListener();
 
         // Get a reference to the location it will be stored using the ImageFile's firebaseId
-        StorageReference ref = getReferenceForFile(file);
+        StorageReference ref = StorageProviderUtils.getReferenceForFile(mStorage, file);
 
         try {
             // Upload the File
@@ -118,7 +118,7 @@ public class StorageProvider {
 
 
         // Get a reference to the location it will be stored using the ImageFile's firebaseId
-        StorageReference ref = getReferenceForFile(file);
+        StorageReference ref = StorageProviderUtils.getReferenceForFile(mStorage, file);
 
         // Download the File to the BaseFile in the signature
         ref.getFile(file)
@@ -151,7 +151,7 @@ public class StorageProvider {
         // Init a StorageListener that will return the status of the operation
         final StorageListener listener = new StorageListener();
 
-        StorageReference ref = getReferenceForFile(file);
+        StorageReference ref = StorageProviderUtils.getReferenceForFile(mStorage, file);
         ref.delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -182,7 +182,7 @@ public class StorageProvider {
         final StorageListener listener = new StorageListener();
 
         // Get a StorageReference using the variables
-        StorageReference ref = getReferenceForFile(file);
+        StorageReference ref = StorageProviderUtils.getReferenceForFile(mStorage, file);
 
         // Get the URL for the File
         ref.getDownloadUrl()
@@ -204,21 +204,6 @@ public class StorageProvider {
         listener.pauseUntilComplete();
 
         return listener.getDownloadUri();
-    }
-
-    /**
-     * Generates the StorageReference for where a File is stored on Firebase Storage
-     *
-     * @param file    File to get the StorageReference for
-     * @return The StorageReference for a File
-     */
-    public StorageReference getReferenceForFile(BaseFile file) {
-        // Get the directory and file extension based on the File's type
-        String directory = StorageProviderUtils.getDirectoryFromType(file);
-        String fileExtension = StorageProviderUtils.getFileExtensionFromType(file);
-
-        // Generate the StorageReference using the directory and file extension
-        return mStorage.child(directory).child(file.firebaseId + fileExtension);
     }
 
     /**

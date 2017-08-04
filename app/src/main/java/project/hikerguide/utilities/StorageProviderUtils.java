@@ -80,4 +80,19 @@ public class StorageProviderUtils {
             throw new UnsupportedOperationException("Unknown BaseFile: " + file.getClass());
         }
     }
+
+    /**
+     * Generates the StorageReference for where a File is stored on Firebase Storage
+     *
+     * @param file    File to get the StorageReference for
+     * @return The StorageReference for a File
+     */
+    public static StorageReference getReferenceForFile(StorageReference storageReference, BaseFile file) {
+        // Get the directory and file extension based on the File's type
+        String directory = getDirectoryFromType(file);
+        String fileExtension = getFileExtensionFromType(file);
+
+        // Generate the StorageReference using the directory and file extension
+        return storageReference.child(directory).child(file.firebaseId + fileExtension);
+    }
 }
