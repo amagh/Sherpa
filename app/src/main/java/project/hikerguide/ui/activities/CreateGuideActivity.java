@@ -191,7 +191,14 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                 if (resultCode == RESULT_OK) {
 
                     // Retrieve the path of the selected File
-                    String filePath = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_DOCS).get(0);
+                    List<String> dataArray = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_DOCS);
+
+                    // Check to ensure the user selected  File
+                    if (dataArray == null || dataArray.size() == 0) {
+                        return;
+                    }
+
+                    String filePath = dataArray.get(0);
 
                     // Check to ensure the first item in the List is a Guide
                     if (mModelList.get(0) instanceof Guide) {
@@ -221,13 +228,15 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                 if (resultCode == RESULT_OK) {
 
                     // Retrieve the path of the selected Image
-                    String imagePath = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA).get(0);
+                    List<String> dataArray = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA);
 
                     // If nothing is selected, do nothing
-                    if (imagePath == null) {
+                    if (dataArray == null || dataArray.size() == 0) {
                         mFilePickerModelPosition = -1;
                         return;
                     }
+
+                    String imagePath = dataArray.get(0);
 
                     // mFilePickerModelPosition is the same as the size of the list, that means
                     // that the user has chosen to add a new Section with image
