@@ -24,7 +24,7 @@ public class AreaActivity extends MapboxActivity {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_area);
 
-        getIntent().getParcelableExtra(AUTHOR_KEY);
+        mAuthor = getIntent().getParcelableExtra(AUTHOR_KEY);
 
         // Initialize ViewModel for the layout
         SearchAreaViewModel vm = new SearchAreaViewModel(this);

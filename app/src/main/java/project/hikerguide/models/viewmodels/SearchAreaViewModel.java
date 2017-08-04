@@ -90,10 +90,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                     } else {
                         // Start TrailActivity
                         if (object instanceof Area) {
-                            Intent intent = new Intent(mActivity, TrailActivity.class);
-                            intent.putExtra(AREA_KEY, (Area) object);
-                            intent.putExtra(AUTHOR_KEY, mActivity.getAuthor());
-                            mActivity.startActivity(intent);
+                            startActivity((Area) object);
                         } else if (object instanceof PlaceModel) {
                             startTrailActivityWithPlaceModel((PlaceModel) object);
                         }
@@ -378,15 +375,12 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                             area.name = place.getName().toString();
                             area.state = place.getAddress().toString();
 
-                            Timber.d("State: " + area.state);
                             area.latitude = latLng.latitude;
                             area.longitude = latLng.longitude;
 
                             places.release();
 
-                            Intent intent = new Intent(mActivity, TrailActivity.class);
-                            intent.putExtra(AREA_KEY, area);
-                            mActivity.startActivity(intent);
+                            startActivity(area);
                         }
                     }
                 });
@@ -415,5 +409,20 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    /**
+     * Launches the TrailActivity
+     *
+     * @param area    The Area that was selected that needs to be passed to the TrailActivity
+     */
+    private void startActivity(Area area) {
+
+        // Instantiate an Intent and add the Area and Author to it
+        Intent intent = new Intent(mActivity, TrailActivity.class);
+        intent.putExtra(AREA_KEY, area);
+        intent.putExtra(AUTHOR_KEY, mActivity.getAuthor());
+
+        mActivity.startActivity(intent);
     }
 }
