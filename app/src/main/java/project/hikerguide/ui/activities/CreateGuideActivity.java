@@ -43,6 +43,7 @@ import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static android.support.v7.widget.helper.ItemTouchHelper.UP;
 import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.IntentKeys.TRAIL_KEY;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 
@@ -59,6 +60,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     private Area mArea;
     private Trail mTrail;
     private Author mAuthor;
+
     private ActivityCreateGuideBinding mBinding;
     private EditGuideDetailsAdapter mAdapter;
     private List<BaseModel> mModelList;
@@ -77,13 +79,21 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
             // Load saved data from database
         } else {
+
+            // Retrieve the passed objects from the Intent
+            mAuthor = getIntent().getParcelableExtra(AUTHOR_KEY);
             mArea = getIntent().getParcelableExtra(AREA_KEY);
             mTrail = getIntent().getParcelableExtra(TRAIL_KEY);
+
+            // Start a new Guide
             mGuide = new Guide();
+
+            // Add the information from the passed objects to the Guide
+            mGuide.authorName = mAuthor.name;
             mGuide.area = mArea.name;
             mGuide.trailName = mTrail.name;
 
-            // Start a new Guide
+            // Setup the Adapter
             mModelList = new ArrayList<>();
             mAdapter.setModelList(mModelList);
             mAdapter.addModel(mGuide);
@@ -233,10 +243,8 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
     /**
      * For adding the hero image to the Guide
-     *
-     * @param view    The ImageView in the Collapsing Toolbar
      */
-    public void onHeroImageClick(View view) {
+    public void onHeroImageClick() {
 
         // Set the position to the first position as that is the only position the Guide should
         // exist in
