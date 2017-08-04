@@ -1,8 +1,12 @@
 package project.hikerguide.utilities;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.firebasestorage.StorageProvider;
@@ -11,6 +15,7 @@ import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.Trail;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 
 import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileType.GPX_FILE;
 import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileType.IMAGE_FILE;
@@ -26,6 +31,7 @@ import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
 public class SaveUtils {
     // ** Constants ** //
     private static final File TEMP_DIRECTORY = new File(System.getProperty("java.io.tmpdir", "."));
+    private static final int MAX_SIZE = 1280;
 
     /**
      * Saves a completed guide to the Firebase Database
@@ -147,6 +153,66 @@ public class SaveUtils {
         }
 
         return new File(TEMP_DIRECTORY, firebaseId + fileExtension);
+    }
+
+    /**
+     * Resize an ImageFile associated with a data model and compresses it with JPEG compression to
+     * lower the file size when stored on Firebase Storage
+     *
+     * @param model    The BaseModel containing an ImageFile to be resized
+     */
+    public static void resizeImageForModel(BaseModelWithImage model) {
+
+        if (!model.hasImage) {
+            // Model does not contain an associated ImageFile. Nothing to resize.
+            return;
+        }
+
+        // Create a Bitmap from the model's associated imageUri
+        Bitmap bitmap = BitmapFactory.decodeFile(model.getImageUri().getPath());
+
+        // Get the dimensions of the Bitmap
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        // Check which dimension is greater and resize it so the largest side is no longer than
+        // MAX_SIZE
+        if (width > MAX_SIZE || height > MAX_SIZE) {
+
+            // References for the new output dimensions
+            int newWidth, newHeight;
+
+            if (width > height) {
+                newWidth = MAX_SIZE;
+                newHeight = (int) (((float) height / (float) width) * MAX_SIZE);
+            } else {
+                newHeight = MAX_SIZE;
+                newWidth = (int) (((float) width / (float) height) * MAX_SIZE);
+            }
+
+            // Scale the Bitmap to the new dimensions
+            bitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false);
+        }
+
+        try {
+
+            // Create a temporary file with the same name as the input File
+            File imageFile = File.createTempFile(model.getImageUri().getLastPathSegment(), null);
+
+            // Create a FOS to the File
+            FileOutputStream outStream = new FileOutputStream(imageFile);
+
+            // Compress and write to the FOS
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outStream);
+            outStream.flush();
+            outStream.close();
+
+            // Set the Uri for the model based on the newly compressed File
+            model.setImageUri(imageFile);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
