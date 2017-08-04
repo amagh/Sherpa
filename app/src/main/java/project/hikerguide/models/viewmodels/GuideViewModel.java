@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -55,6 +56,7 @@ public class GuideViewModel extends BaseObservable {
     private Guide mGuide;
     private WeakReference<MapboxActivity> mActivity;
     private int mColorPosition;
+    private boolean mShowError;
 
     public GuideViewModel(Context context, Guide guide) {
         mContext = context;
@@ -342,5 +344,40 @@ public class GuideViewModel extends BaseObservable {
         if (getActivity() instanceof CreateGuideActivity) {
             ((CreateGuideActivity) getActivity()).onHeroImageClick();
         }
+    }
+
+    @Bindable
+    public int getIconVisibility() {
+        if (mGuide.hasImage) {
+            mShowError = false;
+            notifyPropertyChanged(BR.showError);
+            return View.GONE;
+        } else {
+            return View.VISIBLE;
+        }
+    }
+
+    @Bindable
+    public boolean getShowError() {
+        return mShowError;
+    }
+
+    @BindingAdapter({"errorIconIv", "imageIconIv", "showError"})
+    public static void showImageMissingError(TextView errorTv, ImageView errorIconIv,
+                                      ImageView imageIconIv, boolean showError) {
+        if (showError) {
+            errorTv.setVisibility(View.VISIBLE);
+            errorIconIv.setVisibility(View.VISIBLE);
+            imageIconIv.setVisibility(View.GONE);
+        } else {
+            errorTv.setVisibility(View.GONE);
+            errorIconIv.setVisibility(View.GONE);
+        }
+    }
+
+    public void setShowError(boolean showError) {
+        mShowError = showError;
+
+        notifyPropertyChanged(BR.showError);
     }
 }
