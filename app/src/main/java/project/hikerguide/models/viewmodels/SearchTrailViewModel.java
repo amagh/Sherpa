@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -25,14 +27,16 @@ import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.BR;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
-import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.ui.activities.CreateGuideActivity;
+import project.hikerguide.ui.activities.TrailActivity;
 import project.hikerguide.ui.adapters.TrailAdapter;
+import project.hikerguide.ui.dialogs.AddTrailDialog;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
-import static project.hikerguide.ui.activities.CreateGuideActivity.IntentKeys.AREA_KEY;
-import static project.hikerguide.ui.activities.CreateGuideActivity.IntentKeys.TRAIL_KEY;
+import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.IntentKeys.TRAIL_KEY;
 
 /**
  * Created by Alvin on 8/3/2017.
@@ -40,16 +44,14 @@ import static project.hikerguide.ui.activities.CreateGuideActivity.IntentKeys.TR
 
 public class SearchTrailViewModel extends BaseObservable {
     // ** Member Variables ** //
-    private Activity mActivity;
-    private Area mArea;
+    private TrailActivity mActivity;
     private TrailAdapter mAdapter;
     private List<Trail> mTrailList;
     private String mQuery;
     private boolean mSearchHasFocus = false;
 
-    public SearchTrailViewModel(Activity activity, Area area) {
+    public SearchTrailViewModel(TrailActivity activity) {
         mActivity = activity;
-        mArea = area;
 
         getTrailsFromFirebase();
     }
@@ -71,7 +73,7 @@ public class SearchTrailViewModel extends BaseObservable {
     }
 
     @Bindable
-    public Activity getActivity() {
+    public TrailActivity getActivity() {
         return mActivity;
     }
 
@@ -82,15 +84,7 @@ public class SearchTrailViewModel extends BaseObservable {
                 @Override
                 public void onClickTrail(Trail trail) {
 
-                    // Create Intent to start CreateGuideActivity
-                    Intent intent = new Intent(mActivity, CreateGuideActivity.class);
-
-                    // Add the Area and Trail to the Intent
-                    intent.putExtra(AREA_KEY, mArea);
-                    intent.putExtra(TRAIL_KEY, trail);
-
-                    // Start the Activity
-                    mActivity.startActivity(intent);
+                    startActivity(trail);
                 }
             });
         }
@@ -145,7 +139,7 @@ public class SearchTrailViewModel extends BaseObservable {
                 .child(GuideDatabase.TRAILS)
                 // TODO: Replace hardcoded String
                 .orderByChild("areaId")
-                .equalTo(mArea.firebaseId);
+                .equalTo(mActivity.getArea().firebaseId);
 
         trailQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -193,6 +187,29 @@ public class SearchTrailViewModel extends BaseObservable {
         notifyPropertyChanged(BR.hasFocus);
     }
 
+    public void onClickFab(View view) {
+
+        AddTrailDialog dialog = new AddTrailDialog();
+
+        dialog.setDialogListener(new AddTrailDialog.DialogListener() {
+            @Override
+            public void onTrailNamed(Trail trail) {
+                if (mTrailList != null && mTrailList.size() > 0) {
+                    for (Trail existingTrail : mTrailList) {
+                        if (existingTrail.name.equals(trail)) {
+                            trail = existingTrail;
+                            break;
+                        }
+                    }
+                }
+
+                startActivity(trail);
+            }
+        });
+
+        dialog.show(mActivity.getSupportFragmentManager(), null);
+    }
+
     /**
      * Replaces the contents of the Adapter with the master list of all trails in the Area
      */
@@ -214,13 +231,28 @@ public class SearchTrailViewModel extends BaseObservable {
         List<Trail> filteredTrailList = new ArrayList<>();
 
         // Iterate through and check each Trail for those that match
-        for (Trail trail : mTrailList) {
-            if (trail.name.toLowerCase().contains(queryLowerCase)) {
-                filteredTrailList.add(trail);
+        if (mTrailList != null && mTrailList.size() > 0) {
+            for (Trail trail : mTrailList) {
+                if (trail.name.toLowerCase().contains(queryLowerCase)) {
+                    filteredTrailList.add(trail);
+                }
             }
         }
 
         // Replace the contents of the Adapter with the filtered List
         mAdapter.replaceAll(filteredTrailList);
+    }
+
+    private void startActivity(Trail trail) {
+        // Create Intent to start CreateGuideActivity
+        Intent intent = new Intent(mActivity, CreateGuideActivity.class);
+
+        // Add the Area and Trail to the Intent
+        intent.putExtra(AUTHOR_KEY, mActivity.getAuthor());
+        intent.putExtra(AREA_KEY, mActivity.getArea());
+        intent.putExtra(TRAIL_KEY, trail);
+
+        // Start the Activity
+        mActivity.startActivity(intent);
     }
 }

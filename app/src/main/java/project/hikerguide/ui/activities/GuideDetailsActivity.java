@@ -23,14 +23,9 @@ import project.hikerguide.ui.adapters.GuideDetailsAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
-import static project.hikerguide.ui.activities.GuideDetailsActivity.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
 public class GuideDetailsActivity extends MapboxActivity {
-    // ** Constants ** //
-    public interface IntentKeys {
-        String GUIDE_KEY = "guide";
-    }
-
     // ** Member Variables ** //
     private ActivityGuideDetailsBinding mBinding;
     private Guide mGuide;

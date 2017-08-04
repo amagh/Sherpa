@@ -47,13 +47,15 @@ import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.mapbox.SmartMapView;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
+import project.hikerguide.ui.activities.AreaActivity;
 import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.ui.activities.TrailActivity;
 import project.hikerguide.ui.adapters.AreaAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
-import static project.hikerguide.ui.activities.TrailActivity.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 
 /**
  * Created by Alvin on 8/2/2017.
@@ -65,13 +67,13 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
 
     // ** Member Variables ** //
     private AreaAdapter mAdapter;
-    private MapboxActivity mActivity;
+    private AreaActivity mActivity;
     private String mQuery;
     private com.mapbox.mapboxsdk.geometry.LatLng mLatLng;
     private boolean mSearchHasFocus = false;
     private GoogleApiClient mGoogleApiClient;
 
-    public SearchAreaViewModel(MapboxActivity activity) {
+    public SearchAreaViewModel(AreaActivity activity) {
         mActivity = activity;
 
         initGoogleApiClient();
@@ -90,6 +92,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                         if (object instanceof Area) {
                             Intent intent = new Intent(mActivity, TrailActivity.class);
                             intent.putExtra(AREA_KEY, (Area) object);
+                            intent.putExtra(AUTHOR_KEY, mActivity.getAuthor());
                             mActivity.startActivity(intent);
                         } else if (object instanceof PlaceModel) {
                             startTrailActivityWithPlaceModel((PlaceModel) object);

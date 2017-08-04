@@ -27,8 +27,11 @@ import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.BR;
 import project.hikerguide.R;
 import project.hikerguide.databinding.ActivityCreateGuideBinding;
+import project.hikerguide.models.datamodels.Area;
+import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
+import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.hikerguide.models.viewmodels.GuideViewModel;
@@ -39,6 +42,8 @@ import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static android.support.v7.widget.helper.ItemTouchHelper.UP;
+import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.IntentKeys.TRAIL_KEY;
 import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 
 /**
@@ -48,12 +53,12 @@ import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
 public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.MenuListener {
     // ** Constants ** //
     public static final int PERMISSION_REQUEST_EXT_STORAGE = 9687;
-    public interface IntentKeys {
-        public String AREA_KEY  = "area";
-        public String TRAIL_KEY = "trail";
-    }
 
     // ** Member Variables ** //
+    private Guide mGuide;
+    private Area mArea;
+    private Trail mTrail;
+    private Author mAuthor;
     private ActivityCreateGuideBinding mBinding;
     private EditGuideDetailsAdapter mAdapter;
     private List<BaseModel> mModelList;
@@ -65,7 +70,6 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         super.onCreate(savedInstanceState);
         Timber.d("onCreate");
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_create_guide);
-        setSupportActionBar(mBinding.guideDetailsTb);
 
         initRecyclerView();
 
@@ -73,13 +77,20 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
             // Load saved data from database
         } else {
+            mArea = getIntent().getParcelableExtra(AREA_KEY);
+            mTrail = getIntent().getParcelableExtra(TRAIL_KEY);
+            mGuide = new Guide();
+            mGuide.area = mArea.name;
+            mGuide.trailName = mTrail.name;
 
             // Start a new Guide
             mModelList = new ArrayList<>();
             mAdapter.setModelList(mModelList);
-            mAdapter.addModel(new Guide());
+            mAdapter.addModel(mGuide);
             mBinding.setVm(new GuideViewModel(this, (Guide) mModelList.get(0)));
         }
+
+        setSupportActionBar(mBinding.guideDetailsTb);
 
         mBinding.fabDial.setMenuListener(this);
     }

@@ -7,22 +7,20 @@ import android.support.v7.app.AppCompatActivity;
 import project.hikerguide.R;
 import project.hikerguide.databinding.ActivityTrailBinding;
 import project.hikerguide.models.datamodels.Area;
+import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.viewmodels.SearchTrailViewModel;
 
-import static project.hikerguide.ui.activities.TrailActivity.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 
 /**
  * Created by Alvin on 8/3/2017.
  */
 
 public class TrailActivity extends AppCompatActivity {
-    // ** Constants ** //
-    public interface IntentKeys {
-        String AREA_KEY = "area";
-    }
-
     // ** Member Variables ** //
     private ActivityTrailBinding mBinding;
+    private Author mAuthor;
     private Area mArea;
 
     @Override
@@ -32,10 +30,19 @@ public class TrailActivity extends AppCompatActivity {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_trail);
 
         if (getIntent().getParcelableExtra(AREA_KEY) != null) {
+            mAuthor = getIntent().getParcelableExtra(AUTHOR_KEY);
             mArea = getIntent().getParcelableExtra(AREA_KEY);
         }
 
-        SearchTrailViewModel vm = new SearchTrailViewModel(this, mArea);
+        SearchTrailViewModel vm = new SearchTrailViewModel(this);
         mBinding.setVm(vm);
+    }
+
+    public Area getArea() {
+        return mArea;
+    }
+
+    public Author getAuthor() {
+        return mAuthor;
     }
 }

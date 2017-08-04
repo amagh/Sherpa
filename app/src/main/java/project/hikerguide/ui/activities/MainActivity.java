@@ -16,6 +16,8 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.ui.fragments.GuideListFragment;
 import project.hikerguide.ui.fragments.SearchFragment;
 
+import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
+
 public class MainActivity extends AppCompatActivity implements GuideListFragment.OnGuideClickListener {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements GuideListFragment
         // Create a new Intent to launch the GuideDetailsActivity and add the clicked Guide as an
         // extra
         Intent intent = new Intent(this, GuideDetailsActivity.class);
-        intent.putExtra(GuideDetailsActivity.IntentKeys.GUIDE_KEY, guide);
+        intent.putExtra(GUIDE_KEY, guide);
         startActivity(intent);
     }
 

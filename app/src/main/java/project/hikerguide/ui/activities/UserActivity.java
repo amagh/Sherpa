@@ -33,18 +33,13 @@ import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
-import static project.hikerguide.ui.activities.UserActivity.BundleKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 
 /**
  * Created by Alvin on 7/31/2017.
  */
 
 public class UserActivity extends AppCompatActivity {
-    // ** Constants ** //
-    public interface BundleKeys {
-        String AUTHOR_KEY = "author";
-    }
-
     // ** Member Variables ** //
     private ActivityUserBinding mBinding;
     private Author mAuthor;
@@ -222,6 +217,8 @@ public class UserActivity extends AppCompatActivity {
      * @param view    FAB that was clicked
      */
     public void onClickFab(View view) {
-        startActivity(new Intent(this, AreaActivity.class));
+        Intent intent = new Intent(this, AreaActivity.class);
+        intent.putExtra(AUTHOR_KEY, mAuthor);
+        startActivity(intent);
     }
 }
