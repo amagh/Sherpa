@@ -9,4 +9,5 @@ public interface IntentKeys {
     String AUTHOR_KEY   = "author";
     String GUIDE_KEY    = "guide";
     String TRAIL_KEY    = "trail";
+    String SECTION_KEY  = "section";
 }
