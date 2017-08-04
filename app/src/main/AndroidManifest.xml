@@ -64,6 +64,10 @@
         <activity android:name=".ui.activities.TrailActivity">
 
         </activity>
+
+        <activity android:name=".ui.activities.PublishActivity">
+
+        </activity>
     </application>
 
 </manifest>
