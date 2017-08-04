@@ -2,13 +2,17 @@ package project.hikerguide.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.os.Parcelable;
+
+import java.io.File;
 
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.Trail;
+import project.hikerguide.utilities.SaveUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
 import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
@@ -32,26 +36,38 @@ public class PublishActivity extends MapboxActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Get the data objects passed from the Intent
         Intent intent = getIntent();
 
         mAuthor = intent.getParcelableExtra(AUTHOR_KEY);
         mGuide = intent.getParcelableExtra(GUIDE_KEY);
         mArea = intent.getParcelableExtra(AREA_KEY);
         mTrail = intent.getParcelableExtra(TRAIL_KEY);
-        mSections = (Section[]) intent.getParcelableArrayExtra(SECTION_KEY);
 
+        // Get the Parcelable[] for the Sections
+        Parcelable[] parcelables = intent.getParcelableArrayExtra(SECTION_KEY);
+        mSections = new Section[parcelables.length];
 
+        // Copy the elements from parcelables to mSections as it cannot be directly cast to Section[]
+        System.arraycopy(parcelables, 0, mSections, 0, parcelables.length);
+
+        // Resize any images associated with the models
+        resizeImages();
     }
 
-    private boolean validateGuide() {
-        if (!mGuide.hasImage) {
-            return false;
-        }
+    /**
+     * Resize the images of any data models that have associated image Files
+     */
+    private void resizeImages() {
 
-        if (mGuide.getGpxUri() == null || mGuide.distance == 0) {
-            return false;
-        }
+        // Resize the image for the Guide
+        SaveUtils.resizeImageForModel(mGuide);
 
-        return true;
+        // Resize the image for any Sections that have images
+        for (Section section : mSections) {
+            if (section.hasImage) {
+                SaveUtils.resizeImageForModel(section);
+            }
+        }
     }
 }
