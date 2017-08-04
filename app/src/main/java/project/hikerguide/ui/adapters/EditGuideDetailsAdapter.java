@@ -172,7 +172,7 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
         }
     }
 
-    class EditViewHolder extends RecyclerView.ViewHolder {
+    public class EditViewHolder extends RecyclerView.ViewHolder {
         // ** Member Variables ** //
         ViewDataBinding mBinding;
 
@@ -202,6 +202,10 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
                     ((ListItemSectionTextEditBinding) mBinding).setVm(vm);
                 }
             }
+        }
+
+        public ViewDataBinding getBinding() {
+            return mBinding;
         }
     }
 }

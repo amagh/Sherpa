@@ -4,7 +4,9 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.internal.NavigationMenu;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -14,7 +16,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.BR;
 import project.hikerguide.R;
 import project.hikerguide.databinding.ActivityCreateGuideBinding;
+import project.hikerguide.databinding.ListItemGuideDetailsBinding;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
@@ -60,6 +62,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     private Area mArea;
     private Trail mTrail;
     private Author mAuthor;
+    private List<Section> mSectionList;
 
     private ActivityCreateGuideBinding mBinding;
     private EditGuideDetailsAdapter mAdapter;
@@ -97,7 +100,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
             mModelList = new ArrayList<>();
             mAdapter.setModelList(mModelList);
             mAdapter.addModel(mGuide);
-            mBinding.setVm(new GuideViewModel(this, (Guide) mModelList.get(0)));
+            mBinding.setVm(new GuideViewModel(this,mGuide));
         }
 
         setSupportActionBar(mBinding.guideDetailsTb);
@@ -195,7 +198,16 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                         // Set the gpxUri for the Guide based on the File at the selected path
                         guide.setGpxUri(new File(filePath));
 
-                        mAdapter.notifyItemChanged(0);
+                        EditGuideDetailsAdapter.EditViewHolder viewHolder =
+                                ((EditGuideDetailsAdapter.EditViewHolder)mBinding.guideDetailsRv.findViewHolderForAdapterPosition(0));
+
+                        if (viewHolder != null) {
+                            ViewDataBinding binding = viewHolder.getBinding();
+
+                            ((ListItemGuideDetailsBinding) binding).getVm().notifyPropertyChanged(BR.gpx);
+                            ((ListItemGuideDetailsBinding) binding).getVm().notifyPropertyChanged(BR.distance);
+                        }
+
                     }
                 }
 
@@ -228,6 +240,10 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                     // Notify the item based on the position of mFilePickerModelPosition of the change
                     if (mFilePickerModelPosition == 0) {
                         mBinding.getVm().notifyPropertyChanged(BR.imageUri);
+                        mBinding.getVm().notifyPropertyChanged(BR.iconVisibility);
+
+                        // Remove error icon from the ActionBar
+                        getSupportActionBar().setIcon(null);
                     } else {
                         mAdapter.notifyItemChanged(mFilePickerModelPosition);
                     }
@@ -368,7 +384,8 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_publish:
-
+                validateGuide();
+                validateSections();
                 return true;
 
             case R.id.menu_save:
@@ -400,5 +417,89 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
      */
     public void removeModel(BaseModel model) {
         mAdapter.removeModel(model);
+    }
+
+    /**
+     * Checks to ensure that all required items for the Guide model exists
+     */
+    private void validateGuide() {
+
+        // Check that the hero image for the Guide has been set
+        if (!mGuide.hasImage) {
+
+            // Display an error icon on the ActionBar to indicate the missing image in case the
+            // hero image is not visible due to CollapsingToolbar
+            getSupportActionBar().setIcon(ContextCompat.getDrawable(this, R.drawable.ic_error_outline));
+
+            // Show an error icon over the missing hero image
+            mBinding.getVm().setShowImageError(true);
+        }
+
+        // Check that the .gpx file has been set
+        if (mGuide.getGpxUri() == null || mGuide.distance == 0) {
+
+            // Scroll to the top so the user can see the missing gpx file error
+            mBinding.guideDetailsRv.scrollToPosition(0);
+
+            // Must be delayed slightly because the scroll operation takes time or else the
+            // ViewHolder will not have been created by the Adapter
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    // Get the ViewHolder for the Guide
+                    EditGuideDetailsAdapter.EditViewHolder viewHolder =
+                            (EditGuideDetailsAdapter.EditViewHolder) mBinding.guideDetailsRv.findViewHolderForAdapterPosition(0);
+
+                    // Show the missing GPX error
+                    ListItemGuideDetailsBinding binding = (ListItemGuideDetailsBinding) viewHolder.getBinding();
+                    binding.getVm().setShowGpxError(true);
+                }
+            }, 100);
+        }
+    }
+
+    /**
+     * Checks that all Sections have been filled out and removes any empty Sections
+     */
+    private void validateSections() {
+
+        // Create a new ArrayList of Sections so that they can be passed on to the PublishActivity
+        mSectionList = new ArrayList<>();
+
+        // Used to set the Section ordering
+        int order = 0;
+
+        // List of empty Sections with no content to be removed
+        List<Section> emptySections = new ArrayList<>();
+
+        // Iterate through each Section and check
+        for (int i = 1; i < mModelList.size(); i++) {
+
+            // Get reference to Section
+            Section section = (Section) mModelList.get(i);
+
+            // Check that Section is not empty
+            if (section.content != null || section.hasImage) {
+
+                // Add the ordering to the Section
+                section.section = order;
+
+                // Increment the ordering for the next Section
+                order++;
+
+                // Add the Section to the List
+                mSectionList.add(section);
+            } else {
+
+                // Empty Section, add it to the List of Section to be removed
+                emptySections.add(section);
+            }
+        }
+
+        // Remove each empty Section from the Adapter
+        for (Section section : emptySections) {
+            mAdapter.removeModel(section);
+        }
     }
 }

@@ -50,13 +50,14 @@ import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
 
 public class GuideViewModel extends BaseObservable {
 
-
     // ** Member Variables ** //
     private Context mContext;
     private Guide mGuide;
     private WeakReference<MapboxActivity> mActivity;
     private int mColorPosition;
-    private boolean mShowError;
+    private boolean mShowImageError;
+    private boolean mShowGpxError;
+    private MapboxMap mMapboxMap;
 
     public GuideViewModel(Context context, Guide guide) {
         mContext = context;
@@ -256,13 +257,11 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @Bindable
-    public double getLatitude() {
-        return mGuide.latitude;
-    }
-
-    @Bindable
-    public double getLongitude() {
-        return mGuide.longitude;
+    public LatLng getLatLng() {
+        if (mGuide.latitude == 0 && mGuide.longitude == 0) {
+            return null;
+        }
+        return new LatLng(mGuide.latitude, mGuide.longitude);
     }
 
     @Bindable
@@ -275,46 +274,70 @@ public class GuideViewModel extends BaseObservable {
         return mGuide.elevation != 0 ? View.VISIBLE : View.GONE;
     }
 
-    @BindingAdapter({"gpx", "activity", "latitude", "longitude"})
-    public static void loadGpxToMap(final SmartMapView mapView, final File gpx,
-                                    MapboxActivity activity, final double latitude, final double longitude) {
+    @BindingAdapter({"activity", "gpx", "viewModel"})
+    public static void loadGpxToMap(SmartMapView mapView, MapboxActivity activity, final File gpx,
+                                    final GuideViewModel viewModel) {
+
+        // TODO: Fix bug with MapboxMap not being loaded some of the time. Still can't figure out
+        // why. Only occurs in CreateGuideActivity.
 
         // The MapView will retain it's internal LifeCycle regardless of how many times it's
         // rendered
         mapView.startMapView(activity);
 
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(final MapboxMap mapboxMap) {
+        // Only get the MapboxMap if it hasn't been set yet
+        if (viewModel.getMapboxMap() == null) {
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(final MapboxMap mapboxMap) {
 
-                // In the case of creating a new Guide without a GPX loaded, show the world map
-                if (latitude == 0 && longitude == 0) {
-                    mapboxMap.setCameraPosition(new CameraPosition.Builder()
-                            .zoom(0)
-                            .build());
+                    // Set the memvar MapboxMap to the loaded MapboxMap
+                    viewModel.setMapboxMap(mapboxMap);
+
+                    // Load the GPX data into the MapboxMap
+                    if (gpx != null) {
+                        viewModel.loadGpx();
+                    }
                 }
-
-                // Set the camera to the correct position
-                mapboxMap.setCameraPosition(new CameraPosition.Builder()
-                        .target(new LatLng(latitude, longitude))
-                        .build());
-
-                // Check to make sure the Polyline hasn't already been added the MapboxMap
-                // e.g. when scrolling the RecyclerView, the View will be reloaded from memory, so
-                // it does not need to re-position the camera or add the Polyline again.
-                if (mapboxMap.getPolylines().size() > 0) {
-                    return;
-                }
-
-                if (gpx == null) {
-                    // GPX File has not been loaded yet. Do nothing.
-                    return;
-                }
-
-                // Parse the GPX File to get the Mapbox PolyLine and Marker
-                addMapOptionsToMap(gpx, mapboxMap);
+            });
+        } else {
+            // Load the GPX data into the MapboxMap
+            if (gpx != null) {
+                viewModel.loadGpx();
             }
-        });
+
+        }
+    }
+
+    /**
+     * Loads the GPX data into the MapboxMap
+     */
+    private void loadGpx() {
+
+        File gpx = getGpx();
+
+        if (gpx == null) {
+            // GPX File has not been loaded yet. Do nothing.
+            return;
+        } else {
+            setShowGpxError(false);
+        }
+
+        // Set the camera to the correct position
+        mMapboxMap.setCameraPosition(new CameraPosition.Builder()
+                .target(getLatLng())
+                .zoom(11)
+                .build());
+
+        // Check to make sure the Polyline hasn't already been added the MapboxMap
+        // e.g. when scrolling the RecyclerView, the View will be reloaded from memory, so
+        // it does not need to re-position the camera or add the Polyline again.
+        if (mMapboxMap.getPolylines().size() > 0) {
+            return;
+        }
+
+        // Parse the GPX File to get the Mapbox PolyLine and Marker
+        addMapOptionsToMap(gpx, mMapboxMap);
     }
 
     @BindingAdapter({"gpx", "context"})
@@ -349,8 +372,8 @@ public class GuideViewModel extends BaseObservable {
     @Bindable
     public int getIconVisibility() {
         if (mGuide.hasImage) {
-            mShowError = false;
-            notifyPropertyChanged(BR.showError);
+            mShowImageError = false;
+            notifyPropertyChanged(BR.showImageError);
             return View.GONE;
         } else {
             return View.VISIBLE;
@@ -358,14 +381,16 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @Bindable
-    public boolean getShowError() {
-        return mShowError;
+    public boolean getShowImageError() {
+        return mShowImageError;
     }
 
-    @BindingAdapter({"errorIconIv", "imageIconIv", "showError"})
+    @BindingAdapter({"errorIconIv", "imageIconIv", "showImageError"})
     public static void showImageMissingError(TextView errorTv, ImageView errorIconIv,
-                                      ImageView imageIconIv, boolean showError) {
-        if (showError) {
+                                      ImageView imageIconIv, boolean showImageError) {
+
+        // Show/hide the error Views
+        if (showImageError) {
             errorTv.setVisibility(View.VISIBLE);
             errorIconIv.setVisibility(View.VISIBLE);
             imageIconIv.setVisibility(View.GONE);
@@ -375,9 +400,46 @@ public class GuideViewModel extends BaseObservable {
         }
     }
 
-    public void setShowError(boolean showError) {
-        mShowError = showError;
+    public void setShowImageError(boolean showError) {
+        mShowImageError = showError;
 
-        notifyPropertyChanged(BR.showError);
+        notifyPropertyChanged(BR.showImageError);
+    }
+
+    private void setMapboxMap(MapboxMap mapboxMap) {
+        mMapboxMap = mapboxMap;
+    }
+
+    @Bindable
+    public GuideViewModel getViewModel() {
+        return this;
+    }
+
+    private MapboxMap getMapboxMap() {
+        return mMapboxMap;
+    }
+
+    public void setShowGpxError(boolean showError) {
+        mShowGpxError = showError;
+
+        notifyPropertyChanged(BR.showGpxError);
+    }
+
+    @Bindable
+    public boolean getShowGpxError() {
+        return mShowGpxError;
+    }
+
+    @BindingAdapter({"gpxErrorTv", "showGpxError"})
+    public static void showGpxMissingError(ImageView errorIv, TextView errorTv, boolean showGpxError) {
+
+        // Show/hide the error Views
+        if (showGpxError) {
+            errorIv.setVisibility(View.VISIBLE);
+            errorTv.setVisibility(View.VISIBLE);
+        } else {
+            errorIv.setVisibility(View.GONE);
+            errorTv.setVisibility(View.GONE);
+        }
     }
 }
