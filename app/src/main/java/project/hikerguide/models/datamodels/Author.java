@@ -1,6 +1,8 @@
 package project.hikerguide.models.datamodels;
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +14,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
  * Created by Alvin on 7/17/2017.
  */
 
-public class Author extends BaseModelWithImage {
+public class Author extends BaseModelWithImage implements Parcelable {
     // ** Constants ** //
     private static final String NAME = "name";
     private static final String DESCRIPTION = "description";
@@ -68,5 +70,42 @@ public class Author extends BaseModelWithImage {
         map.put(SCORE, score);
 
         return map;
+    }
+
+    //********************************************************************************************//
+    //***************************** Parcelable Related Methods ***********************************//
+    //********************************************************************************************//
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(firebaseId);
+        parcel.writeString(name);
+        parcel.writeString(description);
+        parcel.writeInt(score);
+    }
+
+    public static final Parcelable.Creator<Author> CREATOR = new Parcelable.Creator<Author>() {
+        @Override
+        public Author createFromParcel(Parcel parcel) {
+            return new Author(parcel);
+        }
+
+        @Override
+        public Author[] newArray(int i) {
+            return new Author[i];
+        }
+    };
+
+    private Author(Parcel parcel) {
+        firebaseId = parcel.readString();
+        name = parcel.readString();
+        description = parcel.readString();
+        score = parcel.readInt();
     }
 }
