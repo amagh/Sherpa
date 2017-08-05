@@ -31,9 +31,11 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
+import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
 import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
 /**
  * Created by Alvin on 7/31/2017.
@@ -70,7 +72,21 @@ public class UserActivity extends AppCompatActivity {
      */
     private void initRecyclerView() {
         // Init the Adapter
-        mAdapter = new AuthorDetailsAdapter(this);
+        mAdapter = new AuthorDetailsAdapter(this, new GuideAdapter.ClickHandler() {
+            @Override
+            public void onGuideClicked(Guide guide) {
+
+                // Start the Activity to display Guide details
+                Intent intent = new Intent(UserActivity.this, GuideDetailsActivity.class);
+                intent.putExtra(GUIDE_KEY, guide);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onGuideLongClicked(Guide guide) {
+
+            }
+        });
 
         // Set the LayoutManager and Adapter
         mBinding.userRv.setLayoutManager(new LinearLayoutManager(this));

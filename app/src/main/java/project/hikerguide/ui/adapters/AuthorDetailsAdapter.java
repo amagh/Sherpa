@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -34,9 +35,11 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
     private List<BaseModel> mModelList;
     private boolean mEnableEdit = false;
     private boolean mIsInEditMode = false;
+    private GuideAdapter.ClickHandler mClickHandler;
 
-    public AuthorDetailsAdapter(UserActivity activity) {
+    public AuthorDetailsAdapter(UserActivity activity, GuideAdapter.ClickHandler clickHandler) {
         mActivity = activity;
+        mClickHandler = clickHandler;
     }
 
     @Override
@@ -144,7 +147,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
         notifyItemChanged(0);
     }
 
-    class AuthorDetailsViewHolder extends RecyclerView.ViewHolder {
+    class AuthorDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         // ** Member Variables ** //
         private ViewDataBinding mBinding;
 
@@ -152,6 +155,19 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
             super(binding.getRoot());
 
             mBinding = binding;
+
+            if (mBinding instanceof ListItemGuideBinding) {
+                mBinding.getRoot().setOnClickListener(this);
+            }
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+
+            Guide guide = (Guide) mModelList.get(position);
+
+            mClickHandler.onGuideClicked(guide);
         }
 
         /**
