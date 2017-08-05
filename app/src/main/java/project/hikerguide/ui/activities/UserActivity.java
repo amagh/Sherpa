@@ -223,8 +223,21 @@ public class UserActivity extends AppCompatActivity {
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(directory, mAuthor.toMap());
 
+        // Modify the Author name for all Guides written by the Author
+        for (int i = 1; i < mModelList.size(); i++) {
+            Guide guide = (Guide) mModelList.get(i);
+            guide.authorName = mAuthor.name;
+
+            directory = GuideDatabase.GUIDES + "/" + guide.firebaseId;
+
+            childUpdates.put(directory, guide.toMap());
+        }
+
+        mAdapter.notifyItemRangeChanged(1, mModelList.size());
+
         // Update the values
         FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+
     }
 
     /**
