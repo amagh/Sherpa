@@ -63,6 +63,22 @@ public class UserActivity extends AppCompatActivity {
 
             // Enable option to edit their profile
             mAdapter.enableEditing();
+        } else {
+            mAuthor = getIntent().getParcelableExtra(AUTHOR_KEY);
+
+            // Add the Author to the Adapter so their info can be displayed
+            mAdapter.addModel(mAuthor);
+            mBinding.setVm(new AuthorViewModel(UserActivity.this, mAuthor));
+
+            // Load the Guides that the Author has created into the Adapter
+            loadGuidesForAuthor();
+
+            // Check if the User is accessing their own page
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            if (mAuthor.firebaseId.equals(user.getUid())) {
+                mAdapter.enableEditing();
+            }
         }
 
     }
