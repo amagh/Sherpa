@@ -22,6 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:contentScrim="@color/colorPrimary"
+                app:title="@null"
                 app:layout_scrollFlags="exitUntilCollapsed|scroll">
 
                 <ImageView
@@ -73,11 +74,12 @@
             app:civ_fill_color="@android:color/white"/>
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/user_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/activity_vertical_margin"
             android:onClick="onClickFab"
-            app:layout_behavior=".ui.behaviors.FABScrollBehavior"
+            android:visibility="@{vm.editVisibility}"
             app:layout_anchor="@id/user_rv"
             app:layout_anchorGravity="bottom|end|right"
             android:src="@drawable/ic_create"/>

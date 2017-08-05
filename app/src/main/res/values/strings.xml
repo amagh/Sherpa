@@ -77,6 +77,9 @@
     <!-- Add Trail Dialog Strings -->
     <string name="add_trail_hint">Trail name</string>
 
+    <!-- User Activity Strings -->
+    <string name="menu_user_log_off">Sign out</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 

@@ -18,6 +18,9 @@ import static android.support.v4.view.ViewCompat.SCROLL_AXIS_VERTICAL;
 
 public class FABScrollBehavior extends FloatingActionButton.Behavior {
 
+    public FABScrollBehavior() {
+    }
+
     public FABScrollBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
     }

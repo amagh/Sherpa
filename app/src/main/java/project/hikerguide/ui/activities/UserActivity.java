@@ -3,8 +3,12 @@ package project.hikerguide.ui.activities;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +36,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
 import project.hikerguide.ui.adapters.GuideAdapter;
+import project.hikerguide.ui.behaviors.FABScrollBehavior;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
 import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
@@ -61,8 +66,8 @@ public class UserActivity extends AppCompatActivity {
             // User is checking their own profile
             loadUserSelfProfile();
 
-            // Enable option to edit their profile
-            mAdapter.enableEditing();
+            // Setup for someone viewing their own profile
+            setupForSelfProfile();
         } else {
             mAuthor = getIntent().getParcelableExtra(AUTHOR_KEY);
 
@@ -76,11 +81,30 @@ public class UserActivity extends AppCompatActivity {
             // Check if the User is accessing their own page
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-            if (mAuthor.firebaseId.equals(user.getUid())) {
-                mAdapter.enableEditing();
+            if (user != null && mAuthor.firebaseId.equals(user.getUid())) {
+
+                // Setup for someone viewing their own profile
+                setupForSelfProfile();
             }
         }
 
+    }
+
+    /**
+     * Sets up the layouts to be appropriate for someone viewing their own profile
+     */
+    private void setupForSelfProfile() {
+
+        // Enable option to edit their profile
+        mAdapter.enableEditing();
+
+        // Add the SupportActionBar so the menu items can be created, but remove the title
+        setSupportActionBar(mBinding.toolbar);
+        getSupportActionBar().setTitle(null);
+
+        // Set the layout behavior for the FAB
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mBinding.userFab.getLayoutParams();
+        params.setBehavior(new FABScrollBehavior());
     }
 
     /**
@@ -126,6 +150,8 @@ public class UserActivity extends AppCompatActivity {
         if (user == null) {
             // No valid user, send to the AccountActivity to sign in
             startActivity(new Intent(this, AccountActivity.class));
+
+            finish();
             return;
         }
 
@@ -265,5 +291,28 @@ public class UserActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AreaActivity.class);
         intent.putExtra(AUTHOR_KEY, mAuthor);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_user, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_user_log_off:
+                FirebaseAuth.getInstance().signOut();
+
+                startActivity(new Intent(this, AccountActivity.class));
+
+                finish();
+                return true;
+        }
+
+        return false;
     }
 }

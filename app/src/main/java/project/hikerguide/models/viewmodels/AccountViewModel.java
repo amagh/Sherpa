@@ -2,6 +2,7 @@ package project.hikerguide.models.viewmodels;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -27,6 +28,7 @@ import java.lang.annotation.RetentionPolicy;
 
 import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.R;
+import project.hikerguide.ui.activities.UserActivity;
 
 import static project.hikerguide.models.viewmodels.AccountViewModel.UiModes.CREATE_ACCOUNT;
 import static project.hikerguide.models.viewmodels.AccountViewModel.UiModes.SIGN_IN;
@@ -192,6 +194,7 @@ public class AccountViewModel extends BaseObservable {
                         notifyPropertyChanged(BR.progressVisibility);
 
                         if (task.isSuccessful()) {
+                            mContext.startActivity(new Intent(mContext, UserActivity.class));
                             ((Activity) mContext).finish();
                         } else {
                             Toast.makeText(mContext, mContext.getString(R.string.authentication_error), Toast.LENGTH_LONG).show();
@@ -233,6 +236,7 @@ public class AccountViewModel extends BaseObservable {
                             notifyPropertyChanged(BR.progressVisibility);
 
                             if (task.isSuccessful()) {
+                                mContext.startActivity(new Intent(mContext, UserActivity.class));
                                 ((Activity) mContext).finish();
                             }
                         }
