@@ -5,6 +5,7 @@ import android.databinding.ViewDataBinding;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import project.hikerguide.R;
@@ -40,6 +41,12 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
     private BaseModel[] mModels;
 
     private MapboxActivity mActivity;
+
+    private ClickHandler mClickHandler;
+
+    public GuideDetailsAdapter(ClickHandler clickHandler) {
+        mClickHandler = clickHandler;
+    }
 
     @Override
     public GuideDetailsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -164,13 +171,29 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
         }
     }
 
-    public class GuideDetailsViewHolder extends RecyclerView.ViewHolder {
+    public interface ClickHandler {
+        void onClickAuthor(Author author);
+    }
+
+    public class GuideDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ViewDataBinding mBinding;
 
         public GuideDetailsViewHolder(ViewDataBinding binding) {
             super(binding.getRoot());
 
             mBinding = binding;
+
+            if (mBinding instanceof ListItemAuthorBinding) {
+                mBinding.getRoot().setOnClickListener(this);
+            }
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+
+            Author author = (Author) mModels[position];
+            mClickHandler.onClickAuthor(author);
         }
 
         public void bind(int position) {

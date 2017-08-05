@@ -1,5 +1,6 @@
 package project.hikerguide.ui.activities;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +24,7 @@ import project.hikerguide.ui.adapters.GuideDetailsAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
+import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
 public class GuideDetailsActivity extends MapboxActivity {
@@ -46,7 +48,15 @@ public class GuideDetailsActivity extends MapboxActivity {
         }
 
         // Setup the Adapter
-        mAdapter = new GuideDetailsAdapter();
+        mAdapter = new GuideDetailsAdapter(new GuideDetailsAdapter.ClickHandler() {
+            @Override
+            public void onClickAuthor(Author author) {
+                Intent intent = new Intent(GuideDetailsActivity.this, UserActivity.class);
+                intent.putExtra(AUTHOR_KEY, author);
+
+                startActivity(intent);
+            }
+        });
 
         // Setup the RecyclerView
         mBinding.setVm(new GuideViewModel(this, mGuide));
