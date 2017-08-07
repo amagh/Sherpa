@@ -1,8 +1,13 @@
 package project.hikerguide.ui.activities;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 
 import java.util.ArrayList;
@@ -16,9 +21,13 @@ import project.hikerguide.ui.fragments.GuideDetailsFragment;
 import project.hikerguide.ui.fragments.GuideDetailsMapFragment;
 import timber.log.Timber;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
 public class GuideDetailsActivity extends MapboxActivity implements ViewPager.OnPageChangeListener {
+    // ** Constants ** //
+    private static final int PERMISSION_REQUEST_FINE_LOCATION = 1654;
+
     // ** Member Variables ** //
     private ActivityGuideDetailsBinding mBinding;
     private GuideDetailsFragmentAdapter mAdapter;
@@ -103,4 +112,31 @@ public class GuideDetailsActivity extends MapboxActivity implements ViewPager.On
     public void onPageScrollStateChanged(int state) {
 
     }
+
+    /**
+     * Requests permission to access FINE_LOCATION for the device
+     */
+    public void requestLocationPermission() {
+
+        // Request permission for FINE_LOCATION if it has not been granted yet
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_REQUEST_FINE_LOCATION);
+        } else {
+            ((GuideDetailsMapFragment) mAdapter.getItem(1)).trackUserPosition();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (requestCode == PERMISSION_REQUEST_FINE_LOCATION && grantResults[0] == PERMISSION_GRANTED) {
+            ((GuideDetailsMapFragment) mAdapter.getItem(1)).trackUserPosition();
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
 }

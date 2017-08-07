@@ -29,8 +29,7 @@ import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
  */
 
 public class GuideDetailsMapFragment extends Fragment {
-    // ** Constants ** //
-    private static final int PERMISSION_REQUEST_FINE_LOCATION = 1654;
+
 
     // ** Member Variables ** //
     private FragmentGuideDetailsMapBinding mBinding;
@@ -76,7 +75,7 @@ public class GuideDetailsMapFragment extends Fragment {
         mBinding.setHandler(new GuideDetailsMapViewModel((GuideDetailsActivity) getActivity()));
 
         // Request permission to track user on map
-        requestLocationPermission();
+        ((GuideDetailsActivity) getActivity()).requestLocationPermission();
 
         return mBinding.getRoot();
     }
@@ -93,31 +92,11 @@ public class GuideDetailsMapFragment extends Fragment {
     }
 
     /**
-     * Requests permission to access FINE_LOCATION for the device
+     * Sets the MapView to begin tracking the user's position
      */
-    private void requestLocationPermission() {
-
-        // Request permission for FINE_LOCATION if it has not been granted yet
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(
-                    new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSION_REQUEST_FINE_LOCATION);
-        } else {
-            trackUserPosition();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        if (requestCode == PERMISSION_REQUEST_FINE_LOCATION && grantResults[0] == PERMISSION_GRANTED) {
-            trackUserPosition();
-        }
-
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
     public void trackUserPosition() {
+
+        // Get the ViewModel that has the MapView and begin tracking location
         mBinding.getVm().setTrackUserPosition(true);
     }
 }
