@@ -67,4 +67,16 @@ public class GuideDetailsActivity extends MapboxActivity {
     public void switchPage(int page) {
         mBinding.guideDetailsVp.setCurrentItem(page);
     }
+
+    @Override
+    public void onBackPressed() {
+
+        // If the user is viewing the map, pressing the back button should have the same action as
+        // pressing the back arrow in the top left (i.e. go back to the Guide details)
+        if (mBinding.guideDetailsVp.getCurrentItem() == 1) {
+            switchPage(0);
+        } else {
+            super.onBackPressed();
+        }
+    }
 }
