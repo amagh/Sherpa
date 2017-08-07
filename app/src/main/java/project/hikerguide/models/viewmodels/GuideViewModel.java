@@ -6,6 +6,7 @@ import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,6 +19,7 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -36,6 +38,7 @@ import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.ConversionUtils;
 import project.hikerguide.utilities.SaveUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
 import static project.hikerguide.utilities.MapUtils.addMapOptionsToMap;
@@ -275,7 +278,7 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @BindingAdapter({"activity", "gpx", "viewModel"})
-    public static void loadGpxToMap(SmartMapView mapView, MapboxActivity activity, final File gpx,
+    public static void loadGpxToMap(final SmartMapView mapView, MapboxActivity activity, final File gpx,
                                     final GuideViewModel viewModel) {
 
         // TODO: Fix bug with MapboxMap not being loaded some of the time. Still can't figure out
@@ -294,6 +297,9 @@ public class GuideViewModel extends BaseObservable {
                     // Set the memvar MapboxMap to the loaded MapboxMap
                     viewModel.setMapboxMap(mapboxMap);
 
+                    // Set the map style
+                    mapboxMap.setStyle(Style.OUTDOORS);
+
                     // Load the GPX data into the MapboxMap
                     if (gpx != null) {
                         viewModel.loadGpx();
@@ -305,7 +311,6 @@ public class GuideViewModel extends BaseObservable {
             if (gpx != null) {
                 viewModel.loadGpx();
             }
-
         }
     }
 
