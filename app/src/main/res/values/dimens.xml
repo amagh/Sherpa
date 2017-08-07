@@ -50,4 +50,6 @@
     <dimen name="create_guide_hero_icon_size">48dp</dimen>
 
     <dimen name="back_icon_padding">12dp</dimen>
+    <dimen name="gps_icon_size">32dp</dimen>
+    <dimen name="gps_icon_padding">4dp</dimen>
 </resources>
