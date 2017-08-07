@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -24,6 +27,7 @@ import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.viewmodels.GuideViewModel;
+import project.hikerguide.ui.activities.CreateGuideActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.UserActivity;
 import project.hikerguide.ui.adapters.GuideDetailsAdapter;
@@ -103,7 +107,27 @@ public class GuideDetailsFragment extends Fragment {
         getSections();
         getAuthor();
 
+        // Show the menu
+        setHasOptionsMenu(true);
+
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_guide_details, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.menu_map:
+                ((GuideDetailsActivity) getActivity()).switchPage(1);
+                return true;
+        }
+
+        return false;
     }
 
     /**
@@ -182,4 +206,5 @@ public class GuideDetailsFragment extends Fragment {
             }
         });
     }
+
 }

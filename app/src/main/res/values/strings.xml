@@ -67,6 +67,9 @@
     <!-- Mapbox related Strings -->
     <string name="outdoors_style">mapbox://styles/mapbox/outdoors-v10</string>
 
+    <!-- Guide Details Strings -->
+    <string name="menu_map_title">Map</string>
+
     <!-- Create Guide Strings -->
     <string name="menu_publish_title">Publish Guide</string>
     <string name="menu_save_title">Save Draft</string>
