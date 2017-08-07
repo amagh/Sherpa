@@ -6,13 +6,12 @@ import android.support.annotation.NonNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URI;
 
 import project.hikerguide.files.abstractfiles.BaseFile;
 import project.hikerguide.utilities.SaveUtils;
 
-import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
+import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
 
 /**
  * Created by Alvin on 7/19/2017.

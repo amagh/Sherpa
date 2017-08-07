@@ -50,7 +50,7 @@ import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 import static project.hikerguide.utilities.IntentKeys.SECTION_KEY;
 import static project.hikerguide.utilities.IntentKeys.TRAIL_KEY;
-import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
+import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
 
 /**
  * Created by Alvin on 7/27/2017.

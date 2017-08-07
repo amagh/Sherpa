@@ -19,9 +19,9 @@ import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.ui.activities.UserActivity;
 
-import static project.hikerguide.utilities.StorageProviderUtils.BACKDROP_SUFFIX;
-import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
-import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
+import static project.hikerguide.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
+import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
+import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
 
 /**
  * Created by Alvin on 7/23/2017.

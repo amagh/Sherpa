@@ -10,7 +10,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -37,7 +36,7 @@ import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 import static project.hikerguide.utilities.IntentKeys.SECTION_KEY;
 import static project.hikerguide.utilities.IntentKeys.TRAIL_KEY;
-import static project.hikerguide.utilities.StorageProviderUtils.getReferenceForFile;
+import static project.hikerguide.utilities.FirebaseProviderUtils.getReferenceForFile;
 
 /**
  * Created by Alvin on 8/3/2017.

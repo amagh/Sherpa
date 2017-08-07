@@ -39,10 +39,10 @@ import project.hikerguide.utilities.SaveUtils;
 
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
 import static project.hikerguide.utilities.MapUtils.addMapOptionsToMap;
-import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
-import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
-import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
-import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
+import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
+import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_PATH;
+import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
+import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
 
 /**
  * Created by Alvin on 7/21/2017.

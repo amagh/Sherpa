@@ -19,10 +19,10 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 
 import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileType.GPX_FILE;
 import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileType.IMAGE_FILE;
-import static project.hikerguide.utilities.StorageProviderUtils.GPX_EXT;
-import static project.hikerguide.utilities.StorageProviderUtils.GPX_PATH;
-import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
-import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
+import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
+import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_PATH;
+import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
+import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
 
 /**
  * Created by Alvin on 7/19/2017.

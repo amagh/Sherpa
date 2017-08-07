@@ -16,12 +16,12 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import project.hikerguide.files.abstractfiles.BaseFile;
-import project.hikerguide.utilities.StorageProviderUtils;
+import project.hikerguide.utilities.FirebaseProviderUtils;
 
 import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileType.GPX_FILE;
 import static project.hikerguide.firebasestorage.StorageProvider.FirebaseFileType.IMAGE_FILE;
-import static project.hikerguide.utilities.StorageProviderUtils.IMAGE_PATH;
-import static project.hikerguide.utilities.StorageProviderUtils.JPEG_EXT;
+import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
+import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
 
 /**
  * The Provider that will be used to interface with Firebase Storage.
@@ -68,7 +68,7 @@ public class StorageProvider {
         final StorageListener listener = new StorageListener();
 
         // Get a reference to the location it will be stored using the ImageFile's firebaseId
-        StorageReference ref = StorageProviderUtils.getReferenceForFile(mStorage, file);
+        StorageReference ref = FirebaseProviderUtils.getReferenceForFile(mStorage, file);
 
         try {
             // Upload the File
@@ -118,7 +118,7 @@ public class StorageProvider {
 
 
         // Get a reference to the location it will be stored using the ImageFile's firebaseId
-        StorageReference ref = StorageProviderUtils.getReferenceForFile(mStorage, file);
+        StorageReference ref = FirebaseProviderUtils.getReferenceForFile(mStorage, file);
 
         // Download the File to the BaseFile in the signature
         ref.getFile(file)
@@ -151,7 +151,7 @@ public class StorageProvider {
         // Init a StorageListener that will return the status of the operation
         final StorageListener listener = new StorageListener();
 
-        StorageReference ref = StorageProviderUtils.getReferenceForFile(mStorage, file);
+        StorageReference ref = FirebaseProviderUtils.getReferenceForFile(mStorage, file);
         ref.delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -182,7 +182,7 @@ public class StorageProvider {
         final StorageListener listener = new StorageListener();
 
         // Get a StorageReference using the variables
-        StorageReference ref = StorageProviderUtils.getReferenceForFile(mStorage, file);
+        StorageReference ref = FirebaseProviderUtils.getReferenceForFile(mStorage, file);
 
         // Get the URL for the File
         ref.getDownloadUrl()

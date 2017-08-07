@@ -1,11 +1,15 @@
 package project.hikerguide.utilities;
 
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import project.hikerguide.data.GuideDatabase;
+import project.hikerguide.files.GpxFile;
+import project.hikerguide.files.ImageFile;
+import project.hikerguide.files.abstractfiles.BaseFile;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
@@ -26,6 +30,12 @@ import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.
  */
 
 public class FirebaseProviderUtils {
+    // ** Constants ** //
+    public static final String IMAGE_PATH = "images";
+    public static final String GPX_PATH = "gpx";
+    public static final String JPEG_EXT = ".jpg";
+    public static final String GPX_EXT = ".gpx";
+    public static final String BACKDROP_SUFFIX = "_bd";
 
     /**
      * Helper method for getting the directory of a type
@@ -169,4 +179,46 @@ public class FirebaseProviderUtils {
 
         return model;
     }
+
+    //********************************************************************************************//
+    //************************* Firebase Storage Related Methods *********************************//
+    //********************************************************************************************//
+
+    public static String getDirectoryFromFile(BaseFile file) {
+        // Return the directory based on the class of the File
+        if (file instanceof ImageFile) {
+            return IMAGE_PATH;
+        } else if (file instanceof GpxFile){
+            return GPX_PATH;
+        } else {
+            throw new UnsupportedOperationException("Unknown BaseFile: " + file.getClass());
+        }
+    }
+
+    public static String getFileExtensionFromFile(BaseFile file) {
+        // Return the file extension based on the class of the File
+        if (file instanceof ImageFile) {
+            return JPEG_EXT;
+        } else if (file instanceof GpxFile){
+            return GPX_EXT;
+        } else {
+            throw new UnsupportedOperationException("Unknown BaseFile: " + file.getClass());
+        }
+    }
+
+    /**
+     * Generates the StorageReference for where a File is stored on Firebase Storage
+     *
+     * @param file    File to get the StorageReference for
+     * @return The StorageReference for a File
+     */
+    public static StorageReference getReferenceForFile(StorageReference storageReference, BaseFile file) {
+        // Get the directory and file extension based on the File's type
+        String directory = getDirectoryFromFile(file);
+        String fileExtension = getFileExtensionFromFile(file);
+
+        // Generate the StorageReference using the directory and file extension
+        return storageReference.child(directory).child(file.firebaseId + fileExtension);
+    }
+
 }
