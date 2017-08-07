@@ -5,6 +5,7 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Handler;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -34,6 +36,7 @@ import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.mapbox.SmartMapView;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.ui.activities.CreateGuideActivity;
+import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.ConversionUtils;
@@ -470,5 +473,35 @@ public class GuideViewModel extends BaseObservable {
         mTrackUserPosition = trackUserPosition;
 
         notifyPropertyChanged(BR.trackUserPosition);
+    }
+
+    /**
+     * Pans the camera to the user's position
+     *
+     * @param view    The button that is clicked
+     */
+    public void onClickTrack(View view) {
+
+        // Get the location of the user from the MapboxMap
+        Location location = mMapboxMap.getMyLocation();
+
+        // Check whether the Location returned is valid
+        if (location != null) {
+
+            // Create a LatLng Object from the coordinates of the Location
+            LatLng cameraTarget = new LatLng(location.getLatitude(), location.getLongitude());
+
+            // Pan the camera
+            mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+                    .target(cameraTarget)
+                    .zoom(13)
+                    .build()), 1500);
+        } else {
+
+            // Request permission for user's location
+            if (mActivity.get() instanceof GuideDetailsActivity) {
+                ((GuideDetailsActivity) mActivity.get()).requestLocationPermission();
+            }
+        }
     }
 }
