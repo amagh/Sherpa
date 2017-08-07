@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.hikerguide.models.viewmodels.GuideViewModel" />
+
+        <variable
+            name="handler"
+            type="project.hikerguide.models.viewmodels.GuideDetailsMapViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <project.hikerguide.mapbox.SmartMapView
+            android:id="@+id/guide_details_mv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:activity="@{vm.activity}"
+            app:gpx="@{vm.gpx}"
+            app:viewModel="@{vm.viewModel}"/>
+
+        <ImageView
+            android:id="@+id/guide_details_map_back_iv"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/back_icon_padding"
+            android:src="@drawable/ic_arrow_back"
+            android:onClick="@{handler::onClickBack}"/>
+
+    </FrameLayout>
+
+
+
+</layout>
