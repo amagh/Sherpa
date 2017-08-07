@@ -61,6 +61,7 @@ public class GuideViewModel extends BaseObservable {
     private boolean mShowImageError;
     private boolean mShowGpxError;
     private MapboxMap mMapboxMap;
+    private boolean mTrackUserPosition;
 
     public GuideViewModel(Context context, Guide guide) {
         mContext = context;
@@ -277,9 +278,9 @@ public class GuideViewModel extends BaseObservable {
         return mGuide.elevation != 0 ? View.VISIBLE : View.GONE;
     }
 
-    @BindingAdapter({"activity", "gpx", "viewModel"})
+    @BindingAdapter(value = {"activity", "gpx", "viewModel", "trackUserPosition"}, requireAll = false)
     public static void loadGpxToMap(final SmartMapView mapView, MapboxActivity activity, final File gpx,
-                                    final GuideViewModel viewModel) {
+                                    final GuideViewModel viewModel, final boolean trackUserPosition) {
 
         // TODO: Fix bug with MapboxMap not being loaded some of the time. Still can't figure out
         // why. Only occurs in CreateGuideActivity.
@@ -304,6 +305,11 @@ public class GuideViewModel extends BaseObservable {
                     if (gpx != null) {
                         viewModel.loadGpx();
                     }
+
+                    // Track user's location if appropriate
+                    if (trackUserPosition) {
+                        mapboxMap.setMyLocationEnabled(true);
+                    }
                 }
             });
         } else {
@@ -311,7 +317,14 @@ public class GuideViewModel extends BaseObservable {
             if (gpx != null) {
                 viewModel.loadGpx();
             }
+
+            // Track user's location if appropriate
+            if (trackUserPosition) {
+                viewModel.getMapboxMap().setMyLocationEnabled(true);
+            }
         }
+
+
     }
 
     /**
@@ -446,5 +459,16 @@ public class GuideViewModel extends BaseObservable {
             errorIv.setVisibility(View.GONE);
             errorTv.setVisibility(View.GONE);
         }
+    }
+
+    @Bindable
+    public boolean getTrackUserPosition() {
+        return mTrackUserPosition;
+    }
+
+    public void setTrackUserPosition(boolean trackUserPosition) {
+        mTrackUserPosition = trackUserPosition;
+
+        notifyPropertyChanged(BR.trackUserPosition);
     }
 }

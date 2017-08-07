@@ -23,7 +23,8 @@
             android:layout_height="match_parent"
             app:activity="@{vm.activity}"
             app:gpx="@{vm.gpx}"
-            app:viewModel="@{vm.viewModel}"/>
+            app:viewModel="@{vm.viewModel}"
+            app:trackUserPosition="@{vm.trackUserPosition}"/>
 
         <ImageView
             android:id="@+id/guide_details_map_back_iv"
