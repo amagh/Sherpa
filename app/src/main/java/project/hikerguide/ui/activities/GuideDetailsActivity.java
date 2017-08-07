@@ -3,6 +3,7 @@ package project.hikerguide.ui.activities;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import timber.log.Timber;
 
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
-public class GuideDetailsActivity extends MapboxActivity {
+public class GuideDetailsActivity extends MapboxActivity implements ViewPager.OnPageChangeListener {
     // ** Member Variables ** //
     private ActivityGuideDetailsBinding mBinding;
     private GuideDetailsFragmentAdapter mAdapter;
@@ -56,6 +57,7 @@ public class GuideDetailsActivity extends MapboxActivity {
         mAdapter.swapFragmentList(fragmentList);
 
         // Set the Adapter
+        mBinding.guideDetailsVp.addOnPageChangeListener(this);
         mBinding.guideDetailsVp.setAdapter(mAdapter);
     }
 
@@ -78,5 +80,27 @@ public class GuideDetailsActivity extends MapboxActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+
+        if (position == 0) {
+            // Enable swiping if on the Guide details page
+            mBinding.guideDetailsVp.setSwipe(true);
+        } else {
+            // Disable on map page to allow for panning of map
+            mBinding.guideDetailsVp.setSwipe(false);
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 }
