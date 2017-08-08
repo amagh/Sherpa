@@ -46,20 +46,27 @@ public class Trail extends BaseModel implements Parcelable {
      * @return Trail with the values described from the Cursor
      */
     public Trail createTrailFromCursor(Cursor cursor) {
+
         // Index all the columns in the Cursor
-        int idxId = cursor.getColumnIndex(GuideContract.TrailEntry._ID);
-        int idxAreaId = cursor.getColumnIndex(GuideContract.TrailEntry.AREA_ID);
-        int idxName = cursor.getColumnIndex(GuideContract.TrailEntry.NAME);
-        int idxNotes = cursor.getColumnIndex(GuideContract.TrailEntry.NOTES);
+        int idxFirebaseId   = cursor.getColumnIndex(GuideContract.TrailEntry.FIREBASE_ID);
+        int idxAreaId       = cursor.getColumnIndex(GuideContract.TrailEntry.AREA_ID);
+        int idxName         = cursor.getColumnIndex(GuideContract.TrailEntry.NAME);
+        int idxNotes        = cursor.getColumnIndex(GuideContract.TrailEntry.NOTES);
 
         // Retrieve the values from the Cursor
-        long id = cursor.getLong(idxId);
-        String areaId = cursor.getString(idxAreaId);
-        String name = cursor.getString(idxName);
-        String notes = cursor.getString(idxNotes);
+        String firebaseId   = cursor.getString(idxFirebaseId);
+        String areaId       = cursor.getString(idxAreaId);
+        String name         = cursor.getString(idxName);
+        String notes        = cursor.getString(idxNotes);
 
         // Create a new Trail from the values
-        return new Trail(areaId, name, notes);
+        Trail trail         = new Trail();
+        trail.firebaseId    = firebaseId;
+        trail.areaId        = areaId;
+        trail.name          = name;
+        trail.notes         = notes;
+
+        return trail;
     }
 
     @Override
