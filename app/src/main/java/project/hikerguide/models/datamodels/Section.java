@@ -48,20 +48,34 @@ public class Section extends BaseModelWithImage implements Parcelable {
      * @return Section with the values contained in the Cursor
      */
     public Section createSectionFromCursor(Cursor cursor) {
+
         // Index the columns of the Cursor
-        int idxId = cursor.getColumnIndex(GuideContract.SectionEntry._ID);
-        int idxGuideId = cursor.getColumnIndex(GuideContract.SectionEntry.GUIDE_ID);
-        int idxSection = cursor.getColumnIndex(GuideContract.SectionEntry.SECTION);
-        int idxContent = cursor.getColumnIndex(GuideContract.SectionEntry.CONTENT);
+        int idxFirebaseId       = cursor.getColumnIndex(GuideContract.SectionEntry.FIREBASE_ID);
+        int idxGuideId          = cursor.getColumnIndex(GuideContract.SectionEntry.GUIDE_ID);
+        int idxSection          = cursor.getColumnIndex(GuideContract.SectionEntry.SECTION);
+        int idxContent          = cursor.getColumnIndex(GuideContract.SectionEntry.CONTENT);
+        int idxImageUri         = cursor.getColumnIndex(GuideContract.SectionEntry.IMAGE_URI);
 
         // Retrieve the values from the Cursor
-        long id = cursor.getLong(idxId);
-        String guideId = cursor.getString(idxGuideId);
-        int section = cursor.getInt(idxSection);
-        String content = cursor.getString(idxContent);
+        String firebaseId       = cursor.getString(idxFirebaseId);
+        String guideId          = cursor.getString(idxGuideId);
+        int section             = cursor.getInt(idxSection);
+        String content          = cursor.getString(idxContent);
+        String imageUriString   = cursor.getString(idxImageUri);
 
         // Instantiate a new Section with the values
-        return new Section(guideId, section, content);
+        Section section0        = new Section();
+        section0.firebaseId     = firebaseId;
+        section0.guideId        = guideId;
+        section0.section        = section;
+        section0.content        = content;
+
+        if (imageUriString != null) {
+            File imageFile = new File(Uri.parse(imageUriString).getPath());
+            setImageUri(imageFile);
+        }
+
+        return section0;
     }
 
     @Override
