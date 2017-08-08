@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Hiker Guide</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
@@ -69,6 +69,8 @@
 
     <!-- Guide Details Strings -->
     <string name="menu_map_title">Map</string>
+    <string name="geo_uri_string">geo:0,0?q=<xliff:g id="latitude">%f</xliff:g>,<xliff:g id="longitude">%f</xliff:g>(Trail+Head)</string>
+    <string name="error_no_map_app">There is no map application installed. Please install a map application and try again.</string>
 
     <!-- Create Guide Strings -->
     <string name="menu_publish_title">Publish Guide</string>

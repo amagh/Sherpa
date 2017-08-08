@@ -1,6 +1,8 @@
 package project.hikerguide.models.viewmodels;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -8,9 +10,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -19,6 +23,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -28,6 +33,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import project.hikerguide.BR;
@@ -502,6 +508,42 @@ public class GuideViewModel extends BaseObservable {
             if (mActivity.get() instanceof GuideDetailsActivity) {
                 ((GuideDetailsActivity) mActivity.get()).requestLocationPermission();
             }
+        }
+    }
+
+    /**
+     * Launches an Intent to open a map application with the coordinates of the trail head
+     *
+     * @param view    Button that is clicked
+     */
+    public void onClickNavigate(View view) {
+
+        // Get the marker for the trail head
+        Marker marker = mMapboxMap.getMarkers().get(0);
+
+        // Get the position of the Marker
+        LatLng position = marker.getPosition();
+
+        // Convert the coordinates of the Marker to a geo Uri
+        String geoString = mActivity.get().getString(R.string.geo_uri_string, position.getLatitude(), position.getLongitude());
+
+        // Create a new Intent to open the Uri
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(geoString));
+
+        // Check to ensure that the user has an application that can handle the geo Uri
+        if (intent.resolveActivity(mActivity.get().getPackageManager()) != null) {
+
+            // Open an application that can handle the Intent
+            mActivity.get().startActivity(intent);
+        } else {
+
+            // Notify the user that they do not have an application that can handle the Intent
+            Toast.makeText(
+                    mActivity.get(),
+                    mActivity.get().getString(R.string.error_no_map_app),
+                    Toast.LENGTH_LONG)
+                    .show();
         }
     }
 }
