@@ -40,28 +40,28 @@ public class ContentProviderUtils {
     public static ContentValues getValuesForGuide(Guide guide) {
         ContentValues values = new ContentValues();
 
-        values.put(GuideContract.GuideEntry.FIREBASE_ID, guide.firebaseId);
-        values.put(GuideContract.GuideEntry.TRAIL_ID, guide.trailId);
-        values.put(GuideContract.GuideEntry.TRAIL_NAME, guide.trailName);
-        values.put(GuideContract.GuideEntry.AUTHOR_ID, guide.authorId);
-        values.put(GuideContract.GuideEntry.AUTHOR_NAME, guide.authorName);
-        values.put(GuideContract.GuideEntry.DATE_ADDED, guide.dateAdded);
-        values.put(GuideContract.GuideEntry.RATING, guide.rating);
-        values.put(GuideContract.GuideEntry.REVIEWS, guide.reviews);
-        values.put(GuideContract.GuideEntry.LATITUDE, guide.latitude);
-        values.put(GuideContract.GuideEntry.LONGITUDE, guide.longitude);
-        values.put(GuideContract.GuideEntry.DISTANCE, guide.distance);
-        values.put(GuideContract.GuideEntry.ELEVATION, guide.elevation);
-        values.put(GuideContract.GuideEntry.DIFFICULTY, guide.difficulty);
+        values.put(GuideContract.GuideEntry.FIREBASE_ID,    guide.firebaseId);
+        values.put(GuideContract.GuideEntry.TRAIL_ID,       guide.trailId);
+        values.put(GuideContract.GuideEntry.TRAIL_NAME,     guide.trailName);
+        values.put(GuideContract.GuideEntry.AUTHOR_ID,      guide.authorId);
+        values.put(GuideContract.GuideEntry.AUTHOR_NAME,    guide.authorName);
+        values.put(GuideContract.GuideEntry.DATE_ADDED,     guide.dateAdded);
+        values.put(GuideContract.GuideEntry.RATING,         guide.rating);
+        values.put(GuideContract.GuideEntry.REVIEWS,        guide.reviews);
+        values.put(GuideContract.GuideEntry.LATITUDE,       guide.latitude);
+        values.put(GuideContract.GuideEntry.LONGITUDE,      guide.longitude);
+        values.put(GuideContract.GuideEntry.DISTANCE,       guide.distance);
+        values.put(GuideContract.GuideEntry.ELEVATION,      guide.elevation);
+        values.put(GuideContract.GuideEntry.DIFFICULTY,     guide.difficulty);
 
         // Add image Uri if the Guide has an image
         if (guide.hasImage) {
-            values.put(GuideContract.GuideEntry.IMAGE_URI, guide.getImageUri().toString());
+            values.put(GuideContract.GuideEntry.IMAGE_URI,  guide.getImageUri().toString());
         }
 
         // Add GPX Uri if the Guide has a GPX
         if (guide.getGpxUri() != null) {
-            values.put(GuideContract.GuideEntry.GPX_URI, guide.getGpxUri().toString());
+            values.put(GuideContract.GuideEntry.GPX_URI,    guide.getGpxUri().toString());
         }
 
         return values;
@@ -76,11 +76,11 @@ public class ContentProviderUtils {
     public static ContentValues getValuesForTrail(Trail trail) {
         ContentValues values = new ContentValues();
 
-        values.put(GuideContract.TrailEntry.FIREBASE_ID, trail.firebaseId);
-        values.put(GuideContract.TrailEntry.AREA_ID, trail.areaId);
-        values.put(GuideContract.TrailEntry.NOTES, trail.name);
-        values.put(GuideContract.TrailEntry.LOWER_CASE_NAME, trail.name.toLowerCase());
-        values.put(GuideContract.TrailEntry.NOTES, trail.notes);
+        values.put(GuideContract.TrailEntry.FIREBASE_ID,        trail.firebaseId);
+        values.put(GuideContract.TrailEntry.AREA_ID,            trail.areaId);
+        values.put(GuideContract.TrailEntry.NAME,               trail.name);
+        values.put(GuideContract.TrailEntry.LOWER_CASE_NAME,    trail.name.toLowerCase());
+        values.put(GuideContract.TrailEntry.NOTES,              trail.notes);
 
         return values;
     }
@@ -94,15 +94,15 @@ public class ContentProviderUtils {
     public static ContentValues getValuesForAuthor(Author author) {
         ContentValues values = new ContentValues();
 
-        values.put(GuideContract.AuthorEntry.FIREBASE_ID, author.firebaseId);
-        values.put(GuideContract.AuthorEntry.NAME, author.name);
-        values.put(GuideContract.AuthorEntry.LOWER_CASE_NAME, author.name.toLowerCase());
-        values.put(GuideContract.AuthorEntry.DESCRIPTION, author.description);
-        values.put(GuideContract.AuthorEntry.SCORE, author.score);
+        values.put(GuideContract.AuthorEntry.FIREBASE_ID,       author.firebaseId);
+        values.put(GuideContract.AuthorEntry.NAME,              author.name);
+        values.put(GuideContract.AuthorEntry.LOWER_CASE_NAME,   author.name.toLowerCase());
+        values.put(GuideContract.AuthorEntry.DESCRIPTION,       author.description);
+        values.put(GuideContract.AuthorEntry.SCORE,             author.score);
 
         // Add image Uri if the Guide has an image
         if (author.hasImage) {
-            values.put(GuideContract.AuthorEntry.IMAGE_URI, author.getImageUri().toString());
+            values.put(GuideContract.AuthorEntry.IMAGE_URI,     author.getImageUri().toString());
         }
 
         return values;
@@ -117,14 +117,14 @@ public class ContentProviderUtils {
     public static ContentValues getValuesForSection(Section section) {
         ContentValues values = new ContentValues();
 
-        values.put(GuideContract.SectionEntry.FIREBASE_ID, section.firebaseId);
-        values.put(GuideContract.SectionEntry.GUIDE_ID, section.guideId);
-        values.put(GuideContract.SectionEntry.SECTION, section.section);
-        values.put(GuideContract.SectionEntry.CONTENT, section.content);
+        values.put(GuideContract.SectionEntry.FIREBASE_ID,      section.firebaseId);
+        values.put(GuideContract.SectionEntry.GUIDE_ID,         section.guideId);
+        values.put(GuideContract.SectionEntry.SECTION,          section.section);
+        values.put(GuideContract.SectionEntry.CONTENT,          section.content);
 
         // Add image Uri if the Guide has an image
         if (section.hasImage) {
-            values.put(GuideContract.SectionEntry.IMAGE_URI, section.getImageUri().toString());
+            values.put(GuideContract.SectionEntry.IMAGE_URI,    section.getImageUri().toString());
         }
 
         return values;
@@ -139,12 +139,12 @@ public class ContentProviderUtils {
     public static ContentValues getValuesForArea(Area area) {
         ContentValues values = new ContentValues();
 
-        values.put(GuideContract.AreaEntry.FIREBASE_ID, area.firebaseId);
-        values.put(GuideContract.AreaEntry.NAME, area.name);
-        values.put(GuideContract.AreaEntry.LOWER_CASE_NAME, area.name.toLowerCase());
-        values.put(GuideContract.AreaEntry.LATITUDE, area.latitude);
-        values.put(GuideContract.AreaEntry.LONGITUDE, area.longitude);
-        values.put(GuideContract.AreaEntry.STATE, area.state);
+        values.put(GuideContract.AreaEntry.FIREBASE_ID,         area.firebaseId);
+        values.put(GuideContract.AreaEntry.NAME,                area.name);
+        values.put(GuideContract.AreaEntry.LOWER_CASE_NAME,     area.name.toLowerCase());
+        values.put(GuideContract.AreaEntry.LATITUDE,            area.latitude);
+        values.put(GuideContract.AreaEntry.LONGITUDE,           area.longitude);
+        values.put(GuideContract.AreaEntry.STATE,               area.state);
 
         return values;
     }
