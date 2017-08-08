@@ -78,28 +78,66 @@ public class Guide extends BaseModelWithImage implements Parcelable {
      * @return Guide with the values described in the input Cursor
      */
     public Guide createGuideFromCursor(Cursor cursor) {
+
         // Get the index of every column from the Cursor
-        int idxTrailId = cursor.getColumnIndex(GuideContract.GuideEntry.TRAIL_ID);
-        int idxAuthorId = cursor.getColumnIndex(GuideContract.GuideEntry.AUTHOR_ID);
-        int idxDateAdded = cursor.getColumnIndex(GuideContract.GuideEntry.DATE_ADDED);
-        int idxRating = cursor.getColumnIndex(GuideContract.GuideEntry.RATING);
-        int idxReviews = cursor.getColumnIndex(GuideContract.GuideEntry.REVIEWS);
-        int idxLatitude = cursor.getColumnIndex(GuideContract.GuideEntry.LATITUDE);
-        int idxLongitude = cursor.getColumnIndex(GuideContract.GuideEntry.LONGITUDE);
+        int idxFirebaseId       = cursor.getColumnIndex(GuideContract.GuideEntry.FIREBASE_ID);
+        int idxTrailId          = cursor.getColumnIndex(GuideContract.GuideEntry.TRAIL_ID);
+        int idxTrailName        = cursor.getColumnIndex(GuideContract.GuideEntry.TRAIL_NAME);
+        int idxAuthorId         = cursor.getColumnIndex(GuideContract.GuideEntry.AUTHOR_ID);
+        int idxAuthorName       = cursor.getColumnIndex(GuideContract.GuideEntry.AUTHOR_NAME);
+        int idxDateAdded        = cursor.getColumnIndex(GuideContract.GuideEntry.DATE_ADDED);
+        int idxRating           = cursor.getColumnIndex(GuideContract.GuideEntry.RATING);
+        int idxReviews          = cursor.getColumnIndex(GuideContract.GuideEntry.REVIEWS);
+        int idxLatitude         = cursor.getColumnIndex(GuideContract.GuideEntry.LATITUDE);
+        int idxLongitude        = cursor.getColumnIndex(GuideContract.GuideEntry.LONGITUDE);
+        int idxDistance         = cursor.getColumnIndex(GuideContract.GuideEntry.DISTANCE);
+        int idxElevation        = cursor.getColumnIndex(GuideContract.GuideEntry.ELEVATION);
+        int idxDifficulty       = cursor.getColumnIndex(GuideContract.GuideEntry.DIFFICULTY);
+        int idxImageUri         = cursor.getColumnIndex(GuideContract.GuideEntry.IMAGE_URI);
+        int idxGpxUri           = cursor.getColumnIndex(GuideContract.GuideEntry.GPX_URI);
 
         // Get the values from the Cursor
-        String trailId = cursor.getString(idxTrailId);
-        String authorId = cursor.getString(idxAuthorId);
-        long dateAdded = cursor.getLong(idxDateAdded);
-        double rating = cursor.getDouble(idxRating);
-        int reviews = cursor.getInt(idxReviews);
-        double latitude = cursor.getDouble(idxLatitude);
-        double longitude = cursor.getDouble(idxLongitude);
+        String firebaseId       = cursor.getString(idxFirebaseId);
+        String trailId          = cursor.getString(idxTrailId);
+        String trailName        = cursor.getString(idxTrailName);
+        String authorId         = cursor.getString(idxAuthorId);
+        String authorName       = cursor.getString(idxAuthorName);
+        long dateAdded          = cursor.getLong(idxDateAdded);
+        double rating           = cursor.getDouble(idxRating);
+        int reviews             = cursor.getInt(idxReviews);
+        double latitude         = cursor.getDouble(idxLatitude);
+        double longitude        = cursor.getDouble(idxLongitude);
+        double distance         = cursor.getDouble(idxDistance);
+        double elevation        = cursor.getDouble(idxElevation);
+        int difficulty          = cursor.getInt(idxDifficulty);
+        String imageUriString   = cursor.getString(idxImageUri);
+        String gpxUriString     = cursor.getString(idxGpxUri);
 
         // Create a new Guide using the values from the Cursor
-        Guide guide = new Guide(trailId, authorId, dateAdded, latitude, longitude);
-        guide.rating = rating;
-        guide.reviews = reviews;
+        Guide guide             = new Guide();
+        guide.firebaseId        = firebaseId;
+        guide.trailId           = trailId;
+        guide.trailName         = trailName;
+        guide.authorId          = authorId;
+        guide.authorName        = authorName;
+        guide.dateAdded         = dateAdded;
+        guide.rating            = rating;
+        guide.reviews           = reviews;
+        guide.latitude          = latitude;
+        guide.longitude         = longitude;
+        guide.distance          = distance;
+        guide.elevation         = elevation;
+        guide.difficulty        = difficulty;
+
+        if (imageUriString != null) {
+            File imageFile = new File(Uri.parse(imageUriString).getPath());
+            guide.setImageUri(imageFile);
+        }
+
+        if (gpxUriString != null) {
+            File gpxFile = new File(Uri.parse(gpxUriString).getPath());
+            guide.setGpxUri(gpxFile);
+        }
 
         return guide;
     }
@@ -118,7 +156,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         map.put(LONGITUDE, longitude);
         map.put(DISTANCE, distance);
         map.put(ELEVATION, elevation);
-        map.put(HAS_IMAGE, hasImage);
         map.put(DISTANCE, distance);
         map.put(DIFFICULTY, difficulty);
         map.put(AREA, area);
