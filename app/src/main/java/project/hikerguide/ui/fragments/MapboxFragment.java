@@ -4,7 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapView;
+
+import project.hikerguide.R;
 
 /**
  * Created by Alvin on 7/25/2017.
@@ -17,6 +20,9 @@ public class MapboxFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Mapbox.getInstance(getActivity(), getString(R.string.mapbox_token));
+
         if (mMapView != null) {
             mMapView.onCreate(savedInstanceState);
         }

@@ -4,7 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapView;
+
+import project.hikerguide.R;
 
 /**
  * Created by Alvin on 7/24/2017.
@@ -17,6 +20,9 @@ public class MapboxActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Mapbox.getInstance(this, getString(R.string.mapbox_token));
+
         if (mMapView != null) {
             mMapView.onCreate(savedInstanceState);
         }
