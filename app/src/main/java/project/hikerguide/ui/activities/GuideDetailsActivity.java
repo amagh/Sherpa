@@ -125,7 +125,9 @@ public class GuideDetailsActivity extends MapboxActivity implements ViewPager.On
                     new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSION_REQUEST_FINE_LOCATION);
         } else {
-            ((GuideDetailsMapFragment) mAdapter.getItem(1)).trackUserPosition();
+            if (mAdapter.getItem(1) != null) {
+                ((GuideDetailsMapFragment) mAdapter.getItem(1)).trackUserPosition();
+            }
         }
     }
 
@@ -133,6 +135,8 @@ public class GuideDetailsActivity extends MapboxActivity implements ViewPager.On
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         if (requestCode == PERMISSION_REQUEST_FINE_LOCATION && grantResults[0] == PERMISSION_GRANTED) {
+
+            // Permission granted. Begin tracking user's location
             ((GuideDetailsMapFragment) mAdapter.getItem(1)).trackUserPosition();
         }
 

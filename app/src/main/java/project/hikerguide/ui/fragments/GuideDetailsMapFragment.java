@@ -97,6 +97,8 @@ public class GuideDetailsMapFragment extends Fragment {
     public void trackUserPosition() {
 
         // Get the ViewModel that has the MapView and begin tracking location
-        mBinding.getVm().setTrackUserPosition(true);
+        if (mBinding != null) {
+            mBinding.getVm().setTrackUserPosition(true);
+        }
     }
 }
