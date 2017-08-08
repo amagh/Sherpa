@@ -12,7 +12,7 @@
     <item
         android:id="@+id/menu_save"
         android:orderInCategory="1"
-        android:title="@string/menu_save_title"
+        android:title="@string/menu_save_draft_title"
         app:showAsAction="never" />
 
 </menu>

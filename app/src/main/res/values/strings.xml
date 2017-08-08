@@ -69,12 +69,13 @@
 
     <!-- Guide Details Strings -->
     <string name="menu_map_title">Map</string>
+    <string name="menu_save_title">Save for offline</string>
     <string name="geo_uri_string">geo:0,0?q=<xliff:g id="latitude">%f</xliff:g>,<xliff:g id="longitude">%f</xliff:g>(Trail+Head)</string>
     <string name="error_no_map_app">There is no map application installed. Please install a map application and try again.</string>
 
     <!-- Create Guide Strings -->
     <string name="menu_publish_title">Publish Guide</string>
-    <string name="menu_save_title">Save Draft</string>
+    <string name="menu_save_draft_title">Save Draft</string>
     <string name="create_guide_image_missing_error_text">Please add an image</string>
     <string name="create_guide_gpx_missing_error_text">Please add a GPX file</string>
     <string name="create_guide_no_sections_error">Please add some content to your guide before publishing</string>

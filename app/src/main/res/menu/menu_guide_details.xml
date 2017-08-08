@@ -5,7 +5,15 @@
     <item
         android:id="@+id/menu_map"
         android:title="@string/menu_map_title"
-        android:icon="@drawable/mapbox_compass_icon"
+        android:icon="@drawable/ic_map"
+        android:orderInCategory="1"
         app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/menu_save"
+        android:title="@string/menu_save_title"
+        android:icon="@drawable/ic_save"
+        android:orderInCategory="0"
+        app:showAsAction="ifRoom" />
 
 </menu>
