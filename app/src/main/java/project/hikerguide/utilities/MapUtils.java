@@ -2,6 +2,9 @@ package project.hikerguide.utilities;
 
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import java.io.File;
@@ -30,6 +33,13 @@ public class MapUtils {
                 // Set the Polyline representing the trail
                 mapboxMap.addPolyline(polylineOptions
                         .width(3));
+
+                // Position the camera such that it fits all the points in the PolyLine
+                CameraPosition position = mapboxMap.getCameraForLatLngBounds(
+                        new LatLngBounds.Builder().includes(polylineOptions.getPoints()).build(),
+                        new int[] {50, 100, 50, 100});
+
+                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
             }
         });
     }

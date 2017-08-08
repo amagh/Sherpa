@@ -497,11 +497,6 @@ public class GuideViewModel extends BaseObservable {
             // Create a LatLng Object from the coordinates of the Location
             LatLng cameraTarget = new LatLng(location.getLatitude(), location.getLongitude());
 
-            // Pan the camera
-            mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-                    .target(cameraTarget)
-                    .zoom(13)
-                    .build()), 1500);
         } else {
 
             // Request permission for user's location
