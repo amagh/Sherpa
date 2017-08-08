@@ -496,7 +496,7 @@ public class GuideViewModel extends BaseObservable {
 
             // Create a LatLng Object from the coordinates of the Location
             LatLng cameraTarget = new LatLng(location.getLatitude(), location.getLongitude());
-
+            mMapboxMap.animateCamera(CameraUpdateFactory.newLatLng(cameraTarget));
         } else {
 
             // Request permission for user's location
