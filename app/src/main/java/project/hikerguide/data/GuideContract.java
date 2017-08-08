@@ -16,61 +16,76 @@ public class GuideContract {
 
     public interface GuideEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
-        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebase_id";
+        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebaseId";
 
-        @DataType(DataType.Type.INTEGER)
+        @DataType(DataType.Type.TEXT)
         @References(table = GuideDatabase.TRAILS, column = TrailEntry.FIREBASE_ID)
-        @NotNull String TRAIL_ID                                                    = "trail_id";
+        String TRAIL_ID                                                             = "trailId";
 
-        @DataType(DataType.Type.INTEGER)
+        @DataType(DataType.Type.TEXT) String TRAIL_NAME                             = "trailName";
+
+        @DataType(DataType.Type.TEXT)
         @References(table = GuideDatabase.AUTHORS, column = AuthorEntry.FIREBASE_ID)
-        @NotNull String AUTHOR_ID                                                   = "author_id";
+        String AUTHOR_ID                                                            = "authorId";
 
-        @DataType(DataType.Type.TEXT) @NotNull String DATE_ADDED                    = "date_added";
+        @DataType(DataType.Type.TEXT) String AUTHOR_NAME                            = "authorName";
+        @DataType(DataType.Type.TEXT) String DATE_ADDED                             = "dateAdded";
         @DataType(DataType.Type.REAL) String RATING                                 = "rating";
         @DataType(DataType.Type.INTEGER) String REVIEWS                             = "reviews";
-//        @DataType(DataType.Type.TEXT) @NotNull String GPX                           = "gpx";
-        @DataType(DataType.Type.REAL) @NotNull String LATITUDE                      = "latitude";
-        @DataType(DataType.Type.REAL) @NotNull String LONGITUDE                     = "longitude";
-        @DataType(DataType.Type.INTEGER) @NotNull String HAS_IMAGE                  = "has_image";
+
+        @DataType(DataType.Type.REAL) String LATITUDE                               = "latitude";
+        @DataType(DataType.Type.REAL) String LONGITUDE                              = "longitude";
+        @DataType(DataType.Type.REAL) String DISTANCE                               = "distance";
+        @DataType(DataType.Type.REAL) String ELEVATION                              = "elevation";
+
+        @DataType(DataType.Type.INTEGER) String DIFFICULTY                          = "difficulty";
+        @DataType(DataType.Type.TEXT) String IMAGE_URI                              = "imageUri";
+        @DataType(DataType.Type.TEXT) String GPX_URI                                = "gpxUri";
     }
 
     public interface TrailEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
-        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebase_id";
+        @DataType(DataType.Type.TEXT) @NotNull String FIREBASE_ID                   = "firebaseId";
 
-        @DataType(DataType.Type.INTEGER)
-        @References(table = GuideDatabase.AUTHORS, column = AreaEntry.FIREBASE_ID)
-        @NotNull String AREA_ID                                                     = "area_id";
+        @DataType(DataType.Type.TEXT)
+        @References(table = GuideDatabase.AREAS, column = AreaEntry.FIREBASE_ID)
+        @NotNull String AREA_ID                                                     = "areaId";
 
         @DataType(DataType.Type.TEXT) @NotNull String NAME                          = "name";
+        @DataType(DataType.Type.TEXT) @NotNull String LOWER_CASE_NAME               = "lowerCaseName";
         @DataType(DataType.Type.TEXT) String NOTES                                  = "notes";
     }
 
     public interface AuthorEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
-        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebase_id";
+        @DataType(DataType.Type.TEXT) @NotNull String FIREBASE_ID                   = "firebaseId";
         @DataType(DataType.Type.TEXT) @NotNull String NAME                          = "name";
-        @DataType(DataType.Type.INTEGER) @NotNull String HAS_IMAGE                  = "has_image";
+        @DataType(DataType.Type.TEXT) @NotNull String LOWER_CASE_NAME               = "lowerCaseName";
+        @DataType(DataType.Type.TEXT) String DESCRIPTION                            = "description";
         @DataType(DataType.Type.INTEGER) String SCORE                               = "score";
+        @DataType(DataType.Type.TEXT) String IMAGE_URI                              = "imageUri";
     }
 
     public interface SectionEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
-        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebase_id";
+        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebaseId";
 
-        @DataType(DataType.Type.INTEGER)
+        @DataType(DataType.Type.TEXT)
         @References(table = GuideDatabase.GUIDES, column = GuideEntry.FIREBASE_ID)
-        @NotNull String GUIDE_ID                                                    = "guide_id";
+        @NotNull String GUIDE_ID                                                    = "guideId";
         
         @DataType(DataType.Type.INTEGER) @NotNull String SECTION                    = "section";
         @DataType(DataType.Type.TEXT) @NotNull String CONTENT                       = "content";
-        @DataType(DataType.Type.INTEGER) @NotNull String HAS_IMAGE                  = "has_image";
+        @DataType(DataType.Type.TEXT) String IMAGE_URI                              = "imageUri";
     }
 
     public interface AreaEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
-        @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebase_id";
+        @DataType(DataType.Type.TEXT) @NotNull String FIREBASE_ID                   = "firebaseId";
         @DataType(DataType.Type.TEXT) @NotNull String NAME                          = "name";
+        @DataType(DataType.Type.TEXT) @NotNull String LOWER_CASE_NAME               = "lowerCaseName";
+        @DataType(DataType.Type.REAL) @NotNull String LATITUDE                      = "latitude";
+        @DataType(DataType.Type.REAL) @NotNull String LONGITUDE                     = "longitude";
+        @DataType(DataType.Type.TEXT) @NotNull String STATE                         = "state";
     }
 }
