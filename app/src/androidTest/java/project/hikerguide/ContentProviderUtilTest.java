@@ -93,11 +93,11 @@ public class ContentProviderUtilTest {
                 null);
 
         // Check to ensure that the Cursor is not null
-        String nullCursor = "Error querying the database for the inserted Guide.";
+        String nullCursor = "Error querying the database for the inserted Trail.";
         assertNotNull(nullCursor, cursor);
 
         // Check that the Cursor contains an entry
-        String errorEmptyCursor = "Returned Cursor is empty. Guide not properly inserted into " +
+        String errorEmptyCursor = "Returned Cursor is empty. Trail not properly inserted into " +
                 "database.";
         assertTrue(errorEmptyCursor, cursor.moveToFirst());
 
@@ -129,11 +129,11 @@ public class ContentProviderUtilTest {
                 null);
 
         // Check to ensure that the Cursor is not null
-        String nullCursor = "Error querying the database for the inserted Guide.";
+        String nullCursor = "Error querying the database for the inserted Author.";
         assertNotNull(nullCursor, cursor);
 
         // Check that the Cursor contains an entry
-        String errorEmptyCursor = "Returned Cursor is empty. Guide not properly inserted into " +
+        String errorEmptyCursor = "Returned Cursor is empty. Author not properly inserted into " +
                 "database.";
         assertTrue(errorEmptyCursor, cursor.moveToFirst());
 
@@ -165,11 +165,11 @@ public class ContentProviderUtilTest {
                 null);
 
         // Check to ensure that the Cursor is not null
-        String nullCursor = "Error querying the database for the inserted Guide.";
+        String nullCursor = "Error querying the database for the inserted Area.";
         assertNotNull(nullCursor, cursor);
 
         // Check that the Cursor contains an entry
-        String errorEmptyCursor = "Returned Cursor is empty. Guide not properly inserted into " +
+        String errorEmptyCursor = "Returned Cursor is empty. Area not properly inserted into " +
                 "database.";
         assertTrue(errorEmptyCursor, cursor.moveToFirst());
 
@@ -180,6 +180,44 @@ public class ContentProviderUtilTest {
         TestUtilities.validateModelValues(area, dbArea);
 
         // Close the Cursor
+        cursor.close();
+    }
+
+    @Test
+    public void testBulkInsertSections() {
+
+        // Init the Sections to be inserted
+        Section[] sections = TestUtilities.getSections1(mContext);
+
+        // Bulk insert the Sections into the database
+        ContentProviderUtils.bulkInsertSections(mContext, sections);
+
+        // Query the database for the inserted Sections
+        Cursor cursor = mContext.getContentResolver().query(
+                GuideProvider.Sections.CONTENT_URI,
+                null,
+                GuideContract.SectionEntry.GUIDE_ID + " = ?",
+                new String[] {sections[0].guideId},
+                GuideContract.SectionEntry.SECTION + " ASC");
+
+        // Check to ensure that the Cursor is not null
+        String nullCursor = "Error querying the database for the inserted Sections.";
+        assertNotNull(nullCursor, cursor);
+
+        // Check that the Cursor contains an entry
+        String errorEmptyCursor = "Returned Cursor is empty. Sections not properly inserted into " +
+                "database.";
+        assertTrue(errorEmptyCursor, cursor.moveToFirst());
+
+        // Iterate through the entries in the Cursor and validate it against the corresponding
+        // inserted Section
+        for (int i = 0; i < sections.length; i++) {
+            cursor.moveToPosition(i);
+            Section section = Section.createSectionFromCursor(cursor);
+
+            TestUtilities.validateModelValues(sections[i], section);
+        }
+
         cursor.close();
     }
 }
