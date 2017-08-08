@@ -32,7 +32,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     private static final String LATITUDE = "latitude";
     private static final String LONGITUDE = "longitude";
     private static final String ELEVATION = "elevation";
-    private static final String HAS_IMAGE = "hasImage";
     private static final String DISTANCE = "distance";
     private static final String DIFFICULTY = "difficulty";
     private static final String AREA = "area";
@@ -77,7 +76,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
      * @param cursor    Cursor describing a Guide
      * @return Guide with the values described in the input Cursor
      */
-    public Guide createGuideFromCursor(Cursor cursor) {
+    public static Guide createGuideFromCursor(Cursor cursor) {
 
         // Get the index of every column from the Cursor
         int idxFirebaseId       = cursor.getColumnIndex(GuideContract.GuideEntry.FIREBASE_ID);

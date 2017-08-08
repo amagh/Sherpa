@@ -46,7 +46,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
      * @param cursor    Cursor describing an Author
      * @return An Author Object with values described in the Cursor
      */
-    public Author createAuthorFromCursor(Cursor cursor) {
+    public static Author createAuthorFromCursor(Cursor cursor) {
 
         // Index the columns of the Cursor
         int idxFirebaseId       = cursor.getColumnIndex(GuideContract.AuthorEntry.FIREBASE_ID);
@@ -71,7 +71,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
 
         if (imageUriString != null) {
             File imageFile = new File(Uri.parse(imageUriString).getPath());
-            setImageUri(imageFile);
+            author.setImageUri(imageFile);
         }
 
         return author;

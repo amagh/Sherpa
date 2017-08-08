@@ -45,7 +45,7 @@ public class Trail extends BaseModel implements Parcelable {
      * @param cursor    Cursor describing a Trail
      * @return Trail with the values described from the Cursor
      */
-    public Trail createTrailFromCursor(Cursor cursor) {
+    public static Trail createTrailFromCursor(Cursor cursor) {
 
         // Index all the columns in the Cursor
         int idxFirebaseId   = cursor.getColumnIndex(GuideContract.TrailEntry.FIREBASE_ID);

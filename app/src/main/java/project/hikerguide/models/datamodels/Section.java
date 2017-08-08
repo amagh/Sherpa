@@ -47,7 +47,7 @@ public class Section extends BaseModelWithImage implements Parcelable {
      * @param cursor    Cursor describing a Section of a Guide
      * @return Section with the values contained in the Cursor
      */
-    public Section createSectionFromCursor(Cursor cursor) {
+    public static Section createSectionFromCursor(Cursor cursor) {
 
         // Index the columns of the Cursor
         int idxFirebaseId       = cursor.getColumnIndex(GuideContract.SectionEntry.FIREBASE_ID);
@@ -72,7 +72,7 @@ public class Section extends BaseModelWithImage implements Parcelable {
 
         if (imageUriString != null) {
             File imageFile = new File(Uri.parse(imageUriString).getPath());
-            setImageUri(imageFile);
+            section0.setImageUri(imageFile);
         }
 
         return section0;

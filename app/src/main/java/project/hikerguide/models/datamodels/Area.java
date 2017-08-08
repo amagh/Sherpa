@@ -40,7 +40,7 @@ public class Area extends BaseModel implements Parcelable {
      * @param cursor    Cursor describing an Area
      * @return Area with values described in the Cursor
      */
-    public Area createAreaFromCursor(Cursor cursor) {
+    public static Area createAreaFromCursor(Cursor cursor) {
 
         // Index the columns of the Cursor
         int idxFirebaseId   = cursor.getColumnIndex(GuideContract.AreaEntry.FIREBASE_ID);
