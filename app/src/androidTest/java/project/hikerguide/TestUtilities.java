@@ -97,8 +97,9 @@ class TestUtilities {
     static ContentValues getAuthorValues() {
         ContentValues values = new ContentValues();
         values.put(GuideContract.AuthorEntry.NAME, "John Muir");
-        values.put(GuideContract.AuthorEntry.HAS_IMAGE, 1);
+        values.put(GuideContract.AuthorEntry.DESCRIPTION, "Test description");
         values.put(GuideContract.AuthorEntry.SCORE, 100);
+        values.put(GuideContract.AuthorEntry.IMAGE_URI, "TestImageUri");
 
         return values;
     }
@@ -114,10 +115,11 @@ class TestUtilities {
 
     static ContentValues getGuideValues() {
         ContentValues values = new ContentValues();
-        values.put(GuideContract.GuideEntry.AUTHOR_ID, 1);
-        values.put(GuideContract.GuideEntry.TRAIL_ID, 1);
+        values.put(GuideContract.GuideEntry.FIREBASE_ID, "testFirebaseId");
+        values.put(GuideContract.GuideEntry.AUTHOR_ID, "testAuthorId");
+        values.put(GuideContract.GuideEntry.TRAIL_ID, "testTrailId");
         values.put(GuideContract.GuideEntry.DATE_ADDED, System.currentTimeMillis());
-        values.put(GuideContract.GuideEntry.HAS_IMAGE, 1);
+//        values.put(GuideContract.GuideEntry.HAS_IMAGE, 1);
         values.put(GuideContract.GuideEntry.LATITUDE, 37.734);
         values.put(GuideContract.GuideEntry.LONGITUDE, -119.602);
         values.put(GuideContract.GuideEntry.RATING, 5);
@@ -131,13 +133,18 @@ class TestUtilities {
         values.put(GuideContract.SectionEntry.GUIDE_ID, 1);
         values.put(GuideContract.SectionEntry.SECTION, 1);
         values.put(GuideContract.SectionEntry.CONTENT, "Description of the hike");
-        values.put(GuideContract.SectionEntry.HAS_IMAGE, 1);
+//        values.put(GuideContract.SectionEntry.HAS_IMAGE, 1);
 
         return values;
     }
 
     static Guide getGuide1(Context context) {
         Guide guide = new Guide(System.currentTimeMillis());
+        guide.firebaseId = "testFirebaseId";
+        guide.authorId = "testAuthorId";
+        guide.authorName = "testAuthor";
+        guide.trailId = "testTrailId";
+        guide.trailName = "testTrailName";
         guide.difficulty = 3;
         guide.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2014/09/09.jpg"));
         guide.setGpxUri(downloadFile(context, "http://www.norcalhiker.com/maps/FourMileTrail.gpx"));
@@ -188,7 +195,10 @@ class TestUtilities {
     }
 
     static Trail getTrail1() {
-        return new Trail("Four Mile Trail", null);
+        Trail trail = new Trail("Four Mile Trail", null);
+        trail.firebaseId = "testFirebaseId";
+        trail.areaId = "testAreaId";
+        return trail;
     }
 
     static Trail getTrail2() {
@@ -205,6 +215,7 @@ class TestUtilities {
 
     static Author getAuthor1(Context context) {
         Author author = new Author("John Muir");
+        author.firebaseId = "testAuthorId";
         author.setImageUri(downloadFile(context, "http://www.norcalhiker.com/JMT/Images/170.jpg"));
         return author;
     }
@@ -332,7 +343,11 @@ class TestUtilities {
     }
 
     static Area getArea1() {
-        return new Area("Yosemite Valley");
+        Area area = new Area("Yosemite Valley");
+        area.firebaseId = "testAreaId";
+        area.state = "testState";
+
+        return area;
     }
 
     static Area getArea2() {
