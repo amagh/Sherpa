@@ -1,9 +1,11 @@
 package project.hikerguide.models.datamodels;
 
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,18 +47,34 @@ public class Author extends BaseModelWithImage implements Parcelable {
      * @return An Author Object with values described in the Cursor
      */
     public Author createAuthorFromCursor(Cursor cursor) {
+
         // Index the columns of the Cursor
-        int idxId = cursor.getColumnIndex(GuideContract.AuthorEntry._ID);
-        int idxName = cursor.getColumnIndex(GuideContract.AuthorEntry.NAME);
-        int idxScore = cursor.getColumnIndex(GuideContract.AuthorEntry.SCORE);
+        int idxFirebaseId       = cursor.getColumnIndex(GuideContract.AuthorEntry.FIREBASE_ID);
+        int idxName             = cursor.getColumnIndex(GuideContract.AuthorEntry.NAME);
+        int idxDescription      = cursor.getColumnIndex(GuideContract.AuthorEntry.DESCRIPTION);
+        int idxScore            = cursor.getColumnIndex(GuideContract.AuthorEntry.SCORE);
+        int idxImageUri         = cursor.getColumnIndex(GuideContract.AuthorEntry.IMAGE_URI);
 
         // Retrieve the values from the Cursor
-        long id = cursor.getLong(idxId);
-        String name = cursor.getString(idxName);
-        int score = cursor.getInt(idxScore);
+        String firebaseId       = cursor.getString(idxFirebaseId);
+        String name             = cursor.getString(idxName);
+        String description      = cursor.getString(idxDescription);
+        int score               = cursor.getInt(idxScore);
+        String imageUriString   = cursor.getString(idxImageUri);
 
         // Instantiate a new Author with the values
-        return new Author(name, score);
+        Author author           = new Author();
+        author.firebaseId       = firebaseId;
+        author.name             = name;
+        author.description      = description;
+        author.score            = score;
+
+        if (imageUriString != null) {
+            File imageFile = new File(Uri.parse(imageUriString).getPath());
+            setImageUri(imageFile);
+        }
+
+        return author;
     }
 
     @Override
