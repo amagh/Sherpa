@@ -5,7 +5,10 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.firebase.geofire.GeoLocation;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,6 +18,7 @@ import org.junit.runner.RunWith;
 import java.util.HashSet;
 import java.util.Set;
 
+import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
@@ -22,6 +26,8 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.Trail;
+import project.hikerguide.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static android.test.MoreAsserts.assertEmpty;
 import static junit.framework.Assert.assertEquals;
@@ -67,8 +73,39 @@ public class FirebaseDatabaseTest {
         BaseModel[] models = {guide, trail, author, section, area};
 
         for (int i = 0; i < types.length; i++) {
-            // Retrieve the Guide from the FirebaseDatabase using the guide's id
-            BaseModel model = mDatabase.getRecord(types[i], models[i].firebaseId);
+
+            BaseModel model = null;
+
+            // Retrieve the Model from the FirebaseDatabase using the model's firebaseId
+            if (models[i] instanceof Section) {
+                FirebaseDatabase.getInstance().getReference()
+                        .child(GuideDatabase.SECTIONS)
+                        .child(((Section) models[i]).guideId)
+                        .child(models[i].firebaseId)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                Section model = (Section) FirebaseProviderUtils.getModelFromSnapshot(SECTION, dataSnapshot);
+                                TestUtilities.validateModelValues(section, model);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                // Ensure that the validation has time to process
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                model = mDatabase.getRecord(types[i], models[i].firebaseId);
+            }
+
 
             // Assert that all values from the returned Guide are equal to the inserted Guide's
             // values
@@ -78,8 +115,6 @@ public class FirebaseDatabaseTest {
                 TestUtilities.validateModelValues(trail, model);
             } else if (model instanceof Author) {
                 TestUtilities.validateModelValues(author, model);
-            } else if (model instanceof Section) {
-                TestUtilities.validateModelValues(section, model);
             } else if (model instanceof Area) {
                 TestUtilities.validateModelValues(area, model);
             }

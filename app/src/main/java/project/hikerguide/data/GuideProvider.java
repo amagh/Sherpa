@@ -62,23 +62,23 @@ public class GuideProvider {
         public static final Uri CONTENT_URI = buildUri(Path.GUIDES);
 
         @InexactContentUri(
-                path = Path.GUIDES + "/#",
+                path = Path.GUIDES + "/*",
                 name = "GUIDE_DETAILS",
                 type = "vnd.android.cursor.item/guides",
-                whereColumn = GuideDatabase.GUIDES + "." + GuideContract.GuideEntry._ID,
+                whereColumn = GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.FIREBASE_ID,
                 pathSegment = 1,
                 join = "JOIN " + GuideDatabase.TRAILS + " ON " +
                         GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.TRAIL_ID + " = "  +
-                        GuideDatabase.TRAILS + "." + GuideContract.TrailEntry._ID               +
+                        GuideDatabase.TRAILS + "." + GuideContract.TrailEntry.FIREBASE_ID               +
                         " JOIN " + GuideDatabase.AUTHORS + " ON "                               +
                         GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.AUTHOR_ID + " = " +
-                        GuideDatabase.AUTHORS + "." + GuideContract.AuthorEntry._ID             +
+                        GuideDatabase.AUTHORS + "." + GuideContract.AuthorEntry.FIREBASE_ID             +
                         " JOIN " + GuideDatabase.SECTIONS + " ON "                              +
-                        GuideDatabase.GUIDES + "." + GuideContract.GuideEntry._ID + " = "       +
+                        GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.FIREBASE_ID + " = "       +
                         GuideDatabase.SECTIONS + "." + GuideContract.SectionEntry.GUIDE_ID
         )
-        public static Uri withId(long id) {
-            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        public static Uri withId(String firebaseId) {
+            return CONTENT_URI.buildUpon().appendPath(firebaseId).build();
         }
 
         @InexactContentUri(

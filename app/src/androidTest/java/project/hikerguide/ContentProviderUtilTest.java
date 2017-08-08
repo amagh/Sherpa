@@ -2,10 +2,13 @@ package project.hikerguide;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,10 +36,14 @@ public class ContentProviderUtilTest {
     // ** Member Variables ** //
     Context mContext;
 
+    @BeforeClass
+    public static void setup() {
+        InstrumentationRegistry.getTargetContext().deleteDatabase(GuideDatabase.DATABASE_NAME);
+    }
+
     @Before
-    public void setup() {
+    public void getContext() {
         mContext = InstrumentationRegistry.getTargetContext();
-        mContext.deleteDatabase(GuideDatabase.DATABASE_NAME);
     }
 
     @Test

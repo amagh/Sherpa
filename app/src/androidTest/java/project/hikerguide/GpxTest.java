@@ -21,7 +21,7 @@ import static junit.framework.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class GpxTest {
     // ** Constants ** //
-    private static final String GPX_URL = "http://www.gpsvisualizer.com/download/convert/20170722025200-45110-data.gpx";
+    private static final String GPX_URL = "http://www.gpsvisualizer.com/download/convert/20170808134714-26167-data.gpx";
 
     @Test
     public void testGetGpxStats() {

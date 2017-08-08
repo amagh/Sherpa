@@ -32,6 +32,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     private static final String LATITUDE = "latitude";
     private static final String LONGITUDE = "longitude";
     private static final String ELEVATION = "elevation";
+    private static final String HAS_IMAGE = "hasImage";
     private static final String DISTANCE = "distance";
     private static final String DIFFICULTY = "difficulty";
     private static final String AREA = "area";
@@ -158,6 +159,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         map.put(DISTANCE, distance);
         map.put(DIFFICULTY, difficulty);
         map.put(AREA, area);
+        map.put(HAS_IMAGE, hasImage);
 
         return map;
     }

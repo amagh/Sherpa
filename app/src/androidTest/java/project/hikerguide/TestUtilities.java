@@ -89,14 +89,19 @@ class TestUtilities {
 
     static ContentValues getAreaValues() {
         ContentValues values = new ContentValues();
+        values.put(GuideContract.AreaEntry.FIREBASE_ID, "testAreaId");
         values.put(GuideContract.AreaEntry.NAME, "Yosemite");
+        values.put(GuideContract.AreaEntry.LOWER_CASE_NAME, "yosemite");
+        values.put(GuideContract.AreaEntry.STATE, "California");
 
         return values;
     }
 
     static ContentValues getAuthorValues() {
         ContentValues values = new ContentValues();
+        values.put(GuideContract.AuthorEntry.FIREBASE_ID, "testAuthorId");
         values.put(GuideContract.AuthorEntry.NAME, "John Muir");
+        values.put(GuideContract.AuthorEntry.LOWER_CASE_NAME, "john muir");
         values.put(GuideContract.AuthorEntry.DESCRIPTION, "Test description");
         values.put(GuideContract.AuthorEntry.SCORE, 100);
         values.put(GuideContract.AuthorEntry.IMAGE_URI, "TestImageUri");
@@ -106,8 +111,10 @@ class TestUtilities {
 
     static ContentValues getTrailValues() {
         ContentValues values = new ContentValues();
-        values.put(GuideContract.TrailEntry.AREA_ID, 1);
+        values.put(GuideContract.TrailEntry.FIREBASE_ID, "testTrailId");
+        values.put(GuideContract.TrailEntry.AREA_ID, "testAreaId");
         values.put(GuideContract.TrailEntry.NAME, "Four Mile Trail");
+        values.put(GuideContract.TrailEntry.LOWER_CASE_NAME, "four mile trail");
         values.put(GuideContract.TrailEntry.NOTES, "Temporarily Closed");
 
         return values;
@@ -115,7 +122,7 @@ class TestUtilities {
 
     static ContentValues getGuideValues() {
         ContentValues values = new ContentValues();
-        values.put(GuideContract.GuideEntry.FIREBASE_ID, "testFirebaseId");
+        values.put(GuideContract.GuideEntry.FIREBASE_ID, "testGuideId");
         values.put(GuideContract.GuideEntry.AUTHOR_ID, "testAuthorId");
         values.put(GuideContract.GuideEntry.TRAIL_ID, "testTrailId");
         values.put(GuideContract.GuideEntry.DATE_ADDED, System.currentTimeMillis());
@@ -130,7 +137,8 @@ class TestUtilities {
 
     static ContentValues getSectionValues() {
         ContentValues values = new ContentValues();
-        values.put(GuideContract.SectionEntry.GUIDE_ID, 1);
+        values.put(GuideContract.SectionEntry.FIREBASE_ID, "testSectionId");
+        values.put(GuideContract.SectionEntry.GUIDE_ID, "testGuideId");
         values.put(GuideContract.SectionEntry.SECTION, 1);
         values.put(GuideContract.SectionEntry.CONTENT, "Description of the hike");
 //        values.put(GuideContract.SectionEntry.HAS_IMAGE, 1);
@@ -221,22 +229,48 @@ class TestUtilities {
     }
 
     static Section getSection() {
-        return new Section("1", 1, "Description of hike");
+        return new Section("testGuideId", 1, "Description of hike");
     }
 
     public static Section[] getSections1(Context context) {
         Section section1 = new Section(1, "The Four Mile Trail (actually 4.8 miles) is one of Yosemite Valley’s most strenuous trails. It climbs up to Glacier Point – an ascent of nearly 3300-ft in just under five miles. After the grueling uphill slog, hikers are rewarded with unparalleled views of Half Dome and the rest of Yosemite Valley. Glacier Point can also be reached by car or shuttle, but the view feels much more rewarding when you walk. We hiked this on a rainy Saturday in late September. Though summer is over, there were still plenty of people out and about. You can’t expect much solitude on this trail, but you can look forward to a great workout and some good people watching!");
+        section1.firebaseId = "testSectionId1";
+        section1.guideId = "testGuideId";
+
         Section section2 = new Section(2, "Red Tape:  The park entrance fee is $20.  If you plan to stay in the Valley, reserve accommodations well in advance!  There is limited parking at the trailhead, but it is along the El Capitan shuttle route.  The shuttle runs from June through October, 9am to 6pm. When you enter the park, they will hand you a fairly decent map at the kiosk. The trail is on this map. There are no junctions, so it’s basically impossible to get lost.");
+        section2.firebaseId = "testSectionId2";
+        section2.guideId = "testGuideId";
+
         Section section3 = new Section(3, "Trail Description: The hike described here is actually a repeat of the beginning portion of the 20-mile John Muir hike we completed last October. On that trip we hiked half this trail in the dark, then continued on towards Sentinel Dome, the Panorama Trail, Liberty Cap and the Mist Trail. This time around we decided to “take it easy” and enjoy the Four Mile Trail on its own.");
+        section3.firebaseId = "testSectionId3";
+        section3.guideId = "testGuideId";
+
         Section section4 = new Section(4, "Getting ready to hike! Saturday morning in Curry Village.");
+        section4.firebaseId = "testSectionId4";
+        section4.guideId = "testGuideId";
         section4.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2014/09/01.jpg"));
+
         Section section5 = new Section(5, "We slept late, ate breakfast at the Curry Village Coffee Corner, then drove the loop around Yosemite Valley to reach the trailhead.  The trail has a huge sign, so it’s difficult to miss.  There was no parking (at 10:00 am on a Saturday), so we drove a little further up the road and parked at the Swinging Bridge Picnic Area.");
+        section5.firebaseId = "testSectionId5";
+        section5.guideId = "testGuideId";
+
         Section section6 = new Section(6, "Somewhere near the beginning of the trail…");
+        section6.firebaseId = "testSectionId6";
+        section6.guideId = "testGuideId";
         section6.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2014/09/02.jpg"));
+
         Section section7 = new Section(7, "We started up the trail and were quickly passed by several people walking much faster.  I think we are just slow, but I will blame our heavy packs.  We carried lots of food, a couple of beers, warm clothing and rain gear.  All proved to be very useful and/or delicious.  Many of the other hikers were wearing shorts (or jeans!!) and not carrying jackets.  It was cold and rainy – seems like poor preparation (but who am I to judge?)");
+        section7.firebaseId = "testSectionId7";
+        section7.guideId = "testGuideId";
+
         Section section8 = new Section(8, "Moss on all the rocks.");
+        section8.firebaseId = "testSectionId8";
+        section8.guideId = "testGuideId";
         section8.setImageUri(downloadFile(context, "http://www.norcalhiker.com/wp-content/uploads/2014/09/03.jpg"));
+
         Section section9 = new Section(9, "The trail climbs at a steady, relentless grade with many switchbacks.  Soon we had glimpses of El Cap and the Valley through the trees.  About halfway up, we started catching views of Half Dome.  We also began encountering quite a few hikers coming down the trail. Some had taken the shuttle up and were now hiking down.  Others had already hiked to the top and were on their way back.  I’m not used to this because we are usually the first people to hit a trail!");
+        section9.firebaseId = "testSectionId9";
+        section9.guideId = "testGuideId";
 
         return new Section[] {section1, section2, section3, section4, section5, section6, section7, section8, section9};
     }

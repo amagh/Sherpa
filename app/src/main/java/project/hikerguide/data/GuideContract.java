@@ -84,8 +84,8 @@ public class GuideContract {
         @DataType(DataType.Type.TEXT) @NotNull String FIREBASE_ID                   = "firebaseId";
         @DataType(DataType.Type.TEXT) @NotNull String NAME                          = "name";
         @DataType(DataType.Type.TEXT) @NotNull String LOWER_CASE_NAME               = "lowerCaseName";
-        @DataType(DataType.Type.REAL) @NotNull String LATITUDE                      = "latitude";
-        @DataType(DataType.Type.REAL) @NotNull String LONGITUDE                     = "longitude";
+        @DataType(DataType.Type.REAL) String LATITUDE                               = "latitude";
+        @DataType(DataType.Type.REAL) String LONGITUDE                              = "longitude";
         @DataType(DataType.Type.TEXT) @NotNull String STATE                         = "state";
     }
 }

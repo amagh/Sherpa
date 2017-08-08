@@ -9,6 +9,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -32,13 +33,18 @@ public class ContentProviderTest {
      * Gets a references to the Context used to access the ContentProvider and ensures that the
      * database is created before each test
      */
-    @Before
-    public void setUp() {
-        // Get reference to Context
-        context = InstrumentationRegistry.getContext();
+    @BeforeClass
+    public static void setUp() {
 
         // Delete the database if it exists
-        context.deleteDatabase(GuideDatabase.DATABASE_NAME);
+//        InstrumentationRegistry.getTargetContext().deleteDatabase(GuideDatabase.DATABASE_NAME);
+    }
+
+    @Before
+    public void getContext() {
+
+        // Get reference to Context
+        context = InstrumentationRegistry.getTargetContext();
     }
 
     /**
@@ -99,7 +105,7 @@ public class ContentProviderTest {
         insertContentValues(TestUtilities.getSectionValues(), GuideProvider.Sections.CONTENT_URI);
 
         // Query the database to see if the joined table works correctly
-        Uri joinedUri = GuideProvider.Guides.withId(1);
+        Uri joinedUri = GuideProvider.Guides.withId("testGuideId");
         Cursor cursor = context.getContentResolver().query(
                 joinedUri,
                 null,
@@ -117,7 +123,7 @@ public class ContentProviderTest {
             assertTrue(emptyCursor, cursor.moveToFirst());
 
             // Assert the Cursor contains as many columns as all the joined tables combined
-            assertEquals(26, cursor.getColumnCount());
+            assertEquals(35, cursor.getColumnCount());
         } finally {
             // Close the Cursor
             cursor.close();
@@ -177,6 +183,6 @@ public class ContentProviderTest {
      */
     @After
     public void cleanUp() {
-        context.deleteDatabase(GuideDatabase.DATABASE_NAME);
+//        context.deleteDatabase(GuideDatabase.DATABASE_NAME);
     }
 }
