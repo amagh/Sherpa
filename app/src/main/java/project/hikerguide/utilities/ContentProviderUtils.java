@@ -19,6 +19,12 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 
 public class ContentProviderUtils {
 
+    /**
+     * Inserts a model into the database
+     *
+     * @param context    Interface to global Context
+     * @param model      Model to be inserted into the database
+     */
     public static void insertModel(Context context, BaseModel model) {
 
         // Insert the values into the database
@@ -29,6 +35,29 @@ public class ContentProviderUtils {
 
                 // Build the ContentValues for the model
                 getContentValuesForModel(model));
+    }
+
+    /**
+     * Bulk inserts an Array of Sections into the database
+     *
+     * @param context     Interface to global Context
+     * @param sections    Array of Sections to be inserted into the database
+     */
+    public static void bulkInsertSections(Context context, Section... sections) {
+
+        // Init the Array of ContentValues to be bulk inserted
+        ContentValues[] sectionValues = new ContentValues[sections.length];
+
+        // Iterate through the Sections and create ContentValues from them
+        for (int i = 0; i < sections.length; i++) {
+            Section section = sections[i];
+            sectionValues[i] = getValuesForSection(section);
+        }
+
+        // Bulk insert the values into the database
+        context.getContentResolver().bulkInsert(
+                GuideProvider.Sections.CONTENT_URI,
+                sectionValues);
     }
 
     /**
