@@ -139,6 +139,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
             getActivity().getSupportLoaderManager().initLoader(LOADER_SECTION, null, this);
             getActivity().getSupportLoaderManager().initLoader(LOADER_AUTHOR, null, this);
         } else {
+
             // Set the data for the Adapter
             mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
             getSectionsFromFirebase();
@@ -233,6 +234,11 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        // Check the Cursor has valid data to be loaded to prevent crashing if there is none
+        if (data.getColumnCount() < 1) {
+            return;
+        }
 
         // Load the data into the Adapter based on the Loader's id
         switch (loader.getId()) {
