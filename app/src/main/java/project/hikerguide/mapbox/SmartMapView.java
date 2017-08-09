@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 
+import project.hikerguide.R;
 import project.hikerguide.ui.activities.MapboxActivity;
 
 /**
@@ -41,6 +42,8 @@ public class SmartMapView extends MapView {
         mStarted = true;
 
         onCreate(null);
+
+        setStyleUrl(activity.getString(R.string.outdoors_style));
         onStart();
 
         activity.attachMapView(this);
