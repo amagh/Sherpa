@@ -3,8 +3,10 @@ package project.hikerguide.ui.fragments;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -66,6 +69,7 @@ public class GuideDetailsFragment extends Fragment {
     private Author mAuthor;
     private GuideDetailsAdapter mAdapter;
     private DownloadListener mListener;
+    private MenuItem mCacheMenuItem;
 
     public GuideDetailsFragment() {}
 
@@ -134,6 +138,13 @@ public class GuideDetailsFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_guide_details, menu);
+
+        mCacheMenuItem = menu.getItem(0);
+        if (!isGuideCached()) {
+            mCacheMenuItem.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_save));
+        } else {
+            mCacheMenuItem.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_delete_white));
+        }
     }
 
     @Override
@@ -147,14 +158,47 @@ public class GuideDetailsFragment extends Fragment {
             case R.id.menu_save:
                 if (!isGuideCached()) {
                     saveFilesForGuide();
+                    animateCacheIcon();
+                    item.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_delete_white));
                 } else {
                     deleteGuide();
+                    animateCacheIcon();
+                    item.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_save));
                 }
 
                 return true;
         }
 
         return false;
+    }
+
+    /**
+     * Replaces the save icon with an indeterminate ProgressBar to inform the user of background
+     * actions.
+     */
+    private void animateCacheIcon() {
+
+        // Inflate the View
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        ProgressBar progressBar = (ProgressBar) inflater.inflate(R.layout.menu_progress_actionview, null);
+
+        // Change the color of the ProgressBar to white
+        progressBar.getIndeterminateDrawable()
+                .setColorFilter(
+                        ContextCompat.getColor(getActivity(), android.R.color.white),
+                        PorterDuff.Mode.SRC_IN);
+
+        // Set the ActionView of the menu icon
+        mCacheMenuItem.setActionView(progressBar);
+    }
+
+    /**
+     * Removes the ProgressBar from the ActionBar replacing the save icon
+     */
+    private void stopCacheIcon() {
+
+        // Remove the ActionView of the menu icon
+        mCacheMenuItem.setActionView(null);
     }
 
     /**
@@ -269,9 +313,16 @@ public class GuideDetailsFragment extends Fragment {
      */
     private void saveFilesForGuide() {
 
+        ProgressDialog dialog = new ProgressDialog();
+        dialog.setCancelable(false);
+        dialog.setTitle(getActivity().getString(R.string.progress_download_files_title));
+        dialog.setIndeterminate(true);
+
+        dialog.show(getActivity().getSupportFragmentManager(), null);
+
         // Init the DownloadListener
         if (mListener == null) {
-            mListener = new DownloadListener();
+            mListener = new DownloadListener(dialog);
         }
 
         // Save the GPX and Image associated with the Guide
@@ -372,6 +423,9 @@ public class GuideDetailsFragment extends Fragment {
                         .show();
 
                 dialog.dismiss();
+
+                // Reset the ActionBar icon
+                stopCacheIcon();
             }
 
             @Override
@@ -460,13 +514,22 @@ public class GuideDetailsFragment extends Fragment {
                         getActivity().getString(R.string.mapbox_deleted),
                         Toast.LENGTH_LONG)
                         .show();
+
+                // Reset the ActionBar icon
+                stopCacheIcon();
             }
         });
     }
 
     private class DownloadListener {
         // ** Member Variables ** //
+        private ProgressDialog mDialog;
         private List<StorageTask<FileDownloadTask.TaskSnapshot>> mTaskList;
+
+
+        public DownloadListener(ProgressDialog dialog) {
+            mDialog = dialog;
+        }
 
         /**
          * Adds a download task to be monitored
@@ -500,6 +563,8 @@ public class GuideDetailsFragment extends Fragment {
                 // The files must be downloaded first so that when the guide is saved to the
                 // database the Uri of the files can also be saved to the database.
                 saveGuide();
+
+                mDialog.dismiss();
             }
         }
     }

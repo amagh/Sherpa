@@ -91,6 +91,7 @@
     <!-- Progressbar Dialog Strings -->
     <string name="progress_download_map_title">Downloading Map Tiles</string>
     <string name="progress_delete_map_title">Deleting Map Tiles</string>
+    <string name="progress_download_files_title">Downloading Files</string>
 
     <!-- User Activity Strings -->
     <string name="menu_user_log_off">Sign out</string>
