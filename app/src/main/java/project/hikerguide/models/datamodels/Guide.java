@@ -217,7 +217,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         GpxFile gpxFile = GpxFile.getDestinationFile(context, this.firebaseId);
 
         // Set the gpxUri to the File's path
-        setGpxUri(gpxFile);
         return gpxFile;
     }
 
