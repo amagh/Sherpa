@@ -3,27 +3,35 @@ package project.hikerguide.ui.fragments;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import project.hikerguide.R;
+import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.databinding.FragmentGuideListBinding;
+import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Guide;
-import project.hikerguide.sync.SyncGuidesTaskLoader;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
+import project.hikerguide.utilities.FirebaseProviderUtils;
 
 /**
  * Created by Alvin on 7/21/2017.
  */
 
-public class GuideListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Guide[]>{
+public class GuideListFragment extends Fragment {
     // ** Constants ** //
     private static final int GUIDES_LOADER = 4349;
     // ** Member Variables ** //
@@ -56,24 +64,37 @@ public class GuideListFragment extends Fragment implements LoaderManager.LoaderC
         mBinding.guideListRv.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Begin loading Guides using the Loader
-        getActivity().getSupportLoaderManager().initLoader(GUIDES_LOADER, null, this);
+//        getActivity().getSupportLoaderManager().initLoader(GUIDES_LOADER, null, this);
+        loadGuides();
         return mBinding.getRoot();
     }
 
-    @Override
-    public Loader<Guide[]> onCreateLoader(int id, Bundle args) {
-        return new SyncGuidesTaskLoader(getActivity());
-    }
+    private void loadGuides() {
 
-    @Override
-    public void onLoadFinished(Loader<Guide[]> loader, Guide[] data) {
-        // Set the retrieved Guides in the Adapter
-        mAdapter.setGuides(Arrays.asList(data));
-    }
+        final Query guideQuery = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.GUIDES)
+                .orderByKey()
+                .limitToLast(20);
 
-    @Override
-    public void onLoaderReset(Loader<Guide[]> loader) {
+        guideQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Guide[] guides = (Guide[]) FirebaseProviderUtils.getModelsFromSnapshot(
+                        DatabaseProvider.FirebaseType.GUIDE,
+                        dataSnapshot);
 
+                List<Guide> guideList = Arrays.asList(guides);
+                Collections.reverse(guideList);
+                mAdapter.setGuides(guideList);
+                guideQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                guideQuery.removeEventListener(this);
+            }
+        });
     }
 
     public interface OnGuideClickListener {
