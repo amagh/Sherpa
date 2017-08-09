@@ -291,7 +291,6 @@ public class GuideViewModel extends BaseObservable {
     public static void loadGpxToMap(final SmartMapView mapView, MapboxActivity activity, final File gpx,
                                     final GuideViewModel viewModel, final boolean trackUserPosition) {
 
-        Timber.d("MapView Stuff");
         // The MapView will retain it's internal LifeCycle regardless of how many times it's
         // rendered
         mapView.startMapView(activity);
@@ -301,7 +300,6 @@ public class GuideViewModel extends BaseObservable {
             mapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(final MapboxMap mapboxMap) {
-                    Timber.d("MapReady!");
 
                     // Set the memvar MapboxMap to the loaded MapboxMap
                     viewModel.setMapboxMap(mapboxMap);
