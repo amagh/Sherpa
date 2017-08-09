@@ -418,7 +418,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
                 return true;
 
-            case R.id.menu_save:
+            case R.id.menu_save_draft:
 
                 return true;
         }
