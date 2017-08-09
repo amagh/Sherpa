@@ -85,6 +85,7 @@
 
     <!-- Add Trail Dialog Strings -->
     <string name="add_trail_hint">Trail name</string>
+    <string name="add_trail_title">Add a New Trail</string>
 
     <!-- User Activity Strings -->
     <string name="menu_user_log_off">Sign out</string>

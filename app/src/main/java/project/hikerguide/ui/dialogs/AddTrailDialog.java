@@ -33,7 +33,7 @@ public class AddTrailDialog extends DialogFragment {
 
         mBinding = DataBindingUtil.inflate(inflater, R.layout.dialog_add_trail, null, false);
         builder.setView(mBinding.getRoot());
-        builder.setTitle("Add a New Trail");
+        builder.setTitle(getActivity().getString(R.string.add_trail_title));
 
         builder.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
             @Override
