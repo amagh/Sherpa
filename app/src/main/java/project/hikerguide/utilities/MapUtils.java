@@ -209,7 +209,8 @@ public class MapUtils {
      * @param context    Interface to global Context
      * @param guide      Guide whose associated Mapbox tiles should be deleted
      */
-    public static void deleteMapboxOffline(final Context context, final Guide guide) {
+    public static void deleteMapboxOffline(final Context context, final Guide guide,
+                                           final MapboxDeleteCallback callback) {
 
         // Init the OfflineManager
         OfflineManager manager = OfflineManager.getInstance(context);
@@ -235,7 +236,7 @@ public class MapUtils {
                         if (guide.firebaseId.equals(firebaseId)) {
 
                             // Delete the tiles for the OfflineRegion
-                            deleteTiles(context, region);
+                            deleteTiles(context, region, callback);
                         }
                     } catch (UnsupportedEncodingException | JSONException e) {
                         e.printStackTrace();
@@ -256,20 +257,16 @@ public class MapUtils {
      * @param context          Interface to global Context
      * @param offlineRegion    OfflineRegion to be deleted
      */
-    private static void deleteTiles(final Context context, OfflineRegion offlineRegion) {
+    private static void deleteTiles(final Context context, OfflineRegion offlineRegion,
+                                    final MapboxDeleteCallback callback) {
 
         // Delete the region
         offlineRegion.delete(new OfflineRegion.OfflineRegionDeleteCallback() {
             @Override
             public void onDelete() {
 
-                // Hide ProgressBar
-
-                // Notify user of success
-                Toast.makeText(context,
-                        context.getString(R.string.mapbox_deleted),
-                        Toast.LENGTH_LONG)
-                        .show();
+                // Trigger callback
+                callback.onComplete();
 
                 Timber.d("Map deleted!");
             }
@@ -291,5 +288,9 @@ public class MapUtils {
     public interface MapboxDownloadCallback {
         void onDownloadComplete();
         void onUpdateProgress(double progress);
+    }
+
+    public interface MapboxDeleteCallback {
+        void onComplete();
     }
 }

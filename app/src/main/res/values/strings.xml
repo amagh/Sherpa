@@ -75,6 +75,7 @@
     <string name="error_downloading_mapbox">There was an error downloading the map tiles. Please try again later.</string>
     <string name="error_tile_count_exceeded">Reached max tile count. Please remove some offline maps before attempting to save again.</string>
     <string name="mapbox_deleted">Mapbox tiles successfully deleted.</string>
+    <string name="mapbox_downloaded">Map downloaded!</string>
 
     <!-- Create Guide Strings -->
     <string name="menu_publish_title">Publish Guide</string>
@@ -86,6 +87,10 @@
     <!-- Add Trail Dialog Strings -->
     <string name="add_trail_hint">Trail name</string>
     <string name="add_trail_title">Add a New Trail</string>
+
+    <!-- Progressbar Dialog Strings -->
+    <string name="progress_download_map_title">Downloading Map Tiles</string>
+    <string name="progress_delete_map_title">Deleting Map Tiles</string>
 
     <!-- User Activity Strings -->
     <string name="menu_user_log_off">Sign out</string>

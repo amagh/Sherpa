@@ -45,6 +45,7 @@ import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.UserActivity;
 import project.hikerguide.ui.adapters.GuideDetailsAdapter;
+import project.hikerguide.ui.dialogs.ProgressDialog;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.MapUtils;
@@ -350,24 +351,34 @@ public class GuideDetailsFragment extends Fragment {
             ContentProviderUtils.bulkInsertSections(getActivity(), mSections);
         }
 
+        // Show a ProgressDialog to inform the user of the progress of the map download
+        final ProgressDialog dialog = new ProgressDialog();
+
+        // Set the Title for the Dialog
+        dialog.setTitle(getActivity().getString(R.string.progress_download_map_title));
+
+        // Prevent user from closing the Dialog when clicking outside
+        dialog.setCancelable(false);
+
+        dialog.show(getActivity().getSupportFragmentManager(), null);
+
         // Save the map tiles for offline use
         MapUtils.saveMapboxOffline(getActivity(), mGuide, new MapUtils.MapboxDownloadCallback() {
             @Override
             public void onDownloadComplete() {
                 Toast.makeText(getActivity(),
-                        "Map downloaded!",
+                        getActivity().getString(R.string.mapbox_downloaded),
                         Toast.LENGTH_LONG)
                         .show();
+
+                dialog.dismiss();
             }
 
             @Override
             public void onUpdateProgress(double progress) {
-//                Toast.makeText(getActivity(),
-//                        String.format(Locale.getDefault(), "%f percent", progress),
-//                        Toast.LENGTH_SHORT)
-//                        .show();
 
-                // TODO: Implement progress bar
+                // Update the ProgressBar
+                dialog.updateProgress((int) progress);
             }
         });
     }
@@ -428,8 +439,29 @@ public class GuideDetailsFragment extends Fragment {
             cursor.close();
         }
 
+        // Show the ProgressDialog
+        final ProgressDialog dialog = new ProgressDialog();
+        dialog.setTitle(getActivity().getString(R.string.progress_delete_map_title));
+        dialog.setIndeterminate(true);
+        dialog.setCancelable(false);
+
+        dialog.show(getActivity().getSupportFragmentManager(), null);
+
         // Delete the downloaded map tiles
-        MapUtils.deleteMapboxOffline(getActivity(), mGuide);
+        MapUtils.deleteMapboxOffline(getActivity(), mGuide, new MapUtils.MapboxDeleteCallback() {
+            @Override
+            public void onComplete() {
+
+                // Dismiss the Dialog
+                dialog.dismiss();
+
+                // Notify user of success
+                Toast.makeText(getActivity(),
+                        getActivity().getString(R.string.mapbox_deleted),
+                        Toast.LENGTH_LONG)
+                        .show();
+            }
+        });
     }
 
     private class DownloadListener {
