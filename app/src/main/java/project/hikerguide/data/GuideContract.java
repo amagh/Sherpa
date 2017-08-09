@@ -75,7 +75,7 @@ public class GuideContract {
         @NotNull String GUIDE_ID                                                    = "guideId";
         
         @DataType(DataType.Type.INTEGER) @NotNull String SECTION                    = "section";
-        @DataType(DataType.Type.TEXT) @NotNull String CONTENT                       = "content";
+        @DataType(DataType.Type.TEXT) String CONTENT                                = "content";
         @DataType(DataType.Type.TEXT) String IMAGE_URI                              = "imageUri";
     }
 
