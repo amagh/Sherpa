@@ -2,15 +2,12 @@ package project.hikerguide.models.viewmodels;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,7 +30,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import project.hikerguide.BR;
@@ -47,7 +43,6 @@ import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.ConversionUtils;
 import project.hikerguide.utilities.SaveUtils;
-import timber.log.Timber;
 
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
 import static project.hikerguide.utilities.MapUtils.addMapOptionsToMap;
