@@ -4,9 +4,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -61,7 +65,12 @@ import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
  * Created by Alvin on 8/7/2017.
  */
 
-public class GuideDetailsFragment extends Fragment {
+public class GuideDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    // ** Constants ** //
+    private static final int LOADER_GUIDE       = 3564;
+    private static final int LOADER_SECTION     = 1654;
+    private static final int LOADER_AUTHOR      = 6188;
+
     // ** Member Variables ** //
     private FragmentGuideDetailsBinding mBinding;
     private Guide mGuide;
@@ -122,12 +131,19 @@ public class GuideDetailsFragment extends Fragment {
         mBinding.guideDetailsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mBinding.guideDetailsRv.setAdapter(mAdapter);
 
-        // Add Guide
-        mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
+        // Check whether the Guide has been cached
+        if (isGuideCached()) {
 
-        // Get the rest of the Guide's details
-        getSections();
-        getAuthor();
+            // Load the Guide from the database
+            getActivity().getSupportLoaderManager().initLoader(LOADER_GUIDE, null, this);
+            getActivity().getSupportLoaderManager().initLoader(LOADER_SECTION, null, this);
+            getActivity().getSupportLoaderManager().initLoader(LOADER_AUTHOR, null, this);
+        } else {
+            // Set the data for the Adapter
+            mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
+            getSectionsFromFirebase();
+            getAuthorFromFirebase();
+        }
 
         // Show the menu
         setHasOptionsMenu(true);
@@ -172,6 +188,103 @@ public class GuideDetailsFragment extends Fragment {
         return false;
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        // Variables for CursorLoader
+        Uri uri = null;
+        String selection = null;
+        String[] selectionArgs = null;
+        String sortOrder = null;
+
+        // Set the variables based on the Loader's id
+        switch (id) {
+            case LOADER_GUIDE:
+                uri = GuideProvider.Guides.CONTENT_URI;
+                selection = GuideContract.GuideEntry.FIREBASE_ID + " = ?";
+                selectionArgs = new String[] {mGuide.firebaseId};
+
+                break;
+
+            case LOADER_SECTION:
+                uri = GuideProvider.Sections.CONTENT_URI;
+                selection = GuideContract.SectionEntry.GUIDE_ID + " = ?";
+                selectionArgs = new String[] {mGuide.firebaseId};
+                sortOrder = GuideContract.SectionEntry.SECTION + " ASC";
+
+                break;
+
+            case LOADER_AUTHOR:
+                uri = GuideProvider.Authors.CONTENT_URI;
+                selection = GuideContract.AuthorEntry.FIREBASE_ID + " = ?";
+                selectionArgs = new String[] {mGuide.authorId};
+
+                break;
+        }
+
+        return new CursorLoader(
+                getActivity(),
+                uri,
+                null,
+                selection,
+                selectionArgs,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        // Load the data into the Adapter based on the Loader's id
+        switch (loader.getId()) {
+            case LOADER_GUIDE:
+
+                // Move the Cursor to the first position
+                data.moveToFirst();
+
+                // Create a Guide from the data in the Cursor
+                mGuide = Guide.createGuideFromCursor(data);
+
+                // Set the Guide to the Adapter
+                mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
+
+                break;
+
+            case LOADER_SECTION:
+
+                // Init mSections
+                mSections = new Section[data.getCount()];
+
+                // Populate the Array using the data from the Cursor
+                for (int i = 0; i < data.getCount(); i++) {
+                    data.moveToPosition(i);
+                    mSections[i] = Section.createSectionFromCursor(data);
+                }
+
+                // Pass mSections to the Adapter
+                 mAdapter.setSections(mSections);
+
+                break;
+
+            case LOADER_AUTHOR:
+
+                // Move the Cursor to the first position
+                data.moveToFirst();
+
+                // Create an Author from the data in the Cursor
+                mAuthor = Author.createAuthorFromCursor(data);
+
+                // Set the Author to the Adapter
+                mAdapter.setAuthor(mAuthor);
+
+                break;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
     /**
      * Replaces the save icon with an indeterminate ProgressBar to inform the user of background
      * actions.
@@ -204,7 +317,7 @@ public class GuideDetailsFragment extends Fragment {
     /**
      * Loads the corresponding Sections for the Guide from FirebaseDatabase
      */
-    private void getSections() {
+    private void getSectionsFromFirebase() {
 
         // Build the Query for the Sections using the FirebaseId of the Guide
         final Query sectionQuery = FirebaseDatabase.getInstance().getReference()
@@ -245,7 +358,7 @@ public class GuideDetailsFragment extends Fragment {
     /**
      * Loads the corresponding Author of the Guide from the Firebase Database
      */
-    private void getAuthor() {
+    private void getAuthorFromFirebase() {
 
         // Build a reference to the Guide in the Firebase Database
         final DatabaseReference authorReference = FirebaseDatabase.getInstance().getReference()
@@ -380,8 +493,6 @@ public class GuideDetailsFragment extends Fragment {
                 }
             }
         });
-
-
     }
 
     /**
