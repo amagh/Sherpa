@@ -44,7 +44,7 @@ import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.BR;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
-import project.hikerguide.mapbox.SmartMapView;
+import project.hikerguide.ui.views.SmartMapView;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.ui.activities.AreaActivity;

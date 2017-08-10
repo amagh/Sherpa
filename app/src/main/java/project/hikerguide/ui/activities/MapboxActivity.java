@@ -13,7 +13,7 @@ import project.hikerguide.R;
  * Created by Alvin on 7/24/2017.
  */
 
-public class MapboxActivity extends AppCompatActivity {
+public class MapboxActivity extends ConnectivityActivity {
     // ** Member Variables ** //
     MapView mMapView;
 
