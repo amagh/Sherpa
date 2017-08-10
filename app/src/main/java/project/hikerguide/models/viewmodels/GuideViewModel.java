@@ -281,7 +281,7 @@ public class GuideViewModel extends BaseObservable {
         return mGuide.elevation != 0 ? View.VISIBLE : View.GONE;
     }
 
-    @BindingAdapter(value = {"activity", "gpx", "viewModel", "trackUserPosition"}, requireAll = false)
+    @BindingAdapter({"activity", "gpx", "viewModel", "trackUserPosition"})
     public static void loadGpxToMap(final SmartMapView mapView, MapboxActivity activity, final File gpx,
                                     final GuideViewModel viewModel, final boolean trackUserPosition) {
 
