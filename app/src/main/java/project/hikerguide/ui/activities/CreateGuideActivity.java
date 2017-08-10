@@ -16,6 +16,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import java.io.File;
@@ -56,7 +57,7 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
  * Created by Alvin on 7/27/2017.
  */
 
-public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.MenuListener {
+public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.MenuListener, ConnectivityActivity.ConnectivityCallback {
     // ** Constants ** //
     public static final int PERMISSION_REQUEST_EXT_STORAGE = 9687;
 
@@ -72,6 +73,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     private List<BaseModel> mModelList;
     private ItemTouchHelper mItemTouchHelper;
     private int mFilePickerModelPosition = -1;
+    private MenuItem mPublishMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +111,20 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         setSupportActionBar(mBinding.guideDetailsTb);
 
         mBinding.fabDial.setMenuListener(this);
+    }
+
+    @Override
+    public void onConnected() {
+
+        // Enable option to publish when connected to network
+        mPublishMenuItem.setVisible(true);
+    }
+
+    @Override
+    public void onDisconnected() {
+
+        // Disable option to publish if there is no network connection
+        mPublishMenuItem.setVisible(false);
     }
 
     /**
@@ -389,6 +405,10 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_create_guide, menu);
 
+        mPublishMenuItem = menu.getItem(0);
+
+        // Begin listening to network status
+        setConnectivityCallback(this);
         return true;
     }
 
