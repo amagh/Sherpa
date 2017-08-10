@@ -1,13 +1,18 @@
 package project.hikerguide.ui.activities;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
 /**
@@ -15,6 +20,9 @@ import android.support.v7.app.AppCompatActivity;
  */
 
 public class ConnectivityActivity extends AppCompatActivity {
+    // ** Constants ** //
+    private static final int PERMISSION_REQUEST_ACCESS_NETWORK_STATE = 5614;
+
     // ** Member Variables ** //
     private ConnectivityListener mConnectivityListener;
     private ConnectivityCallback mCallback;
@@ -32,6 +40,15 @@ public class ConnectivityActivity extends AppCompatActivity {
         super.onPause();
 
         unregisterConnectivityListener();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_ACCESS_NETWORK_STATE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            registerConnectivityListener();
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     /**
@@ -66,6 +83,15 @@ public class ConnectivityActivity extends AppCompatActivity {
      * Registers a ConnectivityListener to listen for a broadcast due to change in network state
      */
     private void registerConnectivityListener() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[] {Manifest.permission.ACCESS_NETWORK_STATE},
+                    PERMISSION_REQUEST_ACCESS_NETWORK_STATE);
+
+            return;
+        }
+
         // Initialize a ConnectivityListener if it hasn't already been initialized
         if (mConnectivityListener == null) {
             mConnectivityListener = new ConnectivityListener();
