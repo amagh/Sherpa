@@ -27,7 +27,7 @@
             app:layout_constraintGuide_percent=".5"
             android:orientation="vertical"/>
 
-        <project.hikerguide.mapbox.SmartMapView
+        <project.hikerguide.ui.views.SmartMapView
             android:id="@+id/list_guide_details_map"
             android:layout_width="0dp"
             android:layout_height="@dimen/list_guide_details_map_height"

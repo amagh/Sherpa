@@ -1,4 +1,4 @@
-package project.hikerguide.mapbox;
+package project.hikerguide.ui.views;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
