@@ -49,6 +49,7 @@ import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.viewmodels.GuideViewModel;
+import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.UserActivity;
 import project.hikerguide.ui.adapters.GuideDetailsAdapter;
@@ -65,7 +66,9 @@ import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
  * Created by Alvin on 8/7/2017.
  */
 
-public class GuideDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class GuideDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+        ConnectivityActivity.ConnectivityCallback {
+
     // ** Constants ** //
     private static final int LOADER_GUIDE       = 3564;
     private static final int LOADER_SECTION     = 1654;
@@ -131,6 +134,10 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         mBinding.guideDetailsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mBinding.guideDetailsRv.setAdapter(mAdapter);
 
+        if (getActivity() instanceof ConnectivityActivity) {
+            ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
+        }
+
         // Check whether the Guide has been cached
         if (isGuideCached()) {
 
@@ -138,12 +145,6 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
             getActivity().getSupportLoaderManager().initLoader(LOADER_GUIDE, null, this);
             getActivity().getSupportLoaderManager().initLoader(LOADER_SECTION, null, this);
             getActivity().getSupportLoaderManager().initLoader(LOADER_AUTHOR, null, this);
-        } else {
-
-            // Set the data for the Adapter
-            mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
-            getSectionsFromFirebase();
-            getAuthorFromFirebase();
         }
 
         // Show the menu
@@ -289,6 +290,24 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    public void onConnected() {
+        FirebaseDatabase.getInstance().goOnline();
+
+        if (!isGuideCached() && mSections == null) {
+
+            // Set the data for the Adapter
+            mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
+            getSectionsFromFirebase();
+            getAuthorFromFirebase();
+        }
+    }
+
+    @Override
+    public void onDisconnected() {
+        FirebaseDatabase.getInstance().goOffline();
     }
 
     /**
