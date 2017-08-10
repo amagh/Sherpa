@@ -32,14 +32,18 @@ public class ConnectivityActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        registerConnectivityListener();
+        if (!connectivityRegistered) {
+            registerConnectivityListener();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        unregisterConnectivityListener();
+        if (connectivityRegistered) {
+            unregisterConnectivityListener();
+        }
     }
 
     @Override
