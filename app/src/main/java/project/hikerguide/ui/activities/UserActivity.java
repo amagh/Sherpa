@@ -38,6 +38,7 @@ import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.ui.behaviors.FABScrollBehavior;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
@@ -65,9 +66,6 @@ public class UserActivity extends AppCompatActivity {
 
             // User is checking their own profile
             loadUserSelfProfile();
-
-            // Setup for someone viewing their own profile
-            setupForSelfProfile();
         } else {
             mAuthor = getIntent().getParcelableExtra(AUTHOR_KEY);
 
@@ -97,6 +95,7 @@ public class UserActivity extends AppCompatActivity {
 
         // Enable option to edit their profile
         mAdapter.enableEditing();
+        mBinding.getVm().enableEditing();
 
         // Add the SupportActionBar so the menu items can be created, but remove the title
         setSupportActionBar(mBinding.toolbar);
@@ -108,7 +107,7 @@ public class UserActivity extends AppCompatActivity {
     }
 
     /**
-     * Initializes components for ReyclerView to function
+     * Initializes components for RecyclerView to function
      */
     private void initRecyclerView() {
         // Init the Adapter
@@ -186,6 +185,9 @@ public class UserActivity extends AppCompatActivity {
                 // Add the Author to the Adapter so their info can be displayed
                 mAdapter.addModel(mAuthor);
                 mBinding.setVm(new AuthorViewModel(UserActivity.this, mAuthor));
+
+                // Setup for someone viewing their own profile
+                setupForSelfProfile();
 
                 // Load the Guides that the Author has created into the Adapter
                 loadGuidesForAuthor();

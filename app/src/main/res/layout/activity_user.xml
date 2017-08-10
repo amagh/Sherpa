@@ -79,7 +79,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/activity_vertical_margin"
             android:onClick="onClickFab"
-            android:visibility="@{vm.editVisibility}"
+            android:visibility="gone"
+            app:fabVisibility="@{vm.fabVisibility}"
             app:layout_anchor="@id/user_rv"
             app:layout_anchorGravity="bottom|end|right"
             android:src="@drawable/ic_create"/>

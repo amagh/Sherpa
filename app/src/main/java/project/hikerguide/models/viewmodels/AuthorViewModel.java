@@ -4,6 +4,7 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +19,7 @@ import com.google.firebase.storage.StorageReference;
 import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.ui.activities.UserActivity;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
 import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
@@ -144,6 +146,22 @@ public class AuthorViewModel extends BaseObservable {
         }
     }
 
+    @Bindable
+    public int getFabVisibility() {
+        if (mEditVisibility == View.INVISIBLE) {
+            return View.GONE;
+        } else {
+            return View.VISIBLE;
+        }
+    }
+
+    @BindingAdapter("fabVisibility")
+    public static void setFabVisibility(FloatingActionButton fab, int fabVisibility) {
+
+        // Set the Visibility of the FAB
+        fab.setVisibility(fabVisibility);
+    }
+
     public void onClickEdit(View view) {
 
         // Switch the layout between edit and display
@@ -168,6 +186,7 @@ public class AuthorViewModel extends BaseObservable {
         mEditVisibility = View.VISIBLE;
 
         notifyPropertyChanged(BR.editVisibility);
+        notifyPropertyChanged(BR.fabVisibility);
     }
 
 }
