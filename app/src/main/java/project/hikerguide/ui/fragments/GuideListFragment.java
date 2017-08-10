@@ -23,6 +23,7 @@ import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.databinding.FragmentGuideListBinding;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
@@ -31,7 +32,7 @@ import project.hikerguide.utilities.FirebaseProviderUtils;
  * Created by Alvin on 7/21/2017.
  */
 
-public class GuideListFragment extends Fragment {
+public class GuideListFragment extends Fragment implements ConnectivityActivity.ConnectivityCallback{
     // ** Constants ** //
     private static final int GUIDES_LOADER = 4349;
     // ** Member Variables ** //
@@ -63,10 +64,27 @@ public class GuideListFragment extends Fragment {
         mBinding.guideListRv.setAdapter(mAdapter);
         mBinding.guideListRv.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        // Begin loading Guides using the Loader
-//        getActivity().getSupportLoaderManager().initLoader(GUIDES_LOADER, null, this);
-        loadGuides();
+        if (getActivity() instanceof ConnectivityActivity) {
+            ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
+        }
+
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onConnected() {
+
+        FirebaseDatabase.getInstance().goOnline();
+
+        // If Adapter is empty, load the Guides from Firebase
+        if (mAdapter.isEmpty()) {
+            loadGuides();
+        }
+    }
+
+    @Override
+    public void onDisconnected() {
+        FirebaseDatabase.getInstance().goOffline();
     }
 
     private void loadGuides() {

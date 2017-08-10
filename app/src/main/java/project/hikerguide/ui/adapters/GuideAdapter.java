@@ -169,6 +169,15 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     }
 
     /**
+     * Checks whether the Adapter has a valid list of data
+     *
+     * @return True if mGuideList is null or empty. False if mGuideList is populated.
+     */
+    public boolean isEmpty() {
+        return mGuideList == null || mGuideList.isEmpty();
+    }
+
+    /**
      * For passing information about the clicked guide to the Activity/Fragment
      */
     public interface ClickHandler {

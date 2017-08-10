@@ -18,7 +18,7 @@ import project.hikerguide.ui.fragments.SearchFragment;
 
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
-public class MainActivity extends AppCompatActivity implements GuideListFragment.OnGuideClickListener {
+public class MainActivity extends ConnectivityActivity implements GuideListFragment.OnGuideClickListener {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
