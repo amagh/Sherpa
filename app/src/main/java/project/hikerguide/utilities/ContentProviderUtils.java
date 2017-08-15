@@ -62,6 +62,63 @@ public class ContentProviderUtils {
     }
 
     /**
+     * Removes a model from the database, using its associated FirebaseId
+     *
+     * @param context    Interface to global Context
+     * @param model      Model to be removed from the database
+     */
+    public static void deleteModel(Context context, BaseModel model) {
+        context.getContentResolver().delete(
+                getUriForModel(model),
+                GuideContract.GuideEntry.FIREBASE_ID + " = ?",
+                new String[] {model.firebaseId});
+    }
+
+    /**
+     * Removes all Sections for a given Guide from the database
+     *
+     * @param context    Interface to global Context
+     * @param guide      Guide whose associated Sections are to be removed
+     */
+    public static void deleteSectionsForGuide(Context context, Guide guide) {
+        context.getContentResolver().delete(
+                GuideProvider.Sections.CONTENT_URI,
+                GuideContract.SectionEntry.GUIDE_ID + " = ?",
+                new String[] {guide.firebaseId});
+    }
+
+    /**
+     * Counts the number of Guides in the local database authored by the Author
+     *
+     * @param context    Interface to global Context
+     * @param author     Author to count the number of Guides for
+     * @return The number of Guides authored by the Author that exist in the local database
+     */
+    public static int getGuideCountForAuthor(Context context, Author author) {
+
+        // Query the database for Guides authored by the Author
+        Cursor cursor = context.getContentResolver().query(
+                GuideProvider.Guides.CONTENT_URI,
+                null,
+                GuideContract.GuideEntry.AUTHOR_ID + " = ?",
+                new String[] {author.firebaseId},
+                null);
+
+        // Return the Cursor count
+        try {
+            if (cursor != null) {
+                return cursor.getCount();
+            } else {
+                return 0;
+            }
+        } finally {
+
+            // Close the Cursor
+            if (cursor != null) cursor.close();
+        }
+    }
+
+    /**
      * Checks whether a data model already exists in the database
      *
      * @param context    Interface to global Context
