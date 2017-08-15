@@ -3,13 +3,18 @@ package project.hikerguide.ui.activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.internal.NavigationMenu;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -30,7 +35,9 @@ import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.BR;
 import project.hikerguide.R;
+import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
+import project.hikerguide.data.GuideProvider;
 import project.hikerguide.databinding.ActivityCreateGuideBinding;
 import project.hikerguide.databinding.ListItemGuideDetailsBinding;
 import project.hikerguide.models.datamodels.Area;
@@ -49,6 +56,7 @@ import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static android.support.v7.widget.helper.ItemTouchHelper.UP;
+import static project.hikerguide.ui.activities.CreateGuideActivity.BUNDLE_KEYS.FIREBASE_ID_KEY;
 import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
 import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
@@ -60,9 +68,19 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
  * Created by Alvin on 7/27/2017.
  */
 
-public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.MenuListener, ConnectivityActivity.ConnectivityCallback {
+public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.MenuListener,
+        ConnectivityActivity.ConnectivityCallback, LoaderManager.LoaderCallbacks<Cursor> {
     // ** Constants ** //
-    public static final int PERMISSION_REQUEST_EXT_STORAGE = 9687;
+    private static final int PERMISSION_REQUEST_EXT_STORAGE = 9687;
+    private static final int LOADER_GUIDE_DRAFT             = 7912;
+    private static final int LOADER_AREA_DRAFT              = 9519;
+    private static final int LOADER_TRAIL_DRAFT             = 7269;
+    private static final int LOADER_SECTION_DRAFT           = 6385;
+    private static final int LOADER_AUTHOR_DRAFT            = 2614;
+
+    interface BUNDLE_KEYS {
+        String FIREBASE_ID_KEY = "firebaseId";
+    }
 
     // ** Member Variables ** //
     private Guide mGuide;
@@ -88,7 +106,14 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
         if (getIntent().getData() != null) {
 
+            mModelList = new ArrayList<>();
+            mAdapter.setModelList(mModelList);
+
             // Load saved data from database
+            Bundle guideBundle = new Bundle();
+            guideBundle.putString(FIREBASE_ID_KEY, GuideProvider.getIdFromUri(getIntent().getData()));
+            getSupportLoaderManager().initLoader(LOADER_GUIDE_DRAFT, guideBundle, this);
+
         } else {
 
             // Retrieve the passed objects from the Intent
@@ -460,6 +485,147 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        // Variables for building CursorLoader
+        Uri uri = null;
+        String selection = null;
+        String[] selectionArgs = null;
+        String sortOrder = null;
+
+        // Set the variables according to the LoaderID
+        switch (id) {
+            case LOADER_GUIDE_DRAFT:
+                uri = GuideProvider.Guides.CONTENT_URI;
+                selection = GuideContract.GuideEntry.FIREBASE_ID + " = ?";
+                selectionArgs = new String[] {args.getString(FIREBASE_ID_KEY, null)};
+
+                break;
+
+            case LOADER_AREA_DRAFT:
+                uri = GuideProvider.Areas.CONTENT_URI;
+                selection = GuideContract.AreaEntry.FIREBASE_ID + " = ?";
+                selectionArgs = new String[] {args.getString(FIREBASE_ID_KEY, null)};
+
+                break;
+
+            case LOADER_TRAIL_DRAFT:
+                uri = GuideProvider.Trails.CONTENT_URI;
+                selection = GuideContract.TrailEntry.FIREBASE_ID + " = ?";
+                selectionArgs = new String[] {args.getString(FIREBASE_ID_KEY, null)};
+
+                break;
+
+            case LOADER_SECTION_DRAFT:
+                uri = GuideProvider.Sections.CONTENT_URI;
+                selection = GuideContract.SectionEntry.GUIDE_ID + " = ?";
+                selectionArgs = new String[] {args.getString(FIREBASE_ID_KEY, null)};
+                sortOrder = GuideContract.SectionEntry.SECTION + " ASC";
+
+                break;
+
+            case LOADER_AUTHOR_DRAFT:
+                uri = GuideProvider.Authors.CONTENT_URI;
+                selection = GuideContract.AuthorEntry.FIREBASE_ID + " = ?";
+                selectionArgs = new String[] {args.getString(FIREBASE_ID_KEY, null)};
+
+                break;
+        }
+
+        return new CursorLoader(
+                this,
+                uri,
+                null,
+                selection,
+                selectionArgs,
+                sortOrder
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        if (data != null) {
+            switch (loader.getId()) {
+                case LOADER_GUIDE_DRAFT:
+
+                    if (mModelList.size() == 0 && data.moveToFirst()) {
+
+                        // Create a Guide from the Cursor
+                        mGuide = Guide.createGuideFromCursor(data);
+
+                        // Set the Guide to the Adapter and the DataBinding ViewModel
+                        mBinding.setVm(new GuideViewModel(this, mGuide));
+                        mAdapter.addModel(mGuide);
+
+                        // Init the CursorLoaders for the associated Sections, Trail, and Author
+                        Bundle sectionBundle = new Bundle();
+                        sectionBundle.putString(FIREBASE_ID_KEY, GuideProvider.getIdFromUri(getIntent().getData()));
+                        getSupportLoaderManager().initLoader(LOADER_SECTION_DRAFT, sectionBundle, this);
+
+                        Bundle trailBundle = new Bundle();
+                        trailBundle.putString(FIREBASE_ID_KEY, mGuide.trailId);
+                        getSupportLoaderManager().initLoader(LOADER_TRAIL_DRAFT, trailBundle, this);
+
+                        Bundle authorBundle = new Bundle();
+                        authorBundle.putString(FIREBASE_ID_KEY, mGuide.authorId);
+                        getSupportLoaderManager().initLoader(LOADER_AUTHOR_DRAFT, authorBundle, this);
+                    }
+
+                    break;
+
+                case LOADER_AREA_DRAFT:
+                    if (data.moveToFirst()) {
+
+                        // Set the memvar to the Area created from the Cursor
+                        mArea = Area.createAreaFromCursor(data);
+                    }
+
+                    break;
+
+                case LOADER_TRAIL_DRAFT:
+                    if (data.moveToFirst()) {
+
+                        // Set the memvar to the Trail created by the Cursor
+                        mTrail = Trail.createTrailFromCursor(data);
+
+                        // Init the CursorLoader for the Area
+                        Bundle areaBundle = new Bundle();
+                        areaBundle.putString(FIREBASE_ID_KEY, mTrail.areaId);
+                        getSupportLoaderManager().initLoader(LOADER_AREA_DRAFT, areaBundle, this);
+                    }
+
+                    break;
+
+                case LOADER_SECTION_DRAFT:
+
+                    // Add each Section created from the Cursor to the Adapter
+                    if (mModelList.size() == 1 && data.moveToFirst()) {
+                        do {
+                            mAdapter.addModel(Section.createSectionFromCursor(data));
+                        } while (data.moveToNext());
+                    }
+
+                    break;
+
+                case LOADER_AUTHOR_DRAFT:
+                    if (data.moveToFirst()) {
+
+                        // Set the memvar to the Author created from the Cursor
+                        mAuthor = Author.createAuthorFromCursor(data);
+                    }
+
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
     /**
      * Triggers the re-ordering function of the ItemTouchHelper
      *
@@ -593,6 +759,17 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
      */
     private void saveGuide() {
 
+        // Remove previous entries from the database
+        ContentProviderUtils.deleteModel(this, mGuide);
+        ContentProviderUtils.deleteModel(this, mArea);
+        ContentProviderUtils.deleteModel(this, mTrail);
+
+        if (ContentProviderUtils.getGuideCountForAuthor(this, mAuthor) == 0) {
+            ContentProviderUtils.deleteModel(this, mAuthor);
+        }
+
+        ContentProviderUtils.deleteSectionsForGuide(this, mGuide);
+
         // Get a FirebaseId for each element that does not already have one and set the FirebaseId
         // of each element that depends on another element's FirebaseId.
         // e.g. Set the trailId of the Guide to the trail's FirebaseId
@@ -633,6 +810,8 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                         .getKey();
 
                 mGuide.setDraft(true);
+            } else if (ContentProviderUtils.isModelInDatabase(this, mGuide)) {
+
             }
 
             mGuide.trailId = mTrail.firebaseId;
