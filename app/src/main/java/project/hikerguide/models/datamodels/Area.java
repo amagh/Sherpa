@@ -48,6 +48,7 @@ public class Area extends BaseModel implements Parcelable {
         int idxLatitude     = cursor.getColumnIndex(GuideContract.AreaEntry.LATITUDE);
         int idxLongitude    = cursor.getColumnIndex(GuideContract.AreaEntry.LONGITUDE);
         int idxState        = cursor.getColumnIndex(GuideContract.AreaEntry.STATE);
+        int idxDraft        = cursor.getColumnIndex(GuideContract.AreaEntry.DRAFT);
 
         // Retrieve the values from the Cursor
         String firebaseId   = cursor.getString(idxFirebaseId);
@@ -55,6 +56,7 @@ public class Area extends BaseModel implements Parcelable {
         double latitude     = cursor.getDouble(idxLatitude);
         double longitude    = cursor.getDouble(idxLongitude);
         String state        = cursor.getString(idxState);
+        boolean draft       = cursor.getInt(idxDraft) == 1;
 
         // Create a new Area with the values
         Area area           = new Area();
@@ -63,6 +65,7 @@ public class Area extends BaseModel implements Parcelable {
         area.latitude       = latitude;
         area.longitude      = longitude;
         area.state          = state;
+        area.setDraft(draft);
 
         return area;
     }

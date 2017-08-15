@@ -52,12 +52,14 @@ public class Trail extends BaseModel implements Parcelable {
         int idxAreaId       = cursor.getColumnIndex(GuideContract.TrailEntry.AREA_ID);
         int idxName         = cursor.getColumnIndex(GuideContract.TrailEntry.NAME);
         int idxNotes        = cursor.getColumnIndex(GuideContract.TrailEntry.NOTES);
+        int idxDraft        = cursor.getColumnIndex(GuideContract.TrailEntry.DRAFT);
 
         // Retrieve the values from the Cursor
         String firebaseId   = cursor.getString(idxFirebaseId);
         String areaId       = cursor.getString(idxAreaId);
         String name         = cursor.getString(idxName);
         String notes        = cursor.getString(idxNotes);
+        boolean draft       = cursor.getInt(idxDraft) == 1;
 
         // Create a new Trail from the values
         Trail trail         = new Trail();
@@ -65,6 +67,7 @@ public class Trail extends BaseModel implements Parcelable {
         trail.areaId        = areaId;
         trail.name          = name;
         trail.notes         = notes;
+        trail.setDraft(draft);
 
         return trail;
     }

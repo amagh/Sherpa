@@ -55,6 +55,7 @@ public class Section extends BaseModelWithImage implements Parcelable {
         int idxSection          = cursor.getColumnIndex(GuideContract.SectionEntry.SECTION);
         int idxContent          = cursor.getColumnIndex(GuideContract.SectionEntry.CONTENT);
         int idxImageUri         = cursor.getColumnIndex(GuideContract.SectionEntry.IMAGE_URI);
+        int idxDraft            = cursor.getColumnIndex(GuideContract.SectionEntry.DRAFT);
 
         // Retrieve the values from the Cursor
         String firebaseId       = cursor.getString(idxFirebaseId);
@@ -62,6 +63,7 @@ public class Section extends BaseModelWithImage implements Parcelable {
         int section             = cursor.getInt(idxSection);
         String content          = cursor.getString(idxContent);
         String imageUriString   = cursor.getString(idxImageUri);
+        boolean draft           = cursor.getInt(idxDraft) == 1;
 
         // Instantiate a new Section with the values
         Section section0        = new Section();
@@ -69,6 +71,7 @@ public class Section extends BaseModelWithImage implements Parcelable {
         section0.guideId        = guideId;
         section0.section        = section;
         section0.content        = content;
+        section0.setDraft(draft);
 
         if (imageUriString != null) {
             File imageFile = new File(Uri.parse(imageUriString).getPath());
