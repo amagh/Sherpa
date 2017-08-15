@@ -327,7 +327,8 @@ public class UserActivity extends ConnectivityActivity implements FabSpeedDial.M
 
             case R.id.fab_open_draft:
 
-                // TODO: Launch Activity for opening a saved draft
+                // Launch Activity for opening a saved draft
+                startActivity(new Intent(this, OpenDraftActivity.class));
                 return true;
         }
 

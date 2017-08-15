@@ -69,6 +69,10 @@
         <activity android:name=".ui.activities.PublishActivity">
 
         </activity>
+
+        <activity android:name=".ui.activities.OpenDraftActivity">
+
+        </activity>
     </application>
 
 </manifest>
