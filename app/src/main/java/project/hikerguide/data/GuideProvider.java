@@ -38,6 +38,10 @@ public class GuideProvider {
         return builder.build();
     }
 
+    public static String getIdFromUri(Uri uri) {
+        return uri.getLastPathSegment();
+    }
+
     /**
      * Defines the paths used to access the data in the database
      */
