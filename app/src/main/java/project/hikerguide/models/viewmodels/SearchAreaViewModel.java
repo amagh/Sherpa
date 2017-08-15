@@ -229,7 +229,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                 .child(GuideDatabase.AREAS)
                 .orderByChild("lowerCaseName")
                 .startAt(query.toLowerCase())
-                .endAt(query + "z");
+                .endAt(query.toLowerCase() + "z");
 
         firebaseQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
