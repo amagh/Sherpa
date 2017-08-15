@@ -128,7 +128,9 @@ public class ContentProviderUtils {
         }
 
         // Add column value for whether the Guide is a draft
-        values.put(GuideContract.GuideEntry.DRAFT,          guide.isDraft());
+        if (guide.isDraft()) {
+            values.put(GuideContract.GuideEntry.DRAFT,      1);
+        }
 
         return values;
     }
@@ -148,7 +150,9 @@ public class ContentProviderUtils {
         values.put(GuideContract.TrailEntry.LOWER_CASE_NAME,    trail.name.toLowerCase());
         values.put(GuideContract.TrailEntry.NOTES,              trail.notes);
 
-        values.put(GuideContract.TrailEntry.DRAFT,              trail.isDraft());
+        if (trail.isDraft()) {
+            values.put(GuideContract.TrailEntry.DRAFT,          1);
+        }
         return values;
     }
 
@@ -172,7 +176,9 @@ public class ContentProviderUtils {
             values.put(GuideContract.AuthorEntry.IMAGE_URI,     author.getImageUri().toString());
         }
 
-        values.put(GuideContract.AuthorEntry.DRAFT,             author.isDraft());
+        if (author.isDraft()) {
+            values.put(GuideContract.AuthorEntry.DRAFT,         1);
+        }
 
         return values;
     }
@@ -196,7 +202,9 @@ public class ContentProviderUtils {
             values.put(GuideContract.SectionEntry.IMAGE_URI,    section.getImageUri().toString());
         }
 
-        values.put(GuideContract.SectionEntry.DRAFT,            section.isDraft());
+        if (section.isDraft()) {
+            values.put(GuideContract.SectionEntry.DRAFT,        1);
+        }
 
         return values;
     }
@@ -217,7 +225,10 @@ public class ContentProviderUtils {
         values.put(GuideContract.AreaEntry.LONGITUDE,           area.longitude);
         values.put(GuideContract.AreaEntry.STATE,               area.state);
 
-        values.put(GuideContract.AreaEntry.DRAFT,               area.isDraft());
+        if (area.isDraft()) {
+            values.put(GuideContract.AreaEntry.DRAFT,           1);
+        }
+
 
         return values;
     }
