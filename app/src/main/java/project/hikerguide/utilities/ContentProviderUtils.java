@@ -2,6 +2,7 @@ package project.hikerguide.utilities;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 
 import project.hikerguide.data.GuideContract;
@@ -61,6 +62,39 @@ public class ContentProviderUtils {
     }
 
     /**
+     * Checks whether a data model already exists in the database
+     *
+     * @param context    Interface to global Context
+     * @param model      Model to be checked against database records to see if it exists
+     * @return True if the Model's FirebaseId already exists in the database. False otherwise
+     */
+    public static boolean isModelInDatabase(Context context, BaseModel model) {
+
+        // Query the database for the model's FirebaseId
+        Cursor cursor = context.getContentResolver().query(
+                getUriForModel(model),
+                null,
+                GuideContract.GuideEntry.FIREBASE_ID + " = ?",
+                new String[] {model.firebaseId},
+                null
+        );
+
+        // Check if Cursor is valid
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+
+                // Entry exists in database
+                return true;
+            }
+
+            // Close the Cursor
+            cursor.close();
+        }
+
+        return false;
+    }
+
+    /**
      * Creates a ContentValues for a Guide data model
      *
      * @param guide    Guide to create ContentValues for
@@ -93,6 +127,9 @@ public class ContentProviderUtils {
             values.put(GuideContract.GuideEntry.GPX_URI,    guide.getGpxUri().toString());
         }
 
+        // Add column value for whether the Guide is a draft
+        values.put(GuideContract.GuideEntry.DRAFT,          guide.isDraft());
+
         return values;
     }
 
@@ -111,6 +148,7 @@ public class ContentProviderUtils {
         values.put(GuideContract.TrailEntry.LOWER_CASE_NAME,    trail.name.toLowerCase());
         values.put(GuideContract.TrailEntry.NOTES,              trail.notes);
 
+        values.put(GuideContract.TrailEntry.DRAFT,              trail.isDraft());
         return values;
     }
 
@@ -134,6 +172,8 @@ public class ContentProviderUtils {
             values.put(GuideContract.AuthorEntry.IMAGE_URI,     author.getImageUri().toString());
         }
 
+        values.put(GuideContract.AuthorEntry.DRAFT,             author.isDraft());
+
         return values;
     }
 
@@ -156,6 +196,8 @@ public class ContentProviderUtils {
             values.put(GuideContract.SectionEntry.IMAGE_URI,    section.getImageUri().toString());
         }
 
+        values.put(GuideContract.SectionEntry.DRAFT,            section.isDraft());
+
         return values;
     }
 
@@ -174,6 +216,8 @@ public class ContentProviderUtils {
         values.put(GuideContract.AreaEntry.LATITUDE,            area.latitude);
         values.put(GuideContract.AreaEntry.LONGITUDE,           area.longitude);
         values.put(GuideContract.AreaEntry.STATE,               area.state);
+
+        values.put(GuideContract.AreaEntry.DRAFT,               area.isDraft());
 
         return values;
     }

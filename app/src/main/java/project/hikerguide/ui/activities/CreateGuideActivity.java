@@ -16,8 +16,9 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
+
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.BR;
 import project.hikerguide.R;
+import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.databinding.ActivityCreateGuideBinding;
 import project.hikerguide.databinding.ListItemGuideDetailsBinding;
 import project.hikerguide.models.datamodels.Area;
@@ -40,6 +42,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.adapters.EditGuideDetailsAdapter;
+import project.hikerguide.utilities.ContentProviderUtils;
 import timber.log.Timber;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
@@ -97,8 +100,14 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
             mGuide = new Guide();
 
             // Add the information from the passed objects to the Guide
+            mGuide.authorId = mAuthor.firebaseId;
             mGuide.authorName = mAuthor.name;
             mGuide.area = mArea.name;
+
+            if (mTrail.firebaseId != null) {
+                mGuide.trailId = mTrail.firebaseId;
+            }
+
             mGuide.trailName = mTrail.name;
 
             // Setup the Adapter
@@ -418,6 +427,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
             case R.id.menu_publish:
                 boolean valid = true;
 
+                // Validate the Sections and Guide to ensure all required elements are present
                 boolean sectionsValid = validateSections();
                 boolean guideValid = validateGuide();
 
@@ -425,7 +435,10 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                     valid = false;
                 }
 
+                // Check if all required elements are valid
                 if (valid) {
+
+                    // Start the PublishActivity and send all elements through the Intent
                     Intent intent = new Intent(this, PublishActivity.class);
                     intent.putExtra(AUTHOR_KEY, mAuthor);
                     intent.putExtra(AREA_KEY, mArea);
@@ -439,6 +452,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                 return true;
 
             case R.id.menu_save_draft:
+                saveGuide();
 
                 return true;
         }
@@ -571,5 +585,81 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         }
 
         return true;
+    }
+
+    /**
+     * Saves the elements for the Guide to the local database so that they can be accessed and
+     * edited at a later time.
+     */
+    private void saveGuide() {
+
+        // Get a FirebaseId for each element that does not already have one and set the FirebaseId
+        // of each element that depends on another element's FirebaseId.
+        // e.g. Set the trailId of the Guide to the trail's FirebaseId
+        if (mArea != null) {
+            if (mArea.firebaseId == null) {
+                mArea.firebaseId = FirebaseDatabase.getInstance().getReference()
+                        .child(GuideDatabase.AREAS)
+                        .push()
+                        .getKey();
+
+                mArea.setDraft(true);
+            }
+
+            ContentProviderUtils.insertModel(this, mArea);
+        }
+
+
+        if (mTrail != null) {
+            if (mTrail.firebaseId == null) {
+                mTrail.firebaseId = FirebaseDatabase.getInstance().getReference()
+                        .child(GuideDatabase.TRAILS)
+                        .push()
+                        .getKey();
+
+                mTrail.setDraft(true);
+            }
+
+            mTrail.areaId = mArea.firebaseId;
+
+            ContentProviderUtils.insertModel(this, mTrail);
+        }
+
+        if (mGuide != null) {
+            if (mGuide.firebaseId == null) {
+                mGuide.firebaseId = FirebaseDatabase.getInstance().getReference()
+                        .child(GuideDatabase.GUIDES)
+                        .push()
+                        .getKey();
+
+                mGuide.setDraft(true);
+            }
+
+            mGuide.trailId = mTrail.firebaseId;
+            mGuide.authorId = mAuthor.firebaseId;
+
+            ContentProviderUtils.insertModel(this, mGuide);
+        }
+
+        if (mAuthor != null) {
+
+            if (!ContentProviderUtils.isModelInDatabase(this, mAuthor)) {
+
+                ContentProviderUtils.insertModel(this, mAuthor);
+            }
+        }
+
+        // Add the Section numbering to each Section
+        validateSections();
+
+        if (mSections != null) {
+            for (Section section : mSections) {
+                section.guideId = mGuide.firebaseId;
+                section.setDraft(true);
+            }
+
+            ContentProviderUtils.bulkInsertSections(this, mSections);
+        }
+
     }
 }

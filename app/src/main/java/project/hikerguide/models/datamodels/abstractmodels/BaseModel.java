@@ -9,6 +9,15 @@ import java.util.Map;
 public abstract class BaseModel {
     // ** Member Variables ** //
     public String firebaseId;
+    private boolean draft;
 
     public abstract Map<String, Object> toMap();
+
+    public boolean isDraft() {
+        return draft;
+    }
+
+    public void setDraft(boolean draft) {
+        this.draft = draft;
+    }
 }
