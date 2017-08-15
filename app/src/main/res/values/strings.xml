@@ -80,6 +80,7 @@
     <!-- Create Guide Strings -->
     <string name="menu_publish_title">Publish Guide</string>
     <string name="menu_save_draft_title">Save Draft</string>
+    <string name="menu_delete_draft">Delete Draft</string>
     <string name="create_guide_image_missing_error_text">Please add an image</string>
     <string name="create_guide_gpx_missing_error_text">Please add a GPX file</string>
     <string name="create_guide_no_sections_error">Please add some content to your guide before publishing</string>

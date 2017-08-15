@@ -480,6 +480,9 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                 saveGuide();
 
                 return true;
+
+            case R.id.menu_delete_draft:
+                deleteDraft();
         }
 
         return super.onOptionsItemSelected(item);
@@ -764,10 +767,6 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         ContentProviderUtils.deleteModel(this, mArea);
         ContentProviderUtils.deleteModel(this, mTrail);
 
-        if (ContentProviderUtils.getGuideCountForAuthor(this, mAuthor) == 0) {
-            ContentProviderUtils.deleteModel(this, mAuthor);
-        }
-
         ContentProviderUtils.deleteSectionsForGuide(this, mGuide);
 
         // Get a FirebaseId for each element that does not already have one and set the FirebaseId
@@ -839,6 +838,21 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
             ContentProviderUtils.bulkInsertSections(this, mSections);
         }
+    }
 
+    /**
+     * Deletes the draft and all associated entries from the database
+     */
+    private void deleteDraft() {
+        // Remove entries from the database
+        ContentProviderUtils.deleteModel(this, mGuide);
+        ContentProviderUtils.deleteModel(this, mArea);
+        ContentProviderUtils.deleteModel(this, mTrail);
+
+        if (ContentProviderUtils.getGuideCountForAuthor(this, mAuthor) == 0) {
+            ContentProviderUtils.deleteModel(this, mAuthor);
+        }
+
+        ContentProviderUtils.deleteSectionsForGuide(this, mGuide);
     }
 }
