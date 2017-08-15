@@ -424,5 +424,8 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
         intent.putExtra(AUTHOR_KEY, mActivity.getAuthor());
 
         mActivity.startActivity(intent);
+
+        // Close the Activity so the user doesn't return to it by hitting the back button
+        mActivity.finish();
     }
 }

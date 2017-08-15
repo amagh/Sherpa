@@ -254,5 +254,8 @@ public class SearchTrailViewModel extends BaseObservable {
 
         // Start the Activity
         mActivity.startActivity(intent);
+
+        // Close the Activity so the user doesn't return to it by hitting the back button
+        mActivity.finish();
     }
 }
