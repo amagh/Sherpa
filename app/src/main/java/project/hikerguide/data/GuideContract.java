@@ -41,6 +41,8 @@ public class GuideContract {
         @DataType(DataType.Type.INTEGER) String DIFFICULTY                          = "difficulty";
         @DataType(DataType.Type.TEXT) String IMAGE_URI                              = "imageUri";
         @DataType(DataType.Type.TEXT) String GPX_URI                                = "gpxUri";
+
+        @DataType(DataType.Type.INTEGER) String DRAFT                               = "draft";
     }
 
     public interface TrailEntry {
@@ -54,6 +56,8 @@ public class GuideContract {
         @DataType(DataType.Type.TEXT) @NotNull String NAME                          = "name";
         @DataType(DataType.Type.TEXT) @NotNull String LOWER_CASE_NAME               = "lowerCaseName";
         @DataType(DataType.Type.TEXT) String NOTES                                  = "notes";
+
+        @DataType(DataType.Type.INTEGER) String DRAFT                               = "draft";
     }
 
     public interface AuthorEntry {
@@ -64,6 +68,8 @@ public class GuideContract {
         @DataType(DataType.Type.TEXT) String DESCRIPTION                            = "description";
         @DataType(DataType.Type.INTEGER) String SCORE                               = "score";
         @DataType(DataType.Type.TEXT) String IMAGE_URI                              = "imageUri";
+
+        @DataType(DataType.Type.INTEGER) String DRAFT                               = "draft";
     }
 
     public interface SectionEntry {
@@ -77,6 +83,8 @@ public class GuideContract {
         @DataType(DataType.Type.INTEGER) @NotNull String SECTION                    = "section";
         @DataType(DataType.Type.TEXT) String CONTENT                                = "content";
         @DataType(DataType.Type.TEXT) String IMAGE_URI                              = "imageUri";
+
+        @DataType(DataType.Type.INTEGER) String DRAFT                               = "draft";
     }
 
     public interface AreaEntry {
@@ -87,5 +95,7 @@ public class GuideContract {
         @DataType(DataType.Type.REAL) String LATITUDE                               = "latitude";
         @DataType(DataType.Type.REAL) String LONGITUDE                              = "longitude";
         @DataType(DataType.Type.TEXT) @NotNull String STATE                         = "state";
+
+        @DataType(DataType.Type.INTEGER) String DRAFT                               = "draft";
     }
 }
