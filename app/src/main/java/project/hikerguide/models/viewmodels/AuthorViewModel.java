@@ -16,6 +16,7 @@ import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.ui.activities.UserActivity;
@@ -156,7 +157,7 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @BindingAdapter("fabVisibility")
-    public static void setFabVisibility(FloatingActionButton fab, int fabVisibility) {
+    public static void setFabVisibility(FabSpeedDial fab, int fabVisibility) {
 
         // Set the Visibility of the FAB
         fab.setVisibility(fabVisibility);

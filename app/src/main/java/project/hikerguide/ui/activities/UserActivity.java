@@ -3,6 +3,7 @@ package project.hikerguide.ui.activities;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
@@ -37,6 +39,7 @@ import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.ui.behaviors.FABScrollBehavior;
+import project.hikerguide.ui.behaviors.FabSpeedDialScrollBehavior;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
@@ -47,7 +50,7 @@ import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
  * Created by Alvin on 7/31/2017.
  */
 
-public class UserActivity extends AppCompatActivity {
+public class UserActivity extends ConnectivityActivity implements FabSpeedDial.MenuListener, ConnectivityActivity.ConnectivityCallback {
     // ** Member Variables ** //
     private ActivityUserBinding mBinding;
     private Author mAuthor;
@@ -59,6 +62,8 @@ public class UserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_user);
+        mBinding.setVm(new AuthorViewModel(this, new Author()));
+        mBinding.fabDial.setMenuListener(this);
 
         initRecyclerView();
 
@@ -102,8 +107,8 @@ public class UserActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(null);
 
         // Set the layout behavior for the FAB
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mBinding.userFab.getLayoutParams();
-        params.setBehavior(new FABScrollBehavior());
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mBinding.fabDial.getLayoutParams();
+        params.setBehavior(new FabSpeedDialScrollBehavior());
     }
 
     /**
@@ -140,7 +145,7 @@ public class UserActivity extends AppCompatActivity {
 
     /**
      * Checks that the Firebase User has been added to the Firebase Database and loads their
-     * profile from Firebase Databse.
+     * profile from Firebase Database.
      */
     private void loadUserSelfProfile() {
         // Get an instance of the FirebaseUser
@@ -200,10 +205,6 @@ public class UserActivity extends AppCompatActivity {
                 authorRef.removeEventListener(this);
             }
         });
-    }
-
-    private void checkUser() {
-
     }
 
     /**
@@ -284,17 +285,6 @@ public class UserActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * Click response for FAB
-     *
-     * @param view    FAB that was clicked
-     */
-    public void onClickFab(View view) {
-        Intent intent = new Intent(this, AreaActivity.class);
-        intent.putExtra(AUTHOR_KEY, mAuthor);
-        startActivity(intent);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -316,5 +306,46 @@ public class UserActivity extends AppCompatActivity {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean onPrepareMenu(NavigationMenu navigationMenu) {
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.fab_new_guide:
+
+                // Launch Activity flow to start a new Guide
+                Intent intent = new Intent(this, AreaActivity.class);
+                intent.putExtra(AUTHOR_KEY, mAuthor);
+                startActivity(intent);
+
+                return true;
+
+            case R.id.fab_open_draft:
+
+                // TODO: Launch Activity for opening a saved draft
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onMenuClosed() {
+
+    }
+
+    @Override
+    public void onConnected() {
+        FirebaseDatabase.getInstance().goOnline();
+    }
+
+    @Override
+    public void onDisconnected() {
+        FirebaseDatabase.getInstance().goOffline();
     }
 }
