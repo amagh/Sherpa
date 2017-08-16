@@ -99,7 +99,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Timber.d("onCreate");
+
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_create_guide);
 
         initRecyclerView();
@@ -456,12 +456,7 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
                 boolean sectionsValid = validateSections();
                 boolean guideValid = validateGuide();
 
-                if (!sectionsValid || !guideValid) {
-                    valid = false;
-                }
-
-                // Check if all required elements are valid
-                if (valid) {
+                if (sectionsValid && guideValid) {
 
                     // Start the PublishActivity and send all elements through the Intent
                     Intent intent = new Intent(this, PublishActivity.class);
@@ -483,6 +478,8 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
             case R.id.menu_delete_draft:
                 deleteDraft();
+
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -838,6 +835,13 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
             ContentProviderUtils.bulkInsertSections(this, mSections);
         }
+
+        // Notify the user of the save operation completion
+        Toast.makeText(
+                this,
+                getString(R.string.draft_saved),
+                Toast.LENGTH_LONG)
+                .show();;
     }
 
     /**
@@ -854,5 +858,15 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         }
 
         ContentProviderUtils.deleteSectionsForGuide(this, mGuide);
+
+        // Notify the user of the deletion
+        Toast.makeText(
+                this,
+                getString(R.string.draft_deleted),
+                Toast.LENGTH_LONG)
+                .show();
+
+        // Close the Activity
+        finish();
     }
 }
