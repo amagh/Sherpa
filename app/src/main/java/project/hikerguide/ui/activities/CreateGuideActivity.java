@@ -21,6 +21,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.firebase.database.FirebaseDatabase;
@@ -40,6 +41,8 @@ import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.data.GuideProvider;
 import project.hikerguide.databinding.ActivityCreateGuideBinding;
 import project.hikerguide.databinding.ListItemGuideDetailsBinding;
+import project.hikerguide.databinding.ListItemSectionImageEditBinding;
+import project.hikerguide.databinding.ListItemSectionTextEditBinding;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
@@ -68,8 +71,8 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
  * Created by Alvin on 7/27/2017.
  */
 
-public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.MenuListener,
-        ConnectivityActivity.ConnectivityCallback, LoaderManager.LoaderCallbacks<Cursor> {
+public class CreateGuideActivity extends MapboxActivity implements ConnectivityActivity.ConnectivityCallback,
+        LoaderManager.LoaderCallbacks<Cursor> {
     // ** Constants ** //
     private static final int PERMISSION_REQUEST_EXT_STORAGE = 9687;
     private static final int LOADER_GUIDE_DRAFT             = 7912;
@@ -143,8 +146,6 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         }
 
         setSupportActionBar(mBinding.guideDetailsTb);
-
-        mBinding.fabDial.setMenuListener(this);
     }
 
     @Override
@@ -312,6 +313,19 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
 
                     // Reset mFilePickerPosition to -1
                     mFilePickerModelPosition = -1;
+
+                    mBinding.guideDetailsRv.scrollToPosition(mModelList.size() - 1);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            EditGuideDetailsAdapter.EditViewHolder viewHolder =
+                                    (EditGuideDetailsAdapter.EditViewHolder) mBinding.guideDetailsRv
+                                            .findViewHolderForAdapterPosition(mModelList.size() - 1);
+
+                            ((ListItemSectionImageEditBinding) viewHolder.getBinding()).listSectionImageCaptionTv.requestFocus();
+                        }
+                    }, 50);
                 }
 
                 break;
@@ -348,45 +362,6 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
         }
     }
 
-    @Override
-    public boolean onPrepareMenu(NavigationMenu navigationMenu) {
-        return true;
-    }
-
-    @Override
-    public boolean onMenuItemSelected(MenuItem menuItem) {
-
-        switch (menuItem.getItemId()) {
-            case R.id.fab_add_gpx:
-
-                // Open FilePicker to allow GPX selection
-                openFilePicker(FilePickerConst.FILE_TYPE_DOCUMENT);
-                return true;
-
-            case R.id.fab_add_section_text:
-
-                // Add another blank section to mModelList
-                mAdapter.addModel(new Section());
-                return true;
-
-            case R.id.fab_add_section_image:
-
-                // Set mFilePickerPosition to the size of mModelList because that is the position
-                // that the Section will exist in once it is added
-                mFilePickerModelPosition = mModelList.size();
-
-                // Open the FilePicker to allow selection of a photo to include
-                openFilePicker(FilePickerConst.FILE_TYPE_MEDIA);
-                return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public void onMenuClosed() {
-
-    }
 
     ItemTouchHelper.Callback mItemTouchCallback = new ItemTouchHelper.SimpleCallback(UP|DOWN, LEFT|RIGHT) {
         @Override
@@ -450,7 +425,6 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_publish:
-                boolean valid = true;
 
                 // Validate the Sections and Guide to ensure all required elements are present
                 boolean sectionsValid = validateSections();
@@ -624,6 +598,55 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    /**
+     * Click response for bottom Toolbar for adding an additional Section
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickAddSection(View view) {
+        // Add another blank section to mModelList
+        mAdapter.addModel(new Section());
+
+        mBinding.guideDetailsRv.scrollToPosition(mModelList.size() - 1);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                EditGuideDetailsAdapter.EditViewHolder viewHolder =
+                        (EditGuideDetailsAdapter.EditViewHolder) mBinding.guideDetailsRv
+                                .findViewHolderForAdapterPosition(mModelList.size() - 1);
+
+                ((ListItemSectionTextEditBinding) viewHolder.getBinding()).listSectionTextTv.requestFocus();
+            }
+        }, 50);
+    }
+
+    /**
+     * Click response for bottom Toolbar for adding an additional Section with Image
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickAddSectionWithImage(View view) {
+
+        // Set mFilePickerPosition to the size of mModelList because that is the position
+        // that the Section will exist in once it is added
+        mFilePickerModelPosition = mModelList.size();
+
+        // Open the FilePicker to allow selection of a photo to include
+        openFilePicker(FilePickerConst.FILE_TYPE_MEDIA);
+    }
+
+    /**
+     * Click response for bottom Toolbar for adding a GPX to the Guide
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickAddGpx(View view) {
+
+        // Open FilePicker to allow GPX selection
+        openFilePicker(FilePickerConst.FILE_TYPE_DOCUMENT);
     }
 
     /**
