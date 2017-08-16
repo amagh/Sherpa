@@ -27,6 +27,7 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
+import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
 import timber.log.Timber;
@@ -42,7 +43,7 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.getReferenceFor
  * Created by Alvin on 8/3/2017.
  */
 
-public class PublishActivity extends MapboxActivity {
+public class PublishActivity extends MapboxActivity implements ConnectivityActivity.ConnectivityCallback {
     // ** Member Variables ** //
     private Author mAuthor;
     private Guide mGuide;
@@ -72,10 +73,25 @@ public class PublishActivity extends MapboxActivity {
         // Copy the elements from parcelables to mSections as it cannot be directly cast to Section[]
         System.arraycopy(parcelables, 0, mSections, 0, parcelables.length);
 
+        setConnectivityCallback(this);
+    }
+
+    @Override
+    public void onConnected() {
         // Resize any images associated with the models
         resizeImages();
 
         mUploadListener = new UploadListener(getChildUpdates());
+    }
+
+    @Override
+    public void onDisconnected() {
+        Toast.makeText(this,
+                "No network connection. Try to publish when you have a network connection",
+                Toast.LENGTH_LONG)
+                .show();
+
+        finish();
     }
 
     /**
@@ -106,18 +122,18 @@ public class PublishActivity extends MapboxActivity {
         Map<String, Object> childUpdates = new HashMap<>();
 
         // Upload the Area if it does not exist in the Firebase Database
-        if (mArea.firebaseId == null) {
+        if (mArea.firebaseId == null || mArea.isDraft()) {
             addChildUpdate(mArea, childUpdates);
         }
 
         // Upload the trail
-        if (mTrail.firebaseId == null) {
+        if (mTrail.firebaseId == null || mTrail.isDraft()) {
             mTrail.areaId = mArea.firebaseId;
             addChildUpdate(mTrail, childUpdates);
         }
 
         // Upload the Guide
-        if (mGuide.firebaseId == null) {
+        if (mGuide.firebaseId == null || mGuide.isDraft()) {
 
             // Set the variables of the Guide to those from the associated Area and trail
             mGuide.trailId = mTrail.firebaseId;
@@ -292,6 +308,20 @@ public class PublishActivity extends MapboxActivity {
         private void onUploadComplete() {
             FirebaseDatabase.getInstance().getReference()
                     .updateChildren(mChildUpdates);
+
+            // Delete the draft from the database
+            ContentProviderUtils.deleteModel(PublishActivity.this, mGuide);
+            ContentProviderUtils.deleteModel(PublishActivity.this, mTrail);
+            ContentProviderUtils.deleteModel(PublishActivity.this, mArea);
+            ContentProviderUtils.deleteSectionsForGuide(PublishActivity.this, mGuide);
+
+            if (ContentProviderUtils.getGuideCountForAuthor(PublishActivity.this, mAuthor) == 0) {
+                ContentProviderUtils.deleteModel(PublishActivity.this, mAuthor);
+            }
+
+            Intent intent = new Intent(PublishActivity.this, UserActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         }
     }
 }
