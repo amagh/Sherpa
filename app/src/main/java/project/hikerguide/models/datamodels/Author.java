@@ -7,6 +7,7 @@ import android.os.Parcelable;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
@@ -18,16 +19,18 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 
 public class Author extends BaseModelWithImage implements Parcelable {
     // ** Constants ** //
-    private static final String NAME = "name";
-    private static final String DESCRIPTION = "description";
+    private static final String NAME            = "name";
+    private static final String DESCRIPTION     = "description";
     private static final String LOWER_CASE_NAME = "lowerCaseName";
-    private static final String HAS_IMAGE = "hasImage";
-    private static final String SCORE = "score";
+    private static final String HAS_IMAGE       = "hasImage";
+    private static final String SCORE           = "score";
+    private static final String FAVORITES       = "favorites";
 
     // ** Member Variables ** //
     public String name;
     public String description;
     public int score;
+    public List<String> favorites;
 
     public Author() {}
 
@@ -86,6 +89,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
         map.put(LOWER_CASE_NAME, name.toLowerCase());
         map.put(HAS_IMAGE, hasImage);
         map.put(SCORE, score);
+        map.put(FAVORITES, favorites);
 
         return map;
     }
