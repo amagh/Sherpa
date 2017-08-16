@@ -17,6 +17,13 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.github.mikephil.charting.charts.LineChart;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -29,11 +36,19 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import de.hdodenhof.circleimageview.CircleImageView;
 import project.hikerguide.BR;
 import project.hikerguide.R;
+import project.hikerguide.data.GuideDatabase;
+import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.firebasestorage.StorageProvider;
+import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.ui.views.SmartMapView;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.ui.activities.CreateGuideActivity;
@@ -41,6 +56,7 @@ import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.ConversionUtils;
+import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
 import timber.log.Timber;
 
@@ -60,6 +76,7 @@ public class GuideViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Context mContext;
     private Guide mGuide;
+    private Author mAuthor;
     private WeakReference<MapboxActivity> mActivity;
     private int mColorPosition;
     private boolean mShowImageError;
@@ -70,7 +87,7 @@ public class GuideViewModel extends BaseObservable {
     public GuideViewModel(Context context, Guide guide) {
         mContext = context;
 
-        // If the passesd Context is a MapboxActivity, then set the mem var to reference it
+        // If the passed Context is a MapboxActivity, then set the mem var to reference it
         if (mContext instanceof MapboxActivity) {
             mActivity = new WeakReference<>((MapboxActivity) mContext);
         }
@@ -81,13 +98,28 @@ public class GuideViewModel extends BaseObservable {
     public GuideViewModel(Context context, Guide guide, int colorPosition) {
         mContext = context;
 
-        // If the passesd Context is a MapboxActivity, then set the mem var to reference it
+        // If the passed Context is a MapboxActivity, then set the mem var to reference it
         if (mContext instanceof MapboxActivity) {
             mActivity = new WeakReference<>((MapboxActivity) mContext);
         }
 
         mGuide = guide;
         mColorPosition = colorPosition;
+    }
+
+    public void setAuthor(Author author) {
+
+        // Set memvar to reference passed Author
+        mAuthor = author;
+
+        if (mAuthor != null && mAuthor.favorites != null && mAuthor.favorites.contains(mGuide.firebaseId)) {
+
+            // Set the favorite status for the Guide if it within the Author's list of favorites
+            mGuide.setFavorite(true);
+
+            // Notify change
+            notifyPropertyChanged(BR.favorite);
+        }
     }
 
     @Bindable
@@ -321,6 +353,27 @@ public class GuideViewModel extends BaseObservable {
 
     }
 
+    @Bindable
+    public boolean getFavorite() {
+        return mGuide.isFavorite();
+    }
+
+    @BindingAdapter("favorite")
+    public static void setFavoriteButton(ImageView imageView, boolean favorite) {
+
+        if (favorite) {
+            AdditiveAnimator.animate(imageView)
+                    .scale(1f)
+                    .setDuration(100)
+                    .start();
+        } else {
+            AdditiveAnimator.animate(imageView)
+                    .scale(0f)
+                    .setDuration(100)
+                    .start();
+        }
+    }
+
     /**
      * Loads the GPX data into the MapboxMap
      */
@@ -524,6 +577,23 @@ public class GuideViewModel extends BaseObservable {
                     mActivity.get().getString(R.string.error_no_map_app),
                     Toast.LENGTH_LONG)
                     .show();
+        }
+    }
+
+    /**
+     * Click response for the favorite star button
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickFavorite(View view) {
+
+        if (mAuthor != null) {
+
+            // Add/remove the Guide from the Author's list of favorites
+            FirebaseProviderUtils.toggleFirebaseFavorite(mAuthor, mGuide);
+
+            // Notify change
+            notifyPropertyChanged(BR.favorite);
         }
     }
 }

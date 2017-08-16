@@ -22,7 +22,9 @@ import project.hikerguide.R;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.databinding.FragmentGuideListBinding;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
+import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
@@ -35,9 +37,11 @@ import project.hikerguide.utilities.FirebaseProviderUtils;
 public class GuideListFragment extends Fragment implements ConnectivityActivity.ConnectivityCallback{
     // ** Constants ** //
     private static final int GUIDES_LOADER = 4349;
+
     // ** Member Variables ** //
     private FragmentGuideListBinding mBinding;
     private GuideAdapter mAdapter;
+    private Author mAuthor;
 
     public GuideListFragment() {}
 
@@ -75,6 +79,17 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
     public void onConnected() {
 
         FirebaseDatabase.getInstance().goOnline();
+
+        if (mAuthor == null) {
+            FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
+                @Override
+                public void onModelReady(BaseModel model) {
+                    mAuthor = (Author) model;
+
+                    mAdapter.setAuthor(mAuthor);
+                }
+            });
+        }
 
         // If Adapter is empty, load the Guides from Firebase
         if (mAdapter.isEmpty()) {

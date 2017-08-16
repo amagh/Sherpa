@@ -13,6 +13,7 @@ import java.util.List;
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemGuideBinding;
 import project.hikerguide.databinding.ListItemGuideCompactBinding;
+import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 
@@ -32,9 +33,21 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     private ClickHandler mHandler;
     private boolean useSearchLayout;
     private String mHighlighted;
+    private Author mAuthor;
 
     public GuideAdapter(ClickHandler clickHandler) {
         mHandler = clickHandler;
+    }
+
+    /**
+     * Sets the Author to be used to check the each Guide is on the Author's favorite list
+     *
+     * @param author    Author whose Favorite List is to be checked for the presence of the Guides
+     */
+    public void setAuthor(Author author) {
+        mAuthor = author;
+
+        notifyDataSetChanged();
     }
 
     @Override
@@ -204,8 +217,11 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
             // Initialize a GuideViewModel using the Guide from the array and set it to the
             // DataBinding
             if (!useSearchLayout) {
-                ((ListItemGuideBinding) mBinding)
-                        .setVm(new GuideViewModel(mBinding.getRoot().getContext(), guide));
+
+                GuideViewModel vm = new GuideViewModel(mBinding.getRoot().getContext(), guide);
+                vm.setAuthor(mAuthor);
+
+                ((ListItemGuideBinding) mBinding).setVm(vm);
             } else {
                 if (guide.firebaseId.equals(mHighlighted)) {
                     // If Guide's track is highlighted, then set the color swatch appropriately
