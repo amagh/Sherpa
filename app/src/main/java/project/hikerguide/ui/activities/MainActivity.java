@@ -6,21 +6,28 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.Mapbox;
 
 import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.ui.fragments.FavoritesFragment;
 import project.hikerguide.ui.fragments.GuideListFragment;
 import project.hikerguide.ui.fragments.SearchFragment;
 import project.hikerguide.ui.fragments.UserFragment;
 
+import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_ACCOUNT;
+import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_FAVORITE;
+import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_HOME;
+import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_SEARCH;
 import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
 public class MainActivity extends ConnectivityActivity implements GuideListFragment.OnGuideClickListener {
+
+
+
     // ** Member Variables ** //
     private BottomNavigationView mNavigation;
 
@@ -32,26 +39,32 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
 
             FragmentManager manager = getSupportFragmentManager();
             Fragment fragment;
+            String tag;
 
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     fragment = new GuideListFragment();
+                    tag = FRAG_TAG_HOME;
                     break;
                 case R.id.navigation_search:
                     fragment = new SearchFragment();
+                    tag = FRAG_TAG_SEARCH;
                     break;
                 case R.id.navigation_account:
                     fragment = new UserFragment();
+                    tag = FRAG_TAG_ACCOUNT;
                     break;
 
                 case R.id.navigation_favorites:
-                    return true;
+                    fragment = new FavoritesFragment();
+                    tag = FRAG_TAG_FAVORITE;
+                    break;
 
                 default: return false;
             }
 
             manager.beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
+                    .replace(R.id.fragment_container, fragment, tag)
                     .commit();
 
             return true;
