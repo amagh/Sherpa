@@ -247,4 +247,13 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
         // Init the CursorLoader
         getActivity().getSupportLoaderManager().initLoader(FAVORITES_LOADER, null, this);
     }
+
+    /**
+     * Removes a Guide from the Adapter
+     *
+     * @param guide    Guide to be removed
+     */
+    public void removeGuideFromAdapter(Guide guide) {
+        mAdapter.removeGuide(guide.firebaseId);
+    }
 }

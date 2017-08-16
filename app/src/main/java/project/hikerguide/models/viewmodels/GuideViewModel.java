@@ -8,6 +8,8 @@ import android.databinding.BindingAdapter;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -49,6 +51,7 @@ import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
+import project.hikerguide.ui.fragments.FavoritesFragment;
 import project.hikerguide.ui.views.SmartMapView;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.ui.activities.CreateGuideActivity;
@@ -60,6 +63,7 @@ import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
 import timber.log.Timber;
 
+import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_FAVORITE;
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
 import static project.hikerguide.utilities.MapUtils.addMapOptionsToMap;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
@@ -591,6 +595,22 @@ public class GuideViewModel extends BaseObservable {
 
             // Add/remove the Guide from the Author's list of favorites
             FirebaseProviderUtils.toggleFirebaseFavorite(mAuthor, mGuide);
+
+            // If the user is on the FavoriteFragment and removing a favorite, then it needs to be
+            // removed from the Adapter when they click the favorite button
+            if (mContext instanceof AppCompatActivity) {
+
+                // Get a reference to the FavoriteFragment using the Fragment tag
+                FavoritesFragment fragment = (FavoritesFragment) ((AppCompatActivity) mContext)
+                        .getSupportFragmentManager()
+                        .findFragmentByTag(FRAG_TAG_FAVORITE);
+
+                if (!mGuide.isFavorite() && fragment != null) {
+
+                    // Remove the Guide from the Adapter
+                    fragment.removeGuideFromAdapter(mGuide);
+                }
+            }
 
             // Notify change
             notifyPropertyChanged(BR.favorite);
