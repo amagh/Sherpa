@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.Exclude;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,20 +24,21 @@ import project.hikerguide.utilities.GpxUtils;
 
 public class Guide extends BaseModelWithImage implements Parcelable {
     // ** Constants ** //
-    private static final String TRAIL_ID = "trailId";
-    private static final String TRAIL_NAME = "trailName";
-    private static final String AUTHOR_ID = "authorId";
-    private static final String AUTHOR_NAME = "authorName";
-    private static final String DATE_ADDED = "dateAdded";
-    private static final String RATING = "rating";
-    private static final String REVIEWS = "reviews";
-    private static final String LATITUDE = "latitude";
-    private static final String LONGITUDE = "longitude";
-    private static final String ELEVATION = "elevation";
-    private static final String HAS_IMAGE = "hasImage";
-    private static final String DISTANCE = "distance";
-    private static final String DIFFICULTY = "difficulty";
-    private static final String AREA = "area";
+    private static final String TRAIL_ID        = "trailId";
+    private static final String TRAIL_NAME      = "trailName";
+    private static final String AUTHOR_ID       = "authorId";
+    private static final String AUTHOR_NAME     = "authorName";
+    private static final String DATE_ADDED      = "dateAdded";
+    private static final String RATING          = "rating";
+    private static final String REVIEWS         = "reviews";
+    private static final String LATITUDE        = "latitude";
+    private static final String LONGITUDE       = "longitude";
+    private static final String ELEVATION       = "elevation";
+    private static final String HAS_IMAGE       = "hasImage";
+    private static final String DISTANCE        = "distance";
+    private static final String DIFFICULTY      = "difficulty";
+    private static final String AREA            = "area";
+    private static final String FAVORITE        = "favorite";
 
     // ** Member Variables ** //
     public String trailId;
@@ -51,6 +54,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     public double elevation;
     public int difficulty;
     public String area;
+    private boolean favorite;
 
     private Uri gpxUri;
 
@@ -97,6 +101,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         int idxImageUri         = cursor.getColumnIndex(GuideContract.GuideEntry.IMAGE_URI);
         int idxGpxUri           = cursor.getColumnIndex(GuideContract.GuideEntry.GPX_URI);
         int idxDraft            = cursor.getColumnIndex(GuideContract.GuideEntry.DRAFT);
+        int idxFavorite         = cursor.getColumnIndex(GuideContract.GuideEntry.FAVORITE);
 
         // Get the values from the Cursor
         String firebaseId       = cursor.getString(idxFirebaseId);
@@ -116,6 +121,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         String imageUriString   = cursor.getString(idxImageUri);
         String gpxUriString     = cursor.getString(idxGpxUri);
         boolean draft           = cursor.getInt(idxDraft) == 1;
+        boolean favorite        = cursor.getInt(idxFavorite) == 1;
 
         // Create a new Guide using the values from the Cursor
         Guide guide             = new Guide();
@@ -133,6 +139,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         guide.elevation         = elevation;
         guide.difficulty        = difficulty;
         guide.area              = area;
+        guide.favorite          = favorite;
         guide.setDraft(draft);
 
         if (imageUriString != null) {
@@ -224,6 +231,15 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
         // Set the gpxUri to the File's path
         return gpxFile;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    @Exclude
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 
     //********************************************************************************************//

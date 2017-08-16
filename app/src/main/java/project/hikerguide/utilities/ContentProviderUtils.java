@@ -221,6 +221,12 @@ public class ContentProviderUtils {
             values.put(GuideContract.GuideEntry.DRAFT,      1);
         }
 
+        if (guide.isFavorite()) {
+            values.put(GuideContract.GuideEntry.FAVORITE,   1);
+        } else {
+            values.put(GuideContract.GuideEntry.FAVORITE,   0);
+        }
+
         return values;
     }
 

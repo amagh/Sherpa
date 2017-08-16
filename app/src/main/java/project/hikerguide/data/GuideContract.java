@@ -44,6 +44,7 @@ public class GuideContract {
         @DataType(DataType.Type.TEXT) String GPX_URI                                = "gpxUri";
 
         @DataType(DataType.Type.INTEGER) String DRAFT                               = "draft";
+        @DataType(DataType.Type.INTEGER) String FAVORITE                            = "favorite";
     }
 
     public interface TrailEntry {
