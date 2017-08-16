@@ -850,8 +850,11 @@ public class CreateGuideActivity extends MapboxActivity implements FabSpeedDial.
     private void deleteDraft() {
         // Remove entries from the database
         ContentProviderUtils.deleteModel(this, mGuide);
-        ContentProviderUtils.deleteModel(this, mArea);
         ContentProviderUtils.deleteModel(this, mTrail);
+
+        if (ContentProviderUtils.getTrailCountForArea(this, mArea) == 0) {
+            ContentProviderUtils.deleteModel(this, mArea);
+        }
 
         if (ContentProviderUtils.getGuideCountForAuthor(this, mAuthor) == 0) {
             ContentProviderUtils.deleteModel(this, mAuthor);

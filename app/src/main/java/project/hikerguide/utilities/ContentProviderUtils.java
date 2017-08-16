@@ -119,6 +119,37 @@ public class ContentProviderUtils {
     }
 
     /**
+     * Counts the number of Trails in the database using an Area
+     *
+     * @param context    Interface to global Context
+     * @param area       Area to count the number of associated Trails for
+     * @return The number of Trails in the database associated with an Area
+     */
+    public static int getTrailCountForArea(Context context, Area area) {
+
+        // Query the database for Trails associated with the Area
+        Cursor cursor = context.getContentResolver().query(
+                GuideProvider.Trails.CONTENT_URI,
+                null,
+                GuideContract.TrailEntry.AREA_ID + " = ?",
+                new String[] {area.firebaseId},
+                null);
+
+        // Return the Cursor count
+        try {
+            if (cursor != null) {
+                return cursor.getCount();
+            } else {
+                return 0;
+            }
+        } finally {
+
+            // Close the Cursor
+            if (cursor != null) cursor.close();
+        }
+    }
+
+    /**
      * Checks whether a data model already exists in the database
      *
      * @param context    Interface to global Context
