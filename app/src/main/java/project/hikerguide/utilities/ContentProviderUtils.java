@@ -173,6 +173,7 @@ public class ContentProviderUtils {
         values.put(GuideContract.GuideEntry.DISTANCE,       guide.distance);
         values.put(GuideContract.GuideEntry.ELEVATION,      guide.elevation);
         values.put(GuideContract.GuideEntry.DIFFICULTY,     guide.difficulty);
+        values.put(GuideContract.GuideEntry.AREA,           guide.area);
 
         // Add image Uri if the Guide has an image
         if (guide.hasImage) {

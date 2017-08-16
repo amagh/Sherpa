@@ -37,8 +37,9 @@ public class GuideContract {
         @DataType(DataType.Type.REAL) String LONGITUDE                              = "longitude";
         @DataType(DataType.Type.REAL) String DISTANCE                               = "distance";
         @DataType(DataType.Type.REAL) String ELEVATION                              = "elevation";
-
         @DataType(DataType.Type.INTEGER) String DIFFICULTY                          = "difficulty";
+        @DataType(DataType.Type.TEXT) String AREA                                   = "area";
+
         @DataType(DataType.Type.TEXT) String IMAGE_URI                              = "imageUri";
         @DataType(DataType.Type.TEXT) String GPX_URI                                = "gpxUri";
 

@@ -93,6 +93,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         int idxDistance         = cursor.getColumnIndex(GuideContract.GuideEntry.DISTANCE);
         int idxElevation        = cursor.getColumnIndex(GuideContract.GuideEntry.ELEVATION);
         int idxDifficulty       = cursor.getColumnIndex(GuideContract.GuideEntry.DIFFICULTY);
+        int idxArea             = cursor.getColumnIndex(GuideContract.GuideEntry.AREA);
         int idxImageUri         = cursor.getColumnIndex(GuideContract.GuideEntry.IMAGE_URI);
         int idxGpxUri           = cursor.getColumnIndex(GuideContract.GuideEntry.GPX_URI);
         int idxDraft            = cursor.getColumnIndex(GuideContract.GuideEntry.DRAFT);
@@ -111,6 +112,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         double distance         = cursor.getDouble(idxDistance);
         double elevation        = cursor.getDouble(idxElevation);
         int difficulty          = cursor.getInt(idxDifficulty);
+        String area             = cursor.getString(idxArea);
         String imageUriString   = cursor.getString(idxImageUri);
         String gpxUriString     = cursor.getString(idxGpxUri);
         boolean draft           = cursor.getInt(idxDraft) == 1;
@@ -130,6 +132,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         guide.distance          = distance;
         guide.elevation         = elevation;
         guide.difficulty        = difficulty;
+        guide.area              = area;
         guide.setDraft(draft);
 
         if (imageUriString != null) {
