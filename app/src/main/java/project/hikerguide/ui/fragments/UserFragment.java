@@ -33,7 +33,6 @@ import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
-import project.hikerguide.databinding.ActivityUserBinding;
 import project.hikerguide.databinding.FragmentUserBinding;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Author;
@@ -44,13 +43,16 @@ import project.hikerguide.ui.activities.AccountActivity;
 import project.hikerguide.ui.activities.AreaActivity;
 import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
+import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.activities.OpenDraftActivity;
 import project.hikerguide.ui.activities.UserActivity;
 import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.ui.behaviors.FabSpeedDialScrollBehavior;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
+import static android.app.Activity.RESULT_OK;
 import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
@@ -60,6 +62,9 @@ import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
 public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
         ConnectivityActivity.ConnectivityCallback {
+
+    // ** Constants ** //
+    public static final int ACCOUNT_ACTIVITY_REQUEST_CODE = 7219;
 
     // ** Member Variables ** //
     private FragmentUserBinding mBinding;
@@ -143,11 +148,10 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
             case R.id.menu_user_log_off:
                 FirebaseAuth.getInstance().signOut();
 
-                startActivity(new Intent(getActivity(), AccountActivity.class));
+                startActivityForResult(
+                        new Intent(getActivity(), AccountActivity.class),
+                        ACCOUNT_ACTIVITY_REQUEST_CODE);
 
-                if (getActivity() instanceof UserActivity) {
-                    getActivity().finish();
-                }
                 return true;
         }
 
@@ -214,11 +218,9 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
         if (user == null) {
             // No valid user, send to the AccountActivity to sign in
-            startActivity(new Intent(getActivity(), AccountActivity.class));
-
-            if (getActivity() instanceof UserActivity) {
-                getActivity().finish();
-            }
+            startActivityForResult(
+                    new Intent(getActivity(), AccountActivity.class),
+                    ACCOUNT_ACTIVITY_REQUEST_CODE);
 
             return;
         }
@@ -269,6 +271,17 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                 authorRef.removeEventListener(this);
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == ACCOUNT_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK
+                && data.getBooleanExtra(AUTHOR_KEY, false)) {
+            loadUserSelfProfile();
+        } else {
+            ((MainActivity) getActivity()).switchFragments(R.id.navigation_home);
+        }
     }
 
     /**

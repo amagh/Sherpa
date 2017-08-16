@@ -28,10 +28,13 @@ import java.lang.annotation.RetentionPolicy;
 
 import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.R;
+import project.hikerguide.ui.activities.AccountActivity;
 import project.hikerguide.ui.activities.UserActivity;
 
 import static project.hikerguide.models.viewmodels.AccountViewModel.UiModes.CREATE_ACCOUNT;
 import static project.hikerguide.models.viewmodels.AccountViewModel.UiModes.SIGN_IN;
+import static project.hikerguide.ui.fragments.UserFragment.ACCOUNT_ACTIVITY_REQUEST_CODE;
+import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 
 /**
  * Created by Alvin on 7/28/2017.
@@ -194,8 +197,11 @@ public class AccountViewModel extends BaseObservable {
                         notifyPropertyChanged(BR.progressVisibility);
 
                         if (task.isSuccessful()) {
-                            mContext.startActivity(new Intent(mContext, UserActivity.class));
-                            ((Activity) mContext).finish();
+                            Intent intent = new Intent();
+                            intent.putExtra(AUTHOR_KEY, task.isSuccessful());
+
+                            ((AccountActivity) mContext).setResult(Activity.RESULT_OK, intent);
+                            ((AccountActivity) mContext).finish();
                         } else {
                             Toast.makeText(mContext, mContext.getString(R.string.authentication_error), Toast.LENGTH_LONG).show();
                         }

@@ -21,6 +21,8 @@ import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
 public class MainActivity extends ConnectivityActivity implements GuideListFragment.OnGuideClickListener {
+    // ** Member Variables ** //
+    private BottomNavigationView mNavigation;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -62,8 +64,8 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        mNavigation = (BottomNavigationView) findViewById(R.id.navigation);
+        mNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         Mapbox.getInstance(this, getString(R.string.mapbox_token));
     }
@@ -77,8 +79,7 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
         startActivity(intent);
     }
 
-    private void launchActivity() {
-        Intent intent = new Intent(this, UserActivity.class);
-        startActivity(intent);
+    public void switchFragments(int id) {
+        mNavigation.setSelectedItemId(id);
     }
 }
