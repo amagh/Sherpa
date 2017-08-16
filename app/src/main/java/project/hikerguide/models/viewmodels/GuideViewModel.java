@@ -42,6 +42,7 @@ import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.ConversionUtils;
 import project.hikerguide.utilities.SaveUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
 import static project.hikerguide.utilities.MapUtils.addMapOptionsToMap;
@@ -160,7 +161,7 @@ public class GuideViewModel extends BaseObservable {
     public StorageReference getImage() {
 
         // If Guide does not have FirebaseId, return null
-        if (mGuide.firebaseId == null) return null;
+        if (mGuide.firebaseId == null || mGuide.getImageUri() != null) return null;
 
         return FirebaseStorage.getInstance().getReference()
                 .child(IMAGE_PATH)
@@ -177,7 +178,7 @@ public class GuideViewModel extends BaseObservable {
     public static void loadImage(ImageView imageView, StorageReference image, Uri imageUri) {
 
         // Check whether to load image from File or from Firebase Storage
-        if (image == null) {
+        if (imageUri != null) {
 
             // No StorageReference, load local file using the File's Uri
             Glide.with(imageView.getContext())
@@ -219,18 +220,12 @@ public class GuideViewModel extends BaseObservable {
     public File getGpx() {
 
         // Check whether to use the online copy of the GPX file or a locally stored file.
-        if (mGuide.firebaseId == null) {
+        if (mGuide.getGpxUri() != null) {
 
-            if (mGuide.getGpxUri() == null) {
+            // Create a new File from the Uri stored in the Guide
+            return new File(mGuide.getGpxUri().getPath());
 
-                // No Uri set yet.
-                return null;
-            } else {
-
-                // Create a new File from the Uri stored in the Guide
-                return new File(mGuide.getGpxUri().getPath());
-            }
-        } else {
+        } else if (mGuide.firebaseId != null){
 
             // Create a temporary File where the GPX will be downloaded
             final File tempGpx = SaveUtils.createTempFile(StorageProvider.FirebaseFileType.GPX_FILE, mGuide.firebaseId);
@@ -255,6 +250,8 @@ public class GuideViewModel extends BaseObservable {
             } else {
                 return tempGpx;
             }
+        } else {
+            return null;
         }
     }
 
