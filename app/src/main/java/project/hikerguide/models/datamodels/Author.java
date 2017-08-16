@@ -106,6 +106,12 @@ public class Author extends BaseModelWithImage implements Parcelable {
         parcel.writeString(name);
         parcel.writeString(description);
         parcel.writeInt(score);
+
+        if (isDraft()) {
+            parcel.writeInt(1);
+        } else {
+            parcel.writeInt(0);
+        }
     }
 
     public static final Parcelable.Creator<Author> CREATOR = new Parcelable.Creator<Author>() {
@@ -125,5 +131,9 @@ public class Author extends BaseModelWithImage implements Parcelable {
         name = parcel.readString();
         description = parcel.readString();
         score = parcel.readInt();
+
+        if (parcel.readInt() == 1) {
+            setDraft(true);
+        }
     }
 }

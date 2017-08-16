@@ -100,6 +100,12 @@ public class Area extends BaseModel implements Parcelable {
         parcel.writeString(state);
         parcel.writeDouble(latitude);
         parcel.writeDouble(longitude);
+
+        if (isDraft()) {
+            parcel.writeInt(1);
+        } else {
+            parcel.writeInt(0);
+        }
     }
 
     public static final Parcelable.Creator<Area> CREATOR = new Parcelable.Creator<Area>() {
@@ -120,5 +126,9 @@ public class Area extends BaseModel implements Parcelable {
         state = parcel.readString();
         latitude = parcel.readDouble();
         longitude = parcel.readDouble();
+
+        if (parcel.readInt() == 1) {
+            setDraft(true);
+        }
     }
 }

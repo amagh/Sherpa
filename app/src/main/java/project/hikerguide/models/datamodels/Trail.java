@@ -99,6 +99,12 @@ public class Trail extends BaseModel implements Parcelable {
         parcel.writeString(firebaseId);
         parcel.writeString(name);
         parcel.writeString(notes);
+
+        if (isDraft()) {
+            parcel.writeInt(1);
+        } else {
+            parcel.writeInt(0);
+        }
     }
 
     public static final Parcelable.Creator<Trail> CREATOR = new Parcelable.Creator<Trail>() {
@@ -117,5 +123,9 @@ public class Trail extends BaseModel implements Parcelable {
         firebaseId = parcel.readString();
         name = parcel.readString();
         notes = parcel.readString();
+
+        if (parcel.readInt() == 1) {
+            setDraft(true);
+        }
     }
 }

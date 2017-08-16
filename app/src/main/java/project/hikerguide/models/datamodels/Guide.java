@@ -260,6 +260,12 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         if (imageUri != null) {
             parcel.writeString(imageUri.toString());
         }
+
+        if (isDraft()) {
+            parcel.writeInt(1);
+        } else {
+            parcel.writeInt(0);
+        }
     }
 
     public static final Parcelable.Creator<Guide> CREATOR = new Parcelable.Creator<Guide>() {
@@ -299,6 +305,10 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         if (imageUriString != null) {
             hasImage = true;
             imageUri = Uri.parse(imageUriString);
+        }
+
+        if (parcel.readInt() == 1) {
+            setDraft(true);
         }
     }
 }

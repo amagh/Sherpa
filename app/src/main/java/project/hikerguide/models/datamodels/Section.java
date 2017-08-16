@@ -112,6 +112,12 @@ public class Section extends BaseModelWithImage implements Parcelable {
         if (hasImage) {
             parcel.writeString(getImageUri().toString());
         }
+
+        if (isDraft()) {
+            parcel.writeInt(1);
+        } else {
+            parcel.writeInt(0);
+        }
     }
 
     public static final Parcelable.Creator<Section> CREATOR = new Parcelable.Creator<Section>() {
@@ -135,6 +141,10 @@ public class Section extends BaseModelWithImage implements Parcelable {
         if (imageUriString != null) {
             hasImage = true;
             imageUri = Uri.parse(imageUriString);
+        }
+
+        if (parcel.readInt() == 1) {
+            setDraft(true);
         }
     }
 }
