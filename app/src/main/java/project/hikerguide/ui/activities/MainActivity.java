@@ -15,7 +15,9 @@ import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.ui.fragments.GuideListFragment;
 import project.hikerguide.ui.fragments.SearchFragment;
+import project.hikerguide.ui.fragments.UserFragment;
 
+import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
 public class MainActivity extends ConnectivityActivity implements GuideListFragment.OnGuideClickListener {
@@ -37,8 +39,8 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
                     fragment = new SearchFragment();
                     break;
                 case R.id.navigation_account:
-                    launchActivity();
-                    return true;
+                    fragment = new UserFragment();
+                    break;
 
                 case R.id.navigation_favorites:
                     return true;

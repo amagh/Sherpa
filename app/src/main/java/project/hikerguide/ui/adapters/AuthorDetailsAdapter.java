@@ -1,5 +1,6 @@
 package project.hikerguide.ui.adapters;
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.activities.UserActivity;
+import project.hikerguide.ui.fragments.UserFragment;
 
 /**
  * Created by Alvin on 8/1/2017.
@@ -31,14 +33,16 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
     private static final int GUIDE_VIEW_TYPE        = 2;
 
     // ** Member Variables ** //
-    private UserActivity mActivity;
+    private Context mContext;
+    private UserFragment mFragment;
     private List<BaseModel> mModelList;
     private boolean mEnableEdit = false;
     private boolean mIsInEditMode = false;
     private GuideAdapter.ClickHandler mClickHandler;
 
-    public AuthorDetailsAdapter(UserActivity activity, GuideAdapter.ClickHandler clickHandler) {
-        mActivity = activity;
+    public AuthorDetailsAdapter(Context context, UserFragment fragment, GuideAdapter.ClickHandler clickHandler) {
+        mContext = context;
+        mFragment = fragment;
         mClickHandler = clickHandler;
     }
 
@@ -182,7 +186,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
 
             // Cast the Model and ViewDataBinding based on the type of BaseModel
             if (model instanceof Author) {
-                AuthorViewModel vm = new AuthorViewModel(mActivity, (Author) model);
+                AuthorViewModel vm = new AuthorViewModel(mContext, mFragment, (Author) model);
 
                 if (mEnableEdit) {
                     // Enable editing of info if user is viewing their own profile

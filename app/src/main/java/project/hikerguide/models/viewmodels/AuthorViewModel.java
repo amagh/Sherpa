@@ -4,6 +4,7 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +21,7 @@ import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.ui.activities.UserActivity;
+import project.hikerguide.ui.fragments.UserFragment;
 import timber.log.Timber;
 
 import static project.hikerguide.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
@@ -34,12 +36,19 @@ public class AuthorViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Author mAuthor;
     private Context mContext;
+    private UserFragment mFragment;
     private int mEditVisibility = View.INVISIBLE;
     private boolean mAccepted = false;
 
-    public AuthorViewModel(Context context, Author author) {
+    public AuthorViewModel(@NonNull Context context, @NonNull UserFragment fragment, @NonNull Author author) {
         mAuthor = author;
         mContext = context;
+        mFragment = fragment;
+    }
+
+    public AuthorViewModel(@NonNull Context context, @NonNull Author author) {
+        mContext = context;
+        mAuthor = author;
     }
 
     @Bindable
@@ -48,16 +57,9 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @Bindable
-    public UserActivity getActivity() {
+    public UserFragment getFragment() {
 
-        // Check that the passed Context is instance of UserActivity
-        if (mContext instanceof UserActivity) {
-
-            // Cast and return mContext
-            return (UserActivity) mContext;
-        } else {
-            return null;
-        }
+        return mFragment;
     }
 
     @Bindable
@@ -130,20 +132,20 @@ public class AuthorViewModel extends BaseObservable {
         return mAccepted;
     }
 
-    @BindingAdapter({"nameTv", "descriptionTv", "author", "activity", "accepted"})
+    @BindingAdapter({"nameTv", "descriptionTv", "author", "fragment", "accepted"})
     public static void saveInfo(Button button, EditText nameEditText, EditText descriptionEditText,
-                                Author author, UserActivity activity, boolean accepted) {
+                                Author author, UserFragment fragment, boolean accepted) {
 
         // Check to see that the accept Button has been clicked as this function runs the first
         // time the ViewModel is loaded as well
-        if (activity != null && accepted) {
+        if (fragment != null && accepted) {
             // Set the Author parameters to match the text that the user has altered
             author.name = nameEditText.getText().toString();
             author.description = descriptionEditText.getText().toString();
 
             // Update the Author's values in the Firebase Database and switch the layout
-            activity.updateAuthorValues();
-            activity.switchAuthorLayout();
+            fragment.updateAuthorValues();
+            fragment.switchAuthorLayout();
         }
     }
 
@@ -166,9 +168,7 @@ public class AuthorViewModel extends BaseObservable {
     public void onClickEdit(View view) {
 
         // Switch the layout between edit and display
-        if (mContext instanceof UserActivity) {
-            ((UserActivity) mContext).switchAuthorLayout();
-        }
+        mFragment.switchAuthorLayout();
     }
 
     public void onClickAccept(View view) {
