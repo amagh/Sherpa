@@ -39,14 +39,26 @@ public class OpenDraftActivity extends AppCompatActivity implements LoaderManage
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_open_draft);
 
+        // Init RecyclerView
         initRecyclerView();
+    }
 
-        getSupportLoaderManager().initLoader(LOADER_DRAFT, null, this);
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Clear the Adapter and reload from the database in case a draft was deleted
+        mGuideList = new ArrayList<>();
+        mAdapter.setGuides(mGuideList);
+
+        // Init the CursorLoader for Guide drafts
+        getSupportLoaderManager().restartLoader(LOADER_DRAFT, null, this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
+        // Generate the CursorLoader for loading all draft Guides
         switch (id) {
             case LOADER_DRAFT:
                 return new CursorLoader(
@@ -64,14 +76,19 @@ public class OpenDraftActivity extends AppCompatActivity implements LoaderManage
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null) {
+
+            // Init the List of Guides
             mGuideList = new ArrayList<>();
 
             if (data.moveToFirst()) {
+                // Populate the List by generating Guides from the Cursor
                 do {
                     Guide guide = Guide.createGuideFromCursor(data);
                     mGuideList.add(guide);
-                    mAdapter.setGuides(mGuideList);
                 } while (data.moveToNext());
+
+                // Set the List to the Adapter
+                mAdapter.setGuides(mGuideList);
             }
         }
     }
@@ -81,10 +98,18 @@ public class OpenDraftActivity extends AppCompatActivity implements LoaderManage
 
     }
 
+    /**
+     * Initializes the elements for the RecyclerView
+     */
     private void initRecyclerView() {
+
+        // Init the GuideAdapter
         mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
             @Override
             public void onGuideClicked(Guide guide) {
+
+                // Start the CreateGuideActivity and set the data to the Uri for the Guide to be
+                // opened
                 Intent intent = new Intent(OpenDraftActivity.this, CreateGuideActivity.class);
                 intent.setData(GuideProvider.Guides.withId(guide.firebaseId));
 
@@ -97,6 +122,7 @@ public class OpenDraftActivity extends AppCompatActivity implements LoaderManage
             }
         });
 
+        // Set the Adapter and LayoutManager for the RecyclerView
         mBinding.draftRv.setAdapter(mAdapter);
         mBinding.draftRv.setLayoutManager(new LinearLayoutManager(this));
     }
