@@ -1,11 +1,20 @@
 package project.hikerguide.utilities;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import project.hikerguide.BR;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.files.GpxFile;
 import project.hikerguide.files.ImageFile;
@@ -180,6 +189,93 @@ public class FirebaseProviderUtils {
         return model;
     }
 
+    /**
+     * Retrieves the Author data model representing the FirebaseUser currently logged in
+     *
+     * @param listener The Listener that will be used to pass the retrieved Author to the calling
+     *                 Object
+     */
+    public static void getAuthorForFirebaseUser(final FirebaseListener listener) {
+
+        // Get the FirebaseUser currently logged in
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null) {
+
+            // Get a reference for the Author in the FirebaseDatabase
+            final DatabaseReference authorRef = FirebaseDatabase.getInstance().getReference()
+                    .child(GuideDatabase.AUTHORS)
+                    .child(user.getUid());
+
+            authorRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    // Check data is valid
+                    if (dataSnapshot.exists()) {
+
+                        // Return the Author created from the DataSnapshot
+                        listener.onModelReady(getModelFromSnapshot(AUTHOR, dataSnapshot));
+                    } else {
+
+                        // Return null result
+                        listener.onModelReady(null);
+                    }
+
+                    // Remove Listener
+                    authorRef.removeEventListener(this);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                    // Return null result
+                    listener.onModelReady(null);
+
+                    // Remove Listener
+                    authorRef.removeEventListener(this);
+                }
+            });
+        }
+    }
+
+    /**
+     * Adds/removes a Guide from an User's list of favorite Guides
+     *
+     * @param author    Data model representing the Firebase Database entry for the User
+     * @param guide     Guide to be added/removed to the Author's favorite list
+     */
+    public static void toggleFirebaseFavorite(Author author, Guide guide) {
+
+        // Check whether the Guide is currently a favorite and switch it in the data model
+        if (guide.isFavorite()) {
+            guide.setFavorite(false);
+        } else {
+            guide.setFavorite(true);
+        }
+
+        // Ensure that the List of Guides has been initialized
+        if (author.favorites == null) {
+            author.favorites = new ArrayList<>();
+        }
+
+        // Modify the Firebase Database entry
+        if (guide.isFavorite()) {
+            author.favorites.add(guide.firebaseId);
+        } else {
+            author.favorites.remove(guide.firebaseId);
+        }
+
+        // Push the update to FirebaseeDatabase
+        String directory = GuideDatabase.AUTHORS + "/" + author.firebaseId;
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(directory, author);
+
+        FirebaseDatabase.getInstance().getReference()
+                .updateChildren(childUpdates);
+    }
+
     //********************************************************************************************//
     //************************* Firebase Storage Related Methods *********************************//
     //********************************************************************************************//
@@ -221,4 +317,10 @@ public class FirebaseProviderUtils {
         return storageReference.child(directory).child(file.firebaseId + fileExtension);
     }
 
+    /**
+     * Listener used to return a BaseModel once it has been successfully loaded
+     */
+    public interface FirebaseListener {
+        void onModelReady(BaseModel model);
+    }
 }
