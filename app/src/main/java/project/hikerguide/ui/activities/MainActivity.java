@@ -33,11 +33,14 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
                 case R.id.navigation_home:
                     fragment = new GuideListFragment();
                     break;
-                case R.id.navigation_dashboard:
+                case R.id.navigation_search:
                     fragment = new SearchFragment();
                     break;
-                case R.id.navigation_notifications:
+                case R.id.navigation_account:
                     launchActivity();
+                    return true;
+
+                case R.id.navigation_favorites:
                     return true;
 
                 default: return false;
