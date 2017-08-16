@@ -311,21 +311,30 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                         mAdapter.notifyItemChanged(mFilePickerModelPosition);
                     }
 
+                    // Check if the image is being selected for the GuideDetails or a Section
+                    if (mFilePickerModelPosition != 0) {
+
+                        // Image is for a Section. Scroll to the bottom so the new Section is
+                        // visible to the Author
+                        mBinding.guideDetailsRv.scrollToPosition(mModelList.size() - 1);
+
+                        // Set the focus on the Caption TextView. Needs to be delayed to prevent
+                        // crashing due to attempting to selecting a ViewHolder before it has been
+                        // created.
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                EditGuideDetailsAdapter.EditViewHolder viewHolder =
+                                        (EditGuideDetailsAdapter.EditViewHolder) mBinding.guideDetailsRv
+                                                .findViewHolderForAdapterPosition(mFilePickerModelPosition);
+
+                                ((ListItemSectionImageEditBinding) viewHolder.getBinding()).listSectionImageCaptionTv.requestFocus();
+                            }
+                        }, 50);
+                    }
+
                     // Reset mFilePickerPosition to -1
                     mFilePickerModelPosition = -1;
-
-                    mBinding.guideDetailsRv.scrollToPosition(mModelList.size() - 1);
-
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            EditGuideDetailsAdapter.EditViewHolder viewHolder =
-                                    (EditGuideDetailsAdapter.EditViewHolder) mBinding.guideDetailsRv
-                                            .findViewHolderForAdapterPosition(mModelList.size() - 1);
-
-                            ((ListItemSectionImageEditBinding) viewHolder.getBinding()).listSectionImageCaptionTv.requestFocus();
-                        }
-                    }, 50);
                 }
 
                 break;
