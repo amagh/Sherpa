@@ -47,8 +47,10 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Databind inflation of the View
+        // DataBind inflation of the View
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_guide_list, container, false);
+
+        ((MainActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
 
         // Initialize the GuideAdapter
         mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
