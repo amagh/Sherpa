@@ -30,7 +30,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
     public String name;
     public String description;
     public int score;
-    public List<String> favorites;
+    public Map<String, String> favorites;
 
     public Author() {}
 

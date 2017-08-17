@@ -256,17 +256,17 @@ public class FirebaseProviderUtils {
 
         // Ensure that the List of Guides has been initialized
         if (author.favorites == null) {
-            author.favorites = new ArrayList<>();
+            author.favorites = new HashMap<>();
         }
 
         // Modify the Firebase Database entry
         if (guide.isFavorite()) {
-            author.favorites.add(guide.firebaseId);
+            author.favorites.put(guide.firebaseId, guide.trailName);
         } else {
             author.favorites.remove(guide.firebaseId);
         }
 
-        // Push the update to FirebaseeDatabase
+        // Push the update to FirebaseDatabase
         String directory = GuideDatabase.AUTHORS + "/" + author.firebaseId;
 
         Map<String, Object> childUpdates = new HashMap<>();
