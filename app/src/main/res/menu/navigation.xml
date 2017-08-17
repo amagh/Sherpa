@@ -20,4 +20,9 @@
         android:id="@+id/navigation_favorites"
         android:icon="@drawable/ic_star_black"
         android:title="@string/title_favorites" />
+
+    <item
+        android:id="@+id/navigation_saved"
+        android:icon="@drawable/ic_offline_pin_black"
+        android:title="@string/title_saved_guides" />
 </menu>

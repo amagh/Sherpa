@@ -4,6 +4,7 @@
     <string name="title_search">Search</string>
     <string name="title_account">Account</string>
     <string name="title_favorites">Favorites</string>
+    <string name="title_saved_guides">Saved Guides</string>
 
     <string name="image_directory">/images</string>
     <string name="gpx_directory">/gpx</string>
