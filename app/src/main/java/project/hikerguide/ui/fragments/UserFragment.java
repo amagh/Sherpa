@@ -45,10 +45,10 @@ import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.activities.OpenDraftActivity;
-import project.hikerguide.ui.activities.UserActivity;
 import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.ui.behaviors.FabSpeedDialScrollBehavior;
+import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
@@ -245,12 +245,16 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                 // Remove Listener
                 authorRef.removeEventListener(this);
 
+                // If the Author does not exist in the Firebase Database, add them
                 if (mAuthor == null) {
 
-                    mAuthor = new Author();
-
-                    // If the Author does not exist in the Firebase Database, add them
+                    // Transfer the locally favorite'd Guides to their new online profile
+                    mAuthor = ContentProviderUtils.generateAuthorFromDatabase(getActivity());
                     authorRef.setValue(mAuthor);
+                } else {
+
+                    // Sync the local database of favorite Guides to the online one
+                    ContentProviderUtils.cleanDatabase(getActivity(), mAuthor);
                 }
 
                 // Add the Author to the Adapter so their info can be displayed
