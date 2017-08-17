@@ -14,12 +14,14 @@ import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.ui.fragments.FavoritesFragment;
 import project.hikerguide.ui.fragments.GuideListFragment;
+import project.hikerguide.ui.fragments.SavedGuidesFragment;
 import project.hikerguide.ui.fragments.SearchFragment;
 import project.hikerguide.ui.fragments.UserFragment;
 
 import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_ACCOUNT;
 import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_FAVORITE;
 import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_HOME;
+import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_SAVED_GUIDES;
 import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_SEARCH;
 import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
@@ -58,6 +60,11 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
                 case R.id.navigation_favorites:
                     fragment = new FavoritesFragment();
                     tag = FRAG_TAG_FAVORITE;
+                    break;
+
+                case R.id.navigation_saved:
+                    fragment = new SavedGuidesFragment();
+                    tag = FRAG_TAG_SAVED_GUIDES;
                     break;
 
                 default: return false;
