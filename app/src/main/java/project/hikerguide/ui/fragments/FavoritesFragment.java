@@ -71,6 +71,9 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
         // Inflate the View using DataBindingUtils
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_favorites, container, false);
 
+        ((MainActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.title_favorites));
+
         // Initialize the RecyclerView
         initRecyclerView();
 
