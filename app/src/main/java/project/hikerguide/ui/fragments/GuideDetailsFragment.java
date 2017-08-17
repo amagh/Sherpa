@@ -237,7 +237,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         // Check the Cursor has valid data to be loaded to prevent crashing if there is none
-        if (data.getColumnCount() < 1) {
+        if (data.getCount() < 1) {
             return;
         }
 
@@ -246,42 +246,46 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
             case LOADER_GUIDE:
 
                 // Move the Cursor to the first position
-                data.moveToFirst();
+                if (data.moveToFirst()) {
 
-                // Create a Guide from the data in the Cursor
-                mGuide = Guide.createGuideFromCursor(data);
+                    // Create a Guide from the data in the Cursor
+                    mGuide = Guide.createGuideFromCursor(data);
 
-                // Set the Guide to the Adapter
-                mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
+                    // Set the Guide to the Adapter
+                    mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
+                }
 
                 break;
 
             case LOADER_SECTION:
 
-                // Init mSections
-                mSections = new Section[data.getCount()];
+                if (data.getCount() > 0) {
+                    // Init mSections
+                    mSections = new Section[data.getCount()];
 
-                // Populate the Array using the data from the Cursor
-                for (int i = 0; i < data.getCount(); i++) {
-                    data.moveToPosition(i);
-                    mSections[i] = Section.createSectionFromCursor(data);
+                    // Populate the Array using the data from the Cursor
+                    for (int i = 0; i < data.getCount(); i++) {
+                        data.moveToPosition(i);
+                        mSections[i] = Section.createSectionFromCursor(data);
+                    }
+
+                    // Pass mSections to the Adapter
+                    mAdapter.setSections(mSections);
                 }
-
-                // Pass mSections to the Adapter
-                 mAdapter.setSections(mSections);
 
                 break;
 
             case LOADER_AUTHOR:
 
                 // Move the Cursor to the first position
-                data.moveToFirst();
+                if (data.moveToFirst()) {
 
-                // Create an Author from the data in the Cursor
-                mAuthor = Author.createAuthorFromCursor(data);
+                    // Create an Author from the data in the Cursor
+                    mAuthor = Author.createAuthorFromCursor(data);
 
-                // Set the Author to the Adapter
-                mAdapter.setAuthor(mAuthor);
+                    // Set the Author to the Adapter
+                    mAdapter.setAuthor(mAuthor);
+                }
 
                 break;
         }
@@ -432,14 +436,16 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                 null);
 
         if (cursor != null) {
-            if (cursor.moveToFirst()) {
+            try {
+                if (cursor.moveToFirst()) {
 
-                // Guide is in database
-                return true;
+                    // Guide is in database
+                    return true;
+                }
+            } finally {
+                // Close the Cursor
+                cursor.close();
             }
-
-            // Close the Cursor
-            cursor.close();
         }
 
         return false;

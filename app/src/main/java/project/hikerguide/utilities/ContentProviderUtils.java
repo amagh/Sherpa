@@ -177,14 +177,16 @@ public class ContentProviderUtils {
 
         // Check if Cursor is valid
         if (cursor != null) {
-            if (cursor.moveToFirst()) {
+            try {
+                if (cursor.moveToFirst()) {
 
-                // Entry exists in database
-                return true;
+                    // Entry exists in database
+                    return true;
+                }
+            } finally {
+                // Close the Cursor
+                cursor.close();
             }
-
-            // Close the Cursor
-            cursor.close();
         }
 
         return false;
