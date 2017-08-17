@@ -1,9 +1,16 @@
 package project.hikerguide.utilities;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.RemoteException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideProvider;
@@ -262,6 +269,139 @@ public class ContentProviderUtils {
 
             } else {
                 return false;
+            }
+        }
+    }
+
+    /**
+     * Generates an Author data model that will contain all the currently favorite'd Guides from
+     * the local database. This is to be used when a User creates a new account and desires to
+     * transfer their favorite Guides to their Firebase Database entry
+     *
+     * @param context    Interface to global Context
+     * @return Author Object containing a map of favorite Guides from the local database
+     */
+    public static Author generateAuthorFromDatabase(Context context) {
+
+        // Query the database for favorite Guides
+        Cursor cursor = context.getContentResolver().query(
+                GuideProvider.Guides.CONTENT_URI,
+                null,
+                GuideContract.GuideEntry.FAVORITE + " = ?",
+                new String[] {"1"},
+                null);
+
+        // Check that the Cursor is valid
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+
+                // Map to hold the favorite Guides
+                Map<String, String> favoritesMap = new HashMap<>();
+
+                do {
+
+                    // Create a Guide from the Cursor
+                    Guide guide = Guide.createGuideFromCursor(cursor);
+
+                    // Add the FirebaseId and Trail name to the Map
+                    favoritesMap.put(guide.firebaseId, guide.trailName);
+
+                } while (cursor.moveToNext());
+
+                // Close the Cursor
+                cursor.close();
+
+                // Create a new Author Object and set the favoritesMaps to its favorites
+                Author author = new Author();
+                author.favorites = favoritesMap;
+
+                return author;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Syncs the local database to match the online database in terms of User favorites
+     *
+     * @param context    Interface to global Context
+     * @param author     Author to sync the local database to
+     */
+    public static void cleanDatabase(Context context, Author author) {
+
+        // Remove all entries that are not saved Guides
+        context.getContentResolver().delete(
+                GuideProvider.Guides.CONTENT_URI,
+                GuideContract.GuideEntry.IMAGE_URI + " IS NULL",
+                null);
+
+        // Check to see if the Author has any items favorite'd
+        if (author.favorites == null) {
+
+            // Set all items that have been saved and are favorite'd to not-favorite as the user
+            // will be drawing their favorite list from online from now on.
+            ContentValues values = new ContentValues();
+            values.put(GuideContract.GuideEntry.FAVORITE, 0);
+
+            context.getContentResolver().update(
+                    GuideProvider.Guides.CONTENT_URI,
+                    values,
+                    GuideContract.GuideEntry.FAVORITE + " = ?",
+                    new String[] {"1"});
+        } else {
+
+            // Query the database for saved Guides and set the favorite status depending on whether
+            // the users Firebase Entry contains the Guide's FirebaseID as a favorite
+            Cursor cursor = context.getContentResolver().query(
+                    GuideProvider.Guides.CONTENT_URI,
+                    null,
+                    GuideContract.GuideEntry.IMAGE_URI + " IS NOT NULL",
+                    null,
+                    null);
+
+            // Ensure Cursor is valid
+            if (cursor != null) {
+
+                // Iterate through the database entries and set the favorite status depending on
+                // whether the user's online entry contains the Guide
+                if (cursor.moveToFirst()) {
+                    ArrayList<ContentProviderOperation> operationList = new ArrayList<>();
+
+                    do {
+
+                        // Create a Guide from the Cursor
+                        Guide guide = Guide.createGuideFromCursor(cursor);
+
+                        // Init the ContentProviderOperations for the value update
+                        ContentProviderOperation.Builder builder = ContentProviderOperation
+                                .newUpdate(GuideProvider.Guides.CONTENT_URI)
+                                .withSelection(
+                                        GuideContract.GuideEntry.FIREBASE_ID + " = ?",
+                                        new String[] {guide.firebaseId});
+
+                        // Toggle the favorite status
+                        if (author.favorites.containsKey(guide.firebaseId)) {
+                            builder.withValue(GuideContract.GuideEntry.FAVORITE, 1);
+                        } else {
+                            builder.withValue(GuideContract.GuideEntry.FAVORITE, 0);
+                        }
+
+                        // Add the operation to the List of operations to be performed
+                        operationList.add(builder.build());
+
+                    } while (cursor.moveToNext());
+
+                    // Batch apply the updates to the database
+                    try {
+                        context.getContentResolver().applyBatch(GuideProvider.AUTHORITY, operationList);
+                    } catch (RemoteException | OperationApplicationException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // Close the Cursor
+                cursor.close();
             }
         }
     }
