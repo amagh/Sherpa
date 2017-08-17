@@ -200,9 +200,19 @@ public class ContentProviderUtils {
 
         // Either insert the Guide or update the value in the database
         if (isModelInDatabase(context, guide)) {
+
+            // ContentValues for modifying the favorite status of a Guide
+            ContentValues values = new ContentValues();
+
+            if (guide.isFavorite()) {
+                values.put(GuideContract.GuideEntry.FAVORITE, 1);
+            } else {
+                values.put(GuideContract.GuideEntry.FAVORITE, 0);
+            }
+
             context.getContentResolver().update(
                     GuideProvider.Guides.CONTENT_URI,
-                    getContentValuesForModel(guide),
+                    values,
                     GuideContract.GuideEntry.FIREBASE_ID + " = ?",
                     new String[] {guide.firebaseId});
         } else {
