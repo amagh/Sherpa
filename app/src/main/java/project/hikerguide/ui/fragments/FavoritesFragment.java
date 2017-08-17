@@ -118,7 +118,9 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
     public void onConnected() {
         FirebaseDatabase.getInstance().goOnline();
 
-        loadFavorites();
+        if (mGuideList == null || mGuideList.size() == 0) {
+            loadFavorites();
+        }
     }
 
     @Override
