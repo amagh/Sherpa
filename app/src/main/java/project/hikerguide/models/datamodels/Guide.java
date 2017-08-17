@@ -271,13 +271,23 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
         if (gpxUri != null) {
             parcel.writeString(gpxUri.toString());
+        } else {
+            parcel.writeString(null);
         }
 
         if (imageUri != null) {
             parcel.writeString(imageUri.toString());
+        } else {
+            parcel.writeString(null);
         }
 
         if (isDraft()) {
+            parcel.writeInt(1);
+        } else {
+            parcel.writeInt(0);
+        }
+
+        if (isFavorite()) {
             parcel.writeInt(1);
         } else {
             parcel.writeInt(0);
@@ -325,6 +335,10 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
         if (parcel.readInt() == 1) {
             setDraft(true);
+        }
+
+        if (parcel.readInt() == 1) {
+            setFavorite(true);
         }
     }
 }
