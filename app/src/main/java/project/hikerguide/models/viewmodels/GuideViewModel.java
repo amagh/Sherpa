@@ -384,12 +384,6 @@ public class GuideViewModel extends BaseObservable {
             setShowGpxError(false);
         }
 
-        // Set the camera to the correct position
-        mMapboxMap.setCameraPosition(new CameraPosition.Builder()
-                .target(getLatLng())
-                .zoom(11)
-                .build());
-
         // Check to make sure the Polyline hasn't already been added the MapboxMap
         // e.g. when scrolling the RecyclerView, the View will be reloaded from memory, so
         // it does not need to re-position the camera or add the Polyline again.
