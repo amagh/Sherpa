@@ -13,6 +13,7 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 8/7/2017.
@@ -183,12 +184,85 @@ public class ContentProviderUtils {
     }
 
     /**
+     * Toggles the favorite status of a Guide in the local database
+     *
+     * @param context    Interface to global Context
+     * @param guide      Guide whose favorite status is to be toggled
+     */
+    public static void toggleFavorite(Context context, Guide guide) {
+
+        // Toggle the favorite status of the Guide
+        if (guide.isFavorite()) {
+            guide.setFavorite(false);
+        } else {
+            guide.setFavorite(true);
+        }
+
+        // Either insert the Guide or update the value in the database
+        if (isModelInDatabase(context, guide)) {
+            context.getContentResolver().update(
+                    GuideProvider.Guides.CONTENT_URI,
+                    getContentValuesForModel(guide),
+                    GuideContract.GuideEntry.FIREBASE_ID + " = ?",
+                    new String[] {guide.firebaseId});
+        } else {
+            insertModel(context, guide);
+        }
+    }
+
+    /**
+     * Checks whether a Guide is favorite'd in the local database
+     *
+     * @param context    Interface to global Context
+     * @param guide      Guide to be checked
+     * @return True if the Guide is favorite'd in the database. False otherwise.
+     */
+    public static boolean isGuideFavorite(Context context, Guide guide) {
+
+        // Check whether the Guide exists in the database
+        if (!isModelInDatabase(context, guide)) {
+
+            // Does not exist in the database. Cannot be a favorite
+            return false;
+        } else {
+
+            // Query the database for the Guide
+            Cursor cursor = context.getContentResolver().query(
+                    GuideProvider.Guides.CONTENT_URI,
+                    null,
+                    GuideContract.GuideEntry.FIREBASE_ID + " = ?",
+                    new String[] {guide.firebaseId},
+                    null);
+
+            if (cursor != null) {
+
+                // Create a Guide from the Cursor
+                cursor.moveToFirst();
+                guide = Guide.createGuideFromCursor(cursor);
+
+                try {
+
+                    // Return the favorite status of the Guide
+                    return guide.isFavorite();
+                } finally {
+
+                    // Close the Cursor
+                    cursor.close();
+                }
+
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /**
      * Creates a ContentValues for a Guide data model
      *
      * @param guide    Guide to create ContentValues for
      * @return ContentValues describing a Guide
      */
-    public static ContentValues getValuesForGuide(Guide guide) {
+    private static ContentValues getValuesForGuide(Guide guide) {
         ContentValues values = new ContentValues();
 
         values.put(GuideContract.GuideEntry.FIREBASE_ID,    guide.firebaseId);
@@ -207,7 +281,7 @@ public class ContentProviderUtils {
         values.put(GuideContract.GuideEntry.AREA,           guide.area);
 
         // Add image Uri if the Guide has an image
-        if (guide.hasImage) {
+        if (guide.getImageUri() != null) {
             values.put(GuideContract.GuideEntry.IMAGE_URI,  guide.getImageUri().toString());
         }
 
@@ -236,7 +310,7 @@ public class ContentProviderUtils {
      * @param trail    Trail to be converted to ContentValues
      * @return ContentValues describing the Trail in the signature
      */
-    public static ContentValues getValuesForTrail(Trail trail) {
+    private static ContentValues getValuesForTrail(Trail trail) {
         ContentValues values = new ContentValues();
 
         values.put(GuideContract.TrailEntry.FIREBASE_ID,        trail.firebaseId);
@@ -257,7 +331,7 @@ public class ContentProviderUtils {
      * @param author    Author to be converted to ContentValues
      * @return ContentValues describing the Author in the signature
      */
-    public static ContentValues getValuesForAuthor(Author author) {
+    private static ContentValues getValuesForAuthor(Author author) {
         ContentValues values = new ContentValues();
 
         values.put(GuideContract.AuthorEntry.FIREBASE_ID,       author.firebaseId);
@@ -284,7 +358,7 @@ public class ContentProviderUtils {
      * @param section    Section to be converted to ContentValues
      * @return ContentValues describing the Section in the signature
      */
-    public static ContentValues getValuesForSection(Section section) {
+    private static ContentValues getValuesForSection(Section section) {
         ContentValues values = new ContentValues();
 
         values.put(GuideContract.SectionEntry.FIREBASE_ID,      section.firebaseId);
@@ -310,7 +384,7 @@ public class ContentProviderUtils {
      * @param area    Area to be converted to ContentValues
      * @return ContentValues describing the Area in the signature
      */
-    public static ContentValues getValuesForArea(Area area) {
+    private static ContentValues getValuesForArea(Area area) {
         ContentValues values = new ContentValues();
 
         values.put(GuideContract.AreaEntry.FIREBASE_ID,         area.firebaseId);

@@ -22,7 +22,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
@@ -37,8 +45,8 @@ import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
-import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 
@@ -110,18 +118,20 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
     public void onConnected() {
         FirebaseDatabase.getInstance().goOnline();
 
-        // Reset the List used by the Adapter so it displays fresh data
-        if (mGuideList.size() != 0) {
-            mGuideList = new ArrayList<>();
-            mAdapter.notifyDataSetChanged();
-        }
-
         loadFavorites();
     }
 
     @Override
     public void onDisconnected() {
         FirebaseDatabase.getInstance().goOffline();
+
+        // Reset the List used by the Adapter so it displays fresh data
+        if (mGuideList.size() > 0) {
+
+            mAdapter.notifyItemRangeRemoved(0, mGuideList.size());
+            mGuideList = new ArrayList<>();
+            mAdapter.setGuides(mGuideList);
+        }
     }
 
     @Override
@@ -141,18 +151,22 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         // Populate the Adapter with the database entries
-        if (data != null && data.moveToFirst()) {
-            do {
-                mAdapter.addGuide(Guide.createGuideFromCursor(data));
+        if (mGuideList.size() == 0 && data != null && data.moveToFirst()) {
 
+            // Retrieve of list of FirebaseIds corresponding to the favorite Guides
+            List<String> guideIdList = new ArrayList<>();
+            do {
+                guideIdList.add(Guide.createGuideFromCursor(data).firebaseId);
             } while (data.moveToNext());
+
+            // Retrieve the Guides from Firebase Databse
+            getGuides(guideIdList);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mGuideList = new ArrayList<>();
-        mAdapter.notifyDataSetChanged();
+
     }
 
     /**
@@ -180,8 +194,31 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
                     Author author = (Author) model;
                     mAdapter.setAuthor(author);
 
-                    // Retrieve the User's favorited Guides
-                    getGuidesForAuthor(author);
+                    // Verify that the Author has a list of favorites
+                    if (author.favorites == null) {
+                        return;
+                    }
+
+                    // Retrieve the User's favorite'd Guides and sort them alphabetically by Trail
+                    // name
+                    List<Map.Entry<String, String>> entryList = new LinkedList<>(author.favorites.entrySet());
+                    Collections.sort(entryList, new Comparator<Map.Entry<String, String>>() {
+                        @Override
+                        public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
+                            return o1.getValue().compareTo(o2.getValue());
+                        }
+                    });
+
+                    // Init List of Guide FirebaseIds to pass to be retrieved from Firebase Database
+                    List<String> guideIdList = new ArrayList<>();
+
+                    // Add each key from the sorted List
+                    for (Map.Entry<String, String> entry : entryList) {
+                        guideIdList.add(entry.getKey());
+                    }
+
+                    // Retrieve the Guides from Firebase Database
+                    getGuides(guideIdList);
                 }
             });
         }
@@ -190,12 +227,10 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
     /**
      * Retrieves each Guide on the Author's list of favorite Guides
      *
-     * @param author    Author whose list of favorites will be retrieved
+     * @param guideIdList    List of FirebaseIds representing the favorite Guides to be retrieved
+     *                         from Firebase Databse
      */
-    private void getGuidesForAuthor(Author author) {
-
-        // Init List of favorite Guides by FirebaseId
-        List<String> guideIdList = author.favorites;
+    private void getGuides(List<String> guideIdList) {
 
         if (guideIdList == null || guideIdList.size() == 0) {
             return;

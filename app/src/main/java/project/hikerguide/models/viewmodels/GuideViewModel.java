@@ -8,7 +8,6 @@ import android.databinding.BindingAdapter;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,13 +18,6 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.github.mikephil.charting.charts.LineChart;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -38,19 +30,13 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import de.hdodenhof.circleimageview.CircleImageView;
 import project.hikerguide.BR;
 import project.hikerguide.R;
-import project.hikerguide.data.GuideDatabase;
-import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.datamodels.Author;
-import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.ui.fragments.FavoritesFragment;
 import project.hikerguide.ui.views.SmartMapView;
 import project.hikerguide.models.datamodels.Guide;
@@ -58,10 +44,10 @@ import project.hikerguide.ui.activities.CreateGuideActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.utilities.ColorGenerator;
+import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.ConversionUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
-import timber.log.Timber;
 
 import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_FAVORITE;
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
@@ -116,10 +102,17 @@ public class GuideViewModel extends BaseObservable {
         // Set memvar to reference passed Author
         mAuthor = author;
 
-        if (mAuthor != null && mAuthor.favorites != null && mAuthor.favorites.contains(mGuide.firebaseId)) {
+        if (mAuthor != null && mAuthor.favorites != null && mAuthor.favorites.containsKey(mGuide.firebaseId)) {
 
             // Set the favorite status for the Guide if it within the Author's list of favorites
             mGuide.setFavorite(true);
+
+            // Notify change
+            notifyPropertyChanged(BR.favorite);
+        } else if (mAuthor == null){
+
+            // Query the database to see if the Guide is a favorite
+            mGuide.setFavorite(ContentProviderUtils.isGuideFavorite(mContext, mGuide));
 
             // Notify change
             notifyPropertyChanged(BR.favorite);
@@ -591,29 +584,35 @@ public class GuideViewModel extends BaseObservable {
      */
     public void onClickFavorite(View view) {
 
+        // Add/remove the Guide from the Author's list of favorites
         if (mAuthor != null) {
 
-            // Add/remove the Guide from the Author's list of favorites
+            // Firebase Database
             FirebaseProviderUtils.toggleFirebaseFavorite(mAuthor, mGuide);
 
-            // If the user is on the FavoriteFragment and removing a favorite, then it needs to be
-            // removed from the Adapter when they click the favorite button
-            if (mContext instanceof AppCompatActivity) {
+        } else {
 
-                // Get a reference to the FavoriteFragment using the Fragment tag
-                FavoritesFragment fragment = (FavoritesFragment) ((AppCompatActivity) mContext)
-                        .getSupportFragmentManager()
-                        .findFragmentByTag(FRAG_TAG_FAVORITE);
-
-                if (!mGuide.isFavorite() && fragment != null) {
-
-                    // Remove the Guide from the Adapter
-                    fragment.removeGuideFromAdapter(mGuide);
-                }
-            }
-
-            // Notify change
-            notifyPropertyChanged(BR.favorite);
+            // Local Database
+            ContentProviderUtils.toggleFavorite(mContext, mGuide);
         }
+
+        // If the user is on the FavoriteFragment and removing a favorite, then it needs to be
+        // removed from the Adapter when they click the favorite button
+        if (mContext instanceof AppCompatActivity) {
+
+            // Get a reference to the FavoriteFragment using the Fragment tag
+            FavoritesFragment fragment = (FavoritesFragment) ((AppCompatActivity) mContext)
+                    .getSupportFragmentManager()
+                    .findFragmentByTag(FRAG_TAG_FAVORITE);
+
+            if (!mGuide.isFavorite() && fragment != null) {
+
+                // Remove the Guide from the Adapter
+                fragment.removeGuideFromAdapter(mGuide);
+            }
+        }
+
+        // Notify change
+        notifyPropertyChanged(BR.favorite);
     }
 }
