@@ -22,7 +22,6 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -345,8 +344,6 @@ public class GuideViewModel extends BaseObservable {
                 viewModel.getMapboxMap().setMyLocationEnabled(true);
             }
         }
-
-
     }
 
     @Bindable

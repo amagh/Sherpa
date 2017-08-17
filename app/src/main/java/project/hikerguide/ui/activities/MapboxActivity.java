@@ -2,10 +2,12 @@ package project.hikerguide.ui.activities;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapView;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import project.hikerguide.R;
 
@@ -16,6 +18,7 @@ import project.hikerguide.R;
 public class MapboxActivity extends ConnectivityActivity {
     // ** Member Variables ** //
     MapView mMapView;
+    Set<MapView> mMapSet;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -23,68 +26,91 @@ public class MapboxActivity extends ConnectivityActivity {
 
         Mapbox.getInstance(this, getString(R.string.mapbox_token));
 
-        if (mMapView != null) {
-            mMapView.onCreate(savedInstanceState);
+        if (mMapSet != null) {
+            for (MapView mapView : mMapSet) {
+                mapView.onCreate(savedInstanceState);
+            }
         }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (mMapView != null) {
-            mMapView.onStart();
+        if (mMapSet != null) {
+            for (MapView mapView : mMapSet) {
+                mapView.onStart();
+            }
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mMapView != null) {
-            mMapView.onResume();
+        if (mMapSet != null) {
+            for (MapView mapView : mMapSet) {
+                mapView.onResume();
+            }
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mMapView != null) {
-            mMapView.onPause();
+        if (mMapSet != null) {
+            for (MapView mapView : mMapSet) {
+                mapView.onPause();
+            }
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mMapView != null) {
-            mMapView.onStop();
+        if (mMapSet != null) {
+            for (MapView mapView : mMapSet) {
+                mapView.onStop();
+            }
         }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mMapView != null) {
-            mMapView.onSaveInstanceState(outState);
+        if (mMapSet != null) {
+            for (MapView mapView : mMapSet) {
+                mapView.onSaveInstanceState(outState);
+            }
         }
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        if (mMapView != null) {
-            mMapView.onLowMemory();
+        if (mMapSet != null) {
+            for (MapView mapView : mMapSet) {
+                mapView.onLowMemory();
+            }
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mMapView != null) {
-            mMapView.onDestroy();
+        if (mMapSet != null) {
+            for (MapView mapView : mMapSet) {
+                mapView.onDestroy();
+            }
         }
     }
 
     public void attachMapView(MapView mapView) {
+
+        if (mMapSet == null) {
+            mMapSet = new HashSet<>();
+        }
+
+        mMapSet.add(mapView);
+
         mMapView = mapView;
     }
 }
