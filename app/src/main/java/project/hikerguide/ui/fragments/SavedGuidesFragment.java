@@ -22,6 +22,7 @@ import project.hikerguide.data.GuideProvider;
 import project.hikerguide.databinding.FragmentSavedGuidesBinding;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
+import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
 
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
@@ -47,6 +48,9 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
 
         // Inflate the Layout using DataBindingUtils
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_saved_guides, container, false);
+
+        ((MainActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.title_saved_guides));
 
         // Initialize the RecyclerView
         initRecyclerView();
