@@ -1,5 +1,7 @@
 package project.hikerguide.models.datamodels.abstractmodels;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.Map;
 
 /**
@@ -13,10 +15,12 @@ public abstract class BaseModel {
 
     public abstract Map<String, Object> toMap();
 
+    @Exclude
     public boolean isDraft() {
         return draft;
     }
 
+    @Exclude
     public void setDraft(boolean draft) {
         this.draft = draft;
     }
