@@ -38,7 +38,6 @@
                     android:adjustViewBounds="true"
                     android:onClick="@{vm::onClickHeroImage}"
                     app:image="@{vm.image}"
-                    app:imageUri="@{vm.imageUri}"
                     app:layout_collapseMode="parallax"/>
                 
                 <ImageView

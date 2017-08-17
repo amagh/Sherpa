@@ -20,6 +20,7 @@ import com.google.firebase.storage.StorageReference;
 
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.ui.activities.CreateGuideActivity;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
@@ -64,33 +65,18 @@ public class SectionViewModel extends BaseObservable {
     }
 
     @Bindable
-    public StorageReference getImage() {
+    public Uri getImage() {
 
-        if (mSection.firebaseId == null) return null;
+        if (mSection.firebaseId == null) {
 
-        // Generate StorageReference for the image using the Section's FirebaseId
-        return FirebaseStorage.getInstance().getReference()
-                .child(IMAGE_PATH)
-                .child(mSection.firebaseId + JPEG_EXT);
-    }
-
-    @BindingAdapter({"image", "imageUri"})
-    public static void loadImage(ImageView imageView, StorageReference image, Uri imageUri) {
-
-        // Check whether to load image from File or from Firebase Storage
-        if (image == null) {
-
-            // No StorageReference, load local file using the File's Uri
-            Glide.with(imageView.getContext())
-                    .load(imageUri)
-                    .into(imageView);
+            // Return the ImageUri
+            return mSection.getImageUri();
         } else {
 
-            // Load from Firebase Storage
-            Glide.with(imageView.getContext())
-                    .using(new FirebaseImageLoader())
-                    .load(image)
-                    .into(imageView);
+            // Parse the StorageReference to a Uri
+            return Uri.parse(FirebaseStorage.getInstance().getReference()
+                    .child(IMAGE_PATH)
+                    .child(mSection.firebaseId + JPEG_EXT).toString());
         }
     }
 

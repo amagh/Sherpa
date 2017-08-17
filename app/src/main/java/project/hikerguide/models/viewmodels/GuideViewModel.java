@@ -48,6 +48,7 @@ import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.ConversionUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_FAVORITE;
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
@@ -187,37 +188,35 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @Bindable
-    public StorageReference getImage() {
+    public Uri getImage() {
 
-        // If Guide does not have FirebaseId, return null
-        if (mGuide.firebaseId == null || mGuide.getImageUri() != null) return null;
+        // Check whether the Guide has a Uri for an offline image File
+        if (mGuide.firebaseId == null || mGuide.getImageUri() != null) {
 
-        return FirebaseStorage.getInstance().getReference()
-                .child(IMAGE_PATH)
-                .child(mGuide.firebaseId + JPEG_EXT);
-    }
-
-    @Bindable
-    public Uri getImageUri() {
-        return mGuide.getImageUri();
-    }
-
-
-    @BindingAdapter({"image", "imageUri"})
-    public static void loadImage(ImageView imageView, StorageReference image, Uri imageUri) {
-
-        // Check whether to load image from File or from Firebase Storage
-        if (imageUri != null) {
-
-            // No StorageReference, load local file using the File's Uri
-            Glide.with(imageView.getContext())
-                    .load(imageUri)
-                    .into(imageView);
+            // Return the ImageUri
+            return mGuide.getImageUri();
         } else {
 
+            // Parse the StorageReference to a Uri
+            return Uri.parse(FirebaseStorage.getInstance().getReference()
+                    .child(IMAGE_PATH)
+                    .child(mGuide.firebaseId + JPEG_EXT).toString());
+        }
+    }
+
+    @BindingAdapter("image")
+    public static void loadImage(ImageView imageView, Uri image) {
+
+        // Check whether to load image from File or from Firebase Storage
+        if (image.getScheme().matches("gs")) {
             // Load from Firebase Storage
             Glide.with(imageView.getContext())
                     .using(new FirebaseImageLoader())
+                    .load(FirebaseProviderUtils.getReferenceFromUri(image))
+                    .into(imageView);
+        } else {
+            // No StorageReference, load local file using the File's Uri
+            Glide.with(imageView.getContext())
                     .load(image)
                     .into(imageView);
         }

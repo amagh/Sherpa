@@ -40,7 +40,6 @@
                 android:adjustViewBounds="true"
                 android:onClick="@{vm::onSectionImageClick}"
                 app:image="@{vm.image}"
-                app:imageUri="@{vm.imageUri}"
                 tools:src="@color/bg_gray"/>
 
             <EditText
