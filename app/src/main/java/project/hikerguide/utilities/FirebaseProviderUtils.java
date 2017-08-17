@@ -1,5 +1,7 @@
 package project.hikerguide.utilities;
 
+import android.net.Uri;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -7,6 +9,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
@@ -315,6 +318,27 @@ public class FirebaseProviderUtils {
 
         // Generate the StorageReference using the directory and file extension
         return storageReference.child(directory).child(file.firebaseId + fileExtension);
+    }
+
+    /**
+     * Parses a Uri pointing to a FirebaseStorage Location to a StorageReference
+     *
+     * @param firebaseUri    Uri to be parsed
+     * @return StorageReference pointing to the location indicated by the Uri
+     */
+    public static StorageReference getReferenceFromUri(Uri firebaseUri) {
+
+        // Check to ensure the schema matches that for Firebase Storage
+        if (!firebaseUri.getScheme().matches("gs")) {
+            return null;
+        } else {
+
+            // Build the Storage using the segments of the Uri
+            List<String> segments = firebaseUri.getPathSegments();
+            return FirebaseStorage.getInstance().getReference()
+                    .child(segments.get(0))
+                    .child(segments.get(1));
+        }
     }
 
     /**
