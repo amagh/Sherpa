@@ -15,13 +15,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.Rating;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
@@ -211,6 +215,95 @@ public class FirebaseDatabaseTest {
 
         String errorWrongNames = "The search query did not return all the names expected.";
         assertEmpty(errorWrongNames, expectedNames);
+    }
+
+    @Test
+    public void testRating() {
+
+        // Generate the Guide and Author
+        final Guide guide = TestUtilities.getGuide1(mContext);
+        final Author author = TestUtilities.getAuthor1(mContext);
+
+        // Generate the Rating
+        Rating rating = new Rating();
+        rating.setComment("Test Comment");
+        rating.setRating(5);
+
+        // Set the rating for the Guide and Author
+        guide.raters = new HashMap<>();
+        guide.raters.put(author.firebaseId, rating);
+
+        author.ratedGuides = new HashMap<>();
+        author.ratedGuides.put(guide.firebaseId, rating);
+
+        // Get the directories for insertion of the data models
+        String guideDirectory = FirebaseProviderUtils.getDirectoryFromModel(guide) + "/" + guide.firebaseId;
+        String authorDirectory = FirebaseProviderUtils.getDirectoryFromModel(author) + "/" + author.firebaseId;
+
+        // Add the models to a Map for insertion
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(guideDirectory, guide.toMap());
+        childUpdates.put(authorDirectory, author.toMap());
+
+        // Insert entries to Firebase Database
+        FirebaseDatabase.getInstance().getReference()
+                .updateChildren(childUpdates);
+
+        // Object lock to ensure the test runs to completion
+        final AtomicBoolean check = new AtomicBoolean(false);
+
+        FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseProviderUtils.getDirectoryFromModel(guide))
+                .child(guide.firebaseId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        // Validate Guide
+                        Guide returnedGuide = (Guide) FirebaseProviderUtils.getModelFromSnapshot(GUIDE, dataSnapshot);
+                        TestUtilities.validateModelValues(guide, returnedGuide);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+        FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseProviderUtils.getDirectoryFromModel(author))
+                .child(author.firebaseId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        // Validate Author
+                        Author returnedAuthor = (Author) FirebaseProviderUtils.getModelFromSnapshot(AUTHOR, dataSnapshot);
+                        TestUtilities.validateModelValues(author, returnedAuthor);
+
+                        // Allow method to complete
+                        synchronized (check) {
+                            check.set(true);
+                            check.notifyAll();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+        // Wait until the
+        synchronized (check) {
+            while (!check.get()) {
+                try {
+                    check.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public Guide insertGuide() {
