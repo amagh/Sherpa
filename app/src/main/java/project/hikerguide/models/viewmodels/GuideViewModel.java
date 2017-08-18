@@ -206,6 +206,8 @@ public class GuideViewModel extends BaseObservable {
     @BindingAdapter("image")
     public static void loadImage(ImageView imageView, Uri image) {
 
+        if (image == null) return;
+
         // Check whether to load image from File or from Firebase Storage
         if (image.getScheme().matches("gs")) {
             // Load from Firebase Storage
