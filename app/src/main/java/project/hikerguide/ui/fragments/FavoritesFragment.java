@@ -164,6 +164,9 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
                 guideIdList.add(Guide.createGuideFromCursor(data).firebaseId);
             } while (data.moveToNext());
 
+            // Hide ProgressBar
+            mBinding.favoritesPb.setVisibility(View.GONE);
+
             // Retrieve the Guides from Firebase Databse
             getGuides(guideIdList);
         }
@@ -264,6 +267,9 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
                         // Add the Guide to the Adapter
                         mAdapter.addGuide(guide);
                     }
+
+                    // Hide ProgressBar
+                    mBinding.favoritesPb.setVisibility(View.GONE);
 
                     // Remove the Listener
                     guideRef.removeEventListener(this);

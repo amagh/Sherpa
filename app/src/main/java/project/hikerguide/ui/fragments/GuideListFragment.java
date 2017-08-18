@@ -121,6 +121,10 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
                 List<Guide> guideList = Arrays.asList(guides);
                 Collections.reverse(guideList);
                 mAdapter.setGuides(guideList);
+
+                // Hide ProgressBar
+                mBinding.guideListPb.setVisibility(View.GONE);
+
                 guideQuery.removeEventListener(this);
             }
 

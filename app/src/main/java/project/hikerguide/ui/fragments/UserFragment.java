@@ -316,6 +316,9 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                     }
                 }
 
+                // Hide ProgressBar
+                mBinding.userPb.setVisibility(View.GONE);
+
                 // Remove Listener
                 guideQuery.removeEventListener(this);
             }
