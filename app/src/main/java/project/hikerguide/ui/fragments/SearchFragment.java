@@ -2,12 +2,14 @@ package project.hikerguide.ui.fragments;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -31,6 +33,11 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
+import org.gavaghan.geodesy.Ellipsoid;
+import org.gavaghan.geodesy.GeodeticCalculator;
+import org.gavaghan.geodesy.GeodeticMeasurement;
+import org.gavaghan.geodesy.GlobalPosition;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +58,7 @@ import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.SaveUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.firebasedatabase.DatabaseProvider.GEOFIRE_PATH;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
@@ -62,10 +70,6 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_PATH;
  */
 
 public class SearchFragment extends MapboxFragment {
-    // ** Constants ** //
-    private static final int PLACES_REQUEST_CODE = 6498;
-
-
 
     // ** Member Variables ** //
     private FragmentSearchBinding mBinding;
@@ -111,8 +115,32 @@ public class SearchFragment extends MapboxFragment {
                                 position.getLatitude(),
                                 position.getLongitude());
 
-                        // Use GeoFire to query for Guides in the area that was searched
-                        queryGeoFire(location);
+                        // Adjust the radius of the search radius to fit the map
+                        if (mMapboxMap.getCameraPosition().zoom > 8) {
+
+                            // Get the coordinates of the corner of the map
+                            LatLng corner = mMapboxMap.getProjection().fromScreenLocation(new PointF(0, mMapView.getY()));
+
+                            // Calculate the distance from the center to the corner of the map
+                            GeodeticCalculator calculator = new GeodeticCalculator();
+                            GeodeticMeasurement measurement = calculator.calculateGeodeticMeasurement(Ellipsoid.WGS84,
+                                    new GlobalPosition(location.latitude, location.longitude, 0),
+                                    new GlobalPosition(corner.getLatitude(), corner.getLongitude(), 0));
+
+                            // Convert distance from meters to kilometers
+                            double searchRadius = measurement.getPointToPointDistance() / 1000;
+
+                            // Use GeoFire to query for Guides in the area that was searched
+                            queryGeoFire(location, searchRadius);
+
+                        } else {
+
+                            // Alter the query so that the search radius returns no results
+                            queryGeoFire(location, 0);
+
+                            // Inform user that they need to zoom in to trigger a search
+                            Toast.makeText(getActivity(), getString(R.string.search_instruction_zoom_in), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             }
@@ -165,9 +193,10 @@ public class SearchFragment extends MapboxFragment {
     /**
      * Uses GeoFire to query the FirebaseDatabase for Guides in the vicinity of the search location
      *
-     * @param location    Coordinates to search the Firebase Database for nearby Guides
+     * @param location      Coordinates to search the Firebase Database for nearby Guides
+     * @param searchRadius  The distance from the center to search for locations in kilometers
      */
-    private void queryGeoFire(GeoLocation location) {
+    private void queryGeoFire(GeoLocation location, double searchRadius) {
 
         // Get a reference to the GeoFire path in the Firebase Database
         DatabaseReference firebaseRef = FirebaseDatabase.getInstance().getReference()
@@ -177,14 +206,16 @@ public class SearchFragment extends MapboxFragment {
 
             // Use GeoFire to build a query
             GeoFire geofire = new GeoFire(firebaseRef);
-            mGeoQuery = geofire.queryAtLocation(location, 10);
+            mGeoQuery = geofire.queryAtLocation(location, searchRadius);
 
             mAdapter.setGuides(mGuideList);
 
             mGeoQuery.addGeoQueryEventListener(geoQueryEventListener);
         } else {
-            // Set the center to the new location
+
+            // Set the center to the new location. Set the new search radius
             mGeoQuery.setCenter(location);
+            mGeoQuery.setRadius(searchRadius);
         }
     }
 
@@ -348,6 +379,11 @@ public class SearchFragment extends MapboxFragment {
                 mGuidePolylineMap = new HashMap<>();
             }
 
+            // Hide the search instructions
+            if (mBinding.searchInstructionTv.getVisibility() == View.VISIBLE) {
+                mBinding.searchInstructionTv.setVisibility(View.GONE);
+            }
+
             // Get the Guide data model that entered the search area
             getGuide(key);
         }
@@ -362,6 +398,12 @@ public class SearchFragment extends MapboxFragment {
 
             // Update the colors of the lines so they match the new position of the Guides
             updatePolylineColors();
+
+            // Show a TextView indicating no results if there are no Guides in the search area
+            if (mAdapter.getItemCount() == 0) {
+                mBinding.searchInstructionTv.setText(getString(R.string.search_instruction_no_guides_found));
+                mBinding.searchInstructionTv.setVisibility(View.VISIBLE);
+            }
         }
 
         @Override
