@@ -81,8 +81,8 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
                     mSearchHasFocus = false;
                     notifyPropertyChanged(BR.hasFocus);
 
-                    // Clear the Adapter
-                    mAdapter.setPlaceList(null);
+                    mQuery = placeModel.primaryText;
+                    notifyPropertyChanged(BR.query);
 
                     // Hide the soft keyboard so the results can be shown
                     GeneralUtils.hideKeyboard(mActivity, mActivity.getCurrentFocus());
@@ -119,7 +119,7 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     public void setQuery(String query) {
         mQuery = query;
 
-        if (mQuery == null || mQuery.isEmpty() || mQuery.length() < 2) {
+        if (mQuery == null || mQuery.isEmpty() || mQuery.length() < 2 || !mSearchHasFocus) {
 
             // Empty the Adapter
             mAdapter.setPlaceList(null);
