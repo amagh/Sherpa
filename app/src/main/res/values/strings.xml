@@ -95,6 +95,7 @@
     <!-- Add Trail Dialog Strings -->
     <string name="add_trail_hint">Trail name</string>
     <string name="add_trail_title">Add a New Trail</string>
+    <string name="add_trail_warn_add_text">Please add a trail name before continuing.</string>
 
     <!-- Progressbar Dialog Strings -->
     <string name="progress_download_map_title">Downloading Map Tiles</string>
