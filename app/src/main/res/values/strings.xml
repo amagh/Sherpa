@@ -92,6 +92,9 @@
     <string name="draft_saved">Draft Saved!</string>
     <string name="draft_deleted">Draft Deleted!</string>
 
+    <!-- TrailActivity Strings -->
+    <string name="trail_activity_title">Select your trail</string>
+
     <!-- Add Trail Dialog Strings -->
     <string name="add_trail_hint">Trail name</string>
     <string name="add_trail_title">Add a New Trail</string>

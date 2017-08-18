@@ -13,37 +13,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/trail_cl"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="wrap_content">
 
-            <View
-                android:id="@+id/trail_search_bg"
-                android:layout_width="0dp"
-                android:layout_height="66dp"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:background="@color/colorPrimary"/>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
             <android.support.v7.widget.CardView
                 android:id="@+id/trail_search_cv"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="@dimen/search_widget_height"
                 android:layout_marginLeft="@dimen/search_widget_horizontal_margin"
                 android:layout_marginStart="@dimen/search_widget_horizontal_margin"
                 android:layout_marginRight="@dimen/search_widget_horizontal_margin"
                 android:layout_marginEnd="@dimen/search_widget_horizontal_margin"
-                android:layout_marginTop="@dimen/search_widget_vertical_margin"
-                app:cardBackgroundColor="@android:color/white"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                >
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                app:cardBackgroundColor="@android:color/white">
 
                 <ImageView
                     android:id="@+id/trail_search_iv"
@@ -64,7 +55,7 @@
                     android:layout_gravity="center_vertical"
                     android:tint="@color/grey_400"
                     android:alpha="0"
-                    android:onClick="@{vm::onClickClear}"
+                    android:onClick="@{vm::onClickClearTrails}"
                     />
 
                 <EditText
@@ -88,6 +79,14 @@
 
             </android.support.v7.widget.CardView>
 
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/trail_cl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/trail_rv"
                 android:layout_width="0dp"
@@ -96,7 +95,7 @@
                 app:adapter="@{vm.adapter}"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/trail_search_bg"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
         </android.support.constraint.ConstraintLayout>

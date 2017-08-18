@@ -25,6 +25,7 @@ import java.util.List;
 
 import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.BR;
+import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Trail;
@@ -33,6 +34,8 @@ import project.hikerguide.ui.activities.TrailActivity;
 import project.hikerguide.ui.adapters.TrailAdapter;
 import project.hikerguide.ui.dialogs.AddTrailDialog;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import project.hikerguide.utilities.GeneralUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
 import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
@@ -137,8 +140,7 @@ public class SearchTrailViewModel extends BaseObservable {
         // Query the Firebase Database
         final Query trailQuery = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.TRAILS)
-                // TODO: Replace hardcoded String
-                .orderByChild("areaId")
+                .orderByChild(GuideContract.TrailEntry.AREA_ID)
                 .equalTo(mActivity.getArea().firebaseId);
 
         trailQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -170,15 +172,19 @@ public class SearchTrailViewModel extends BaseObservable {
     }
 
     public void onFocusChanged(View view, boolean hasFocus) {
+
         mSearchHasFocus = hasFocus;
 
         notifyPropertyChanged(BR.hasFocus);
     }
 
-    public void onClickClear(View view) {
+    public void onClickClearTrails(View view) {
 
         // Set the focus to false
         mSearchHasFocus = false;
+
+        // Hide soft keyboard
+        GeneralUtils.hideKeyboard(mActivity, view);
 
         // Clear the query
         mQuery = null;

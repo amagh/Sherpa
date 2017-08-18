@@ -28,6 +28,8 @@ public class TrailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_trail);
+        setSupportActionBar(mBinding.toolbar);
+        getSupportActionBar().setTitle(getString(R.string.trail_activity_title));
 
         if (getIntent().getParcelableExtra(AREA_KEY) != null) {
             mAuthor = getIntent().getParcelableExtra(AUTHOR_KEY);
