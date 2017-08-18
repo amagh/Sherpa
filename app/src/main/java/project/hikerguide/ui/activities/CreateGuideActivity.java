@@ -302,7 +302,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
                     // Notify the item based on the position of mFilePickerModelPosition of the change
                     if (mFilePickerModelPosition == 0) {
-                        mBinding.getVm().notifyPropertyChanged(BR.imageUri);
+                        mBinding.getVm().notifyPropertyChanged(BR.image);
                         mBinding.getVm().notifyPropertyChanged(BR.iconVisibility);
 
                         // Remove error icon from the ActionBar
