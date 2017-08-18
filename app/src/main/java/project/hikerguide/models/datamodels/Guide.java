@@ -175,6 +175,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         map.put(DIFFICULTY, difficulty);
         map.put(AREA, area);
         map.put(HAS_IMAGE, hasImage);
+        map.put(RATERS, raters);
 
         return map;
     }
