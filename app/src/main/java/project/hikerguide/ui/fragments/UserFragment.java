@@ -284,7 +284,17 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                 && data.getBooleanExtra(AUTHOR_KEY, false)) {
             loadUserSelfProfile();
         } else {
-            ((MainActivity) getActivity()).switchFragments(R.id.navigation_home);
+
+            // Handle the log out based on the Activity the Fragment is in
+            if (getActivity() instanceof MainActivity) {
+
+                // Switch Fragments
+                ((MainActivity) getActivity()).switchFragments(R.id.navigation_home);
+            } else {
+
+                // Close the Activity
+                getActivity().finish();
+            }
         }
     }
 
