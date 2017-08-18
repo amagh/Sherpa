@@ -14,8 +14,11 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/list_place_vertical_padding"
         android:paddingBottom="@dimen/list_place_vertical_padding"
-        android:paddingLeft="@dimen/search_widget_text_horizontal_margin"
+        android:paddingLeft="@dimen/list_place_horizontal_padding"
+        android:paddingStart="@dimen/list_place_horizontal_padding"
         android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:background="?android:attr/selectableItemBackground"
         android:orientation="vertical">
 
         <TextView
