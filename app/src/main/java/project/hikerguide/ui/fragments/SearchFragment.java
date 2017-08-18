@@ -13,10 +13,6 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -47,14 +43,15 @@ import project.hikerguide.databinding.FragmentSearchBinding;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.models.viewmodels.SearchViewModel;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
+import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.SaveUtils;
 
-import static android.app.Activity.RESULT_OK;
 import static project.hikerguide.firebasedatabase.DatabaseProvider.GEOFIRE_PATH;
 import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
@@ -87,11 +84,9 @@ public class SearchFragment extends MapboxFragment {
         // Get a reference to the ViewDataBinding and inflate the View
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false);
 
-        // Launch the AutoCompleteSearchWidget
-        launchPlacesSearch();
-
         // Attach the MapView to the Fragment's Lifecycle
         attachMapView(mBinding.searchMv);
+        mBinding.setVm(new SearchViewModel((MainActivity) getActivity()));
         mBinding.searchMv.onCreate(savedInstanceState);
 
         // Get a reference of the MapboxMap to manipulate camera position and add Polylines
@@ -120,14 +115,6 @@ public class SearchFragment extends MapboxFragment {
                         queryGeoFire(location);
                     }
                 });
-            }
-        });
-
-        // Set an OnClickListener to launch the PlaceAutocompleteSearchWidget when clicked
-        mBinding.searchSv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                launchPlacesSearch();
             }
         });
 
@@ -160,30 +147,19 @@ public class SearchFragment extends MapboxFragment {
         return mBinding.getRoot();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PLACES_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-
-                // Get the Place selected by the user
-                Place place = PlaceAutocomplete.getPlace(getActivity(), data);
-
-                // Convert the Google LatLng to the Mapbox LatLng so the camera can be properly
-                // positioned
-                com.google.android.gms.maps.model.LatLng result = place.getLatLng();
-                LatLng target = new LatLng(result.latitude, result.longitude);
-
-                if (mMapboxMap != null) {
-                    // Move the camera to the correct position
-                    mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-                            .target(target)
-                            .zoom(10)
-                            .build()), 1500);
-                }
-            }
+    /**
+     * Animates the movement of the camera for MapboxMap to a new target
+     *
+     * @param target    Location to move the camera to
+     */
+    public void moveMapCamera(LatLng target) {
+        if (mMapboxMap != null) {
+            // Move the camera to the correct position
+            mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+                    .target(target)
+                    .zoom(10)
+                    .build()), 1500);
         }
-
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /**
@@ -305,22 +281,6 @@ public class SearchFragment extends MapboxFragment {
                         .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(guide.firebaseId))));
             }
         });
-    }
-
-    /**
-     * Launches the Places AutoCompleteSearch Widget in an overlay for searching for areas by name
-     */
-    private void launchPlacesSearch() {
-        try {
-            // Build the Intent to launch the Widget in overlay mode
-            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-                    .build(getActivity());
-
-            // Start Intent
-            startActivityForResult(intent, PLACES_REQUEST_CODE);
-        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
