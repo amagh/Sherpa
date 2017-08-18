@@ -31,6 +31,9 @@
     <string name="search_label">Search</string>
     <string name="search_more_text">Can\'t find the park or area you are searching for?</string>
     <string name="search_more_text_2">Click here to find more</string>
+    <string name="search_instruction_search">Search for trails by location by entering a query</string>
+    <string name="search_instruction_no_guides_found">No trails found in the area! Be sure to add your guide if you go on a trail in this area!</string>
+    <string name="search_instruction_zoom_in">Please zoom in to trigger a search.</string>
 
     <!-- Strings for Account Info -->
     <string name="sign_in_email_hint">Email</string>
