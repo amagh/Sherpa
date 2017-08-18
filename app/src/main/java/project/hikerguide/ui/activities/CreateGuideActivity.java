@@ -318,6 +318,9 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                         // visible to the Author
                         mBinding.guideDetailsRv.scrollToPosition(mModelList.size() - 1);
 
+                        // Get the position to be scrolled to
+                        final int position = mFilePickerModelPosition;
+
                         // Set the focus on the Caption TextView. Needs to be delayed to prevent
                         // crashing due to attempting to selecting a ViewHolder before it has been
                         // created.
@@ -326,7 +329,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                             public void run() {
                                 EditGuideDetailsAdapter.EditViewHolder viewHolder =
                                         (EditGuideDetailsAdapter.EditViewHolder) mBinding.guideDetailsRv
-                                                .findViewHolderForAdapterPosition(mFilePickerModelPosition);
+                                                .findViewHolderForAdapterPosition(position);
 
                                 ((ListItemSectionImageEditBinding) viewHolder.getBinding()).listSectionImageCaptionTv.requestFocus();
                             }
