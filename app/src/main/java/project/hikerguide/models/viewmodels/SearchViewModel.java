@@ -4,6 +4,7 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,6 +41,7 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     private String mQuery;
     private LatLng mLatLng;
     private boolean mSearchHasFocus = false;
+    private Handler mSearchHandler;
 
     public SearchViewModel(ConnectivityActivity activity) {
         mActivity = activity;
@@ -122,17 +124,37 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
             // Empty the Adapter
             mAdapter.setPlaceList(null);
         } else {
+
+            // Show ProgressBar
             mAdapter.setShowProgress(true);
 
-            // Query the Firebase Database
-            GooglePlacesApiUtils.queryGooglePlaces(mGoogleApiClient, mQuery, new GooglePlacesApiUtils.QueryCallback() {
-                @Override
-                public void onQueryReady(List<PlaceModel> placeModelList) {
-                    mAdapter.setPlaceList(placeModelList);
+            if (mSearchHandler == null) {
 
-                    mAdapter.setShowProgress(false);
+                // Init the Handler for querying Google Places API
+                mSearchHandler = new Handler();
+
+            } else {
+
+                // Cancel the previous search query
+                mSearchHandler.removeCallbacksAndMessages(null);
+            }
+
+            // Query Google Places API with a delay of 500ms to allow time for the user to finish
+            // typing
+            mSearchHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    GooglePlacesApiUtils.queryGooglePlaces(mGoogleApiClient, mQuery, new GooglePlacesApiUtils.QueryCallback() {
+                        @Override
+                        public void onQueryReady(List<PlaceModel> placeModelList) {
+                            mAdapter.setPlaceList(placeModelList);
+
+                            mAdapter.setShowProgress(false);
+                        }
+                    });
                 }
-            });
+            }, 500);
+
         }
     }
 
@@ -159,6 +181,8 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
 
         notifyPropertyChanged(BR.query);
         notifyPropertyChanged(BR.hasFocus);
+
+        GeneralUtils.hideKeyboard(mActivity, view);
     }
 
     @Override
