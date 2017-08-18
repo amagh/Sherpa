@@ -104,6 +104,9 @@
     <!-- User Activity Strings -->
     <string name="menu_user_log_off">Sign out</string>
 
+    <!-- Area Activity Strings -->
+    <string name="area_search_instruction_text">Search for the park/area where the trail exists</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 
