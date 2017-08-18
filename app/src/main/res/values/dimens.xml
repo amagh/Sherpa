@@ -32,6 +32,7 @@
     <dimen name="search_widget_horizontal_margin">8dp</dimen>
     <dimen name="search_widget_vertical_margin">8dp</dimen>
     <dimen name="search_map_height">300dp</dimen>
+    <dimen name="search_instruction_height">76dp</dimen>
 
     <dimen name="list_place_vertical_padding">12dp</dimen>
     <dimen name="list_place_text_vertical_separation">2dp</dimen>
