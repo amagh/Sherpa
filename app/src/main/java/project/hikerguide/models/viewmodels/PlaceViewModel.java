@@ -4,7 +4,10 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.geometry.LatLng;
+
 import project.hikerguide.models.datamodels.PlaceModel;
+import project.hikerguide.utilities.GooglePlacesApiUtils;
 
 /**
  * Created by Alvin on 8/2/2017.
@@ -31,7 +34,18 @@ public class PlaceViewModel extends BaseObservable {
     }
 
     public void onClickGeolocation(View view) {
-        mViewModel.changeMapCamera(mPlaceModel.placeId);
+
+        // Get the LatLng corresponding to the PlaceId of the PlaceModel
+        GooglePlacesApiUtils.getMapboxLatLngForPlaceId(mViewModel.getGoogleApiClient(),
+                mPlaceModel.placeId,
+                new GooglePlacesApiUtils.CoordinateCallback() {
+            @Override
+            public void onCoordinatesReady(LatLng latLng) {
+
+                // Move the camera to the coordinates
+                mViewModel.changeMapCamera(latLng);
+            }
+        });
     }
 
 }

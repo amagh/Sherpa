@@ -52,6 +52,7 @@ import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.ui.activities.TrailActivity;
 import project.hikerguide.ui.adapters.AreaAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import project.hikerguide.utilities.GooglePlacesApiUtils;
 import timber.log.Timber;
 
 import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
@@ -76,7 +77,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
     public SearchAreaViewModel(AreaActivity activity) {
         mActivity = activity;
 
-        initGoogleApiClient();
+        mGoogleApiClient = GooglePlacesApiUtils.initGoogleApiClient(mActivity, this, this);
     }
 
     @Bindable
@@ -86,7 +87,12 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                 @Override
                 public void onClickArea(Object object) {
                     if (object == null) {
-                        queryGooglePlaces(mQuery);
+                        GooglePlacesApiUtils.queryGooglePlaces(mGoogleApiClient, mQuery, new GooglePlacesApiUtils.QueryCallback() {
+                            @Override
+                            public void onQueryReady(List<PlaceModel> placeModelList) {
+                                mAdapter.setAreaList(new ArrayList<Object>(placeModelList));
+                            }
+                        });
                     } else {
                         // Start TrailActivity
                         if (object instanceof Area) {
@@ -146,7 +152,6 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
 
         notifyPropertyChanged(BR.hasFocus);
     }
-
 
     public void onClickClear(View view) {
 
@@ -267,84 +272,8 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
         });
     }
 
-    /**
-     * Initializes the GoogleApiClient to use the Places API
-     */
-    private void initGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(mActivity)
-                .addApi(Places.GEO_DATA_API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-        mGoogleApiClient.connect();
-    }
-
-    /**
-     * Query the Google Places API for a Place that matches
-     *
-     * @param query    Query for the Google Places API
-     */
-    private void queryGooglePlaces(String query) {
-
-        // Max LatLngBounds possible
-        LatLngBounds bounds = new LatLngBounds(
-                new LatLng(-85, 180),   // Max NE bound
-                new LatLng(85, -180));  // Max SW bound
-
-        // Query Places API
-        PendingResult<AutocompletePredictionBuffer> result = Places.GeoDataApi
-                .getAutocompletePredictions(mGoogleApiClient, query, bounds, null);
-
-        result.setResultCallback(new ResultCallback<AutocompletePredictionBuffer>() {
-            @Override
-            public void onResult(@NonNull AutocompletePredictionBuffer autocompletePredictions) {
-                if (autocompletePredictions.getStatus().isSuccess() && autocompletePredictions.getCount() > 0) {
-                    List<Object> placeList = new ArrayList<>();
-
-                    for (AutocompletePrediction prediction : autocompletePredictions) {
-
-                        // Create a new PlaceModel from the List and populate it with info
-                        PlaceModel placeModel = new PlaceModel();
-                        placeModel.primaryText = prediction.getPrimaryText(null).toString();
-                        placeModel.secondaryText = prediction.getSecondaryText(null).toString();
-                        placeModel.placeId = prediction.getPlaceId();
-
-                        placeList.add(placeModel);
-                    }
-
-                    autocompletePredictions.release();
-
-                    mAdapter.setAreaList(placeList);
-                }
-            }
-        });
-    }
-
-    /**
-     * Moves the camera to the coordinates provided by Google Places API for a given PlaceId
-     *
-     * @param placeId    PlaceId of the PlaceModel to move the camera to
-     */
-    void changeMapCamera(String placeId) {
-
-        // Query Places API to get the Place
-        Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId).setResultCallback(new ResultCallback<PlaceBuffer>() {
-            @Override
-            public void onResult(@NonNull PlaceBuffer places) {
-
-                // Check to ensure results are valid
-                if (places.getStatus().isSuccess() && places.getCount() > 0) {
-
-                    // Get the Place, generate the LatLng and move the camera
-                    Place place = places.get(0);
-                    LatLng location = place.getLatLng();
-                    changeMapCamera(new com.mapbox.mapboxsdk.geometry.LatLng(location.latitude, location.longitude));
-
-                    places.release();
-                }
-            }
-        });
+    GoogleApiClient getGoogleApiClient() {
+        return mGoogleApiClient;
     }
 
     /**
