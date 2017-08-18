@@ -25,12 +25,14 @@ public class Author extends BaseModelWithImage implements Parcelable {
     private static final String HAS_IMAGE       = "hasImage";
     private static final String SCORE           = "score";
     private static final String FAVORITES       = "favorites";
+    private static final String RATED_GUIDES    = "ratedGuides";
 
     // ** Member Variables ** //
     public String name;
     public String description;
     public int score;
     public Map<String, String> favorites;
+    public Map<String, Rating> ratedGuides;
 
     public Author() {}
 
@@ -90,6 +92,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
         map.put(HAS_IMAGE, hasImage);
         map.put(SCORE, score);
         map.put(FAVORITES, favorites);
+        map.put(RATED_GUIDES, ratedGuides);
 
         return map;
     }

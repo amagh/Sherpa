@@ -39,6 +39,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     private static final String DIFFICULTY      = "difficulty";
     private static final String AREA            = "area";
     private static final String FAVORITE        = "favorite";
+    private static final String RATERS          = "raters";
 
     // ** Member Variables ** //
     public String trailId;
@@ -55,6 +56,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     public int difficulty;
     public String area;
     private boolean favorite;
+    public Map<String, Rating> raters;
 
     private Uri gpxUri;
 
