@@ -100,6 +100,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@+id/area_rv"
+            app:showInstructions="@{vm.showInstructions}"
             android:text="@string/area_search_instruction_text"/>
 
         <android.support.v7.widget.RecyclerView

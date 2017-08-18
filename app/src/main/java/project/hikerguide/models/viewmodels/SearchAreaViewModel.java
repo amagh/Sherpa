@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -73,6 +74,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
     private com.mapbox.mapboxsdk.geometry.LatLng mLatLng;
     private boolean mSearchHasFocus = false;
     private GoogleApiClient mGoogleApiClient;
+    private boolean mShowInstructions = true;
 
     public SearchAreaViewModel(AreaActivity activity) {
         mActivity = activity;
@@ -141,10 +143,21 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
         if (!mQuery.isEmpty() && mQuery.length() > 2) {
             // Query the Firebase Database
             queryFirebaseDatabase(mQuery);
+
+            mShowInstructions = false;
         } else {
             // Empty the Adapter
             mAdapter.setAreaList(null);
+
+            mShowInstructions = true;
         }
+
+        notifyPropertyChanged(BR.showInstructions);
+    }
+
+    @Bindable
+    public boolean getShowInstructions() {
+        return mShowInstructions;
     }
 
     public void onFocusChanged(View view, boolean hasFocus) {
@@ -220,6 +233,15 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                         .build()), 1500);
             }
         });
+    }
+
+    @BindingAdapter("showInstructions")
+    public static void setInstructions(TextView textView, boolean showInstructions) {
+        if (showInstructions) {
+            textView.setVisibility(View.VISIBLE);
+        } else {
+            textView.setVisibility(View.GONE);
+        }
     }
 
     /**
