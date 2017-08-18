@@ -122,7 +122,7 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
                 mAreaList = new ArrayList<>();
             }
 
-            notifyItemInserted(mAreaList.size() - 1);
+            notifyDataSetChanged();
         }
     }
 
