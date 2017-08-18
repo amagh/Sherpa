@@ -11,14 +11,10 @@ import java.util.Map;
 
 public class Rating {
     // ** Constants ** //
-    private static final String AUTHOR_ID   = "authorId";
-    private static final String GUIDE_ID    = "guideId";
     private static final String COMMENT     = "comment";
     private static final String RATING      = "rating";
 
     // ** Member Variables ** //
-    private String authorId;
-    private String guideId;
     private String comment;
     private int rating;
 
@@ -31,19 +27,22 @@ public class Rating {
         return map;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj instanceof Rating) {
+            if (((Rating) obj).getComment().equals(this.comment) &&
+                    ((Rating) obj).rating == this.rating) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     //********************************************************************************************//
     //*********************************** Getters and Setters ************************************//
     //********************************************************************************************//
-
-    @Exclude
-    public String getAuthorId() {
-        return authorId;
-    }
-
-    @Exclude
-    public String getGuideId() {
-        return guideId;
-    }
 
     public String getComment() {
         return comment;
@@ -51,14 +50,6 @@ public class Rating {
 
     public int getRating() {
         return rating;
-    }
-
-    public void setAuthorId(String authorId) {
-        this.authorId = authorId;
-    }
-
-    public void setGuideId(String guideId) {
-        this.guideId = guideId;
     }
 
     public void setComment(String comment) {
