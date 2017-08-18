@@ -12,7 +12,7 @@ import java.util.List;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemAreaBinding;
-import project.hikerguide.databinding.ListItemPlaceBinding;
+import project.hikerguide.databinding.ListItemPlaceNavBinding;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.models.viewmodels.AreaViewModel;
@@ -52,7 +52,7 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
                 break;
 
             case PLACE_VIEW_TYPE:
-                layoutId = R.layout.list_item_place;
+                layoutId = R.layout.list_item_place_nav;
                 break;
 
             case SEARCH_MORE_VIEW_TYPE:
@@ -153,7 +153,7 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
                 ((ListItemAreaBinding) mBinding).setVm(vm);
             } else if (object instanceof PlaceModel) {
                 PlaceViewModel vm = new PlaceViewModel((PlaceModel) object, mViewModel);
-                ((ListItemPlaceBinding) mBinding).setVm(vm);
+                ((ListItemPlaceNavBinding) mBinding).setVm(vm);
             }
 
 
