@@ -20,14 +20,18 @@ import project.hikerguide.BR;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.adapters.PlaceAdapter;
+import project.hikerguide.ui.fragments.SearchFragment;
+import project.hikerguide.utilities.GeneralUtils;
 import project.hikerguide.utilities.GooglePlacesApiUtils;
+
+import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_SEARCH;
 
 /**
  * Created by Alvin on 8/17/2017.
  */
 
-public class SearchViewModel extends BaseObservable implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    // ** Constants ** //
+public class SearchViewModel extends BaseObservable implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     // ** Member Variables ** //
     private ConnectivityActivity mActivity;
@@ -50,6 +54,36 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
                 @Override
                 public void onClickPlace(PlaceModel placeModel) {
 
+                    // Get a reference to SearchFragment
+                    final SearchFragment fragment = (SearchFragment) mActivity.getSupportFragmentManager()
+                            .findFragmentByTag(FRAG_TAG_SEARCH);
+
+                    if (fragment != null) {
+
+                        // Get the LatLng corresponding to the Place selected
+                        GooglePlacesApiUtils.getMapboxLatLngForPlaceId(
+                                mGoogleApiClient,
+                                placeModel.placeId,
+                                new GooglePlacesApiUtils.CoordinateCallback() {
+
+                                    @Override
+                                    public void onCoordinatesReady(LatLng latLng) {
+
+                                        // Move the camera to the LatLng for the selected Place
+                                        fragment.moveMapCamera(latLng);
+                                    }
+                                });
+                    }
+
+                    // Remove focus from the search widget
+                    mSearchHasFocus = false;
+                    notifyPropertyChanged(BR.hasFocus);
+
+                    // Clear the Adapter
+                    mAdapter.setPlaceList(null);
+
+                    // Hide the soft keyboard so the results can be shown
+                    GeneralUtils.hideKeyboard(mActivity, mActivity.getCurrentFocus());
                 }
             });
         }
@@ -73,11 +107,6 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     @Bindable
     public boolean getHasFocus() {
         return mSearchHasFocus;
-    }
-
-    @Bindable
-    public LatLng getLatLng() {
-        return mLatLng;
     }
 
     @Bindable
