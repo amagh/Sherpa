@@ -111,6 +111,11 @@
     <!-- Area Activity Strings -->
     <string name="area_search_instruction_text">Search for the park/area where the trail exists</string>
 
+    <!-- Rating Related Strings -->
+    <string name="list_rating_title_text">Rate this guide</string>
+    <string name="list_rating_comments_hint">Comments (Optional)</string>
+    <string name="list_rating_button_text">Rate</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 
