@@ -53,6 +53,7 @@ import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.ui.activities.TrailActivity;
 import project.hikerguide.ui.adapters.AreaAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import project.hikerguide.utilities.GeneralUtils;
 import project.hikerguide.utilities.GooglePlacesApiUtils;
 import timber.log.Timber;
 
@@ -173,6 +174,9 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
 
         // Clear the query
         mQuery = null;
+
+        // Hide the keyboard
+        GeneralUtils.hideKeyboard(mActivity, view);
 
         notifyPropertyChanged(BR.query);
         notifyPropertyChanged(BR.hasFocus);
