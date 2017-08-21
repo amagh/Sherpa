@@ -135,4 +135,6 @@
 
     <string name="list_area_text">Yosemite National Park</string>
     <string name="list_area_state_text">California</string>
+
+    <string name="list_rating_comment_text">This is a test comment to see how a real comment would be displayed. We are making it long to see what it looks like as multiple lines.</string>
 </resources>
