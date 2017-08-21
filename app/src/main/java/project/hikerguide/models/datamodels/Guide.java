@@ -9,7 +9,9 @@ import android.os.Parcelable;
 import com.google.firebase.database.Exclude;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
@@ -243,6 +245,40 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     @Exclude
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
+    }
+
+    /**
+     * Converts the Map of raters into an Array of Ratings to be used to populate the Guide's
+     * ratings
+     *
+     * @return An Array describing the people who have rated this guide, their rating, and their
+     * comments
+     */
+    @Exclude
+    public Rating[] getRatings() {
+
+        // Validate raters
+        if (raters != null) {
+
+            // Create a List to hold the Ratings to be returned
+            List<Rating> ratingList = new ArrayList<>();
+
+            // Iterate through the Map and convert each entry to a Rating
+            for (String authorId : raters.keySet()) {
+
+                Rating rating = raters.get(authorId);
+
+                // Add the authorId to the Rating
+                rating.setAuthorId(authorId);
+
+                // Add the Rating to the List
+                ratingList.add(rating);
+            }
+
+            return ratingList.toArray(new Rating[ratingList.size()]);
+        } else {
+            return null;
+        }
     }
 
     //********************************************************************************************//
