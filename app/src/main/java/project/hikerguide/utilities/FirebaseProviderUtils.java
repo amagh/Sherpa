@@ -8,6 +8,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -25,10 +27,12 @@ import project.hikerguide.files.abstractfiles.BaseFile;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.Rating;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.Trail;
+import timber.log.Timber;
 
 import static junit.framework.Assert.assertNotNull;
 import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;
@@ -277,6 +281,134 @@ public class FirebaseProviderUtils {
 
         FirebaseDatabase.getInstance().getReference()
                 .updateChildren(childUpdates);
+    }
+
+    /**
+     * Updates a User's Firebase Database entry to match the local changes made
+     *
+     * @param user      User to be updated
+     */
+    public static void updateUser(Author user) {
+
+        // Run an update on the values
+        Map<String, Object> childUpdates = new HashMap<>();
+
+        String directory = GuideDatabase.AUTHORS + "/" + user.firebaseId;
+
+        childUpdates.put(directory, user.toMap());
+
+        FirebaseDatabase.getInstance().getReference()
+                .updateChildren(childUpdates);
+    }
+
+    /**
+     * Uses a transaction to update a Guide when it's Rating has been altered. Transactions allow
+     * for multiple people to use the same action without losing track of the state of each action.
+     *
+     * e.g. If user1 adds a rating of 5 and user2 adds a rating 3 at the same time, it will
+     * successfully calculate the added total of 8 instead of one action over-writing the other.
+     *
+     * @param guideId    The ID of the Guide to be updated
+     * @param rating     Rating that will alter the Guide's rating
+     */
+    public static void updateGuideRaters(String guideId, final Rating rating) {
+
+        // Build the Transaction
+        FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.GUIDES)
+                .child(guideId)
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+
+                        // Retrieve the Guide from the data
+                        Guide guide = mutableData.getValue(Guide.class);
+
+                        // Ensure that a Guide was returned
+                        if (guide == null) {
+                            return Transaction.success(mutableData);
+                        }
+
+                        // To hold any previous rating made by the Author of the Rating
+                        int previousRating = 0;
+
+                        if (guide.raters == null) {
+
+                            // Init a new HashMap if it hasn't been rated before
+                            guide.raters = new HashMap<>();
+                        } else if (guide.raters.containsKey(rating.getAuthorId())) {
+
+                            // Set the previous rating to the user's previous rating
+                            previousRating = guide.raters.get(rating.getAuthorId()).getRating();
+                        }
+
+                        // Add the Rating to the Map
+                        guide.raters.put(rating.getAuthorId(), rating);
+
+                        // Add the new score, subtracting out th previous rating
+                        guide.rating += rating.getRating() - previousRating;
+
+                        if (previousRating == 0) {
+
+                            // Increment the number of reviews if the user hasn't rated this Guide
+                            // previously
+                            guide.reviews++;
+                        }
+
+                        // Set the data to be updated to Firebase Database
+                        mutableData.setValue(guide);
+
+                        // Update the Guide's Author's score
+                        updateAuthorScore(guide.authorId, rating, previousRating);
+
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                        Timber.e("Error updating guides's raters: " + databaseError);
+                    }
+                });
+    }
+
+    /**
+     * Updates an Author's score after a rating for one of their Guides has been altered
+     *
+     * @param authorId          FirebaseId of the Author to be updated
+     * @param rating            The Rating to be added to the Author's Map of rated Guides
+     * @param previousRating    The previous rating the Author gave the Guide
+     */
+    private static void updateAuthorScore(String authorId, final Rating rating, final int previousRating) {
+
+        // Build the Transaction
+        FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.AUTHORS)
+                .child(authorId)
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+
+                        // Get the Author from the data
+                        Author author = mutableData.getValue(Author.class);
+
+                        // Ensure the Author exists
+                        if (author == null) {
+                            return Transaction.success(mutableData);
+                        }
+
+                        // Change the Author's score
+                        author.score += (rating.getRating() - previousRating);
+
+                        // Set the data to be updated to Firebase Database
+                        mutableData.setValue(author);
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                        Timber.e("Error updating author's score: " + databaseError);
+                    }
+                });
     }
 
     //********************************************************************************************//
