@@ -1,11 +1,14 @@
 package project.hikerguide.models.datamodels;
 
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.ServerValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 8/18/2017.
@@ -16,12 +19,15 @@ public class Rating {
     private static final String COMMENT     = "comment";
     private static final String RATING      = "rating";
     private static final String AUTHOR_NAME = "authorName";
+    private static final String DATE_ADDED  = "dateAdded";
 
     // ** Member Variables ** //
     private String comment;
     private int rating;
     private String authorId;
     private String authorName;
+    private long dateAdded;
+    private boolean addDate;
 
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
@@ -31,6 +37,7 @@ public class Rating {
 
         if (authorName != null) {
             map.put(AUTHOR_NAME, authorName);
+            map.put(DATE_ADDED, dateAdded);
         }
 
         return map;
@@ -70,6 +77,19 @@ public class Rating {
         return authorName;
     }
 
+    public Map<String, String> getDateAdded() {
+        if (addDate) {
+            return ServerValue.TIMESTAMP;
+        } else {
+            return null;
+        }
+    }
+
+    @Exclude
+    public long getDate() {
+        return dateAdded;
+    }
+
     public void setComment(String comment) {
         this.comment = comment;
     }
@@ -84,5 +104,13 @@ public class Rating {
 
     public void setAuthorName(String authorName) {
         this.authorName = authorName;
+    }
+
+    public void setDateAdded(long dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    public void addDate() {
+        this.addDate = true;
     }
 }
