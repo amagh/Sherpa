@@ -321,7 +321,7 @@ public class ContentProviderUtils {
             }
         }
 
-        return null;
+        return new Author();
     }
 
     /**
