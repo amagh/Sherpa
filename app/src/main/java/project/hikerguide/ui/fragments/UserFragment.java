@@ -146,8 +146,14 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_user_log_off:
+                // Reset the data in the Adapter
+                mModelList = new ArrayList<>();
+                mAdapter.setModelList(mModelList);
+
+                // Log the User out
                 FirebaseAuth.getInstance().signOut();
 
+                // Start the AccountActivity
                 startActivityForResult(
                         new Intent(getActivity(), AccountActivity.class),
                         ACCOUNT_ACTIVITY_REQUEST_CODE);
@@ -309,7 +315,8 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
         // Query the Firebase Database
         final Query guideQuery = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.GUIDES)
-                .orderByChild(GuideContract.GuideEntry.AUTHOR_ID);
+                .orderByChild(GuideContract.GuideEntry.AUTHOR_ID)
+                .equalTo(mAuthor.firebaseId);
 
         guideQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
