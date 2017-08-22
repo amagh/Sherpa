@@ -10,6 +10,8 @@ import com.google.firebase.database.Exclude;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,7 @@ import project.hikerguide.files.GpxFile;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.hikerguide.utilities.objects.GpxStats;
 import project.hikerguide.utilities.GpxUtils;
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 7/17/2017.
@@ -40,7 +43,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     private static final String DISTANCE        = "distance";
     private static final String DIFFICULTY      = "difficulty";
     private static final String AREA            = "area";
-    private static final String FAVORITE        = "favorite";
     private static final String RATERS          = "raters";
 
     // ** Member Variables ** //
@@ -220,6 +222,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
      *
      * @return GpxFile corresponding to the original GPX file that was set to the Guide
      */
+    @Exclude
     public GpxFile getGpxFile() {
         return new GpxFile(this.firebaseId, this.gpxUri.getPath());
     }
@@ -274,6 +277,18 @@ public class Guide extends BaseModelWithImage implements Parcelable {
                 // Add the Rating to the List
                 ratingList.add(rating);
             }
+
+            Collections.sort(ratingList, new Comparator<Rating>() {
+                @Override
+                public int compare(Rating rating, Rating t1) {
+                    Timber.d("Rating dates: " + rating.getDate() + " | " + t1.getDate());
+                    return rating.getDate() < t1.getDate()
+                            ? -1
+                            : rating.getDate() > t1.getDate()
+                            ? 1
+                            : 0;
+                }
+            });
 
             return ratingList.toArray(new Rating[ratingList.size()]);
         } else {
@@ -331,6 +346,18 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         } else {
             parcel.writeInt(0);
         }
+
+        if (raters != null) {
+            parcel.writeInt(raters.size());
+
+            for (String authorId : raters.keySet()) {
+                parcel.writeString(authorId);
+                parcel.writeString(raters.get(authorId).getAuthorName());
+                parcel.writeInt(raters.get(authorId).getRating());
+                parcel.writeString(raters.get(authorId).getComment());
+                parcel.writeLong(raters.get(authorId).getDate());
+            }
+        }
     }
 
     public static final Parcelable.Creator<Guide> CREATOR = new Parcelable.Creator<Guide>() {
@@ -378,6 +405,24 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
         if (parcel.readInt() == 1) {
             setFavorite(true);
+        }
+
+        int ratings;
+        if ((ratings = parcel.readInt()) != 0) {
+            raters = new HashMap<>();
+
+            for (int i = 0; i < ratings; i++) {
+                String authorId = parcel.readString();
+
+                Rating rating = new Rating();
+
+                rating.setAuthorName(parcel.readString());
+                rating.setRating(parcel.readInt());
+                rating.setComment(parcel.readString());
+                rating.setDateAdded(parcel.readLong());
+
+                raters.put(authorId, rating);
+            }
         }
     }
 }
