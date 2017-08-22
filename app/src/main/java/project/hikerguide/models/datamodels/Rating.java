@@ -77,11 +77,11 @@ public class Rating {
         return authorName;
     }
 
-    public Map<String, String> getDateAdded() {
+    public Object getDateAdded() {
         if (addDate) {
             return ServerValue.TIMESTAMP;
         } else {
-            return null;
+            return dateAdded;
         }
     }
 

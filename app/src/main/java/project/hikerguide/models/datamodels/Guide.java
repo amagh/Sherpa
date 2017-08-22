@@ -281,7 +281,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
             Collections.sort(ratingList, new Comparator<Rating>() {
                 @Override
                 public int compare(Rating rating, Rating t1) {
-                    Timber.d("Rating dates: " + rating.getDate() + " | " + t1.getDate());
                     return rating.getDate() < t1.getDate()
                             ? -1
                             : rating.getDate() > t1.getDate()
