@@ -90,7 +90,9 @@ public class SectionViewModel extends BaseObservable {
 
         // Work around for multiline EditText with IME option
         editText.setImeOptions(imeAction);
-        editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
+        editText.setRawInputType(InputType.TYPE_CLASS_TEXT|
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES|
+                InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
     }
 
     /**

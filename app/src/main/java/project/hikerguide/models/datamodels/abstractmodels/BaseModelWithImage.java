@@ -3,6 +3,8 @@ package project.hikerguide.models.datamodels.abstractmodels;
 import android.content.Context;
 import android.net.Uri;
 
+import com.google.firebase.database.Exclude;
+
 import java.io.File;
 
 import project.hikerguide.files.ImageFile;
@@ -36,6 +38,7 @@ public abstract class BaseModelWithImage extends BaseModel {
         this.imageUri = Uri.fromFile(imageFile);
     }
 
+    @Exclude
     public Uri getImageUri() {
         return imageUri;
     }
