@@ -55,6 +55,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
     private MapboxActivity mActivity;
 
     private ClickHandler mClickHandler;
+    private boolean mIsInEditMode;
 
     public GuideDetailsAdapter(ClickHandler clickHandler) {
         mClickHandler = clickHandler;
@@ -146,7 +147,8 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
         } else if (model instanceof Rating) {
 
             // For adding a new rating or editing a user's previous rating
-            if (((Rating) model).getAuthorId() == null) {
+            if (((Rating) model).getAuthorId() == null ||
+                    (mIsInEditMode && position == mSections.length + 2)) {
                 return ADD_RATING_VIEW_TYPE;
             } else {
                 return RATING_VIEW_TYPE;
@@ -272,11 +274,19 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
     }
 
     /**
-     * Forces the Adapter to re-load its data
+     * Forces the Adapter to re-load the ViewHolder for the User's rating
      */
     public void updateRating() {
+        mIsInEditMode = false;
+        notifyItemChanged(mSections.length + 2);
+    }
 
-        updateModels();
+    /**
+     * Sets the Adapter to load the editable rating layout instead of the display one
+     */
+    public void enterEditMode() {
+        mIsInEditMode = true;
+        notifyItemChanged(mSections.length + 2);
     }
 
     public interface ClickHandler {
@@ -334,7 +344,8 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
                         new AuthorViewModel(mActivity, (Author) model));
             } else if (model instanceof Rating) {
 
-                if (((Rating) model).getAuthorId() == null) {
+                if (((Rating) model).getAuthorId() == null ||
+                        (mIsInEditMode && position == mSections.length + 2)) {
 
                     // If the Rating does not contain an AuthorId, it is a new Rating for the user
                     // to rate the Guide with

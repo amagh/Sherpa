@@ -10,6 +10,8 @@ import android.widget.Toast;
 import com.android.databinding.library.baseAdapters.BR;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -21,6 +23,7 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Rating;
 import project.hikerguide.ui.adapters.GuideDetailsAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
 
@@ -39,8 +42,6 @@ public class RatingViewModel extends BaseObservable {
         mGuide = guide;
         mAdapter = adapter;
         mUser = author;
-
-
     }
 
     public RatingViewModel(Rating rating, Guide guide, GuideDetailsAdapter adapter) {
@@ -85,6 +86,7 @@ public class RatingViewModel extends BaseObservable {
             Glide.with(imageView.getContext())
                     .using(new FirebaseImageLoader())
                     .load(authorRef)
+                    .error(R.drawable.ic_account_circle)
                     .into(imageView);
         }
     }
@@ -146,6 +148,22 @@ public class RatingViewModel extends BaseObservable {
             return View.GONE;
         } else {
             return View.VISIBLE;
+        }
+    }
+
+    @Bindable
+    public int getEditRatingVisibility() {
+
+        // Check if the User is logged in
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null && user.getUid().equals(mRating.getAuthorId())) {
+
+            // Rating's authorId matches the logged in User's id, show the button for editing the
+            // rating
+            return View.VISIBLE;
+        } else {
+            return View.GONE;
         }
     }
 
@@ -246,5 +264,9 @@ public class RatingViewModel extends BaseObservable {
 
         // Force the Adapter to update the Guide with the new Rating
         mAdapter.updateRating();
+    }
+
+    public void onClickEditRating(View view) {
+        mAdapter.enterEditMode();
     }
 }

@@ -113,6 +113,20 @@
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             android:src="@drawable/ic_star"/>
 
+        <ImageView
+            android:id="@+id/list_rating_edit_iv"
+            android:layout_width="@dimen/list_section_icon_size"
+            android:layout_height="@dimen/list_section_icon_size"
+            android:padding="@dimen/list_section_icon_padding"
+            android:layout_marginTop="12dp"
+            android:src="@drawable/ic_create"
+            android:tint="@color/grey_400"
+            android:visibility="@{vm.editRatingVisibility}"
+            android:onClick="@{vm::onClickEditRating}"
+            app:layout_constraintLeft_toRightOf="@id/list_rating_star_5"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
         <TextView
             android:id="@+id/list_rating_comment_tv"
             android:layout_width="0dp"
