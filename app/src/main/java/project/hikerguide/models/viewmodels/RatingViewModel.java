@@ -1,0 +1,250 @@
+package project.hikerguide.models.viewmodels;
+
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.databinding.BindingAdapter;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.android.databinding.library.baseAdapters.BR;
+import com.bumptech.glide.Glide;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.HashMap;
+
+import project.hikerguide.R;
+import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.models.datamodels.Rating;
+import project.hikerguide.ui.adapters.GuideDetailsAdapter;
+import project.hikerguide.utilities.FirebaseProviderUtils;
+
+import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
+
+/**
+ * Created by Alvin on 8/21/2017.
+ */
+
+public class RatingViewModel extends BaseObservable {
+    private Rating mRating;
+    private Guide mGuide;
+    private Author mUser;
+    private GuideDetailsAdapter mAdapter;
+
+    public RatingViewModel(Rating rating, Guide guide, GuideDetailsAdapter adapter, Author author) {
+        mRating = rating;
+        mGuide = guide;
+        mAdapter = adapter;
+        mUser = author;
+
+
+    }
+
+    public RatingViewModel(Rating rating, Guide guide, GuideDetailsAdapter adapter) {
+        mRating = rating;
+        mGuide = guide;
+        mAdapter = adapter;
+    }
+
+    @Bindable
+    public String getAuthorName() {
+
+        if (mRating.getAuthorId() != null) {
+
+            // Rating does not have an AuthorId because the user is creating a new Rating
+            return mRating.getAuthorName();
+        } else {
+            return mUser.name;
+        }
+    }
+
+    @Bindable
+    public StorageReference getAuthorImage() {
+
+        String id;
+
+        if (mRating.getAuthorId() != null) {
+
+            // Rating does not have an AuthorId because the user is creating a new Rating
+            id = mRating.getAuthorId();
+        } else {
+            id = mUser.firebaseId;
+        }
+
+        return FirebaseStorage.getInstance().getReference()
+                .child(FirebaseProviderUtils.IMAGE_PATH)
+                .child(id + JPEG_EXT);
+    }
+
+    @BindingAdapter("authorImage")
+    public static void setAuthorImage(ImageView imageView, StorageReference authorRef) {
+        if (authorRef != null) {
+            Glide.with(imageView.getContext())
+                    .using(new FirebaseImageLoader())
+                    .load(authorRef)
+                    .into(imageView);
+        }
+    }
+
+    @Bindable
+    public int getRating() {
+        return mRating.getRating();
+    }
+
+    public void setRating(int rating) {
+        this.mRating.setRating(rating);
+
+        notifyPropertyChanged(BR.rating);
+    }
+
+    @Bindable
+    public String getComment() {
+        return mRating.getComment();
+    }
+
+    public void setComment(String comment) {
+        this.mRating.setComment(comment);
+    }
+
+    @BindingAdapter({"star2", "star3", "star4", "star5", "rating"})
+    public static void setRatingStar(ImageView star1, ImageView star2, ImageView star3, ImageView star4, ImageView star5, int rating) {
+
+        // Reset all stars to un-rated
+        star1.setImageResource(R.drawable.ic_star);
+        star2.setImageResource(R.drawable.ic_star);
+        star3.setImageResource(R.drawable.ic_star);
+        star4.setImageResource(R.drawable.ic_star);
+        star5.setImageResource(R.drawable.ic_star);
+
+        // Set the colors depending on the rating
+        switch (rating) {
+            case 5:
+                star5.setImageResource(R.drawable.ic_star_yellow);
+
+            case 4:
+                star4.setImageResource(R.drawable.ic_star_yellow);
+
+            case 3:
+                star3.setImageResource(R.drawable.ic_star_yellow);
+
+            case 2:
+                star2.setImageResource(R.drawable.ic_star_yellow);
+
+            case 1:
+                star1.setImageResource(R.drawable.ic_star_yellow);
+        }
+    }
+
+    @Bindable
+    public int getCommentVisibility() {
+
+        // Set Visibility of the comment TextView depending on whether the Rating has a comment
+        if (mRating.getComment() == null || mRating.getComment().isEmpty()) {
+            return View.GONE;
+        } else {
+            return View.VISIBLE;
+        }
+    }
+
+    public void onClickStar1(View view) {
+        mRating.setRating(1);
+
+        notifyPropertyChanged(BR.rating);
+    }
+
+    public void onClickStar2(View view) {
+        mRating.setRating(2);
+
+        notifyPropertyChanged(BR.rating);
+    }
+
+    public void onClickStar3(View view) {
+        mRating.setRating(3);
+
+        notifyPropertyChanged(BR.rating);
+    }
+
+    public void onClickStar4(View view) {
+        mRating.setRating(4);
+
+        notifyPropertyChanged(BR.rating);
+    }
+
+    public void onClickStar5(View view) {
+        mRating.setRating(5);
+
+        notifyPropertyChanged(BR.rating);
+    }
+
+    /**
+     * Click response for rate button
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickRate (View view) {
+
+        // Check to see if the user has filled out the necessary rating fields
+        if (mRating.getRating() == 0) {
+
+            // Inform the user that they must select a rating first
+            Toast.makeText(
+                    view.getContext(),
+                    view.getContext().getString(R.string.toast_missing_rating_error),
+                    Toast.LENGTH_LONG)
+                    .show();
+
+            return;
+        }
+
+        // Create Ratings to be added to the Firebase Database
+        final Rating authorRating = new Rating();
+        final Rating guideRating = new Rating();
+
+        // The "authorRating" will not contain any author information
+        authorRating.setRating(getRating());
+        authorRating.setComment(getComment());
+
+        guideRating.setRating(getRating());
+        guideRating.setComment(getComment());
+        guideRating.setAuthorId(mUser.firebaseId);
+        guideRating.setAuthorName(mUser.name);
+        guideRating.addDate();
+
+        // Check whether the user has previously rated this Guide
+        int previousRating = 0;
+
+        if (mGuide.raters != null && mGuide.raters.containsKey(mUser.firebaseId)) {
+
+            // Get the previous rating the user rated this Guide
+            previousRating = mGuide.raters.get(mUser.firebaseId).getRating();
+        } else if (mGuide.raters == null){
+
+            // Create a new Map to store ratings
+            mGuide.raters = new HashMap<>();
+        }
+
+        // Add the new Rating to the Guide, subtracting the value of the previous rating
+        mGuide.rating += getRating() - previousRating;
+
+        // Add the Rating to the Guide data model
+        mGuide.raters.put(mUser.firebaseId, guideRating);
+
+        // Create the Map to hold the user's rated Guides
+        if (mUser.ratedGuides == null) {
+            mUser.ratedGuides = new HashMap<>();
+        }
+
+        // Add the Rating to the user's rated Guides
+        mUser.ratedGuides.put(mGuide.firebaseId, authorRating);
+
+        // Update the Firebase Database with the rating
+        FirebaseProviderUtils.updateUser(mUser);
+        FirebaseProviderUtils.updateGuideRaters(mGuide.firebaseId, guideRating);
+
+        // Force the Adapter to update the Guide with the new Rating
+        mAdapter.updateRating();
+    }
+}
