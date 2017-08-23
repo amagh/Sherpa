@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.android.databinding.library.baseAdapters.BR;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -304,7 +305,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(final int requestCode, int resultCode, Intent data) {
 
         Timber.d("Request code:" + requestCode);
 
@@ -367,6 +368,13 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot snapshot) {
                     dialog.dismiss();
+
+                    // Update the image
+                    if (requestCode == REQUEST_CODE_PROFILE_PIC) {
+                        mBinding.getVm().notifyPropertyChanged(BR.authorImage);
+                    } else {
+                        mBinding.getVm().notifyPropertyChanged(BR.backdrop);
+                    }
                 }
             })
             .addOnFailureListener(new OnFailureListener() {
