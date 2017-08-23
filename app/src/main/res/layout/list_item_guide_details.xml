@@ -27,16 +27,90 @@
             app:layout_constraintGuide_percent=".5"
             android:orientation="vertical"/>
 
+        <ImageView
+            android:id="@+id/list_guide_difficulty_circle_1"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_circle_stroke"
+            android:layout_marginLeft="64dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/list_guide_difficulty_circle_2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:difficultyRating="@{vm.difficultyRating}"
+            app:circle2="@{listGuideDifficultyCircle2}"
+            app:circle3="@{listGuideDifficultyCircle3}"
+            app:circle4="@{listGuideDifficultyCircle4}"
+            app:circle5="@{listGuideDifficultyCircle5}"
+            tools:src="@drawable/ic_circle"/>
+
+        <ImageView
+            android:id="@+id/list_guide_difficulty_circle_2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_circle_stroke"
+            app:layout_constraintLeft_toRightOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintRight_toLeftOf="@+id/list_guide_difficulty_circle_3"
+            app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            tools:src="@drawable/ic_circle"/>
+
+        <ImageView
+            android:id="@+id/list_guide_difficulty_circle_3"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_circle_stroke"
+            app:layout_constraintLeft_toRightOf="@id/list_guide_difficulty_circle_2"
+            app:layout_constraintRight_toLeftOf="@+id/list_guide_difficulty_circle_4"
+            app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <ImageView
+            android:id="@+id/list_guide_difficulty_circle_4"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_circle_stroke"
+            app:layout_constraintLeft_toRightOf="@id/list_guide_difficulty_circle_3"
+            app:layout_constraintRight_toLeftOf="@+id/list_guide_difficulty_circle_5"
+            app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <ImageView
+            android:id="@+id/list_guide_difficulty_circle_5"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_circle_stroke"
+            android:layout_marginRight="64dp"
+            app:layout_constraintLeft_toRightOf="@id/list_guide_difficulty_circle_4"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <TextView
+            android:id="@+id/list_guide_difficulty_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/text_vertical_margin"
+            android:text="@{vm.difficulty}"
+            app:layout_constraintTop_toBottomOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            tools:text="@string/difficulty_moderate"
+            />
+
         <project.hikerguide.ui.views.SmartMapView
             android:id="@+id/list_guide_details_map"
             android:layout_width="0dp"
             android:layout_height="@dimen/list_guide_details_map_height"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             app:activity="@{vm.activity}"
             app:gpx="@{vm.gpx}"
             app:viewModel="@{vm.viewModel}"
             app:trackUserPosition="@{vm.trackUserPosition}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/list_guide_difficulty_tv"
             app:mapbox_uiZoomGestures="false"
             app:mapbox_uiScrollGestures="false"
             app:mapbox_uiRotateGestures="false"

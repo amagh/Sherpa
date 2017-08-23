@@ -155,6 +155,10 @@ public class GuideViewModel extends BaseObservable {
         return mContext.getString(R.string.list_guide_format_reviews, mGuide.reviews);
     }
 
+    public int getDifficultyRating() {
+        return mGuide.difficulty;
+    }
+
     @Bindable
     public String getDifficulty() {
         String difficultyString = "Unknown";
@@ -356,6 +360,36 @@ public class GuideViewModel extends BaseObservable {
                     .scale(0f)
                     .setDuration(100)
                     .start();
+        }
+    }
+
+    @BindingAdapter({"circle2", "circle3", "circle4", "circle5", "difficultyRating"})
+    public static void setDifficultyCircles(ImageView circle1, ImageView circle2, ImageView circle3,
+                                            ImageView circle4, ImageView circle5, int difficulty) {
+
+        // Reset all images to their default icon
+        circle1.setImageResource(R.drawable.ic_circle_stroke);
+        circle2.setImageResource(R.drawable.ic_circle_stroke);
+        circle3.setImageResource(R.drawable.ic_circle_stroke);
+        circle4.setImageResource(R.drawable.ic_circle_stroke);
+        circle5.setImageResource(R.drawable.ic_circle_stroke);
+
+        // Change icons based on difficulty
+        switch (difficulty) {
+            case 5:
+                circle5.setImageResource(R.drawable.ic_circle);
+
+            case 4:
+                circle4.setImageResource(R.drawable.ic_circle);
+
+            case 3:
+                circle3.setImageResource(R.drawable.ic_circle);
+
+            case 2:
+                circle2.setImageResource(R.drawable.ic_circle);
+
+            case 1:
+                circle1.setImageResource(R.drawable.ic_circle);
         }
     }
 
