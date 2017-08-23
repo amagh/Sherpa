@@ -53,6 +53,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.adapters.EditGuideDetailsAdapter;
 import project.hikerguide.utilities.ContentProviderUtils;
+import project.hikerguide.utilities.GeneralUtils;
 import timber.log.Timber;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
@@ -74,7 +75,7 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
 public class CreateGuideActivity extends MapboxActivity implements ConnectivityActivity.ConnectivityCallback,
         LoaderManager.LoaderCallbacks<Cursor> {
     // ** Constants ** //
-    private static final int PERMISSION_REQUEST_EXT_STORAGE = 9687;
+
     private static final int LOADER_GUIDE_DRAFT             = 7912;
     private static final int LOADER_AREA_DRAFT              = 9519;
     private static final int LOADER_TRAIL_DRAFT             = 7269;
@@ -177,60 +178,6 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         // Init and set the ItemTouchHelper
         mItemTouchHelper = new ItemTouchHelper(mItemTouchCallback);
         mItemTouchHelper.attachToRecyclerView(mBinding.guideDetailsRv);
-    }
-
-    /**
-     * Opens Android-FilePicker Activity so the user may select a File to add to the Guide
-     *
-     * @param type    Type of file to be selected. Either document or media.
-     */
-    public void openFilePicker(int type) {
-
-        // Check to ensure the app has the required permissions first
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-            // Request permission to read external storage
-            requestPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_EXT_STORAGE);
-        } else {
-
-            // Launch the FilePicker based on the type of file to be added to the Guide
-            switch (type) {
-                case FilePickerConst.FILE_TYPE_DOCUMENT: {
-
-                    FilePickerBuilder.getInstance()
-                            .setMaxCount(1)
-                            .addFileSupport(getString(R.string.gpx_label), new String[]{GPX_EXT})
-                            .enableDocSupport(false)
-                            .pickFile(this);
-
-                    break;
-            }
-
-                case FilePickerConst.FILE_TYPE_MEDIA: {
-
-                    FilePickerBuilder.getInstance()
-                            .setMaxCount(1)
-                            .enableVideoPicker(false)
-                            .pickPhoto(this);
-
-                    break;
-                }
-            }
-        }
-
-    }
-
-    /**
-     * Requests Android permission for the application
-     *
-     * @param permissions    The Permission(s) to request
-     * @param requestCode    Code to request it with. For identifying the result.
-     */
-    public void requestPermission(String[] permissions, int requestCode) {
-
-        ActivityCompat.requestPermissions(this,
-                permissions,
-                requestCode);
     }
 
     @Override
@@ -355,7 +302,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         mFilePickerModelPosition = 0;
 
         // Open the FilePicker to allow the user to select the image they want to use
-        openFilePicker(FilePickerConst.FILE_TYPE_MEDIA);
+        GeneralUtils.openFilePicker(this, FilePickerConst.FILE_TYPE_MEDIA);
     }
 
     /**
@@ -370,7 +317,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
         if (mFilePickerModelPosition != -1) {
             // Open the FilePicker
-            openFilePicker(FilePickerConst.FILE_TYPE_MEDIA);
+            GeneralUtils.openFilePicker(this, FilePickerConst.FILE_TYPE_MEDIA);
         }
     }
 
@@ -647,7 +594,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         mFilePickerModelPosition = mModelList.size();
 
         // Open the FilePicker to allow selection of a photo to include
-        openFilePicker(FilePickerConst.FILE_TYPE_MEDIA);
+        GeneralUtils.openFilePicker(this, FilePickerConst.FILE_TYPE_MEDIA);
     }
 
     /**
@@ -658,7 +605,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
     public void onClickAddGpx(View view) {
 
         // Open FilePicker to allow GPX selection
-        openFilePicker(FilePickerConst.FILE_TYPE_DOCUMENT);
+        GeneralUtils.openFilePicker(this, FilePickerConst.FILE_TYPE_DOCUMENT);
     }
 
     /**
