@@ -147,13 +147,13 @@ public class CustomFilePickerBuilder  {
                     ? mRequestCode
                     : FilePickerConst.REQUEST_CODE_PHOTO;
 
-            fragment.getActivity().startActivityForResult(intent, requestCode);
+            fragment.startActivityForResult(intent, requestCode);
         } else {
             int requestCode = mRequestCode != -1
                     ? mRequestCode
                     : FilePickerConst.REQUEST_CODE_DOC;
 
-            fragment.getActivity().startActivityForResult(intent, requestCode);
+            fragment.startActivityForResult(intent, requestCode);
         }
     }
 }

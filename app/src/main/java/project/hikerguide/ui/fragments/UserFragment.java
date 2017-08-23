@@ -306,83 +306,85 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-            if (requestCode == ACCOUNT_ACTIVITY_REQUEST_CODE) {
-                if (resultCode == RESULT_OK && data.getBooleanExtra(AUTHOR_KEY, false)) {
-                    loadUserSelfProfile();
+        Timber.d("Request code:" + requestCode);
+
+        if (requestCode == ACCOUNT_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK && data.getBooleanExtra(AUTHOR_KEY, false)) {
+                loadUserSelfProfile();
+            } else {
+                // Handle the log out based on the Activity the Fragment is in
+                if (getActivity() instanceof MainActivity) {
+
+                    // Switch Fragments
+                    ((MainActivity) getActivity()).switchFragments(R.id.navigation_home);
                 } else {
-                    // Handle the log out based on the Activity the Fragment is in
-                    if (getActivity() instanceof MainActivity) {
 
-                        // Switch Fragments
-                        ((MainActivity) getActivity()).switchFragments(R.id.navigation_home);
-                    } else {
-
-                        // Close the Activity
-                        getActivity().finish();
-                    }
+                    // Close the Activity
+                    getActivity().finish();
                 }
-
-            } else if (requestCode == REQUEST_CODE_PROFILE_PIC || requestCode == REQUEST_CODE_BACKDROP) {
-
-                if (resultCode != RESULT_OK) {
-                    return;
-                }
-
-                // Retrieve the path of the selected Image
-                List<String> dataArray = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA);
-
-                if (dataArray == null) {
-                    return;
-                }
-
-                // Get the path for the image selected
-                String imagePath = dataArray.get(0);
-
-                // Resize the image for upload
-                File imageFile = new File(imagePath);
-                imageFile = SaveUtils.resizeImage(imageFile);
-
-                // Get StorageReference for location to upload the image to
-                StorageReference imageRef = FirebaseStorage.getInstance().getReference()
-                        .child(IMAGE_PATH);
-
-                // Set the sub-directory depending on requestCode
-                if (requestCode == REQUEST_CODE_PROFILE_PIC) {
-                    imageRef = imageRef.child(mAuthor.firebaseId + JPEG_EXT);
-                } else {
-                    imageRef = imageRef.child(mAuthor.firebaseId + BACKDROP_SUFFIX + JPEG_EXT);
-                }
-
-                // Show a dialog to the User to indicate the upload action
-                final ProgressDialog dialog = new ProgressDialog();
-                dialog.setTitle(getString(R.string.progress_upload_files_title));
-                dialog.setIndeterminate(true);
-
-                dialog.show(getActivity().getSupportFragmentManager(), null);
-
-                // Upload the Image
-                imageRef.putFile(Uri.fromFile(imageFile)).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot snapshot) {
-                        dialog.dismiss();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        dialog.dismiss();
-
-                        // Inform the user of the failure
-                        Toast.makeText(
-                                getActivity(),
-                                getString(R.string.failed_image_upload_text),
-                                Toast.LENGTH_LONG)
-                                .show();
-
-                        Timber.e(e, e.getMessage());
-                    }
-                });
             }
+
+        } else if (requestCode == REQUEST_CODE_PROFILE_PIC || requestCode == REQUEST_CODE_BACKDROP) {
+
+            if (resultCode != RESULT_OK) {
+                return;
+            }
+
+            // Retrieve the path of the selected Image
+            List<String> dataArray = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA);
+
+            if (dataArray == null) {
+                return;
+            }
+
+            // Get the path for the image selected
+            String imagePath = dataArray.get(0);
+
+            // Resize the image for upload
+            File imageFile = new File(imagePath);
+            imageFile = SaveUtils.resizeImage(imageFile);
+
+            // Get StorageReference for location to upload the image to
+            StorageReference imageRef = FirebaseStorage.getInstance().getReference()
+                    .child(IMAGE_PATH);
+
+            // Set the sub-directory depending on requestCode
+            if (requestCode == REQUEST_CODE_PROFILE_PIC) {
+                imageRef = imageRef.child(mAuthor.firebaseId + JPEG_EXT);
+            } else {
+                imageRef = imageRef.child(mAuthor.firebaseId + BACKDROP_SUFFIX + JPEG_EXT);
+            }
+
+            // Show a dialog to the User to indicate the upload action
+            final ProgressDialog dialog = new ProgressDialog();
+            dialog.setTitle(getString(R.string.progress_upload_files_title));
+            dialog.setIndeterminate(true);
+
+            dialog.show(getActivity().getSupportFragmentManager(), null);
+
+            // Upload the Image
+            imageRef.putFile(Uri.fromFile(imageFile)).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot snapshot) {
+                    dialog.dismiss();
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    dialog.dismiss();
+
+                    // Inform the user of the failure
+                    Toast.makeText(
+                            getActivity(),
+                            getString(R.string.failed_image_upload_text),
+                            Toast.LENGTH_LONG)
+                            .show();
+
+                    Timber.e(e, e.getMessage());
+                }
+            });
+        }
     }
 
     /**

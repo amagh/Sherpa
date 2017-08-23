@@ -56,6 +56,7 @@ public class GeneralUtils {
      *
      * @param activity           Activity to pass onActivityResult to. Also used as interface to
      *                           global Context
+     * @param requestCode        Request code to be used for ActivityResult
      * @param type               Type of file to be selected. Either document or media.
      */
     public static void openFilePicker(@NonNull Activity activity, int requestCode, int type) {
@@ -103,7 +104,60 @@ public class GeneralUtils {
                 }
             }
         }
+    }
 
+    /**
+     * Opens Android-FilePicker Activity so the user may select a File to add to the Guide
+     *
+     * @param fragment       Fragment calling for the FilePicker
+     * @param requestCode    RequestCode for ActivityResult
+     * @param type               Type of file to be selected. Either document or media.
+     */
+    public static void openFilePicker(@NonNull Fragment fragment, int requestCode, int type) {
+        // Check to ensure the app has the required permissions first
+        if (ContextCompat.checkSelfPermission(fragment.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            // Request permission to read external storage
+            requestPermission(
+                    fragment.getActivity(),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_EXT_STORAGE);
+        } else {
+
+            // Launch the FilePicker based on the type of file to be added to the Guide
+            switch (type) {
+                case FilePickerConst.FILE_TYPE_DOCUMENT: {
+
+                    CustomFilePickerBuilder builder = CustomFilePickerBuilder.getInstance()
+                            .setMaxCount(1)
+                            .addFileSupport(fragment.getString(R.string.gpx_label), new String[]{GPX_EXT})
+                            .enableDocSupport(false);
+
+                    if (requestCode != DEFAULT_REQUEST_CODE) {
+                        builder.setRequestCode(requestCode);
+                    }
+
+                    builder.pickFile(fragment);
+
+                    break;
+                }
+
+                case FilePickerConst.FILE_TYPE_MEDIA: {
+
+                    CustomFilePickerBuilder builder = CustomFilePickerBuilder.getInstance()
+                            .setMaxCount(1)
+                            .enableVideoPicker(false);
+
+                    if (requestCode != DEFAULT_REQUEST_CODE) {
+                        builder.setRequestCode(requestCode);
+                    }
+
+                    builder.pickPhoto(fragment);
+
+                    break;
+                }
+            }
+        }
     }
 
     /**
