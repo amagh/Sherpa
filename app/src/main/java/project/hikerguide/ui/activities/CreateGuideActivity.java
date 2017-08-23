@@ -302,7 +302,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         mFilePickerModelPosition = 0;
 
         // Open the FilePicker to allow the user to select the image they want to use
-        GeneralUtils.openFilePicker(this, FilePickerConst.FILE_TYPE_MEDIA);
+        GeneralUtils.openFilePicker(this, GeneralUtils.DEFAULT_REQUEST_CODE, FilePickerConst.FILE_TYPE_MEDIA);
     }
 
     /**
@@ -317,7 +317,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
         if (mFilePickerModelPosition != -1) {
             // Open the FilePicker
-            GeneralUtils.openFilePicker(this, FilePickerConst.FILE_TYPE_MEDIA);
+            GeneralUtils.openFilePicker(this, GeneralUtils.DEFAULT_REQUEST_CODE, FilePickerConst.FILE_TYPE_MEDIA);
         }
     }
 
@@ -594,7 +594,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         mFilePickerModelPosition = mModelList.size();
 
         // Open the FilePicker to allow selection of a photo to include
-        GeneralUtils.openFilePicker(this, FilePickerConst.FILE_TYPE_MEDIA);
+        GeneralUtils.openFilePicker(this, GeneralUtils.DEFAULT_REQUEST_CODE, FilePickerConst.FILE_TYPE_MEDIA);
     }
 
     /**
@@ -605,7 +605,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
     public void onClickAddGpx(View view) {
 
         // Open FilePicker to allow GPX selection
-        GeneralUtils.openFilePicker(this, FilePickerConst.FILE_TYPE_DOCUMENT);
+        GeneralUtils.openFilePicker(this, GeneralUtils.DEFAULT_REQUEST_CODE, FilePickerConst.FILE_TYPE_DOCUMENT);
     }
 
     /**

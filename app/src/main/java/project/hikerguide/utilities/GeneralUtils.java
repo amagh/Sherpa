@@ -4,7 +4,10 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -13,6 +16,7 @@ import android.widget.EditText;
 import droidninja.filepicker.FilePickerBuilder;
 import droidninja.filepicker.FilePickerConst;
 import project.hikerguide.R;
+import project.hikerguide.filepicker.CustomFilePickerBuilder;
 
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
 
@@ -23,6 +27,7 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
 public class GeneralUtils {
     // ** Constants ** //
     private static final int PERMISSION_REQUEST_EXT_STORAGE = 9687;
+    public static final int DEFAULT_REQUEST_CODE = -1;
 
     /**
      * Shows the soft keyboard
@@ -49,10 +54,11 @@ public class GeneralUtils {
     /**
      * Opens Android-FilePicker Activity so the user may select a File to add to the Guide
      *
-     * @param activity  Activity to pass onActivityResult to
-     * @param type      Type of file to be selected. Either document or media.
+     * @param activity           Activity to pass onActivityResult to. Also used as interface to
+     *                           global Context
+     * @param type               Type of file to be selected. Either document or media.
      */
-    public static void openFilePicker(Activity activity, int type) {
+    public static void openFilePicker(@NonNull Activity activity, int requestCode, int type) {
         // Check to ensure the app has the required permissions first
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
@@ -67,21 +73,31 @@ public class GeneralUtils {
             switch (type) {
                 case FilePickerConst.FILE_TYPE_DOCUMENT: {
 
-                    FilePickerBuilder.getInstance()
+                    CustomFilePickerBuilder builder = CustomFilePickerBuilder.getInstance()
                             .setMaxCount(1)
                             .addFileSupport(activity.getString(R.string.gpx_label), new String[]{GPX_EXT})
-                            .enableDocSupport(false)
-                            .pickFile(activity);
+                            .enableDocSupport(false);
+
+                    if (requestCode != DEFAULT_REQUEST_CODE) {
+                        builder.setRequestCode(requestCode);
+                    }
+
+                    builder.pickFile(activity);
 
                     break;
                 }
 
                 case FilePickerConst.FILE_TYPE_MEDIA: {
 
-                    FilePickerBuilder.getInstance()
+                    CustomFilePickerBuilder builder = CustomFilePickerBuilder.getInstance()
                             .setMaxCount(1)
-                            .enableVideoPicker(false)
-                            .pickPhoto(activity);
+                            .enableVideoPicker(false);
+
+                    if (requestCode != DEFAULT_REQUEST_CODE) {
+                        builder.setRequestCode(requestCode);
+                    }
+
+                    builder.pickPhoto(activity);
 
                     break;
                 }
