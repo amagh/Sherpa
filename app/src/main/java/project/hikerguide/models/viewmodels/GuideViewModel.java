@@ -20,7 +20,6 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -223,20 +222,20 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @Bindable
-    public StorageReference getAuthorImage() {
-        return FirebaseStorage.getInstance().getReference()
-                .child(IMAGE_PATH)
-                .child(mGuide.authorId + JPEG_EXT);
-    }
+    public Uri getAuthorImage() {
 
-    @BindingAdapter("authorImage")
-    public static void loadAuthorImage(ImageView imageView, StorageReference authorImage) {
-        Glide.with(imageView.getContext())
-                .using(new FirebaseImageLoader())
-                // Use default profile image if the author does not have one
-                .load(authorImage)
-                .error(R.drawable.ic_account_circle)
-                .into(imageView);
+        // Check whether the Author has a Uri for an offline ImageUri
+        if (mAuthor.getImageUri() != null) {
+
+            // Return the ImageUri
+            return mAuthor.getImageUri();
+        } else {
+
+            // Parse the StorageReference to a Uri
+            return Uri.parse(FirebaseStorage.getInstance().getReference()
+                    .child(IMAGE_PATH)
+                    .child(mAuthor.firebaseId + JPEG_EXT).toString());
+        }
     }
 
     @Bindable
