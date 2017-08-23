@@ -14,20 +14,27 @@ import android.widget.ImageView;
 import com.android.databinding.library.baseAdapters.BR;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.lang.ref.WeakReference;
 
+import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.ui.fragments.UserFragment;
+import project.hikerguide.utilities.FirebaseProviderUtils;
+import project.hikerguide.utilities.GeneralUtils;
 
 import static project.hikerguide.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
 import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
 import static project.hikerguide.utilities.interfaces.FragmentTags.FRAG_TAG_ACCOUNT;
+import static project.hikerguide.utilities.interfaces.UserFragmentRequestCodes.REQUEST_CODE_BACKDROP;
+import static project.hikerguide.utilities.interfaces.UserFragmentRequestCodes.REQUEST_CODE_PROFILE_PIC;
 
 /**
  * Created by Alvin on 7/23/2017.
@@ -37,6 +44,7 @@ public class AuthorViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Author mAuthor;
     private WeakReference<AppCompatActivity> mActivity;
+    private boolean mEditMode;
     private int mEditVisibility = View.INVISIBLE;
     private boolean mAccepted = false;
 
@@ -68,7 +76,7 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @Bindable
-    public Uri getImage() {
+    public Uri getAuthorImage() {
 
         // Check whether the Author has a Uri for an offline ImageUri
         if (mAuthor.getImageUri() != null) {
@@ -81,6 +89,28 @@ public class AuthorViewModel extends BaseObservable {
             return Uri.parse(FirebaseStorage.getInstance().getReference()
                     .child(IMAGE_PATH)
                     .child(mAuthor.firebaseId + JPEG_EXT).toString());
+        }
+    }
+
+    @BindingAdapter("authorImage")
+    public static void loadImage(ImageView imageView, Uri authorImage) {
+
+        if (authorImage == null) return;
+
+        // Check whether to load image from File or from Firebase Storage
+        if (authorImage.getScheme().matches("gs")) {
+            // Load from Firebase Storage
+            Glide.with(imageView.getContext())
+                    .using(new FirebaseImageLoader())
+                    .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
+                    .error(R.drawable.ic_account_circle)
+                    .into(imageView);
+        } else {
+            // No StorageReference, load local file using the File's Uri
+            Glide.with(imageView.getContext())
+                    .load(authorImage)
+                    .error(R.drawable.ic_account_circle)
+                    .into(imageView);
         }
     }
 
@@ -182,6 +212,32 @@ public class AuthorViewModel extends BaseObservable {
 
     public void onClickBackdrop(View view) {
 
+        // Check to ensure the user is clicking their own backdrop image
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || !user.getUid().equals(mAuthor.firebaseId)) {
+            return;
+        }
+
+        // Open FilePicker for selecting backdrop image
+        GeneralUtils.openFilePicker(
+                getFragment(),
+                REQUEST_CODE_BACKDROP,
+                FilePickerConst.FILE_TYPE_MEDIA);
+    }
+
+    public void onClickProfileImage(View view) {
+
+        // Check to ensure the user is clicking their own profile image
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || !user.getUid().equals(mAuthor.firebaseId)) {
+            return;
+        }
+
+        // Open FilePicker for selecting profile image
+        GeneralUtils.openFilePicker(
+                getFragment(),
+                REQUEST_CODE_PROFILE_PIC,
+                FilePickerConst.FILE_TYPE_MEDIA);
     }
 
     /**
