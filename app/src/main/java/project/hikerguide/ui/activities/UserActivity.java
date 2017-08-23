@@ -6,7 +6,7 @@ import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.ui.fragments.UserFragment;
 
-import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
 
 /**
  * Created by Alvin on 7/31/2017.

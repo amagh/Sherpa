@@ -8,7 +8,7 @@ import project.hikerguide.databinding.ActivityAreaBinding;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.viewmodels.SearchAreaViewModel;
 
-import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
 
 /**
  * Created by Alvin on 8/1/2017.

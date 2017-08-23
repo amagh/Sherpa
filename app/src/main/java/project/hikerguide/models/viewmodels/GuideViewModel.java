@@ -47,9 +47,8 @@ import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.ConversionUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
-import timber.log.Timber;
 
-import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_FAVORITE;
+import static project.hikerguide.utilities.interfaces.FragmentTags.FRAG_TAG_FAVORITE;
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
 import static project.hikerguide.utilities.MapUtils.addMapOptionsToMap;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;

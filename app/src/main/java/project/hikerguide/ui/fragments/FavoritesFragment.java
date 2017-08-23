@@ -24,13 +24,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
@@ -46,9 +42,8 @@ import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
-import timber.log.Timber;
 
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
 
 /**
  * Created by Alvin on 8/16/2017.

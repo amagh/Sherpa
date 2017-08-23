@@ -1,16 +1,12 @@
 package project.hikerguide.ui.activities;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.internal.NavigationMenu;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
@@ -31,9 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import droidninja.filepicker.FilePickerBuilder;
 import droidninja.filepicker.FilePickerConst;
-import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.BR;
 import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
@@ -54,19 +48,17 @@ import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.adapters.EditGuideDetailsAdapter;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.GeneralUtils;
-import timber.log.Timber;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static android.support.v7.widget.helper.ItemTouchHelper.UP;
 import static project.hikerguide.ui.activities.CreateGuideActivity.BUNDLE_KEYS.FIREBASE_ID_KEY;
-import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
-import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
-import static project.hikerguide.utilities.IntentKeys.SECTION_KEY;
-import static project.hikerguide.utilities.IntentKeys.TRAIL_KEY;
-import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
+import static project.hikerguide.utilities.interfaces.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.SECTION_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.TRAIL_KEY;
 
 /**
  * Created by Alvin on 7/27/2017.

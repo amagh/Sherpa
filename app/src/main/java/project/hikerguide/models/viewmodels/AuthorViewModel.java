@@ -27,7 +27,7 @@ import project.hikerguide.ui.fragments.UserFragment;
 import static project.hikerguide.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
 import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
-import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_ACCOUNT;
+import static project.hikerguide.utilities.interfaces.FragmentTags.FRAG_TAG_ACCOUNT;
 
 /**
  * Created by Alvin on 7/23/2017.

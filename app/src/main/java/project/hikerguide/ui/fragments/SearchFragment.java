@@ -58,10 +58,9 @@ import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.SaveUtils;
-import timber.log.Timber;
 
 import static project.hikerguide.firebasedatabase.DatabaseProvider.GEOFIRE_PATH;
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_PATH;
 

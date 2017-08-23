@@ -33,8 +33,7 @@ import project.hikerguide.ui.activities.UserActivity;
 
 import static project.hikerguide.models.viewmodels.AccountViewModel.UiModes.CREATE_ACCOUNT;
 import static project.hikerguide.models.viewmodels.AccountViewModel.UiModes.SIGN_IN;
-import static project.hikerguide.ui.fragments.UserFragment.ACCOUNT_ACTIVITY_REQUEST_CODE;
-import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
 
 /**
  * Created by Alvin on 7/28/2017.

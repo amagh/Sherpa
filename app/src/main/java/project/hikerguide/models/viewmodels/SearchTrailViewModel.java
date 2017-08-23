@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -35,11 +33,10 @@ import project.hikerguide.ui.adapters.TrailAdapter;
 import project.hikerguide.ui.dialogs.AddTrailDialog;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GeneralUtils;
-import timber.log.Timber;
 
-import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
-import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.IntentKeys.TRAIL_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.TRAIL_KEY;
 
 /**
  * Created by Alvin on 8/3/2017.

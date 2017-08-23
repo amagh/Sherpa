@@ -1,14 +1,8 @@
 package project.hikerguide.ui.fragments;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.PermissionChecker;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +15,7 @@ import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import timber.log.Timber;
 
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
 
 /**
  * Created by Alvin on 8/7/2017.

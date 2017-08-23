@@ -32,11 +32,11 @@ import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
 import timber.log.Timber;
 
-import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
-import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
-import static project.hikerguide.utilities.IntentKeys.SECTION_KEY;
-import static project.hikerguide.utilities.IntentKeys.TRAIL_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.SECTION_KEY;
+import static project.hikerguide.utilities.interfaces.IntentKeys.TRAIL_KEY;
 import static project.hikerguide.utilities.FirebaseProviderUtils.getReferenceForFile;
 
 /**

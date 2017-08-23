@@ -25,7 +25,7 @@ import project.hikerguide.ui.fragments.SearchFragment;
 import project.hikerguide.utilities.GeneralUtils;
 import project.hikerguide.utilities.GooglePlacesApiUtils;
 
-import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_SEARCH;
+import static project.hikerguide.utilities.interfaces.FragmentTags.FRAG_TAG_SEARCH;
 
 /**
  * Created by Alvin on 8/17/2017.

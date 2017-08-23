@@ -1,4 +1,4 @@
-package project.hikerguide.utilities;
+package project.hikerguide.utilities.interfaces;
 
 /**
  * Created by Alvin on 8/16/2017.
