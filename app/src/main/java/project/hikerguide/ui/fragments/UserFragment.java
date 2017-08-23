@@ -50,7 +50,6 @@ import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.ui.behaviors.FabSpeedDialScrollBehavior;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
-import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
@@ -102,7 +101,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
         // Set a blank Author to the ViewDataBinding so that the FabSpeedDial's visibility will be
         // properly triggered
-        mBinding.setVm(new AuthorViewModel(getActivity(), this, new Author()));
+        mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), new Author()));
         mBinding.fabDial.setMenuListener(this);
 
         initRecyclerView();
@@ -116,7 +115,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
             // Add the Author to the Adapter so their info can be displayed
             mAdapter.addModel(mAuthor);
-            mBinding.setVm(new AuthorViewModel(getActivity(), this, mAuthor));
+            mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
 
             // Load the Guides that the Author has created into the Adapter
             loadGuidesForAuthor();
@@ -187,7 +186,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
      */
     private void initRecyclerView() {
         // Init the Adapter
-        mAdapter = new AuthorDetailsAdapter(getActivity(), this, new GuideAdapter.ClickHandler() {
+        mAdapter = new AuthorDetailsAdapter((AppCompatActivity) getActivity(), new GuideAdapter.ClickHandler() {
             @Override
             public void onGuideClicked(Guide guide) {
 
@@ -265,7 +264,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
                 // Add the Author to the Adapter so their info can be displayed
                 mAdapter.addModel(mAuthor);
-                mBinding.setVm(new AuthorViewModel(getActivity(), UserFragment.this, mAuthor));
+                mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
 
                 // Setup for someone viewing their own profile
                 setupForSelfProfile();

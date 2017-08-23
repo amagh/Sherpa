@@ -1,12 +1,11 @@
 package project.hikerguide.models.viewmodels;
 
-import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,16 +17,17 @@ import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.lang.ref.WeakReference;
+
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
-import project.hikerguide.ui.activities.UserActivity;
 import project.hikerguide.ui.fragments.UserFragment;
-import timber.log.Timber;
 
 import static project.hikerguide.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
 import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
+import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_ACCOUNT;
 
 /**
  * Created by Alvin on 7/23/2017.
@@ -36,20 +36,13 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
 public class AuthorViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Author mAuthor;
-    private Context mContext;
-    private UserFragment mFragment;
+    private WeakReference<AppCompatActivity> mActivity;
     private int mEditVisibility = View.INVISIBLE;
     private boolean mAccepted = false;
 
-    public AuthorViewModel(@NonNull Context context, @NonNull UserFragment fragment, @NonNull Author author) {
+    public AuthorViewModel(@NonNull AppCompatActivity activity, @NonNull Author author) {
         mAuthor = author;
-        mContext = context;
-        mFragment = fragment;
-    }
-
-    public AuthorViewModel(@NonNull Context context, @NonNull Author author) {
-        mContext = context;
-        mAuthor = author;
+        mActivity = new WeakReference<>(activity);
     }
 
     @Bindable
@@ -60,7 +53,13 @@ public class AuthorViewModel extends BaseObservable {
     @Bindable
     public UserFragment getFragment() {
 
-        return mFragment;
+        if (mActivity.get() == null) return null;
+
+        // Retrieve the Fragment using the FragmentManager
+        UserFragment fragment = (UserFragment) mActivity.get().getSupportFragmentManager()
+                .findFragmentByTag(FRAG_TAG_ACCOUNT);
+
+        return fragment;
     }
 
     @Bindable
@@ -102,7 +101,7 @@ public class AuthorViewModel extends BaseObservable {
 
     @Bindable
     public String getScore() {
-        return mContext.getString(R.string.list_author_format_score, mAuthor.score);
+        return mActivity.get().getString(R.string.list_author_format_score, mAuthor.score);
     }
 
     @Bindable
@@ -171,7 +170,7 @@ public class AuthorViewModel extends BaseObservable {
     public void onClickEdit(View view) {
 
         // Switch the layout between edit and display
-        mFragment.switchAuthorLayout();
+        getFragment().switchAuthorLayout();
     }
 
     public void onClickAccept(View view) {
@@ -179,6 +178,10 @@ public class AuthorViewModel extends BaseObservable {
         // Switch the variable to indicate that the user has clicked accept
         mAccepted = true;
         notifyPropertyChanged(BR.accepted);
+    }
+
+    public void onClickBackdrop(View view) {
+
     }
 
     /**
