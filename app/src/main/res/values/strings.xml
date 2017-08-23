@@ -104,9 +104,11 @@
     <string name="progress_download_map_title">Downloading Map Tiles</string>
     <string name="progress_delete_map_title">Deleting Map Tiles</string>
     <string name="progress_download_files_title">Downloading Files</string>
+    <string name="progress_upload_files_title">Uploading Files</string>
 
     <!-- User Activity Strings -->
     <string name="menu_user_log_off">Sign out</string>
+    <string name="failed_image_upload_text">Failed to upload image. Please try again later.</string>
 
     <!-- Area Activity Strings -->
     <string name="area_search_instruction_text">Search for the park/area where the trail exists</string>
