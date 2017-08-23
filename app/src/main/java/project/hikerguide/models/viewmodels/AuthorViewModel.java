@@ -13,12 +13,16 @@ import android.widget.ImageView;
 
 import com.android.databinding.library.baseAdapters.BR;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 
 import droidninja.filepicker.FilePickerConst;
@@ -28,6 +32,7 @@ import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.ui.fragments.UserFragment;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GeneralUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
 import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
@@ -93,18 +98,29 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @BindingAdapter("authorImage")
-    public static void loadImage(ImageView imageView, Uri authorImage) {
+    public static void loadImage(final ImageView imageView, final Uri authorImage) {
 
         if (authorImage == null) return;
 
         // Check whether to load image from File or from Firebase Storage
         if (authorImage.getScheme().matches("gs")) {
-            // Load from Firebase Storage
-            Glide.with(imageView.getContext())
-                    .using(new FirebaseImageLoader())
-                    .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
-                    .error(R.drawable.ic_account_circle)
-                    .into(imageView);
+            StorageReference authorRef = FirebaseProviderUtils.getReferenceFromUri(authorImage);
+
+            if (authorRef == null) return;
+
+            authorRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                @Override
+                public void onSuccess(StorageMetadata storageMetadata) {
+                    // Load from Firebase Storage
+                    Glide.with(imageView.getContext())
+                            .using(new FirebaseImageLoader())
+                            .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
+                            .signature(new StringSignature(storageMetadata.getMd5Hash()))
+                            .error(R.drawable.ic_account_circle)
+                            .into(imageView);
+                }
+            });
+
         } else {
             // No StorageReference, load local file using the File's Uri
             Glide.with(imageView.getContext())
@@ -122,11 +138,19 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @BindingAdapter("backdrop")
-    public static void loadBackdrop(ImageView imageView, StorageReference backdrop) {
-        Glide.with(imageView.getContext())
-                .using(new FirebaseImageLoader())
-                .load(backdrop)
-                .into(imageView);
+    public static void loadBackdrop(final ImageView imageView, final StorageReference backdrop) {
+
+        backdrop.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+            @Override
+            public void onSuccess(StorageMetadata storageMetadata) {
+
+                Glide.with(imageView.getContext())
+                        .using(new FirebaseImageLoader())
+                        .load(backdrop)
+                        .signature(new StringSignature(storageMetadata.getMd5Hash()))
+                        .into(imageView);
+            }
+        });
     }
 
     @Bindable
