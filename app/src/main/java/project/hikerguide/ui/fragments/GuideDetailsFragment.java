@@ -303,7 +303,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         if (!isGuideCached() && mSections == null) {
 
             // Set the data for the Adapter
-            mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
+            getGuideFromFirebase();
             getSectionsFromFirebase();
             getAuthorFromFirebase();
         }
@@ -341,6 +341,41 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
         // Remove the ActionView of the menu icon
         mCacheMenuItem.setActionView(null);
+    }
+
+    /**
+     * Loads the Guide from Firebase to ensure the data is fresh
+     */
+    private void getGuideFromFirebase() {
+
+        // Get Reference for Guide
+        final DatabaseReference guideRef = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.GUIDES)
+                .child(mGuide.firebaseId);
+
+        guideRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                // Set the memvar to the retreived Guide
+                mGuide = (Guide) FirebaseProviderUtils.getModelFromSnapshot(
+                        DatabaseProvider.FirebaseType.GUIDE,
+                        dataSnapshot);
+
+                // Add the Guide to the Adapter
+                mAdapter.setGuide(mGuide, ((GuideDetailsActivity) getActivity()));
+
+                // Remove Listener
+                guideRef.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                // Remove Listener
+                guideRef.removeEventListener(this);
+            }
+        });
     }
 
     /**
@@ -507,7 +542,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         StorageReference reference = FirebaseStorage.getInstance().getReference();
         StorageTask<FileDownloadTask.TaskSnapshot> task =
                 FirebaseProviderUtils.getReferenceForFile(reference, file)
-                .getFile(file);
+                        .getFile(file);
 
         // Add the Task to the Listener
         mListener.addDownloadTask(task);
