@@ -224,18 +224,10 @@ public class GuideViewModel extends BaseObservable {
     @Bindable
     public Uri getAuthorImage() {
 
-        // Check whether the Author has a Uri for an offline ImageUri
-        if (mAuthor.getImageUri() != null) {
-
-            // Return the ImageUri
-            return mAuthor.getImageUri();
-        } else {
-
-            // Parse the StorageReference to a Uri
-            return Uri.parse(FirebaseStorage.getInstance().getReference()
-                    .child(IMAGE_PATH)
-                    .child(mAuthor.firebaseId + JPEG_EXT).toString());
-        }
+        // Parse the StorageReference to a Uri
+        return Uri.parse(FirebaseStorage.getInstance().getReference()
+                .child(IMAGE_PATH)
+                .child(mGuide.authorId + JPEG_EXT).toString());
     }
 
     @Bindable
