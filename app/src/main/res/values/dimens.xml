@@ -60,7 +60,7 @@
     <dimen name="map_icon_padding">4dp</dimen>
     <dimen name="nav_icon_bottom_margin">64dp</dimen>
 
-    <dimen name="rating_star_size">24dp</dimen>
+    <dimen name="rating_star_size">32dp</dimen>
     <dimen name="rating_star_padding">4dp</dimen>
     <dimen name="list_rating_horizontal_separation">64dp</dimen>
 
