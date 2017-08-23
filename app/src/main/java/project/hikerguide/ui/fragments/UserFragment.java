@@ -328,7 +328,8 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                             .getModelsFromSnapshot(DatabaseProvider.FirebaseType.GUIDE, dataSnapshot);
 
                     // Add each Guide to the Adapter
-                    for (Guide guide : guides) {
+                    for (int i = guides.length -1; i > -1; i--) {
+                        Guide guide = guides[i];
                         mAdapter.addModel(guide);
                     }
                 }
