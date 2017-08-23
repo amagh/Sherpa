@@ -155,6 +155,7 @@ public class GuideViewModel extends BaseObservable {
         return mContext.getString(R.string.list_guide_format_reviews, mGuide.reviews);
     }
 
+    @Bindable
     public int getDifficultyRating() {
         return mGuide.difficulty;
     }
@@ -630,5 +631,43 @@ public class GuideViewModel extends BaseObservable {
 
         // Notify change
         notifyPropertyChanged(BR.favorite);
+    }
+
+    /**
+     * Click response for clicking on a difficulty circle
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickDifficultyCircle(View view) {
+
+        // Only set difficulty if the user is creating a Guide
+        if (mActivity.get() instanceof CreateGuideActivity) {
+
+            // Change the difficulty of the Guide
+            switch (view.getId()) {
+                case R.id.list_guide_difficulty_circle_1:
+                    mGuide.difficulty = 1;
+                    break;
+
+                case R.id.list_guide_difficulty_circle_2:
+                    mGuide.difficulty = 2;
+                    break;
+
+                case R.id.list_guide_difficulty_circle_3:
+                    mGuide.difficulty = 3;
+                    break;
+
+                case R.id.list_guide_difficulty_circle_4:
+                    mGuide.difficulty = 4;
+                    break;
+
+                case R.id.list_guide_difficulty_circle_5:
+                    mGuide.difficulty = 5;
+                    break;
+            }
+
+            notifyPropertyChanged(BR.difficulty);
+            notifyPropertyChanged(BR.difficultyRating);
+        }
     }
 }
