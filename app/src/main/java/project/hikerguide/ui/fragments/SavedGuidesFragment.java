@@ -89,6 +89,8 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
                 do {
                     mAdapter.addGuide(Guide.createGuideFromCursor(data));
                 } while (data.moveToNext());
+            } else {
+                mBinding.savedGuidesEmptyTv.setVisibility(View.VISIBLE);
             }
         }
     }

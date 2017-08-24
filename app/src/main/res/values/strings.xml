@@ -124,6 +124,9 @@
     <!-- Favorites Fragment Strings -->
     <string name="favorite_empty_text">Favorite a guide to see it here.</string>
 
+    <!-- Saved Guides Fragment Strings -->
+    <string name="saved_guides_empty_text">No saved guides.</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 
