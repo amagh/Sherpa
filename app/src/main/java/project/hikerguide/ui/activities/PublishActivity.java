@@ -64,6 +64,11 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
     private Trail mTrail;
     private Section[] mSections;
 
+    // Models with the original FirebaseId of the models so they can properly deleted upon publishing
+    private Guide mDeleteGuide;
+    private Area mDeleteArea;
+    private Trail mDeleteTrail;
+
     private List<StorageReference> mUploadReferenceList;
     private UploadListener mUploadListener;
 
@@ -92,6 +97,16 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
 
         // Copy the elements from parcelables to mSections as it cannot be directly cast to Section[]
         System.arraycopy(parcelables, 0, mSections, 0, parcelables.length);
+
+        // Create dummy copies of the BaseModels with their original FirebaseIds
+        mDeleteGuide = new Guide();
+        mDeleteGuide.firebaseId = mGuide.firebaseId;
+
+        mDeleteArea = new Area();
+        mDeleteArea.firebaseId = mArea.firebaseId;
+
+        mDeleteTrail = new Trail();
+        mDeleteTrail.firebaseId = mTrail.firebaseId;
 
         setConnectivityCallback(this);
     }
@@ -332,10 +347,10 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
                         public void onSuccess(Void aVoid) {
 
                             // Delete the draft from the database
-                            ContentProviderUtils.deleteModel(PublishActivity.this, mGuide);
-                            ContentProviderUtils.deleteModel(PublishActivity.this, mTrail);
-                            ContentProviderUtils.deleteModel(PublishActivity.this, mArea);
-                            ContentProviderUtils.deleteSectionsForGuide(PublishActivity.this, mGuide);
+                            ContentProviderUtils.deleteModel(PublishActivity.this, mDeleteGuide);
+                            ContentProviderUtils.deleteModel(PublishActivity.this, mDeleteTrail);
+                            ContentProviderUtils.deleteModel(PublishActivity.this, mDeleteArea);
+                            ContentProviderUtils.deleteSectionsForGuide(PublishActivity.this, mDeleteGuide);
 
                             if (ContentProviderUtils.getGuideCountForAuthor(PublishActivity.this, mAuthor) == 0) {
                                 ContentProviderUtils.deleteModel(PublishActivity.this, mAuthor);
