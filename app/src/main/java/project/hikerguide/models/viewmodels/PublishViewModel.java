@@ -16,7 +16,6 @@ import project.hikerguide.R;
 public class PublishViewModel extends BaseObservable {
 
     // ** Member Variables ** //
-    private double mUploadProgress;
     private int mTotalUploads;
     private int mCurrentUpload = 1;
 
@@ -47,22 +46,5 @@ public class PublishViewModel extends BaseObservable {
         String uploadProgress = textView.getContext().getString(R.string.publish_progress_text, currentUpload, totalUploads);
 
         textView.setText(uploadProgress);
-    }
-
-    @Bindable
-    public double getUploadProgress() {
-        return mUploadProgress;
-    }
-
-    public void setUploadProgress(double progress) {
-        mUploadProgress = progress;
-
-        notifyPropertyChanged(BR.uploadProgress);
-    }
-
-    @BindingAdapter("uploadProgress")
-    public static void updateProgressBar(ProgressBar progressBar, double uploadProgress) {
-        progressBar.setIndeterminate(false);
-        progressBar.setProgress((int) uploadProgress);
     }
 }
