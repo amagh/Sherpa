@@ -331,18 +331,31 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
                         @Override
                         public void onSuccess(Void aVoid) {
 
+                            // Delete the draft from the database
+                            ContentProviderUtils.deleteModel(PublishActivity.this, mGuide);
+                            ContentProviderUtils.deleteModel(PublishActivity.this, mTrail);
+                            ContentProviderUtils.deleteModel(PublishActivity.this, mArea);
+                            ContentProviderUtils.deleteSectionsForGuide(PublishActivity.this, mGuide);
+
+                            if (ContentProviderUtils.getGuideCountForAuthor(PublishActivity.this, mAuthor) == 0) {
+                                ContentProviderUtils.deleteModel(PublishActivity.this, mAuthor);
+                            }
+
+                            // Add
+                            Intent data = new Intent();
+                            data.putExtra(GUIDE_KEY, mGuide);
+
+                            setResult(RESULT_OK, data);
+                            finish();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Timber.e(e, e.getMessage());
+                            finish();
                         }
                     });
-
-            // Delete the draft from the database
-            ContentProviderUtils.deleteModel(PublishActivity.this, mGuide);
-            ContentProviderUtils.deleteModel(PublishActivity.this, mTrail);
-            ContentProviderUtils.deleteModel(PublishActivity.this, mArea);
-            ContentProviderUtils.deleteSectionsForGuide(PublishActivity.this, mGuide);
-
-            if (ContentProviderUtils.getGuideCountForAuthor(PublishActivity.this, mAuthor) == 0) {
-                ContentProviderUtils.deleteModel(PublishActivity.this, mAuthor);
-            }
         }
     }
 }

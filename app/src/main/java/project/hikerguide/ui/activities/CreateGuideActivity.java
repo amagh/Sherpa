@@ -59,6 +59,7 @@ import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.SECTION_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.TRAIL_KEY;
+import static project.hikerguide.utilities.Constants.RequestCodes.REQUEST_CODE_PUBLISH;
 
 /**
  * Created by Alvin on 7/27/2017.
@@ -281,6 +282,22 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
                 break;
             }
+
+            case REQUEST_CODE_PUBLISH:
+                if (resultCode == RESULT_OK) {
+
+                    // Retrieve Guide that was just published
+                    mGuide = data.getParcelableExtra(GUIDE_KEY);
+
+                    // Start GuideDetailsActivity for mGuide
+                    Intent intent = new Intent(this, GuideDetailsActivity.class);
+                    intent.putExtra(GUIDE_KEY, mGuide);
+
+                    startActivity(intent);
+
+                    // Close this Activity
+                    finish();
+                }
         }
     }
 
@@ -391,7 +408,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                     intent.putExtra(GUIDE_KEY, mGuide);
                     intent.putExtra(SECTION_KEY, mSections);
 
-                    startActivity(intent);
+                    startActivityForResult(intent, REQUEST_CODE_PUBLISH);
                 }
 
                 return true;

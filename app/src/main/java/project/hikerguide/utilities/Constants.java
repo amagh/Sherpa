@@ -14,6 +14,7 @@ public class Constants {
 
         public static final int REQUEST_CODE_PROFILE_PIC    = 5987;
         public static final int REQUEST_CODE_BACKDROP       = 1894;
+        public static final int REQUEST_CODE_PUBLISH        = 6133;
     }
 
     public static class FragmentTags {
