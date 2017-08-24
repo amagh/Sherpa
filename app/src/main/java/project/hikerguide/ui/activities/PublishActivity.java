@@ -10,6 +10,8 @@ import android.support.annotation.NonNull;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.FirebaseDatabase;
@@ -90,7 +92,6 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
 
         // Copy the elements from parcelables to mSections as it cannot be directly cast to Section[]
         System.arraycopy(parcelables, 0, mSections, 0, parcelables.length);
-        Timber.d("Sections size: " + mSections.length);
 
         setConnectivityCallback(this);
     }
@@ -169,6 +170,12 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
             // Upload the Files for the Guide
             uploadFile(mGuide.getGpxFile());
             uploadFile(mGuide.getImageFile());
+
+            // Add the location to the GeoFire database so it can be queried
+            GeoFire geoFire = FirebaseProviderUtils.getGeoFireInstance();
+            GeoLocation location = new GeoLocation(mGuide.latitude, mGuide.longitude);
+
+            geoFire.setLocation(mGuide.firebaseId, location);
         }
 
         // Upload each Section
