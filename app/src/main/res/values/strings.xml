@@ -121,6 +121,9 @@
     <!-- Open Draft Activity Strings -->
     <string name="draft_empty_text">No saved drafts.</string>
 
+    <!-- Favorites Fragment Strings -->
+    <string name="favorite_empty_text">Favorite a guide to see it here.</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 
