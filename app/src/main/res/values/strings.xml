@@ -5,6 +5,7 @@
     <string name="title_account">Account</string>
     <string name="title_favorites">Favorites</string>
     <string name="title_saved_guides">Saved Guides</string>
+    <string name="title_drafts">Saved Guide Drafts</string>
 
     <string name="image_directory">/images</string>
     <string name="gpx_directory">/gpx</string>
@@ -116,6 +117,9 @@
     <!-- Publish Activity Strings -->
     <string name="publish_title_text">Publishing Guide. Please wait…</string>
     <string name="publish_progress_text">Uploading file %1$d of %2$d</string>
+
+    <!-- Open Draft Activity Strings -->
+    <string name="draft_empty_text">No saved drafts.</string>
 
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>

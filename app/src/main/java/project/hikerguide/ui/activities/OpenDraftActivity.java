@@ -9,6 +9,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ public class OpenDraftActivity extends AppCompatActivity implements LoaderManage
         super.onCreate(savedInstanceState);
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_open_draft);
+        setSupportActionBar(mBinding.draftTb);
+        getSupportActionBar().setTitle(getString(R.string.title_drafts));
 
         // Init RecyclerView
         initRecyclerView();
@@ -89,6 +92,12 @@ public class OpenDraftActivity extends AppCompatActivity implements LoaderManage
 
                 // Set the List to the Adapter
                 mAdapter.setGuides(mGuideList);
+            }
+
+            if (mGuideList.size() == 0) {
+
+                // Inform the user that there are no saved Guide drafts
+                mBinding.draftEmptyTv.setVisibility(View.VISIBLE);
             }
         }
     }
