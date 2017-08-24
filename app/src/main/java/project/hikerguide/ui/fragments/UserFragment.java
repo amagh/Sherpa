@@ -30,7 +30,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -67,13 +66,13 @@ import project.hikerguide.utilities.SaveUtils;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
+import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
+import static project.hikerguide.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
 import static project.hikerguide.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
 import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
-import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
-import static project.hikerguide.utilities.interfaces.UserFragmentRequestCodes.REQUEST_CODE_BACKDROP;
-import static project.hikerguide.utilities.interfaces.UserFragmentRequestCodes.REQUEST_CODE_PROFILE_PIC;
 
 /**
  * Created by Alvin on 8/15/2017.

@@ -22,7 +22,7 @@ import project.hikerguide.ui.fragments.GuideDetailsMapFragment;
 import timber.log.Timber;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 public class GuideDetailsActivity extends MapboxActivity implements ViewPager.OnPageChangeListener {
     // ** Constants ** //

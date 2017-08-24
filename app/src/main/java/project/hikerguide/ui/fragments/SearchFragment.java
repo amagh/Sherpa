@@ -59,7 +59,7 @@ import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.SaveUtils;
 
-import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_PATH;
 

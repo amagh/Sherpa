@@ -34,9 +34,9 @@ import project.hikerguide.ui.dialogs.AddTrailDialog;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GeneralUtils;
 
-import static project.hikerguide.utilities.interfaces.IntentKeys.AREA_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.TRAIL_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.TRAIL_KEY;
 
 /**
  * Created by Alvin on 8/3/2017.

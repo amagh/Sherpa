@@ -15,7 +15,7 @@ import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import timber.log.Timber;
 
-import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 /**
  * Created by Alvin on 8/7/2017.

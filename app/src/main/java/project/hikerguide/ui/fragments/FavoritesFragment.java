@@ -43,7 +43,7 @@ import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
-import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 /**
  * Created by Alvin on 8/16/2017.

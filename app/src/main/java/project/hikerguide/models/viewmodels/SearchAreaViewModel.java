@@ -53,8 +53,8 @@ import project.hikerguide.utilities.GeneralUtils;
 import project.hikerguide.utilities.GooglePlacesApiUtils;
 import timber.log.Timber;
 
-import static project.hikerguide.utilities.interfaces.IntentKeys.AREA_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
 
 /**
  * Created by Alvin on 8/2/2017.

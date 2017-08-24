@@ -10,8 +10,8 @@ import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.viewmodels.SearchTrailViewModel;
 
-import static project.hikerguide.utilities.interfaces.IntentKeys.AREA_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
 
 /**
  * Created by Alvin on 8/3/2017.

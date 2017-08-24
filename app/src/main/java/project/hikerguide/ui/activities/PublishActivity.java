@@ -42,11 +42,11 @@ import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
 import timber.log.Timber;
 
-import static project.hikerguide.utilities.interfaces.IntentKeys.AREA_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.SECTION_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.TRAIL_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.SECTION_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.TRAIL_KEY;
 import static project.hikerguide.utilities.FirebaseProviderUtils.getReferenceForFile;
 
 /**
@@ -330,9 +330,7 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Intent intent = new Intent(PublishActivity.this, UserActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
+
                         }
                     });
 

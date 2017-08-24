@@ -54,11 +54,11 @@ import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static android.support.v7.widget.helper.ItemTouchHelper.UP;
 import static project.hikerguide.ui.activities.CreateGuideActivity.BUNDLE_KEYS.FIREBASE_ID_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.AREA_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.SECTION_KEY;
-import static project.hikerguide.utilities.interfaces.IntentKeys.TRAIL_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.SECTION_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.TRAIL_KEY;
 
 /**
  * Created by Alvin on 7/27/2017.
@@ -66,8 +66,8 @@ import static project.hikerguide.utilities.interfaces.IntentKeys.TRAIL_KEY;
 
 public class CreateGuideActivity extends MapboxActivity implements ConnectivityActivity.ConnectivityCallback,
         LoaderManager.LoaderCallbacks<Cursor> {
-    // ** Constants ** //
 
+    // ** Constants ** //
     private static final int LOADER_GUIDE_DRAFT             = 7912;
     private static final int LOADER_AREA_DRAFT              = 9519;
     private static final int LOADER_TRAIL_DRAFT             = 7269;

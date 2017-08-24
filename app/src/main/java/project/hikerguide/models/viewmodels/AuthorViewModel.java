@@ -22,7 +22,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 
 import droidninja.filepicker.FilePickerConst;
@@ -32,14 +31,13 @@ import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.ui.fragments.UserFragment;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GeneralUtils;
-import timber.log.Timber;
 
+import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_ACCOUNT;
+import static project.hikerguide.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
+import static project.hikerguide.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
 import static project.hikerguide.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
 import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
-import static project.hikerguide.utilities.interfaces.FragmentTags.FRAG_TAG_ACCOUNT;
-import static project.hikerguide.utilities.interfaces.UserFragmentRequestCodes.REQUEST_CODE_BACKDROP;
-import static project.hikerguide.utilities.interfaces.UserFragmentRequestCodes.REQUEST_CODE_PROFILE_PIC;
 
 /**
  * Created by Alvin on 7/23/2017.
