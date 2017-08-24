@@ -2,6 +2,7 @@ package project.hikerguide.utilities;
 
 import android.net.Uri;
 
+import com.firebase.geofire.GeoFire;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -48,6 +49,7 @@ public class FirebaseProviderUtils {
     public static final String JPEG_EXT = ".jpg";
     public static final String GPX_EXT = ".gpx";
     public static final String BACKDROP_SUFFIX = "_bd";
+    public static final String GEOFIRE_PATH = "geofire";
 
     /**
      * Helper method for getting the directory of a type
@@ -277,6 +279,20 @@ public class FirebaseProviderUtils {
 
         FirebaseDatabase.getInstance().getReference()
                 .updateChildren(childUpdates);
+    }
+
+    /**
+     * Returns an instance of GeoFire that is already set to the correct Firebase Database Reference
+     *
+     * @return a new GeoFire instance
+     */
+    public static GeoFire getGeoFireInstance() {
+
+        // Get the Database Reference for GeoFire's database path
+        DatabaseReference geoFireRef = FirebaseDatabase.getInstance().getReference()
+                .child(GEOFIRE_PATH);
+
+        return new GeoFire(geoFireRef);
     }
 
     //********************************************************************************************//

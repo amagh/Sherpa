@@ -59,7 +59,6 @@ import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.SaveUtils;
 
-import static project.hikerguide.firebasedatabase.DatabaseProvider.GEOFIRE_PATH;
 import static project.hikerguide.utilities.interfaces.IntentKeys.GUIDE_KEY;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_PATH;
@@ -198,13 +197,10 @@ public class SearchFragment extends MapboxFragment {
     private void queryGeoFire(GeoLocation location, double searchRadius) {
 
         // Get a reference to the GeoFire path in the Firebase Database
-        DatabaseReference firebaseRef = FirebaseDatabase.getInstance().getReference()
-                .child(GEOFIRE_PATH);
-
         if (mGeoQuery == null) {
 
             // Use GeoFire to build a query
-            GeoFire geofire = new GeoFire(firebaseRef);
+            GeoFire geofire = FirebaseProviderUtils.getGeoFireInstance();
             mGeoQuery = geofire.queryAtLocation(location, searchRadius);
 
             mAdapter.setGuides(mGuideList);
