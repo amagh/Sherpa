@@ -78,6 +78,11 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
 
         // Check to ensure the Cursor is valid
         if (data != null) {
+
+            // Clear the Array
+            mGuideList = new ArrayList<>();
+            mAdapter.setGuides(mGuideList);
+
             if (data.moveToFirst()) {
 
                 // Add each Guide from the database to the Adapter
