@@ -315,5 +315,9 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
      */
     public void removeGuideFromAdapter(Guide guide) {
         mAdapter.removeGuide(guide.firebaseId);
+
+        if (mGuideList.size() == 0) {
+            showEmptyText();
+        }
     }
 }
