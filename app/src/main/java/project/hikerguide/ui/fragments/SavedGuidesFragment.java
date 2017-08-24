@@ -69,8 +69,8 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
                 getActivity(),
                 GuideProvider.Guides.CONTENT_URI,
                 null,
-                GuideContract.GuideEntry.IMAGE_URI + " IS NOT NULL",
-                null,
+                GuideContract.GuideEntry.IMAGE_URI + " IS NOT NULL AND NOT" + GuideContract.GuideEntry.DRAFT + " = ?",
+                new String[] {"1"},
                 GuideContract.GuideEntry.TRAIL_NAME + " ASC");
     }
 
