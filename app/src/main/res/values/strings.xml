@@ -113,6 +113,10 @@
     <!-- Area Activity Strings -->
     <string name="area_search_instruction_text">Search for the park/area where the trail exists</string>
 
+    <!-- Publish Activity Strings -->
+    <string name="publish_title_text">Publishing Guide. Please wait…</string>
+    <string name="publish_progress_text">Uploading file $1%d of $2%d</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 
