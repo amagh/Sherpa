@@ -57,7 +57,6 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
 
         // Load the saved Guides from database
         getActivity().getSupportLoaderManager().initLoader(LOADER_SAVED_GUIDES, null, this);
-
         return mBinding.getRoot();
     }
 
@@ -69,8 +68,8 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
                 getActivity(),
                 GuideProvider.Guides.CONTENT_URI,
                 null,
-                GuideContract.GuideEntry.IMAGE_URI + " IS NOT NULL AND NOT" + GuideContract.GuideEntry.DRAFT + " = ?",
-                new String[] {"1"},
+                GuideContract.GuideEntry.IMAGE_URI + " IS NOT NULL AND " + GuideContract.GuideEntry.DRAFT + " IS NULL",
+                null,
                 GuideContract.GuideEntry.TRAIL_NAME + " ASC");
     }
 
@@ -119,6 +118,8 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
 
             }
         });
+
+        mAdapter.setHasStableIds(true);
 
         // Set the List for the Adapter
         mAdapter.setGuides(mGuideList);
