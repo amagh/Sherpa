@@ -22,6 +22,7 @@ public class Rating {
     private static final String DATE_ADDED  = "dateAdded";
 
     // ** Member Variables ** //
+    private String guideId;
     private String comment;
     private int rating;
     private String authorId;
@@ -60,6 +61,10 @@ public class Rating {
     //*********************************** Getters and Setters ************************************//
     //********************************************************************************************//
 
+    public String getGuideId() {
+        return guideId;
+    }
+
     public String getComment() {
         return comment;
     }
@@ -88,6 +93,10 @@ public class Rating {
     @Exclude
     public long getDate() {
         return dateAdded;
+    }
+
+    public void setGuideId(String guideId) {
+        this.guideId = guideId;
     }
 
     public void setComment(String comment) {
