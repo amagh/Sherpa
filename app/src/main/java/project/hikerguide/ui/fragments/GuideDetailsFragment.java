@@ -516,12 +516,12 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
 
-                // Remove the Task from the Listener
-                mListener.removeDownloadTask(taskSnapshot.getTask());
-
                 if (file instanceof GpxFile) {
                     mGuide.setGpxUri(file);
                 }
+
+                // Remove the Task from the Listener
+                mListener.removeDownloadTask(taskSnapshot.getTask());
             }
         });
     }
