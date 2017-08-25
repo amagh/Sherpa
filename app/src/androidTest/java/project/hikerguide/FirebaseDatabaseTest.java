@@ -8,6 +8,7 @@ import com.firebase.geofire.GeoLocation;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.junit.After;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Area;
@@ -44,6 +46,7 @@ import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.
 import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
 import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.SECTION;
 import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.utilities.FirebaseProviderUtils.RATING_DIRECTORY;
 
 /**
  * Created by Alvin on 7/17/2017.
@@ -225,76 +228,81 @@ public class FirebaseDatabaseTest {
         final Author author = TestUtilities.getAuthor1(mContext);
 
         // Generate the Rating
-        Rating rating = new Rating();
+        final Rating rating = new Rating();
+        rating.setGuideId(guide.firebaseId);
         rating.setComment("Test Comment");
         rating.setRating(5);
-
-        // Set the rating for the Guide and Author
-        guide.raters = new HashMap<>();
-        guide.raters.put(author.firebaseId, rating);
-
-        author.ratedGuides = new HashMap<>();
-        author.ratedGuides.put(guide.firebaseId, rating);
-
-        // Get the directories for insertion of the data models
-        String guideDirectory = FirebaseProviderUtils.getDirectoryFromModel(guide) + "/" + guide.firebaseId;
-        String authorDirectory = FirebaseProviderUtils.getDirectoryFromModel(author) + "/" + author.firebaseId;
-
-        // Add the models to a Map for insertion
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(guideDirectory, guide.toMap());
-        childUpdates.put(authorDirectory, author.toMap());
-
-        // Insert entries to Firebase Database
-        FirebaseDatabase.getInstance().getReference()
-                .updateChildren(childUpdates);
+        rating.setAuthorName(author.name);
+        rating.setAuthorId(author.firebaseId);
+        rating.addDate();
 
         // Object lock to ensure the test runs to completion
         final AtomicBoolean check = new AtomicBoolean(false);
 
-        FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseProviderUtils.getDirectoryFromModel(guide))
-                .child(guide.firebaseId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        // Insert the rating into Firebase
+        FirebaseProviderUtils.updateRating(rating, 0);
+
+        // Query for the Rating by GuideId
+        final Query queryByGuide = FirebaseDatabase.getInstance().getReference()
+                .child(RATING_DIRECTORY)
+                .orderByChild(GuideContract.SectionEntry.GUIDE_ID)
+                .equalTo(rating.getGuideId());
+
+        queryByGuide.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        // Validate Guide
-                        Guide returnedGuide = (Guide) FirebaseProviderUtils.getModelFromSnapshot(GUIDE, dataSnapshot);
-                        TestUtilities.validateModelValues(guide, returnedGuide);
-                    }
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-        FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseProviderUtils.getDirectoryFromModel(author))
-                .child(author.firebaseId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        // Validate Author
-                        Author returnedAuthor = (Author) FirebaseProviderUtils.getModelFromSnapshot(AUTHOR, dataSnapshot);
-                        TestUtilities.validateModelValues(author, returnedAuthor);
-
-                        // Allow method to complete
-                        synchronized (check) {
-                            check.set(true);
-                            check.notifyAll();
+                            // Verify the returned Rating matches the inserted Rating
+                            Rating returnedRating = dataSnapshot.getValue(Rating.class);
+                            returnedRating.firebaseId = snapshot.getKey();
+                            TestUtilities.validateModelValues(rating, returnedRating);
                         }
+
+                        queryByGuide.removeEventListener(this);
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        queryByGuide.removeEventListener(this);
                     }
                 });
 
-        // Wait until the
+        // Query for the Rating by the AuthorId
+        final Query queryByAuthor = FirebaseDatabase.getInstance().getReference()
+                .child(GuideContract.GuideEntry.AUTHOR_ID)
+                .orderByChild(rating.getAuthorId())
+                .equalTo(rating.getAuthorId());
+
+        queryByAuthor.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+                    // Verify the returned Rating matches the inserted Rating
+                    Rating returnedRating = dataSnapshot.getValue(Rating.class);
+                    returnedRating.firebaseId = snapshot.getKey();
+                    TestUtilities.validateModelValues(rating, returnedRating);
+                }
+
+                // Allow the test to proceed
+                synchronized (check) {
+                    check.set(true);
+                    check.notifyAll();
+                }
+
+                queryByAuthor.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                queryByAuthor.removeEventListener(this);
+            }
+        });
+
+        // Wait until the Ratings are verified before proceeding
         synchronized (check) {
             while (!check.get()) {
                 try {
