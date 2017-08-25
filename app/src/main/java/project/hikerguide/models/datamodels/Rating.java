@@ -17,8 +17,10 @@ import timber.log.Timber;
 
 public class Rating extends BaseModel {
     // ** Constants ** //
+    private static final String GUIDE_ID    = "guideId";
     private static final String COMMENT     = "comment";
     private static final String RATING      = "rating";
+    private static final String AUTHOR_ID   = "authorId";
     private static final String AUTHOR_NAME = "authorName";
     private static final String DATE_ADDED  = "dateAdded";
 
@@ -34,13 +36,12 @@ public class Rating extends BaseModel {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
+        map.put(GUIDE_ID, guideId);
         map.put(COMMENT, comment);
         map.put(RATING, rating);
-
-        if (authorName != null) {
-            map.put(AUTHOR_NAME, authorName);
-            map.put(DATE_ADDED, dateAdded);
-        }
+        map.put(AUTHOR_ID, authorId);
+        map.put(AUTHOR_NAME, authorName);
+        map.put(DATE_ADDED, getDateAdded());
 
         return map;
     }
@@ -74,7 +75,6 @@ public class Rating extends BaseModel {
         return rating;
     }
 
-    @Exclude
     public String getAuthorId() {
         return authorId;
     }
