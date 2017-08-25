@@ -359,7 +359,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
                 // Set the memvar to the retreived Guide
                 mGuide = (Guide) FirebaseProviderUtils.getModelFromSnapshot(
-                        DatabaseProvider.FirebaseType.GUIDE,
+                        FirebaseProviderUtils.FirebaseType.GUIDE,
                         dataSnapshot);
 
                 // Add the Guide to the Adapter
@@ -398,7 +398,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                     // The DataSnapshot containing the Sections is a child of the child
                     // (grand-child?) of the DataSnapshot from the signature
                     mSections = (Section[]) FirebaseProviderUtils.getModelsFromSnapshot(
-                            DatabaseProvider.FirebaseType.SECTION,
+                            FirebaseProviderUtils.FirebaseType.SECTION,
                             snapshot);
                 }
 
@@ -436,7 +436,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Convert the DataSnapshot to an Author
                 mAuthor = (Author) FirebaseProviderUtils.getModelFromSnapshot(
-                        DatabaseProvider.FirebaseType.AUTHOR,
+                        FirebaseProviderUtils.FirebaseType.AUTHOR,
                         dataSnapshot);
 
                 // Set the Author to be used by the Adapter

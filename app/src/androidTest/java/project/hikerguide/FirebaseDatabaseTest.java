@@ -41,11 +41,11 @@ import static junit.framework.Assert.assertNull;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AUTHOR;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.SECTION;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.AREA;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.SECTION;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.TRAIL;
 import static project.hikerguide.utilities.FirebaseProviderUtils.RATING_DIRECTORY;
 
 /**

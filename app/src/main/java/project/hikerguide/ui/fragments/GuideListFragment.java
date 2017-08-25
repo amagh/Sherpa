@@ -115,7 +115,7 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Guide[] guides = (Guide[]) FirebaseProviderUtils.getModelsFromSnapshot(
-                        DatabaseProvider.FirebaseType.GUIDE,
+                        FirebaseProviderUtils.FirebaseType.GUIDE,
                         dataSnapshot);
 
                 List<Guide> guideList = Arrays.asList(guides);

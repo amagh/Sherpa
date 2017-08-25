@@ -148,7 +148,7 @@ public class SearchTrailViewModel extends BaseObservable {
                 if (dataSnapshot.exists()) {
 
                     // Retrieve the Trails from the DataSnapshot
-                    Trail[] trails = (Trail[]) FirebaseProviderUtils.getModelsFromSnapshot(DatabaseProvider.FirebaseType.TRAIL, dataSnapshot);
+                    Trail[] trails = (Trail[]) FirebaseProviderUtils.getModelsFromSnapshot(FirebaseProviderUtils.FirebaseType.TRAIL, dataSnapshot);
 
                     // Pass the Trails to the Adapter
                     mTrailList = Arrays.asList(trails);

@@ -26,12 +26,8 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
-import static junit.framework.Assert.assertNotNull;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AUTHOR;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.SECTION;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.SECTION;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GEOFIRE_PATH;
 
 /**
@@ -50,14 +46,6 @@ public class DatabaseProvider {
     private static final String GUIDE_ID = "guideId";
     private static final int GUIDE_LIMIT = 20;
 
-    @IntDef({GUIDE, TRAIL, AUTHOR, SECTION, AREA})
-    public @interface FirebaseType {
-        int GUIDE = 0;
-        int TRAIL = 1;
-        int AUTHOR = 2;
-        int SECTION = 3;
-        int AREA = 4;
-    }
 
     // ** Member Variables ** //
     private static DatabaseProvider sProvider;
@@ -148,7 +136,7 @@ public class DatabaseProvider {
      * @param firebaseId  ID of the Guide to retrieve
      * @return The model matching the firebaseId in the signature
      */
-    public BaseModel getRecord(@FirebaseType final int type, final String firebaseId) {
+    public BaseModel getRecord(@FirebaseProviderUtils.FirebaseType final int type, final String firebaseId) {
 
         final DatabaseListener listener = new DatabaseListener();
 
@@ -220,7 +208,7 @@ public class DatabaseProvider {
      * @param type    The Firebase Type of record to remove
      * @param firebaseIds     The ID of the record to remove
      */
-    public void deleteRecords(@FirebaseType int type, String... firebaseIds) {
+    public void deleteRecords(@FirebaseProviderUtils.FirebaseType int type, String... firebaseIds) {
         // Init the variable to hold the path of the type to be deleted
         String directory = FirebaseProviderUtils.getDirectoryFromType(type);
 
@@ -239,7 +227,7 @@ public class DatabaseProvider {
      *
      * @return The BaseModels that match the query
      */
-    public BaseModel[] searchForRecords(@FirebaseType final int type, String query, int limit) {
+    public BaseModel[] searchForRecords(@FirebaseProviderUtils.FirebaseType final int type, String query, int limit) {
         // Convert the query to lowercase because Firebase's sorting function is case-sensitive
         query = query.toLowerCase();
 

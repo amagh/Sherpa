@@ -1,6 +1,7 @@
 package project.hikerguide.utilities;
 
 import android.net.Uri;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
 import com.firebase.geofire.GeoFire;
@@ -38,11 +39,12 @@ import project.hikerguide.models.datamodels.Trail;
 import timber.log.Timber;
 
 import static junit.framework.Assert.assertNotNull;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AUTHOR;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.SECTION;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.AREA;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.RATING;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.SECTION;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.TRAIL;
 
 /**
  * Utility class for commonly used functions for the DatabaseProvider
@@ -57,6 +59,16 @@ public class FirebaseProviderUtils {
     public static final String BACKDROP_SUFFIX = "_bd";
     public static final String GEOFIRE_PATH = "geofire";
 
+    @IntDef({GUIDE, TRAIL, AUTHOR, SECTION, AREA, RATING})
+    public @interface FirebaseType {
+        int GUIDE = 0;
+        int TRAIL = 1;
+        int AUTHOR = 2;
+        int SECTION = 3;
+        int AREA = 4;
+        int RATING = 5;
+    }
+
     public static final String RATING_DIRECTORY = "ratings";
 
     /**
@@ -65,7 +77,7 @@ public class FirebaseProviderUtils {
      * @param type    FirebaseType
      * @return The directory that corresponds to the type
      */
-    public static String getDirectoryFromType(@DatabaseProvider.FirebaseType int type) {
+    public static String getDirectoryFromType(@FirebaseType int type) {
         switch (type) {
             case GUIDE:
                 return GuideDatabase.GUIDES;
@@ -118,7 +130,7 @@ public class FirebaseProviderUtils {
      * @param dataSnapshot    The DataSnapShot containing children of the FirebaseType
      * @return An Array of BaseModels corresponding to the FirebaseType parameter
      */
-    public static BaseModel[] getModelsFromSnapshot(@DatabaseProvider.FirebaseType int type, DataSnapshot dataSnapshot) {
+    public static BaseModel[] getModelsFromSnapshot(@FirebaseType int type, DataSnapshot dataSnapshot) {
         // Initialize the List that will store all the BaseModels created from the DataSnapshots
         List<BaseModel> modelList = new ArrayList<>();
 
@@ -168,7 +180,7 @@ public class FirebaseProviderUtils {
      * @param dataSnapshot    The DataSnapshot describing a BaseModel
      * @return A BaseModel with the information contained within the DataSnapshot
      */
-    public static BaseModel getModelFromSnapshot(@DatabaseProvider.FirebaseType int type, DataSnapshot dataSnapshot) {
+    public static BaseModel getModelFromSnapshot(@FirebaseType int type, DataSnapshot dataSnapshot) {
         BaseModel model;
 
         switch (type) {
@@ -192,6 +204,8 @@ public class FirebaseProviderUtils {
                 model = dataSnapshot.getValue(Area.class);
                 break;
 
+            case RATING:
+
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
         }
 
@@ -210,7 +224,7 @@ public class FirebaseProviderUtils {
      * @param listener      FirebaseListener that will be used to pass the retrieved object to the
      *                      calling Object
      */
-    public static void getModel(@DatabaseProvider.FirebaseType final int type,
+    public static void getModel(@FirebaseType final int type,
                                 @NonNull String firebaseId,
                                 @NonNull final FirebaseListener listener) {
 
@@ -277,7 +291,7 @@ public class FirebaseProviderUtils {
                 if (dataSnapshot.exists()) {
 
                     // Convert the DataSnapshot to an Array of BaseModels
-                    BaseModel[] models = getModelsFromSnapshot(SECTION, dataSnapshot);
+                    Section[] models = (Section[]) getModelsFromSnapshot(SECTION, dataSnapshot);
 
                     // Return the Sections to the calling Object
                     listener.onModelsReady(models);
@@ -473,6 +487,7 @@ public class FirebaseProviderUtils {
                     }
                 });
     }
+
 
     /**
      * Returns an instance of GeoFire that is already set to the correct Firebase Database Reference
