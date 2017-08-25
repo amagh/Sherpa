@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import project.hikerguide.BR;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.files.GpxFile;
 import project.hikerguide.files.ImageFile;
@@ -52,6 +51,8 @@ public class FirebaseProviderUtils {
     public static final String JPEG_EXT = ".jpg";
     public static final String GPX_EXT = ".gpx";
     public static final String BACKDROP_SUFFIX = "_bd";
+
+    private static final String RATING_DIRECTORY = "ratings";
 
     /**
      * Helper method for getting the directory of a type
@@ -302,71 +303,71 @@ public class FirebaseProviderUtils {
     }
 
     /**
-     * Uses a transaction to update a Guide when it's Rating has been altered. Transactions allow
-     * for multiple people to use the same action without losing track of the state of each action.
+     * Adds/updates the Rating of a Guide, the Guide's ratings, and the Author's score
      *
-     * e.g. If user1 adds a rating of 5 and user2 adds a rating 3 at the same time, it will
-     * successfully calculate the added total of 8 instead of one action over-writing the other.
-     *
-     * @param guideId    The ID of the Guide to be updated
-     * @param rating     Rating that will alter the Guide's rating
+     * @param rating            Rating to be inserted/updated in the Firebase Database
+     * @param previousRating    The value of the rating of the previous Rating for the Guide by
+     *                          the user
      */
-    public static void updateGuideRaters(String guideId, final Rating rating) {
+    public static void updateRating(final Rating rating, final int previousRating) {
 
-        // Build the Transaction
+        // Add a FirebaseId to the Rating if it doesn't already have one
+        if (rating.firebaseId != null) {
+            rating.firebaseId = FirebaseDatabase.getInstance().getReference()
+                    .child(RATING_DIRECTORY)
+                    .push()
+                    .getKey();
+        }
+
+        // Update the Guide and the Author
+        updateGuideScore(rating, previousRating);
+        updateAuthorScore(rating, previousRating);
+
+        // Push the Rating to the Firebase Database
+        String directory = RATING_DIRECTORY + "/" + rating.firebaseId;
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(directory, rating);
+
+        FirebaseDatabase.getInstance().getReference()
+                .updateChildren(childUpdates);
+    }
+
+    /**
+     * Updates a Guide's score after their rating has been altered
+     *
+     * @param rating            The Rating to be added to be added the Guide's rating/reviews
+     * @param previousRating    The value of the rating of the previous Rating for the Guide by
+     *                          the user
+     */
+    private static void updateGuideScore(final Rating rating, final int previousRating) {
+
+        // Update the Guide's rating/reviews
         FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.GUIDES)
-                .child(guideId)
+                .child(rating.getGuideId())
                 .runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
 
-                        // Retrieve the Guide from the data
+                        // Retrieve the corresponding Guide for the Rating
                         Guide guide = mutableData.getValue(Guide.class);
-
-                        // Ensure that a Guide was returned
-                        if (guide == null) {
-                            return Transaction.success(mutableData);
-                        }
-
-                        // To hold any previous rating made by the Author of the Rating
-                        int previousRating = 0;
-
-                        if (guide.raters == null) {
-
-                            // Init a new HashMap if it hasn't been rated before
-                            guide.raters = new HashMap<>();
-                        } else if (guide.raters.containsKey(rating.getAuthorId())) {
-
-                            // Set the previous rating to the user's previous rating
-                            previousRating = guide.raters.get(rating.getAuthorId()).getRating();
-                        }
-
-                        // Add the Rating to the Map
-                        guide.raters.put(rating.getAuthorId(), rating);
-
-                        // Add the new score, subtracting out th previous rating
                         guide.rating += rating.getRating() - previousRating;
 
                         if (previousRating == 0) {
 
-                            // Increment the number of reviews if the user hasn't rated this Guide
-                            // previously
+                            // Increment the Guide reviews if it has not previously been rated
                             guide.reviews++;
                         }
 
-                        // Set the data to be updated to Firebase Database
+                        // Update the Firebase Database value
                         mutableData.setValue(guide);
-
-                        // Update the Guide's Author's score
-                        updateAuthorScore(guide.authorId, rating, previousRating);
-
                         return Transaction.success(mutableData);
                     }
 
                     @Override
                     public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                        Timber.e("Error updating guides's raters: " + databaseError);
+
                     }
                 });
     }
@@ -374,27 +375,22 @@ public class FirebaseProviderUtils {
     /**
      * Updates an Author's score after a rating for one of their Guides has been altered
      *
-     * @param authorId          FirebaseId of the Author to be updated
      * @param rating            The Rating to be added to the Author's Map of rated Guides
-     * @param previousRating    The previous rating the Author gave the Guide
+     * @param previousRating    The value of the rating of the previous Rating for the Guide by
+     *                          the user
      */
-    private static void updateAuthorScore(String authorId, final Rating rating, final int previousRating) {
+    private static void updateAuthorScore(final Rating rating, final int previousRating) {
 
         // Build the Transaction
         FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.AUTHORS)
-                .child(authorId)
+                .child(rating.getAuthorId())
                 .runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
 
                         // Get the Author from the data
                         Author author = mutableData.getValue(Author.class);
-
-                        // Ensure the Author exists
-                        if (author == null) {
-                            return Transaction.success(mutableData);
-                        }
 
                         // Change the Author's score
                         author.score += (rating.getRating() - previousRating);
