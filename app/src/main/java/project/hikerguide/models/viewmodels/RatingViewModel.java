@@ -217,50 +217,20 @@ public class RatingViewModel extends BaseObservable {
             return;
         }
 
-        // Create Ratings to be added to the Firebase Database
-        final Rating authorRating = new Rating();
-        final Rating guideRating = new Rating();
-
-        // The "authorRating" will not contain any author information
-        authorRating.setRating(getRating());
-        authorRating.setComment(getComment());
-
-        guideRating.setRating(getRating());
-        guideRating.setComment(getComment());
-        guideRating.setAuthorId(mUser.firebaseId);
-        guideRating.setAuthorName(mUser.name);
-        guideRating.addDate();
+        mRating.addDate();
 
         // Check whether the user has previously rated this Guide
         int previousRating = 0;
 
-        if (mGuide.raters != null && mGuide.raters.containsKey(mUser.firebaseId)) {
-
-            // Get the previous rating the user rated this Guide
-            previousRating = mGuide.raters.get(mUser.firebaseId).getRating();
-        } else if (mGuide.raters == null){
-
-            // Create a new Map to store ratings
-            mGuide.raters = new HashMap<>();
+        if (mUser != null) {
+            previousRating = mRating.getRating();
         }
 
         // Add the new Rating to the Guide, subtracting the value of the previous rating
         mGuide.rating += getRating() - previousRating;
 
-        // Add the Rating to the Guide data model
-        mGuide.raters.put(mUser.firebaseId, guideRating);
-
-        // Create the Map to hold the user's rated Guides
-        if (mUser.ratedGuides == null) {
-            mUser.ratedGuides = new HashMap<>();
-        }
-
-        // Add the Rating to the user's rated Guides
-        mUser.ratedGuides.put(mGuide.firebaseId, authorRating);
-
         // Update the Firebase Database with the rating
-        FirebaseProviderUtils.updateUser(mUser);
-        FirebaseProviderUtils.updateGuideRaters(mGuide.firebaseId, guideRating);
+        FirebaseProviderUtils.updateRating(mRating, previousRating);
 
         // Force the Adapter to update the Guide with the new Rating
         mAdapter.updateRating();
