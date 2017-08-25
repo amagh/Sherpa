@@ -8,13 +8,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import timber.log.Timber;
 
 /**
  * Created by Alvin on 8/18/2017.
  */
 
-public class Rating {
+public class Rating extends BaseModel {
     // ** Constants ** //
     private static final String COMMENT     = "comment";
     private static final String RATING      = "rating";
