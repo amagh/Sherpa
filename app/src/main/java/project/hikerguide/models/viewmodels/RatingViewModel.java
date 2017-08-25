@@ -33,20 +33,17 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
 
 public class RatingViewModel extends BaseObservable {
     private Rating mRating;
-    private Guide mGuide;
     private Author mUser;
     private GuideDetailsAdapter mAdapter;
 
-    public RatingViewModel(Rating rating, Guide guide, GuideDetailsAdapter adapter, Author author) {
+    public RatingViewModel(Rating rating, GuideDetailsAdapter adapter, Author author) {
         mRating = rating;
-        mGuide = guide;
         mAdapter = adapter;
         mUser = author;
     }
 
-    public RatingViewModel(Rating rating, Guide guide, GuideDetailsAdapter adapter) {
+    public RatingViewModel(Rating rating, GuideDetailsAdapter adapter) {
         mRating = rating;
-        mGuide = guide;
         mAdapter = adapter;
     }
 
@@ -226,14 +223,11 @@ public class RatingViewModel extends BaseObservable {
             previousRating = mRating.getRating();
         }
 
-        // Add the new Rating to the Guide, subtracting the value of the previous rating
-        mGuide.rating += getRating() - previousRating;
-
         // Update the Firebase Database with the rating
         FirebaseProviderUtils.updateRating(mRating, previousRating);
 
         // Force the Adapter to update the Guide with the new Rating
-        mAdapter.updateRating();
+        mAdapter.updateRating(getRating(), previousRating);
     }
 
     public void onClickEditRating(View view) {
