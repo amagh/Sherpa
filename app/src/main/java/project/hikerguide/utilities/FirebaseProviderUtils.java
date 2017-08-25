@@ -1,6 +1,7 @@
 package project.hikerguide.utilities;
 
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import com.firebase.geofire.GeoFire;
 import com.google.firebase.auth.FirebaseAuth;
@@ -9,6 +10,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -195,6 +197,58 @@ public class FirebaseProviderUtils {
     }
 
     /**
+     * Retrieves a Model corresponding to the FirebaseId and type parameters
+     *
+     * @param type          FirebaseType pertaining to the type of BaseModel to be retrieved
+     * @param firebaseId    FirebaseId of entry to be retrieved
+     * @param listener      FirebaseListener that will be used to pass the retrieved object to the
+     *                      calling Object
+     */
+    public static void getModel(@DatabaseProvider.FirebaseType final int type,
+                                @NonNull String firebaseId,
+                                @NonNull final FirebaseListener listener) {
+
+        // Get the directory to insert the data to based on the type
+        String directory = getDirectoryFromType(type);
+
+        // Get a Database Reference for retrieving the data
+        final DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child(directory)
+                .child(firebaseId);
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        // Check that the DataSnapshot exists
+                        if (dataSnapshot.exists()) {
+
+                            // Convert the DataSnapshot to a BaseModel
+                            BaseModel model = getModelFromSnapshot(type, dataSnapshot);
+
+                            // Return the model to the requesting Object
+                            listener.onModelReady(model);
+                        } else {
+                            listener.onModelReady(null);
+                        }
+
+                        // Remove the Listener
+                        reference.removeEventListener(this);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                        // Return a null result
+                        listener.onModelReady(null);
+
+                        // Remove the Listener
+                        reference.removeEventListener(this);
+                    }
+                });
+    }
+
+    /**
      * Retrieves the Author data model representing the FirebaseUser currently logged in
      *
      * @param listener The Listener that will be used to pass the retrieved Author to the calling
@@ -207,40 +261,8 @@ public class FirebaseProviderUtils {
 
         if (user != null) {
 
-            // Get a reference for the Author in the FirebaseDatabase
-            final DatabaseReference authorRef = FirebaseDatabase.getInstance().getReference()
-                    .child(GuideDatabase.AUTHORS)
-                    .child(user.getUid());
-
-            authorRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    // Check data is valid
-                    if (dataSnapshot.exists()) {
-
-                        // Return the Author created from the DataSnapshot
-                        listener.onModelReady(getModelFromSnapshot(AUTHOR, dataSnapshot));
-                    } else {
-
-                        // Return null result
-                        listener.onModelReady(null);
-                    }
-
-                    // Remove Listener
-                    authorRef.removeEventListener(this);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                    // Return null result
-                    listener.onModelReady(null);
-
-                    // Remove Listener
-                    authorRef.removeEventListener(this);
-                }
-            });
+            // Retrieve the Author corresponding to the User's UID
+            getModel(AUTHOR, user.getUid(), listener);
         }
     }
 
@@ -362,5 +384,9 @@ public class FirebaseProviderUtils {
      */
     public interface FirebaseListener {
         void onModelReady(BaseModel model);
+    }
+
+    public interface FirebaseArrayListener {
+        void onModelsReady(BaseModel[] models);
     }
 }
