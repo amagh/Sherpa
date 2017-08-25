@@ -2,7 +2,9 @@ package project.hikerguide.ui.fragments;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
@@ -14,7 +16,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.android.databinding.library.baseAdapters.BR;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,12 +29,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
@@ -48,13 +59,20 @@ import project.hikerguide.ui.activities.OpenDraftActivity;
 import project.hikerguide.ui.adapters.AuthorDetailsAdapter;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.ui.behaviors.FabSpeedDialScrollBehavior;
+import project.hikerguide.ui.dialogs.ProgressDialog;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import project.hikerguide.utilities.SaveUtils;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
-import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
+import static project.hikerguide.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
+import static project.hikerguide.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
+import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
+import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
 
 /**
  * Created by Alvin on 8/15/2017.
@@ -102,7 +120,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
         // Set a blank Author to the ViewDataBinding so that the FabSpeedDial's visibility will be
         // properly triggered
-        mBinding.setVm(new AuthorViewModel(getActivity(), this, new Author()));
+        mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), new Author()));
         mBinding.fabDial.setMenuListener(this);
 
         initRecyclerView();
@@ -116,7 +134,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
             // Add the Author to the Adapter so their info can be displayed
             mAdapter.addModel(mAuthor);
-            mBinding.setVm(new AuthorViewModel(getActivity(), this, mAuthor));
+            mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
 
             // Load the Guides that the Author has created into the Adapter
             loadGuidesForAuthor();
@@ -164,6 +182,8 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
         return false;
     }
 
+
+
     /**
      * Sets up the layouts to be appropriate for someone viewing their own profile
      */
@@ -187,7 +207,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
      */
     private void initRecyclerView() {
         // Init the Adapter
-        mAdapter = new AuthorDetailsAdapter(getActivity(), this, new GuideAdapter.ClickHandler() {
+        mAdapter = new AuthorDetailsAdapter((AppCompatActivity) getActivity(), new GuideAdapter.ClickHandler() {
             @Override
             public void onGuideClicked(Guide guide) {
 
@@ -265,7 +285,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
                 // Add the Author to the Adapter so their info can be displayed
                 mAdapter.addModel(mAuthor);
-                mBinding.setVm(new AuthorViewModel(getActivity(), UserFragment.this, mAuthor));
+                mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
 
                 // Setup for someone viewing their own profile
                 setupForSelfProfile();
@@ -284,23 +304,93 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(final int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == ACCOUNT_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK
-                && data.getBooleanExtra(AUTHOR_KEY, false)) {
-            loadUserSelfProfile();
-        } else {
+        Timber.d("Request code:" + requestCode);
 
-            // Handle the log out based on the Activity the Fragment is in
-            if (getActivity() instanceof MainActivity) {
-
-                // Switch Fragments
-                ((MainActivity) getActivity()).switchFragments(R.id.navigation_home);
+        if (requestCode == ACCOUNT_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK && data.getBooleanExtra(AUTHOR_KEY, false)) {
+                loadUserSelfProfile();
             } else {
+                // Handle the log out based on the Activity the Fragment is in
+                if (getActivity() instanceof MainActivity) {
 
-                // Close the Activity
-                getActivity().finish();
+                    // Switch Fragments
+                    ((MainActivity) getActivity()).switchFragments(R.id.navigation_home);
+                } else {
+
+                    // Close the Activity
+                    getActivity().finish();
+                }
             }
+
+        } else if (requestCode == REQUEST_CODE_PROFILE_PIC || requestCode == REQUEST_CODE_BACKDROP) {
+
+            if (resultCode != RESULT_OK) {
+                return;
+            }
+
+            // Retrieve the path of the selected Image
+            List<String> dataArray = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA);
+
+            if (dataArray == null) {
+                return;
+            }
+
+            // Get the path for the image selected
+            String imagePath = dataArray.get(0);
+
+            // Resize the image for upload
+            File imageFile = new File(imagePath);
+            imageFile = SaveUtils.resizeImage(imageFile);
+
+            // Get StorageReference for location to upload the image to
+            StorageReference imageRef = FirebaseStorage.getInstance().getReference()
+                    .child(IMAGE_PATH);
+
+            // Set the sub-directory depending on requestCode
+            if (requestCode == REQUEST_CODE_PROFILE_PIC) {
+                imageRef = imageRef.child(mAuthor.firebaseId + JPEG_EXT);
+            } else {
+                imageRef = imageRef.child(mAuthor.firebaseId + BACKDROP_SUFFIX + JPEG_EXT);
+            }
+
+            // Show a dialog to the User to indicate the upload action
+            final ProgressDialog dialog = new ProgressDialog();
+            dialog.setTitle(getString(R.string.progress_upload_files_title));
+            dialog.setIndeterminate(true);
+
+            dialog.show(getActivity().getSupportFragmentManager(), null);
+
+            // Upload the Image
+            imageRef.putFile(Uri.fromFile(imageFile)).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot snapshot) {
+                    dialog.dismiss();
+
+                    // Update the image
+                    if (requestCode == REQUEST_CODE_PROFILE_PIC) {
+                        mBinding.getVm().notifyPropertyChanged(BR.authorImage);
+                    } else {
+                        mBinding.getVm().notifyPropertyChanged(BR.backdrop);
+                    }
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    dialog.dismiss();
+
+                    // Inform the user of the failure
+                    Toast.makeText(
+                            getActivity(),
+                            getString(R.string.failed_image_upload_text),
+                            Toast.LENGTH_LONG)
+                            .show();
+
+                    Timber.e(e, e.getMessage());
+                }
+            });
         }
     }
 
@@ -328,7 +418,8 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                             .getModelsFromSnapshot(DatabaseProvider.FirebaseType.GUIDE, dataSnapshot);
 
                     // Add each Guide to the Adapter
-                    for (Guide guide : guides) {
+                    for (int i = guides.length -1; i > -1; i--) {
+                        Guide guide = guides[i];
                         mAdapter.addModel(guide);
                     }
                 }

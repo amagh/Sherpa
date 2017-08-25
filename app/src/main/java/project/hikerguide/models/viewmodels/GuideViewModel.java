@@ -20,7 +20,6 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -47,9 +46,8 @@ import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.ConversionUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
-import timber.log.Timber;
 
-import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_FAVORITE;
+import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_FAVORITE;
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
 import static project.hikerguide.utilities.MapUtils.addMapOptionsToMap;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
@@ -158,6 +156,11 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @Bindable
+    public int getDifficultyRating() {
+        return mGuide.difficulty;
+    }
+
+    @Bindable
     public String getDifficulty() {
         String difficultyString = "Unknown";
 
@@ -224,20 +227,12 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @Bindable
-    public StorageReference getAuthorImage() {
-        return FirebaseStorage.getInstance().getReference()
-                .child(IMAGE_PATH)
-                .child(mGuide.authorId + JPEG_EXT);
-    }
+    public Uri getAuthorImage() {
 
-    @BindingAdapter("authorImage")
-    public static void loadAuthorImage(ImageView imageView, StorageReference authorImage) {
-        Glide.with(imageView.getContext())
-                .using(new FirebaseImageLoader())
-                // Use default profile image if the author does not have one
-                .load(authorImage)
-                .error(R.drawable.ic_account_circle)
-                .into(imageView);
+        // Parse the StorageReference to a Uri
+        return Uri.parse(FirebaseStorage.getInstance().getReference()
+                .child(IMAGE_PATH)
+                .child(mGuide.authorId + JPEG_EXT).toString());
     }
 
     @Bindable
@@ -366,6 +361,36 @@ public class GuideViewModel extends BaseObservable {
                     .scale(0f)
                     .setDuration(100)
                     .start();
+        }
+    }
+
+    @BindingAdapter({"circle2", "circle3", "circle4", "circle5", "difficultyRating"})
+    public static void setDifficultyCircles(ImageView circle1, ImageView circle2, ImageView circle3,
+                                            ImageView circle4, ImageView circle5, int difficulty) {
+
+        // Reset all images to their default icon
+        circle1.setImageResource(R.drawable.ic_circle_stroke);
+        circle2.setImageResource(R.drawable.ic_circle_stroke);
+        circle3.setImageResource(R.drawable.ic_circle_stroke);
+        circle4.setImageResource(R.drawable.ic_circle_stroke);
+        circle5.setImageResource(R.drawable.ic_circle_stroke);
+
+        // Change icons based on difficulty
+        switch (difficulty) {
+            case 5:
+                circle5.setImageResource(R.drawable.ic_circle);
+
+            case 4:
+                circle4.setImageResource(R.drawable.ic_circle);
+
+            case 3:
+                circle3.setImageResource(R.drawable.ic_circle);
+
+            case 2:
+                circle2.setImageResource(R.drawable.ic_circle);
+
+            case 1:
+                circle1.setImageResource(R.drawable.ic_circle);
         }
     }
 
@@ -606,5 +631,43 @@ public class GuideViewModel extends BaseObservable {
 
         // Notify change
         notifyPropertyChanged(BR.favorite);
+    }
+
+    /**
+     * Click response for clicking on a difficulty circle
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickDifficultyCircle(View view) {
+
+        // Only set difficulty if the user is creating a Guide
+        if (mActivity.get() instanceof CreateGuideActivity) {
+
+            // Change the difficulty of the Guide
+            switch (view.getId()) {
+                case R.id.list_guide_difficulty_circle_1:
+                    mGuide.difficulty = 1;
+                    break;
+
+                case R.id.list_guide_difficulty_circle_2:
+                    mGuide.difficulty = 2;
+                    break;
+
+                case R.id.list_guide_difficulty_circle_3:
+                    mGuide.difficulty = 3;
+                    break;
+
+                case R.id.list_guide_difficulty_circle_4:
+                    mGuide.difficulty = 4;
+                    break;
+
+                case R.id.list_guide_difficulty_circle_5:
+                    mGuide.difficulty = 5;
+                    break;
+            }
+
+            notifyPropertyChanged(BR.difficulty);
+            notifyPropertyChanged(BR.difficultyRating);
+        }
     }
 }

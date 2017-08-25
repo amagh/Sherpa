@@ -1,15 +1,22 @@
 package project.hikerguide.ui.activities;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -20,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import project.hikerguide.R;
+import project.hikerguide.databinding.ActivityPublishBinding;
 import project.hikerguide.files.abstractfiles.BaseFile;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
@@ -27,16 +36,17 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
+import project.hikerguide.models.viewmodels.PublishViewModel;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
 import timber.log.Timber;
 
-import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
-import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
-import static project.hikerguide.utilities.IntentKeys.SECTION_KEY;
-import static project.hikerguide.utilities.IntentKeys.TRAIL_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.SECTION_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.TRAIL_KEY;
 import static project.hikerguide.utilities.FirebaseProviderUtils.getReferenceForFile;
 
 /**
@@ -45,11 +55,19 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.getReferenceFor
 
 public class PublishActivity extends MapboxActivity implements ConnectivityActivity.ConnectivityCallback {
     // ** Member Variables ** //
+    private ActivityPublishBinding mBinding;
+    private PublishViewModel mViewModel;
+
     private Author mAuthor;
     private Guide mGuide;
     private Area mArea;
     private Trail mTrail;
     private Section[] mSections;
+
+    // Models with the original FirebaseId of the models so they can properly deleted upon publishing
+    private Guide mDeleteGuide;
+    private Area mDeleteArea;
+    private Trail mDeleteTrail;
 
     private List<StorageReference> mUploadReferenceList;
     private UploadListener mUploadListener;
@@ -57,6 +75,13 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_publish);
+
+        setFinishOnTouchOutside(false);
+        setTitle(getString(R.string.publish_title_text));
+
+        mViewModel = new PublishViewModel();
+        mBinding.setVm(mViewModel);
 
         // Get the data objects passed from the Intent
         Intent intent = getIntent();
@@ -73,15 +98,28 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
         // Copy the elements from parcelables to mSections as it cannot be directly cast to Section[]
         System.arraycopy(parcelables, 0, mSections, 0, parcelables.length);
 
+        // Create dummy copies of the BaseModels with their original FirebaseIds
+        mDeleteGuide = new Guide();
+        mDeleteGuide.firebaseId = mGuide.firebaseId;
+
+        mDeleteArea = new Area();
+        mDeleteArea.firebaseId = mArea.firebaseId;
+
+        mDeleteTrail = new Trail();
+        mDeleteTrail.firebaseId = mTrail.firebaseId;
+
         setConnectivityCallback(this);
     }
 
     @Override
     public void onConnected() {
-        // Resize any images associated with the models
-        resizeImages();
 
-        mUploadListener = new UploadListener(getChildUpdates());
+        if (mUploadListener == null) {
+            // Resize any images associated with the models
+            resizeImages();
+
+            mUploadListener = new UploadListener(getChildUpdates());
+        }
     }
 
     @Override
@@ -147,6 +185,12 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
             // Upload the Files for the Guide
             uploadFile(mGuide.getGpxFile());
             uploadFile(mGuide.getImageFile());
+
+            // Add the location to the GeoFire database so it can be queried
+            GeoFire geoFire = FirebaseProviderUtils.getGeoFireInstance();
+            GeoLocation location = new GeoLocation(mGuide.latitude, mGuide.longitude);
+
+            geoFire.setLocation(mGuide.firebaseId, location);
         }
 
         // Upload each Section
@@ -219,35 +263,24 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
         // Add the Reference to the list of uploads to track
         addUploadReference(reference);
 
-        try {
+        reference.putFile(Uri.fromFile(file))
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot snapshot) {
 
-            // Create a FIS from the File
-            FileInputStream inStream = new FileInputStream(file);
+                        // Remove the task from the tracked List
+                        onUploadComplete(snapshot.getStorage());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
-            // Upload
-            reference.putStream(inStream)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot snapshot) {
-
-                            // Remove the task from the tracked List
-                            onUploadComplete(snapshot.getStorage());
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-
-                            // Inform the user that it did not complete and will allow them
-                            // to try again
-                            Toast.makeText(PublishActivity.this, "Upload failed! Please try again.", Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
+                        // Inform the user that it did not complete and will allow them
+                        // to try again
+                        Toast.makeText(PublishActivity.this, "Upload failed! Please try again.", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     /**
@@ -265,7 +298,7 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
         // Add the StorageReference to the List
         mUploadReferenceList.add(uploadReference);
 
-        Timber.d("Uploads remaining: " + mUploadReferenceList.size());
+        mViewModel.setTotalUploads(mUploadReferenceList.size());
     }
 
     /**
@@ -289,9 +322,9 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
 
             // If all upload tasks have completed, update the Firebase Database
             mUploadListener.onUploadComplete();
+        } else {
+            mViewModel.setCurrentUpload(mViewModel.getTotalUploads() - mUploadReferenceList.size() + 1);
         }
-
-        Timber.d("Removing task: " + mUploadReferenceList.size() + " remaining");
     }
 
     private class UploadListener {
@@ -306,22 +339,38 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
          * Updates the Firebase Database with the data loaded into mChildUpdates
          */
         private void onUploadComplete() {
+
             FirebaseDatabase.getInstance().getReference()
-                    .updateChildren(mChildUpdates);
+                    .updateChildren(mChildUpdates)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
 
-            // Delete the draft from the database
-            ContentProviderUtils.deleteModel(PublishActivity.this, mGuide);
-            ContentProviderUtils.deleteModel(PublishActivity.this, mTrail);
-            ContentProviderUtils.deleteModel(PublishActivity.this, mArea);
-            ContentProviderUtils.deleteSectionsForGuide(PublishActivity.this, mGuide);
+                            // Delete the draft from the database
+                            ContentProviderUtils.deleteModel(PublishActivity.this, mDeleteGuide);
+                            ContentProviderUtils.deleteModel(PublishActivity.this, mDeleteTrail);
+                            ContentProviderUtils.deleteModel(PublishActivity.this, mDeleteArea);
+                            ContentProviderUtils.deleteSectionsForGuide(PublishActivity.this, mDeleteGuide);
 
-            if (ContentProviderUtils.getGuideCountForAuthor(PublishActivity.this, mAuthor) == 0) {
-                ContentProviderUtils.deleteModel(PublishActivity.this, mAuthor);
-            }
+                            if (ContentProviderUtils.getGuideCountForAuthor(PublishActivity.this, mAuthor) == 0) {
+                                ContentProviderUtils.deleteModel(PublishActivity.this, mAuthor);
+                            }
 
-            Intent intent = new Intent(PublishActivity.this, UserActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+                            // Add
+                            Intent data = new Intent();
+                            data.putExtra(GUIDE_KEY, mGuide);
+
+                            setResult(RESULT_OK, data);
+                            finish();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Timber.e(e, e.getMessage());
+                            finish();
+                        }
+                    });
         }
     }
 }

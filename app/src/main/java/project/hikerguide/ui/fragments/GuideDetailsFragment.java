@@ -59,8 +59,8 @@ import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.MapUtils;
 import timber.log.Timber;
 
-import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 /**
  * Created by Alvin on 8/7/2017.
@@ -119,7 +119,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         }
 
         // Setup the Adapter
-        mAdapter = new GuideDetailsAdapter(new GuideDetailsAdapter.ClickHandler() {
+        mAdapter = new GuideDetailsAdapter((GuideDetailsActivity) getActivity(), new GuideDetailsAdapter.ClickHandler() {
             @Override
             public void onClickAuthor(Author author) {
                 Intent intent = new Intent(getActivity(), UserActivity.class);
@@ -252,7 +252,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                     mGuide = Guide.createGuideFromCursor(data);
 
                     // Set the Guide to the Adapter
-                    mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
+                    mAdapter.addModel(mGuide);
                 }
 
                 break;
@@ -267,10 +267,10 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                     for (int i = 0; i < data.getCount(); i++) {
                         data.moveToPosition(i);
                         mSections[i] = Section.createSectionFromCursor(data);
-                    }
 
-                    // Pass mSections to the Adapter
-                    mAdapter.setSections(mSections);
+                        // Pass mSections to the Adapter
+                        mAdapter.addModel(mSections[i]);
+                    }
                 }
 
                 break;
@@ -284,7 +284,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                     mAuthor = Author.createAuthorFromCursor(data);
 
                     // Set the Author to the Adapter
-                    mAdapter.setAuthor(mAuthor);
+                    mAdapter.addModel(mAuthor);
                 }
 
                 break;
@@ -363,7 +363,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                         dataSnapshot);
 
                 // Add the Guide to the Adapter
-                mAdapter.setGuide(mGuide, ((GuideDetailsActivity) getActivity()));
+                mAdapter.addModel(mGuide);
 
                 // Remove Listener
                 guideRef.removeEventListener(this);
@@ -402,8 +402,9 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                             snapshot);
                 }
 
-                // Set the Sections to be used by the Adapter
-                mAdapter.setSections(mSections);
+                for (Section section : mSections) {
+                    mAdapter.addModel(section);
+                }
 
                 // Remove the Listener
                 sectionQuery.removeEventListener(this);
@@ -439,7 +440,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                         dataSnapshot);
 
                 // Set the Author to be used by the Adapter
-                mAdapter.setAuthor(mAuthor);
+                mAdapter.addModel(mAuthor);
 
                 // Remove the Listener
                 authorReference.removeEventListener(this);
@@ -542,7 +543,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         StorageReference reference = FirebaseStorage.getInstance().getReference();
         StorageTask<FileDownloadTask.TaskSnapshot> task =
                 FirebaseProviderUtils.getReferenceForFile(reference, file)
-                        .getFile(file);
+                .getFile(file);
 
         // Add the Task to the Listener
         mListener.addDownloadTask(task);

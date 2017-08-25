@@ -26,6 +26,15 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
+        <TextView
+            android:id="@+id/saved_guides_empty_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:text="@string/saved_guides_empty_text"
+            style="@style/TextAppearance.AppCompat.Body1"/>
+
     </android.support.design.widget.CoordinatorLayout>
 
 </layout>

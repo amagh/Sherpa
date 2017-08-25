@@ -24,13 +24,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
@@ -46,9 +42,8 @@ import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
-import timber.log.Timber;
 
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 /**
  * Created by Alvin on 8/16/2017.
@@ -156,19 +151,23 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         // Populate the Adapter with the database entries
-        if (mGuideList.size() == 0 && data != null && data.moveToFirst()) {
+        if (mGuideList.size() == 0 && data != null) {
+            if (data.moveToFirst()) {
 
-            // Retrieve of list of FirebaseIds corresponding to the favorite Guides
-            List<String> guideIdList = new ArrayList<>();
-            do {
-                guideIdList.add(Guide.createGuideFromCursor(data).firebaseId);
-            } while (data.moveToNext());
+                // Retrieve of list of FirebaseIds corresponding to the favorite Guides
+                List<String> guideIdList = new ArrayList<>();
+                do {
+                    guideIdList.add(Guide.createGuideFromCursor(data).firebaseId);
+                } while (data.moveToNext());
 
-            // Hide ProgressBar
-            mBinding.favoritesPb.setVisibility(View.GONE);
+                // Hide ProgressBar
+                mBinding.favoritesPb.setVisibility(View.GONE);
 
-            // Retrieve the Guides from Firebase Databse
-            getGuides(guideIdList);
+                // Retrieve the Guides from Firebase Databse
+                getGuides(guideIdList);
+            } else {
+                showEmptyText();
+            }
         }
     }
 
@@ -204,6 +203,8 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
                     // Verify that the Author has a list of favorites
                     if (author.favorites == null) {
+                        showEmptyText();
+
                         return;
                     }
 
@@ -227,9 +228,22 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
                     // Retrieve the Guides from Firebase Database
                     getGuides(guideIdList);
+
+                    if (guideIdList.size() == 0) {
+                        showEmptyText();
+                    }
                 }
             });
         }
+    }
+
+    /**
+     * Hides the ProgressBar and shows the text indicating there are not favorite items to be
+     * displayed
+     */
+    private void showEmptyText() {
+        mBinding.favoritesPb.setVisibility(View.GONE);
+        mBinding.favoritesEmptyTv.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -301,5 +315,9 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
      */
     public void removeGuideFromAdapter(Guide guide) {
         mAdapter.removeGuide(guide.firebaseId);
+
+        if (mGuideList.size() == 0) {
+            showEmptyText();
+        }
     }
 }

@@ -25,7 +25,7 @@ import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
 
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 /**
  * Created by Alvin on 8/16/2017.
@@ -57,7 +57,6 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
 
         // Load the saved Guides from database
         getActivity().getSupportLoaderManager().initLoader(LOADER_SAVED_GUIDES, null, this);
-
         return mBinding.getRoot();
     }
 
@@ -69,7 +68,7 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
                 getActivity(),
                 GuideProvider.Guides.CONTENT_URI,
                 null,
-                GuideContract.GuideEntry.IMAGE_URI + " IS NOT NULL",
+                GuideContract.GuideEntry.IMAGE_URI + " IS NOT NULL AND " + GuideContract.GuideEntry.DRAFT + " IS NULL",
                 null,
                 GuideContract.GuideEntry.TRAIL_NAME + " ASC");
     }
@@ -79,12 +78,19 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
 
         // Check to ensure the Cursor is valid
         if (data != null) {
+
+            // Clear the Array
+            mGuideList = new ArrayList<>();
+            mAdapter.setGuides(mGuideList);
+
             if (data.moveToFirst()) {
 
                 // Add each Guide from the database to the Adapter
                 do {
                     mAdapter.addGuide(Guide.createGuideFromCursor(data));
                 } while (data.moveToNext());
+            } else {
+                mBinding.savedGuidesEmptyTv.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -119,6 +125,8 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
 
             }
         });
+
+        mAdapter.setHasStableIds(true);
 
         // Set the List for the Adapter
         mAdapter.setGuides(mGuideList);

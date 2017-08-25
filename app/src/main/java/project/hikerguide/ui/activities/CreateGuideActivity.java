@@ -1,16 +1,12 @@
 package project.hikerguide.ui.activities;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.internal.NavigationMenu;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
@@ -31,9 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import droidninja.filepicker.FilePickerBuilder;
 import droidninja.filepicker.FilePickerConst;
-import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.BR;
 import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
@@ -53,19 +47,19 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.adapters.EditGuideDetailsAdapter;
 import project.hikerguide.utilities.ContentProviderUtils;
-import timber.log.Timber;
+import project.hikerguide.utilities.GeneralUtils;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static android.support.v7.widget.helper.ItemTouchHelper.UP;
 import static project.hikerguide.ui.activities.CreateGuideActivity.BUNDLE_KEYS.FIREBASE_ID_KEY;
-import static project.hikerguide.utilities.IntentKeys.AREA_KEY;
-import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
-import static project.hikerguide.utilities.IntentKeys.SECTION_KEY;
-import static project.hikerguide.utilities.IntentKeys.TRAIL_KEY;
-import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
+import static project.hikerguide.utilities.Constants.IntentKeys.AREA_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.SECTION_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.TRAIL_KEY;
+import static project.hikerguide.utilities.Constants.RequestCodes.REQUEST_CODE_PUBLISH;
 
 /**
  * Created by Alvin on 7/27/2017.
@@ -73,8 +67,8 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
 
 public class CreateGuideActivity extends MapboxActivity implements ConnectivityActivity.ConnectivityCallback,
         LoaderManager.LoaderCallbacks<Cursor> {
+
     // ** Constants ** //
-    private static final int PERMISSION_REQUEST_EXT_STORAGE = 9687;
     private static final int LOADER_GUIDE_DRAFT             = 7912;
     private static final int LOADER_AREA_DRAFT              = 9519;
     private static final int LOADER_TRAIL_DRAFT             = 7269;
@@ -177,60 +171,6 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         // Init and set the ItemTouchHelper
         mItemTouchHelper = new ItemTouchHelper(mItemTouchCallback);
         mItemTouchHelper.attachToRecyclerView(mBinding.guideDetailsRv);
-    }
-
-    /**
-     * Opens Android-FilePicker Activity so the user may select a File to add to the Guide
-     *
-     * @param type    Type of file to be selected. Either document or media.
-     */
-    public void openFilePicker(int type) {
-
-        // Check to ensure the app has the required permissions first
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-            // Request permission to read external storage
-            requestPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_EXT_STORAGE);
-        } else {
-
-            // Launch the FilePicker based on the type of file to be added to the Guide
-            switch (type) {
-                case FilePickerConst.FILE_TYPE_DOCUMENT: {
-
-                    FilePickerBuilder.getInstance()
-                            .setMaxCount(1)
-                            .addFileSupport(getString(R.string.gpx_label), new String[]{GPX_EXT})
-                            .enableDocSupport(false)
-                            .pickFile(this);
-
-                    break;
-            }
-
-                case FilePickerConst.FILE_TYPE_MEDIA: {
-
-                    FilePickerBuilder.getInstance()
-                            .setMaxCount(1)
-                            .enableVideoPicker(false)
-                            .pickPhoto(this);
-
-                    break;
-                }
-            }
-        }
-
-    }
-
-    /**
-     * Requests Android permission for the application
-     *
-     * @param permissions    The Permission(s) to request
-     * @param requestCode    Code to request it with. For identifying the result.
-     */
-    public void requestPermission(String[] permissions, int requestCode) {
-
-        ActivityCompat.requestPermissions(this,
-                permissions,
-                requestCode);
     }
 
     @Override
@@ -342,6 +282,22 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
                 break;
             }
+
+            case REQUEST_CODE_PUBLISH:
+                if (resultCode == RESULT_OK) {
+
+                    // Retrieve Guide that was just published
+                    mGuide = data.getParcelableExtra(GUIDE_KEY);
+
+                    // Start GuideDetailsActivity for mGuide
+                    Intent intent = new Intent(this, GuideDetailsActivity.class);
+                    intent.putExtra(GUIDE_KEY, mGuide);
+
+                    startActivity(intent);
+
+                    // Close this Activity
+                    finish();
+                }
         }
     }
 
@@ -355,7 +311,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         mFilePickerModelPosition = 0;
 
         // Open the FilePicker to allow the user to select the image they want to use
-        openFilePicker(FilePickerConst.FILE_TYPE_MEDIA);
+        GeneralUtils.openFilePicker(this, GeneralUtils.DEFAULT_REQUEST_CODE, FilePickerConst.FILE_TYPE_MEDIA);
     }
 
     /**
@@ -370,7 +326,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
         if (mFilePickerModelPosition != -1) {
             // Open the FilePicker
-            openFilePicker(FilePickerConst.FILE_TYPE_MEDIA);
+            GeneralUtils.openFilePicker(this, GeneralUtils.DEFAULT_REQUEST_CODE, FilePickerConst.FILE_TYPE_MEDIA);
         }
     }
 
@@ -452,7 +408,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                     intent.putExtra(GUIDE_KEY, mGuide);
                     intent.putExtra(SECTION_KEY, mSections);
 
-                    startActivity(intent);
+                    startActivityForResult(intent, REQUEST_CODE_PUBLISH);
                 }
 
                 return true;
@@ -647,7 +603,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         mFilePickerModelPosition = mModelList.size();
 
         // Open the FilePicker to allow selection of a photo to include
-        openFilePicker(FilePickerConst.FILE_TYPE_MEDIA);
+        GeneralUtils.openFilePicker(this, GeneralUtils.DEFAULT_REQUEST_CODE, FilePickerConst.FILE_TYPE_MEDIA);
     }
 
     /**
@@ -658,7 +614,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
     public void onClickAddGpx(View view) {
 
         // Open FilePicker to allow GPX selection
-        openFilePicker(FilePickerConst.FILE_TYPE_DOCUMENT);
+        GeneralUtils.openFilePicker(this, GeneralUtils.DEFAULT_REQUEST_CODE, FilePickerConst.FILE_TYPE_DOCUMENT);
     }
 
     /**

@@ -129,9 +129,20 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
             mGuideList = new ArrayList<>();
         }
 
-        // Add the Guide to the List
-        mGuideList.add(guide);
-        notifyItemInserted(mGuideList.size() - 1);
+        // Check to see if Guide is already in the Adapter
+        boolean newGuide = true;
+
+        for (Guide listGuide : mGuideList) {
+            if (listGuide.firebaseId.equals(guide.firebaseId)) {
+                newGuide = false;
+            }
+        }
+
+        if (newGuide) {
+            // Add the Guide to the List
+            mGuideList.add(guide);
+            notifyItemInserted(mGuideList.size() - 1);
+        }
     }
 
     /**

@@ -66,7 +66,8 @@
 
         </activity>
 
-        <activity android:name=".ui.activities.PublishActivity">
+        <activity android:name=".ui.activities.PublishActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog">
 
         </activity>
 

@@ -3,6 +3,7 @@ package project.hikerguide.utilities;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -168,8 +169,23 @@ public class SaveUtils {
             return;
         }
 
+        // Resize the image
+        File resizedImage = resizeImage(model.getImageFile());
+
+        // Set the model's image to point to the resized image
+        model.setImageUri(resizedImage);
+    }
+
+    /**
+     * Resize an image file and compresses it with JPEG compression to lower the file size when
+     * stored on Firebase Storage.
+     *
+     * @param image    Image File to be resized
+     * @return Resized Image File.
+     */
+    public static File resizeImage(File image) {
         // Create a Bitmap from the model's associated imageUri
-        Bitmap bitmap = BitmapFactory.decodeFile(model.getImageUri().getPath());
+        Bitmap bitmap = BitmapFactory.decodeFile(image.getPath());
 
         // Get the dimensions of the Bitmap
         int width = bitmap.getWidth();
@@ -197,7 +213,7 @@ public class SaveUtils {
         try {
 
             // Create a temporary file with the same name as the input File
-            File imageFile = File.createTempFile(model.getImageUri().getLastPathSegment(), null);
+            File imageFile = File.createTempFile(Uri.fromFile(image).getLastPathSegment(), null);
 
             // Create a FOS to the File
             FileOutputStream outStream = new FileOutputStream(imageFile);
@@ -208,11 +224,13 @@ public class SaveUtils {
             outStream.close();
 
             // Set the Uri for the model based on the newly compressed File
-            model.setImageUri(imageFile);
+            return imageFile;
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 }
 

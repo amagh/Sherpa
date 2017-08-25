@@ -5,6 +5,7 @@
     <string name="title_account">Account</string>
     <string name="title_favorites">Favorites</string>
     <string name="title_saved_guides">Saved Guides</string>
+    <string name="title_drafts">Saved Guide Drafts</string>
 
     <string name="image_directory">/images</string>
     <string name="gpx_directory">/gpx</string>
@@ -104,12 +105,27 @@
     <string name="progress_download_map_title">Downloading Map Tiles</string>
     <string name="progress_delete_map_title">Deleting Map Tiles</string>
     <string name="progress_download_files_title">Downloading Files</string>
+    <string name="progress_upload_files_title">Uploading Files</string>
 
     <!-- User Activity Strings -->
     <string name="menu_user_log_off">Sign out</string>
+    <string name="failed_image_upload_text">Failed to upload image. Please try again later.</string>
 
     <!-- Area Activity Strings -->
     <string name="area_search_instruction_text">Search for the park/area where the trail exists</string>
+
+    <!-- Publish Activity Strings -->
+    <string name="publish_title_text">Publishing Guide. Please wait…</string>
+    <string name="publish_progress_text">Uploading file %1$d of %2$d</string>
+
+    <!-- Open Draft Activity Strings -->
+    <string name="draft_empty_text">No saved drafts.</string>
+
+    <!-- Favorites Fragment Strings -->
+    <string name="favorite_empty_text">Favorite a guide to see it here.</string>
+
+    <!-- Saved Guides Fragment Strings -->
+    <string name="saved_guides_empty_text">No saved guides.</string>
 
     <!-- Rating Related Strings -->
     <string name="list_rating_heading">Guide Reviews</string>

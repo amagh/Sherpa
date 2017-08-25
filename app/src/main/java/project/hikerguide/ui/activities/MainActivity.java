@@ -18,13 +18,12 @@ import project.hikerguide.ui.fragments.SavedGuidesFragment;
 import project.hikerguide.ui.fragments.SearchFragment;
 import project.hikerguide.ui.fragments.UserFragment;
 
-import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_ACCOUNT;
-import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_FAVORITE;
-import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_HOME;
-import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_SAVED_GUIDES;
-import static project.hikerguide.utilities.FragmentTags.FRAG_TAG_SEARCH;
-import static project.hikerguide.utilities.IntentKeys.AUTHOR_KEY;
-import static project.hikerguide.utilities.IntentKeys.GUIDE_KEY;
+import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_ACCOUNT;
+import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_FAVORITE;
+import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_HOME;
+import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_SAVED_GUIDES;
+import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_SEARCH;
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 public class MainActivity extends ConnectivityActivity implements GuideListFragment.OnGuideClickListener {
 

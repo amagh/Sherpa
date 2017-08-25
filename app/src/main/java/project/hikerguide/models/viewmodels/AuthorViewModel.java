@@ -1,12 +1,11 @@
 package project.hikerguide.models.viewmodels;
 
-import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,17 +13,28 @@ import android.widget.ImageView;
 
 import com.android.databinding.library.baseAdapters.BR;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
+import java.lang.ref.WeakReference;
+
+import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
-import project.hikerguide.ui.activities.UserActivity;
 import project.hikerguide.ui.fragments.UserFragment;
-import timber.log.Timber;
+import project.hikerguide.utilities.FirebaseProviderUtils;
+import project.hikerguide.utilities.GeneralUtils;
 
+import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_ACCOUNT;
+import static project.hikerguide.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
+import static project.hikerguide.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
 import static project.hikerguide.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
 import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
@@ -36,20 +46,14 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
 public class AuthorViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Author mAuthor;
-    private Context mContext;
-    private UserFragment mFragment;
+    private WeakReference<AppCompatActivity> mActivity;
+    private boolean mEditMode;
     private int mEditVisibility = View.INVISIBLE;
     private boolean mAccepted = false;
 
-    public AuthorViewModel(@NonNull Context context, @NonNull UserFragment fragment, @NonNull Author author) {
+    public AuthorViewModel(@NonNull AppCompatActivity activity, @NonNull Author author) {
         mAuthor = author;
-        mContext = context;
-        mFragment = fragment;
-    }
-
-    public AuthorViewModel(@NonNull Context context, @NonNull Author author) {
-        mContext = context;
-        mAuthor = author;
+        mActivity = new WeakReference<>(activity);
     }
 
     @Bindable
@@ -60,7 +64,13 @@ public class AuthorViewModel extends BaseObservable {
     @Bindable
     public UserFragment getFragment() {
 
-        return mFragment;
+        if (mActivity.get() == null) return null;
+
+        // Retrieve the Fragment using the FragmentManager
+        UserFragment fragment = (UserFragment) mActivity.get().getSupportFragmentManager()
+                .findFragmentByTag(FRAG_TAG_ACCOUNT);
+
+        return fragment;
     }
 
     @Bindable
@@ -69,7 +79,7 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @Bindable
-    public Uri getImage() {
+    public Uri getAuthorImage() {
 
         // Check whether the Author has a Uri for an offline ImageUri
         if (mAuthor.getImageUri() != null) {
@@ -85,6 +95,39 @@ public class AuthorViewModel extends BaseObservable {
         }
     }
 
+    @BindingAdapter("authorImage")
+    public static void loadImage(final ImageView imageView, final Uri authorImage) {
+
+        if (authorImage == null) return;
+
+        // Check whether to load image from File or from Firebase Storage
+        if (authorImage.getScheme().matches("gs")) {
+            StorageReference authorRef = FirebaseProviderUtils.getReferenceFromUri(authorImage);
+
+            if (authorRef == null) return;
+
+            authorRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                @Override
+                public void onSuccess(StorageMetadata storageMetadata) {
+                    // Load from Firebase Storage
+                    Glide.with(imageView.getContext())
+                            .using(new FirebaseImageLoader())
+                            .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
+                            .signature(new StringSignature(storageMetadata.getMd5Hash()))
+                            .error(R.drawable.ic_account_circle)
+                            .into(imageView);
+                }
+            });
+
+        } else {
+            // No StorageReference, load local file using the File's Uri
+            Glide.with(imageView.getContext())
+                    .load(authorImage)
+                    .error(R.drawable.ic_account_circle)
+                    .into(imageView);
+        }
+    }
+
     @Bindable
     public StorageReference getBackdrop() {
         return FirebaseStorage.getInstance().getReference()
@@ -93,16 +136,24 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @BindingAdapter("backdrop")
-    public static void loadBackdrop(ImageView imageView, StorageReference backdrop) {
-        Glide.with(imageView.getContext())
-                .using(new FirebaseImageLoader())
-                .load(backdrop)
-                .into(imageView);
+    public static void loadBackdrop(final ImageView imageView, final StorageReference backdrop) {
+
+        backdrop.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+            @Override
+            public void onSuccess(StorageMetadata storageMetadata) {
+
+                Glide.with(imageView.getContext())
+                        .using(new FirebaseImageLoader())
+                        .load(backdrop)
+                        .signature(new StringSignature(storageMetadata.getMd5Hash()))
+                        .into(imageView);
+            }
+        });
     }
 
     @Bindable
     public String getScore() {
-        return mContext.getString(R.string.list_author_format_score, mAuthor.score);
+        return mActivity.get().getString(R.string.list_author_format_score, mAuthor.score);
     }
 
     @Bindable
@@ -171,7 +222,7 @@ public class AuthorViewModel extends BaseObservable {
     public void onClickEdit(View view) {
 
         // Switch the layout between edit and display
-        mFragment.switchAuthorLayout();
+        getFragment().switchAuthorLayout();
     }
 
     public void onClickAccept(View view) {
@@ -179,6 +230,36 @@ public class AuthorViewModel extends BaseObservable {
         // Switch the variable to indicate that the user has clicked accept
         mAccepted = true;
         notifyPropertyChanged(BR.accepted);
+    }
+
+    public void onClickBackdrop(View view) {
+
+        // Check to ensure the user is clicking their own backdrop image
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || !user.getUid().equals(mAuthor.firebaseId)) {
+            return;
+        }
+
+        // Open FilePicker for selecting backdrop image
+        GeneralUtils.openFilePicker(
+                getFragment(),
+                REQUEST_CODE_BACKDROP,
+                FilePickerConst.FILE_TYPE_MEDIA);
+    }
+
+    public void onClickProfileImage(View view) {
+
+        // Check to ensure the user is clicking their own profile image
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || !user.getUid().equals(mAuthor.firebaseId)) {
+            return;
+        }
+
+        // Open FilePicker for selecting profile image
+        GeneralUtils.openFilePicker(
+                getFragment(),
+                REQUEST_CODE_PROFILE_PIC,
+                FilePickerConst.FILE_TYPE_MEDIA);
     }
 
     /**

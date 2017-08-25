@@ -32,6 +32,7 @@ import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.
 import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
 import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.SECTION;
 import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.utilities.FirebaseProviderUtils.GEOFIRE_PATH;
 
 /**
  * The Provider that will be used to interface with Firebase Database.
@@ -45,7 +46,7 @@ import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.
 public class DatabaseProvider {
     // ** Constants ** //
     private static final String TAG = DatabaseProvider.class.getSimpleName();
-    public static final String GEOFIRE_PATH = "geofire";
+
     private static final String GUIDE_ID = "guideId";
     private static final int GUIDE_LIMIT = 20;
 
