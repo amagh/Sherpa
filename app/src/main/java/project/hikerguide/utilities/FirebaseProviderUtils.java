@@ -166,6 +166,10 @@ public class FirebaseProviderUtils {
                 models = new Area[modelList.size()];
                 break;
 
+            case RATING:
+                models = new Rating[modelList.size()];
+                break;
+
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
         }
 
@@ -205,6 +209,8 @@ public class FirebaseProviderUtils {
                 break;
 
             case RATING:
+                model = dataSnapshot.getValue(Rating.class);
+                break;
 
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
         }
