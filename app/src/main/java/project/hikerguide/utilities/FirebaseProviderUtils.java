@@ -249,6 +249,48 @@ public class FirebaseProviderUtils {
     }
 
     /**
+     * Retrieves an Array of Sections from Firebase Database corresponding to the FirebaseId of
+     * a Guide
+     *
+     * @param firebaseId    FirebaseId of the Guide to retrieve the Sections for
+     * @param listener      Listener to pass the retrieved Sections to the calling Object
+     */
+    public static void getSectionsForGuide(String firebaseId, final FirebaseArrayListener listener) {
+
+        // Query the database for Sections that match the FirebaseId of the Guide in the signature
+        final Query query = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.SECTIONS)
+                .orderByKey()
+                .equalTo(firebaseId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                // Check that the DataSnapshot is valid
+                if (dataSnapshot.exists()) {
+
+                    // Convert the DataSnapshot to an Array of BaseModels
+                    BaseModel[] models = getModelsFromSnapshot(SECTION, dataSnapshot);
+
+                    // Return the Sections to the calling Object
+                    listener.onModelsReady(models);
+                }
+
+                // Remove the Listener
+                query.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                // Remove the Listener
+                query.removeEventListener(this);
+            }
+        });
+    }
+
+    /**
      * Retrieves the Author data model representing the FirebaseUser currently logged in
      *
      * @param listener The Listener that will be used to pass the retrieved Author to the calling
