@@ -488,6 +488,54 @@ public class FirebaseProviderUtils {
                 });
     }
 
+    /**
+     * Retrieves ratings for a specific Guide
+     *
+     * @param guide       Guide to retrieve Ratings for
+     * @param page        Correlates to the number of Ratings to be returned
+     * @param listener    Listener that will be used to pass the Ratings to the calling Object
+     */
+    public static void getRatingsForGuide(Guide guide, int page, final FirebaseArrayListener listener) {
+
+        // Setup the query
+        Query ratingQuery = FirebaseDatabase.getInstance().getReference()
+                .child(RATING_DIRECTORY)
+                .orderByChild("guideId")
+                .equalTo(guide.firebaseId);
+
+        if (page == 0) {
+
+            // For page 0, only return 5 reviews as a preview of the reviews
+            ratingQuery = ratingQuery.limitToLast(5);
+        } else {
+
+            // For subsequent pages, return an additional 20 for each page
+            ratingQuery = ratingQuery.limitToLast(5 + 20 * page);
+        }
+
+        final Query finalRatingQuery = ratingQuery;
+
+        ratingQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                // Retrieve the Ratings and pass them to the Listener
+                Rating[] ratings = (Rating[]) getModelsFromSnapshot(RATING, dataSnapshot);
+
+                listener.onModelsReady(ratings);
+
+                // Remove the Listener
+                finalRatingQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                // Remove the Listener
+                finalRatingQuery.removeEventListener(this);
+            }
+        });
+    }
 
     /**
      * Returns an instance of GeoFire that is already set to the correct Firebase Database Reference
