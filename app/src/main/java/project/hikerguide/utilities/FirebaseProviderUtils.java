@@ -52,7 +52,7 @@ public class FirebaseProviderUtils {
     public static final String GPX_EXT = ".gpx";
     public static final String BACKDROP_SUFFIX = "_bd";
 
-    private static final String RATING_DIRECTORY = "ratings";
+    public static final String RATING_DIRECTORY = "ratings";
 
     /**
      * Helper method for getting the directory of a type
@@ -312,7 +312,7 @@ public class FirebaseProviderUtils {
     public static void updateRating(final Rating rating, final int previousRating) {
 
         // Add a FirebaseId to the Rating if it doesn't already have one
-        if (rating.firebaseId != null) {
+        if (rating.firebaseId == null) {
             rating.firebaseId = FirebaseDatabase.getInstance().getReference()
                     .child(RATING_DIRECTORY)
                     .push()
@@ -327,7 +327,7 @@ public class FirebaseProviderUtils {
         String directory = RATING_DIRECTORY + "/" + rating.firebaseId;
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(directory, rating);
+        childUpdates.put(directory, rating.toMap());
 
         FirebaseDatabase.getInstance().getReference()
                 .updateChildren(childUpdates);
