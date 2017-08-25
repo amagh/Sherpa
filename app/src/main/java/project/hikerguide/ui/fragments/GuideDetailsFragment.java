@@ -119,7 +119,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         }
 
         // Setup the Adapter
-        mAdapter = new GuideDetailsAdapter(new GuideDetailsAdapter.ClickHandler() {
+        mAdapter = new GuideDetailsAdapter((GuideDetailsActivity) getActivity(), new GuideDetailsAdapter.ClickHandler() {
             @Override
             public void onClickAuthor(Author author) {
                 Intent intent = new Intent(getActivity(), UserActivity.class);
@@ -252,7 +252,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                     mGuide = Guide.createGuideFromCursor(data);
 
                     // Set the Guide to the Adapter
-                    mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
+                    mAdapter.addModel(mGuide);
                 }
 
                 break;
@@ -267,10 +267,10 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                     for (int i = 0; i < data.getCount(); i++) {
                         data.moveToPosition(i);
                         mSections[i] = Section.createSectionFromCursor(data);
-                    }
 
-                    // Pass mSections to the Adapter
-                    mAdapter.setSections(mSections);
+                        // Pass mSections to the Adapter
+                        mAdapter.addModel(mSections[i]);
+                    }
                 }
 
                 break;
@@ -284,7 +284,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                     mAuthor = Author.createAuthorFromCursor(data);
 
                     // Set the Author to the Adapter
-                    mAdapter.setAuthor(mAuthor);
+                    mAdapter.addModel(mAuthor);
                 }
 
                 break;
@@ -303,7 +303,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         if (!isGuideCached() && mSections == null) {
 
             // Set the data for the Adapter
-            mAdapter.setGuide(mGuide, (GuideDetailsActivity) getActivity());
+            getGuideFromFirebase();
             getSectionsFromFirebase();
             getAuthorFromFirebase();
         }
@@ -344,6 +344,41 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
     }
 
     /**
+     * Loads the Guide from Firebase to ensure the data is fresh
+     */
+    private void getGuideFromFirebase() {
+
+        // Get Reference for Guide
+        final DatabaseReference guideRef = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.GUIDES)
+                .child(mGuide.firebaseId);
+
+        guideRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                // Set the memvar to the retreived Guide
+                mGuide = (Guide) FirebaseProviderUtils.getModelFromSnapshot(
+                        DatabaseProvider.FirebaseType.GUIDE,
+                        dataSnapshot);
+
+                // Add the Guide to the Adapter
+                mAdapter.addModel(mGuide);
+
+                // Remove Listener
+                guideRef.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                // Remove Listener
+                guideRef.removeEventListener(this);
+            }
+        });
+    }
+
+    /**
      * Loads the corresponding Sections for the Guide from FirebaseDatabase
      */
     private void getSectionsFromFirebase() {
@@ -367,8 +402,9 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                             snapshot);
                 }
 
-                // Set the Sections to be used by the Adapter
-                mAdapter.setSections(mSections);
+                for (Section section : mSections) {
+                    mAdapter.addModel(section);
+                }
 
                 // Remove the Listener
                 sectionQuery.removeEventListener(this);
@@ -404,7 +440,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                         dataSnapshot);
 
                 // Set the Author to be used by the Adapter
-                mAdapter.setAuthor(mAuthor);
+                mAdapter.addModel(mAuthor);
 
                 // Remove the Listener
                 authorReference.removeEventListener(this);
@@ -507,7 +543,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         StorageReference reference = FirebaseStorage.getInstance().getReference();
         StorageTask<FileDownloadTask.TaskSnapshot> task =
                 FirebaseProviderUtils.getReferenceForFile(reference, file)
-                .getFile(file);
+                        .getFile(file);
 
         // Add the Task to the Listener
         mListener.addDownloadTask(task);
@@ -516,12 +552,12 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
 
+                // Remove the Task from the Listener
+                mListener.removeDownloadTask(taskSnapshot.getTask());
+
                 if (file instanceof GpxFile) {
                     mGuide.setGpxUri(file);
                 }
-
-                // Remove the Task from the Listener
-                mListener.removeDownloadTask(taskSnapshot.getTask());
             }
         });
     }
