@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import project.hikerguide.R;
-import project.hikerguide.databinding.ListItemAddRatingBinding;
 import project.hikerguide.databinding.ListItemAuthorBinding;
 import project.hikerguide.databinding.ListItemGuideDetailsBinding;
 import project.hikerguide.databinding.ListItemRatingBinding;
+import project.hikerguide.databinding.ListItemRatingEditBinding;
 import project.hikerguide.databinding.ListItemSectionImageBinding;
 import project.hikerguide.databinding.ListItemSectionTextBinding;
 import project.hikerguide.models.datamodels.Author;
@@ -439,7 +439,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
                     // to rate the Guide with
                     RatingViewModel vm = new RatingViewModel((Rating) model, mAdapter, mUser);
 
-                    ((ListItemAddRatingBinding) mBinding).setVm(vm);
+                    ((ListItemRatingEditBinding) mBinding).setVm(vm);
                 } else {
 
                     RatingViewModel vm = new RatingViewModel((Rating) model, mAdapter);

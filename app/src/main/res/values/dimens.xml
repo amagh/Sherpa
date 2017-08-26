@@ -62,6 +62,7 @@
 
     <dimen name="rating_star_size">32dp</dimen>
     <dimen name="rating_star_padding">4dp</dimen>
+    <dimen name="rating_star_top_margin">4dp</dimen>
     <dimen name="list_rating_horizontal_separation">64dp</dimen>
 
 </resources>
