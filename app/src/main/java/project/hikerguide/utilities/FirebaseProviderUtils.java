@@ -411,7 +411,7 @@ public class FirebaseProviderUtils {
         updateAuthorScore(rating, previousRating);
 
         // Push the Rating to the Firebase Database
-        String directory = RATING_DIRECTORY + "/" + rating.firebaseId;
+        String directory = RATING_DIRECTORY + "/" + rating.getGuideId() + "/" + rating.firebaseId;
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(directory, rating.toMap());
@@ -440,6 +440,8 @@ public class FirebaseProviderUtils {
                         // Retrieve the corresponding Guide for the Rating
                         Guide guide = mutableData.getValue(Guide.class);
                         guide.rating += rating.getRating() - previousRating;
+
+                        Timber.d(guide.toMap().toString());
 
                         if (previousRating == 0) {
 
@@ -471,7 +473,7 @@ public class FirebaseProviderUtils {
         // Build the Transaction
         FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.AUTHORS)
-                .child(rating.getAuthorId())
+                .child(rating.getGuideAuthorId())
                 .runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
@@ -479,8 +481,10 @@ public class FirebaseProviderUtils {
                         // Get the Author from the data
                         Author author = mutableData.getValue(Author.class);
 
+                        Timber.d("New Rating: " + rating.getRating() + " | Previous Rating: " + previousRating);
+
                         // Change the Author's score
-                        author.score += (rating.getRating() - previousRating);
+                        author.score += rating.getRating() - previousRating;
 
                         // Set the data to be updated to Firebase Database
                         mutableData.setValue(author);
@@ -506,7 +510,7 @@ public class FirebaseProviderUtils {
         // Setup the query
         Query ratingQuery = FirebaseDatabase.getInstance().getReference()
                 .child(RATING_DIRECTORY)
-                .orderByChild("guideId")
+                .orderByKey()
                 .equalTo(guide.firebaseId);
 
         if (page == 0) {
@@ -525,11 +529,20 @@ public class FirebaseProviderUtils {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                // Retrieve the Ratings and pass them to the Listener
-                Rating[] ratings = (Rating[]) getModelsFromSnapshot(RATING, dataSnapshot);
+                if (dataSnapshot.exists()) {
 
-                listener.onModelsReady(ratings);
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        // Retrieve the Ratings and pass them to the Listener
+                        Rating[] ratings = (Rating[]) getModelsFromSnapshot(RATING, snapshot);
 
+                        listener.onModelsReady(ratings);
+                    }
+
+                } else {
+
+                    // No data found, return null
+                    listener.onModelsReady(null);
+                }
                 // Remove the Listener
                 finalRatingQuery.removeEventListener(this);
             }
@@ -539,6 +552,60 @@ public class FirebaseProviderUtils {
 
                 // Remove the Listener
                 finalRatingQuery.removeEventListener(this);
+            }
+        });
+    }
+
+    /**
+     * Retrieves a Rating specific to a Guide for the logged in Firebase User
+     *
+     * @param guideId     The FirebaseId of the Guide to retrieve the Rating for
+     * @param listener    The Listener that will be used to pass the Rating to the calling Object
+     */
+    public static void getGuideRatingForFirebaseUser(String guideId, final FirebaseListener listener) {
+
+        // Check to ensure the Firebase User is logged in
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) {
+            listener.onModelReady(null);
+            return;
+        }
+
+        // Generate the Query for the Rating
+        final Query ratingQuery = FirebaseDatabase.getInstance().getReference()
+                .child(RATING_DIRECTORY)
+                .child(guideId)
+                .orderByChild(Rating.AUTHOR_ID)
+                .equalTo(user.getUid());
+
+        ratingQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.exists()) {
+
+                    // Retrieve the Rating from the DataSnapshot
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        listener.onModelReady(getModelFromSnapshot(RATING, snapshot));
+                        break;
+                    }
+
+                } else {
+
+                    // Nothing found, return null
+                    listener.onModelReady(null);
+                }
+
+                // Remove the Listener
+                ratingQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                // Remove the Listener
+                ratingQuery.removeEventListener(this);
             }
         });
     }

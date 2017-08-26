@@ -17,15 +17,16 @@ import timber.log.Timber;
 
 public class Rating extends BaseModel {
     // ** Constants ** //
-    private static final String GUIDE_ID    = "guideId";
+    public static final String GUIDE_ID    = "guideId";
     private static final String COMMENT     = "comment";
     private static final String RATING      = "rating";
-    private static final String AUTHOR_ID   = "authorId";
+    public static final String AUTHOR_ID   = "authorId";
     private static final String AUTHOR_NAME = "authorName";
     private static final String DATE_ADDED  = "dateAdded";
 
     // ** Member Variables ** //
     private String guideId;
+    private String guideAuthorId;
     private String comment;
     private int rating;
     private String authorId;
@@ -67,6 +68,11 @@ public class Rating extends BaseModel {
         return guideId;
     }
 
+    @Exclude
+    public String getGuideAuthorId() {
+        return guideAuthorId;
+    }
+
     public String getComment() {
         return comment;
     }
@@ -98,6 +104,10 @@ public class Rating extends BaseModel {
 
     public void setGuideId(String guideId) {
         this.guideId = guideId;
+    }
+
+    public void setGuideAuthorId(String guideAuthorId) {
+        this.guideAuthorId = guideAuthorId;
     }
 
     public void setComment(String comment) {

@@ -241,6 +241,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         return gpxFile;
     }
 
+    @Exclude
     public boolean isFavorite() {
         return favorite;
     }
