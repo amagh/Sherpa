@@ -48,6 +48,7 @@ import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
@@ -303,9 +304,39 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         if (!isGuideCached() && mSections == null) {
 
             // Set the data for the Adapter
-            getGuideFromFirebase();
-            getSectionsFromFirebase();
-            getAuthorFromFirebase();
+            FirebaseProviderUtils.getModel(
+                    FirebaseProviderUtils.FirebaseType.GUIDE,
+                    mGuide.firebaseId,
+                    new FirebaseProviderUtils.FirebaseListener() {
+                        @Override
+                        public void onModelReady(BaseModel model) {
+                            mGuide = (Guide) model;
+                            mAdapter.addModel(mGuide);
+                        }
+                    });
+
+            FirebaseProviderUtils.getSectionsForGuide(
+                    mGuide.firebaseId,
+                    new FirebaseProviderUtils.FirebaseArrayListener() {
+                        @Override
+                        public void onModelsReady(BaseModel[] models) {
+                            mSections = (Section[]) models;
+                            for (Section section : mSections) {
+                                mAdapter.addModel(section);
+                            }
+                        }
+                    });
+
+            FirebaseProviderUtils.getModel(
+                    FirebaseProviderUtils.FirebaseType.AUTHOR,
+                    mGuide.authorId,
+                    new FirebaseProviderUtils.FirebaseListener() {
+                        @Override
+                        public void onModelReady(BaseModel model) {
+                            mAuthor = (Author) model;
+                            mAdapter.addModel(mAuthor);
+                        }
+                    });
         }
     }
 
@@ -341,119 +372,6 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
         // Remove the ActionView of the menu icon
         mCacheMenuItem.setActionView(null);
-    }
-
-    /**
-     * Loads the Guide from Firebase to ensure the data is fresh
-     */
-    private void getGuideFromFirebase() {
-
-        // Get Reference for Guide
-        final DatabaseReference guideRef = FirebaseDatabase.getInstance().getReference()
-                .child(GuideDatabase.GUIDES)
-                .child(mGuide.firebaseId);
-
-        guideRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                // Set the memvar to the retreived Guide
-                mGuide = (Guide) FirebaseProviderUtils.getModelFromSnapshot(
-                        FirebaseProviderUtils.FirebaseType.GUIDE,
-                        dataSnapshot);
-
-                // Add the Guide to the Adapter
-                mAdapter.addModel(mGuide);
-
-                // Remove Listener
-                guideRef.removeEventListener(this);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-                // Remove Listener
-                guideRef.removeEventListener(this);
-            }
-        });
-    }
-
-    /**
-     * Loads the corresponding Sections for the Guide from FirebaseDatabase
-     */
-    private void getSectionsFromFirebase() {
-
-        // Build the Query for the Sections using the FirebaseId of the Guide
-        final Query sectionQuery = FirebaseDatabase.getInstance().getReference()
-                .child(GuideDatabase.SECTIONS)
-                .orderByKey()
-                .equalTo(mGuide.firebaseId);
-
-        // Add a Listener for when the data is ready
-        sectionQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Convert the DataSnapshot to the Section model
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    // The DataSnapshot containing the Sections is a child of the child
-                    // (grand-child?) of the DataSnapshot from the signature
-                    mSections = (Section[]) FirebaseProviderUtils.getModelsFromSnapshot(
-                            FirebaseProviderUtils.FirebaseType.SECTION,
-                            snapshot);
-                }
-
-                for (Section section : mSections) {
-                    mAdapter.addModel(section);
-                }
-
-                // Remove the Listener
-                sectionQuery.removeEventListener(this);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Timber.e(databaseError.getMessage());
-
-                // Remove the Listener
-                sectionQuery.removeEventListener(this);
-            }
-        });
-    }
-
-    /**
-     * Loads the corresponding Author of the Guide from the Firebase Database
-     */
-    private void getAuthorFromFirebase() {
-
-        // Build a reference to the Guide in the Firebase Database
-        final DatabaseReference authorReference = FirebaseDatabase.getInstance().getReference()
-                .child(GuideDatabase.AUTHORS)
-                .child(mGuide.authorId);
-
-        // Add a Listener
-        authorReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Convert the DataSnapshot to an Author
-                mAuthor = (Author) FirebaseProviderUtils.getModelFromSnapshot(
-                        FirebaseProviderUtils.FirebaseType.AUTHOR,
-                        dataSnapshot);
-
-                // Set the Author to be used by the Adapter
-                mAdapter.addModel(mAuthor);
-
-                // Remove the Listener
-                authorReference.removeEventListener(this);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Timber.e(databaseError.getMessage());
-
-                // Remove the Listener
-                authorReference.removeEventListener(this);
-            }
-        });
     }
 
     /**

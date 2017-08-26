@@ -296,11 +296,16 @@ public class FirebaseProviderUtils {
                 // Check that the DataSnapshot is valid
                 if (dataSnapshot.exists()) {
 
-                    // Convert the DataSnapshot to an Array of BaseModels
-                    Section[] models = (Section[]) getModelsFromSnapshot(SECTION, dataSnapshot);
 
-                    // Return the Sections to the calling Object
-                    listener.onModelsReady(models);
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        // Convert the DataSnapshot to an Array of BaseModels
+                        Section[] models = (Section[]) getModelsFromSnapshot(SECTION, snapshot);
+
+                        // Return the Sections to the calling Object
+                        listener.onModelsReady(models);
+
+                        return;
+                    }
                 }
 
                 // Remove the Listener
