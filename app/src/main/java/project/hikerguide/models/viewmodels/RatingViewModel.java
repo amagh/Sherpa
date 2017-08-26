@@ -191,32 +191,29 @@ public class RatingViewModel extends BaseObservable {
         }
     }
 
-    public void onClickStar1(View view) {
-        mRating.setRating(1);
+    public void onClickStarRating(View view) {
 
-        notifyPropertyChanged(BR.rating);
-    }
+        switch (view.getId()) {
+            case R.id.list_rating_star_1:
+                mRating.setRating(1);
+                break;
 
-    public void onClickStar2(View view) {
-        mRating.setRating(2);
+            case R.id.list_rating_star_2:
+                mRating.setRating(2);
+                break;
 
-        notifyPropertyChanged(BR.rating);
-    }
+            case R.id.list_rating_star_3:
+                mRating.setRating(3);
+                break;
 
-    public void onClickStar3(View view) {
-        mRating.setRating(3);
+            case R.id.list_rating_star_4:
+                mRating.setRating(4);
+                break;
 
-        notifyPropertyChanged(BR.rating);
-    }
-
-    public void onClickStar4(View view) {
-        mRating.setRating(4);
-
-        notifyPropertyChanged(BR.rating);
-    }
-
-    public void onClickStar5(View view) {
-        mRating.setRating(5);
+            case R.id.list_rating_star_5:
+                mRating.setRating(5);
+                break;
+        }
 
         notifyPropertyChanged(BR.rating);
     }
