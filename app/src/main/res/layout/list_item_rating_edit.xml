@@ -49,6 +49,18 @@
             app:authorImage="@{vm.authorImage}"
             tools:src="@drawable/ic_account_circle"/>
 
+        <ImageView
+            android:id="@+id/list_rating_cancel_iv"
+            android:layout_width="@dimen/list_section_icon_size"
+            android:layout_height="@dimen/list_section_icon_size"
+            android:padding="@dimen/list_section_icon_padding"
+            android:src="@drawable/ic_close"
+            android:tint="@color/red_900"
+            android:onClick="@{vm::onClickCancelEditRating}"
+            app:layout_constraintLeft_toRightOf="@id/list_rating_star_5"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/list_rating_title_tv"/>
+
         <TextView
             android:id="@+id/list_rating_author_tv"
             android:layout_width="0dp"

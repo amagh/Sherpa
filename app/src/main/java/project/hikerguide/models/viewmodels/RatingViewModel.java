@@ -260,4 +260,8 @@ public class RatingViewModel extends BaseObservable {
     public void onClickEditRating(View view) {
         mAdapter.enterEditMode();
     }
+
+    public void onClickCancelEditRating(View view) {
+        mAdapter.updateRating(mOriginalRating.getRating(), mOriginalRating.getRating());
+    }
 }
