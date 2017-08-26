@@ -14,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
@@ -24,11 +23,12 @@
             android:id="@+id/list_author_heading_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:gravity="center_horizontal"
+            android:text="@string/list_author_heading"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:text="@string/list_author_heading"/>
+            style="@style/Base.TextAppearance.AppCompat.Subhead"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/list_author_iv"
@@ -72,6 +72,7 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/list_author_name_tv"
             tools:text="@string/list_author_description_text"/>
+
 
     </android.support.constraint.ConstraintLayout>
 

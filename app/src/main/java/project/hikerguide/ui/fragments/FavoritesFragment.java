@@ -275,7 +275,7 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
                         // Create Guide from DataSnapshot
                         Guide guide = (Guide) FirebaseProviderUtils.getModelFromSnapshot(
-                                DatabaseProvider.FirebaseType.GUIDE,
+                                FirebaseProviderUtils.FirebaseType.GUIDE,
                                 dataSnapshot);
 
                         // Add the Guide to the Adapter

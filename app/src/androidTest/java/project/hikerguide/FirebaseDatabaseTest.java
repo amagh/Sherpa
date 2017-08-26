@@ -8,6 +8,7 @@ import com.firebase.geofire.GeoLocation;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.junit.After;
@@ -15,13 +16,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.Rating;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
@@ -35,11 +41,12 @@ import static junit.framework.Assert.assertNull;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AUTHOR;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.SECTION;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.AREA;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.SECTION;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.TRAIL;
+import static project.hikerguide.utilities.FirebaseProviderUtils.RATING_DIRECTORY;
 
 /**
  * Created by Alvin on 7/17/2017.
@@ -211,6 +218,100 @@ public class FirebaseDatabaseTest {
 
         String errorWrongNames = "The search query did not return all the names expected.";
         assertEmpty(errorWrongNames, expectedNames);
+    }
+
+    @Test
+    public void testRating() {
+
+        // Generate the Guide and Author
+        final Guide guide = TestUtilities.getGuide1(mContext);
+        final Author author = TestUtilities.getAuthor1(mContext);
+
+        // Generate the Rating
+        final Rating rating = new Rating();
+        rating.setGuideId(guide.firebaseId);
+        rating.setComment("Test Comment");
+        rating.setRating(5);
+        rating.setAuthorName(author.name);
+        rating.setAuthorId(author.firebaseId);
+        rating.addDate();
+
+        // Object lock to ensure the test runs to completion
+        final AtomicBoolean check = new AtomicBoolean(false);
+
+        // Insert the rating into Firebase
+        FirebaseProviderUtils.updateRating(rating, 0);
+
+        // Query for the Rating by GuideId
+        final Query queryByGuide = FirebaseDatabase.getInstance().getReference()
+                .child(RATING_DIRECTORY)
+                .orderByChild(GuideContract.SectionEntry.GUIDE_ID)
+                .equalTo(rating.getGuideId());
+
+        queryByGuide.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+                            // Verify the returned Rating matches the inserted Rating
+                            Rating returnedRating = dataSnapshot.getValue(Rating.class);
+                            returnedRating.firebaseId = snapshot.getKey();
+                            TestUtilities.validateModelValues(rating, returnedRating);
+                        }
+
+                        queryByGuide.removeEventListener(this);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        queryByGuide.removeEventListener(this);
+                    }
+                });
+
+        // Query for the Rating by the AuthorId
+        final Query queryByAuthor = FirebaseDatabase.getInstance().getReference()
+                .child(GuideContract.GuideEntry.AUTHOR_ID)
+                .orderByChild(rating.getAuthorId())
+                .equalTo(rating.getAuthorId());
+
+        queryByAuthor.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+                    // Verify the returned Rating matches the inserted Rating
+                    Rating returnedRating = dataSnapshot.getValue(Rating.class);
+                    returnedRating.firebaseId = snapshot.getKey();
+                    TestUtilities.validateModelValues(rating, returnedRating);
+                }
+
+                // Allow the test to proceed
+                synchronized (check) {
+                    check.set(true);
+                    check.notifyAll();
+                }
+
+                queryByAuthor.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                queryByAuthor.removeEventListener(this);
+            }
+        });
+
+        // Wait until the Ratings are verified before proceeding
+        synchronized (check) {
+            while (!check.get()) {
+                try {
+                    check.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public Guide insertGuide() {

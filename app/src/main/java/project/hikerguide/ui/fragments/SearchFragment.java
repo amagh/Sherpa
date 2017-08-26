@@ -231,7 +231,7 @@ public class SearchFragment extends MapboxFragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Convert the DataSnapshot to a Guide
                 Guide guide = (Guide) FirebaseProviderUtils.getModelFromSnapshot(
-                        DatabaseProvider.FirebaseType.GUIDE,
+                        FirebaseProviderUtils.FirebaseType.GUIDE,
                         dataSnapshot);
 
                 // Add the Guide to the Adapter

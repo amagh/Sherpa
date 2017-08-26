@@ -265,7 +265,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
                     // Convert the DataSnapshot to an Author Object
                     mAuthor = (Author) FirebaseProviderUtils
-                            .getModelFromSnapshot(DatabaseProvider.FirebaseType.AUTHOR, dataSnapshot);
+                            .getModelFromSnapshot(FirebaseProviderUtils.FirebaseType.AUTHOR, dataSnapshot);
                 }
 
                 // Remove Listener
@@ -415,7 +415,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                 // Check that the returned values are valid
                 if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
                     Guide[] guides = (Guide[]) FirebaseProviderUtils
-                            .getModelsFromSnapshot(DatabaseProvider.FirebaseType.GUIDE, dataSnapshot);
+                            .getModelsFromSnapshot(FirebaseProviderUtils.FirebaseType.GUIDE, dataSnapshot);
 
                     // Add each Guide to the Adapter
                     for (int i = guides.length -1; i > -1; i--) {

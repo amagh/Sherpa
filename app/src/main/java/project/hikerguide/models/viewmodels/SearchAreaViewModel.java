@@ -267,7 +267,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                 if (dataSnapshot.exists()) {
 
                     // Convert to a List of Areas and then pass it to the Adapter
-                    Object[] areas = (Object[]) FirebaseProviderUtils.getModelsFromSnapshot(DatabaseProvider.FirebaseType.AREA, dataSnapshot);
+                    Object[] areas = (Object[]) FirebaseProviderUtils.getModelsFromSnapshot(FirebaseProviderUtils.FirebaseType.AREA, dataSnapshot);
                     mAdapter.setAreaList(Arrays.asList(areas));
 
                     delay = SEARCH_DELAY;

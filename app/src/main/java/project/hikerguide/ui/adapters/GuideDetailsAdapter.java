@@ -8,22 +8,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemAuthorBinding;
 import project.hikerguide.databinding.ListItemGuideDetailsBinding;
+import project.hikerguide.databinding.ListItemRatingBinding;
+import project.hikerguide.databinding.ListItemRatingEditBinding;
 import project.hikerguide.databinding.ListItemSectionImageBinding;
 import project.hikerguide.databinding.ListItemSectionTextBinding;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.models.datamodels.Rating;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
+import project.hikerguide.models.viewmodels.RatingViewModel;
 import project.hikerguide.models.viewmodels.SectionViewModel;
 import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.utilities.FirebaseProviderUtils;
@@ -39,6 +41,8 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
     private static final int SECTION_VIEW_TYPE          = 1;
     private static final int SECTION_IMAGE_VIEW_TYPE    = 2;
     private static final int AUTHOR_VIEW_TYPE           = 3;
+    private static final int RATING_VIEW_TYPE           = 4;
+    private static final int ADD_RATING_VIEW_TYPE       = 5;
 
     // ** Member Variables ** //
     private SortedList.Callback<BaseModel> mSortedListCallback = new SortedList.Callback<BaseModel>() {
@@ -50,6 +54,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
             classList.add(Guide.class);
             classList.add(Section.class);
             classList.add(Author.class);
+            classList.add(Rating.class);
 
             // Compare the items
             if (o1.getClass().equals(Section.class) && o2.getClass().equals(Section.class)) {
@@ -58,6 +63,21 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
                 return ((Section) o1).section < ((Section) o2).section
                         ? -1
                         : ((Section) o1).section > ((Section) o2).section
+                        ? 1
+                        : 0;
+            } else if (o1.getClass().equals(Rating.class) && o2.getClass().equals(Rating.class)) {
+
+                if (mUser != null) {
+                    if (((Rating) o1).getAuthorId().equals(mUser.firebaseId) || ((Rating) o1).getRating() == 0) {
+                        return -1;
+                    } else if (((Rating) o2).getAuthorId().equals(mUser.firebaseId) || ((Rating) o2).getRating() == 0) {
+                        return 1;
+                    }
+                }
+
+                return ((Rating) o1).getDate() < ((Rating) o2).getDate()
+                        ? -1
+                        : ((Rating) o1).getDate() > ((Rating) o2).getDate()
                         ? 1
                         : 0;
             } else {
@@ -105,10 +125,26 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
 
     private MapboxActivity mActivity;
     private ClickHandler mClickHandler;
+    private Guide mGuide;
+    private Author mUser;
+    private boolean mIsInEditMode;
 
     public GuideDetailsAdapter(MapboxActivity activity, ClickHandler clickHandler) {
         mActivity = activity;
         mClickHandler = clickHandler;
+
+        FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
+            @Override
+            public void onModelReady(BaseModel model) {
+                mUser = (Author) model;
+
+                if (mGuide != null) {
+
+                    // Add the user's review of the Guide
+                    addUserReview();
+                }
+            }
+        });
     }
 
     @Override
@@ -134,11 +170,19 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
                 layoutId = R.layout.list_item_author;
                 break;
 
+            case RATING_VIEW_TYPE:
+                layoutId = R.layout.list_item_rating;
+                break;
+
+            case ADD_RATING_VIEW_TYPE:
+                layoutId = R.layout.list_item_rating_edit;
+                break;
+
             default: throw new UnsupportedOperationException("Unknown view type: " + viewType);
         }
 
         ViewDataBinding binding = DataBindingUtil.inflate(inflater, layoutId, parent, false);
-        return new GuideDetailsViewHolder(binding);
+        return new GuideDetailsViewHolder(binding, this);
     }
 
     @Override
@@ -168,6 +212,20 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
             } else {
                 return SECTION_VIEW_TYPE;
             }
+        } else if (model instanceof Rating) {
+            if (((Rating) model).getRating() == 0) {
+
+                // If the Rating has a rating of 0, then it must be edited
+                mIsInEditMode = true;
+            }
+
+            if (mIsInEditMode && ((Rating) model).getAuthorId().equals(mUser.firebaseId)) {
+
+                // For adding a new rating or editing a user's previous rating
+                return ADD_RATING_VIEW_TYPE;
+            } else {
+                return RATING_VIEW_TYPE;
+            }
         }
 
         return super.getItemViewType(position);
@@ -183,15 +241,141 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
         // Iterate through and check to see if the model is already in the Adapter
         for (int i = 0; i < mModelsList.size(); i++) {
 
-            if (mModelsList.get(i).firebaseId.equals(model.firebaseId)) {
+            if (mModelsList.get(i).firebaseId != null &&
+                    mModelsList.get(i).firebaseId.equals(model.firebaseId)) {
 
                 // Model is in Adapter, do nothing
                 return;
             }
         }
 
+        if (model instanceof Guide) {
+
+            // Set memvar to the Guide
+            mGuide = (Guide) model;
+
+            // If User is logged in, add the User's review of this Guide
+            if (mUser != null) addUserReview();
+
+            // Retrieve the Ratings for the displayed Guide
+            FirebaseProviderUtils.getRatingsForGuide((Guide) model, 0, new FirebaseProviderUtils.FirebaseArrayListener() {
+                @Override
+                public void onModelsReady(BaseModel[] models) {
+
+                    if (models == null) return;
+
+                    // Add the Ratings to the Adapter
+                    Rating[] ratings = (Rating[]) models;
+
+                    for (Rating rating : ratings) {
+                        addModel(rating);
+                    }
+                }
+            });
+        }
+
         // Add the Model to the Adapter
         mModelsList.add(model);
+    }
+
+    /**
+     * Add the logged in Firebase User's review to the Adapter
+     */
+    private void addUserReview() {
+
+        // Check to ensure the User is logged in
+        if (mUser != null && !mUser.firebaseId.equals(mGuide.authorId)) {
+            FirebaseProviderUtils.getGuideRatingForFirebaseUser(mGuide.firebaseId, new FirebaseProviderUtils.FirebaseListener() {
+                @Override
+                public void onModelReady(BaseModel model) {
+
+                    // Check to see if the User has rated this Guide previously
+                    if (model == null) {
+
+                        // Has not been rated. Create a new Rating for the User to fill out
+                        Rating rating = new Rating();
+
+                        rating.setGuideId(mGuide.firebaseId);
+                        rating.setGuideAuthorId(mGuide.authorId);
+                        rating.setAuthorId(mUser.firebaseId);
+                        rating.setAuthorName(mUser.name);
+
+                        // Add the new Rating to the Adapter
+                        addModel(rating);
+                    } else {
+
+                        Rating rating = (Rating) model;
+                        rating.setGuideId(mGuide.firebaseId);
+                        rating.setGuideAuthorId(mGuide.authorId);
+
+                        // Add the found Rating to the Adapter
+                        addModel(model);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Alters the layout used for the User's review to one that is editable
+     */
+    public void enterEditMode() {
+
+        // Set the memvar to true to indicate the User is editing their review
+        mIsInEditMode = true;
+
+        // Iterate through the Models in the list to find the User's Rating
+        for (int i = 0; i < mModelsList.size(); i++) {
+            BaseModel model = mModelsList.get(i);
+
+            if (!(model instanceof Rating)) {
+                continue;
+            }
+
+            if (((Rating) model).getAuthorId().equals(mUser.firebaseId)) {
+
+                // Notify layout changed
+                notifyItemChanged(i);
+
+                return;
+            }
+        }
+    }
+
+    /**
+     * Updates the Rating for the Guide with the User's new rating
+     *
+     * @param newRating         The new rating that the User assigned to the Guide
+     * @param previousRating    The previous rating that the User assigned to the Guide
+     */
+    public void updateRating(int newRating, int previousRating) {
+
+        // Retrieve the Guide
+        Guide guide = (Guide) mModelsList.get(0);
+
+        // Update the rating
+        guide.rating += newRating - previousRating;
+        if (previousRating == 0) {
+            guide.reviews++;
+        }
+
+        // Turn off edit mode
+        mIsInEditMode = false;
+
+        // Notify change of the layout for the User's rating's position in the Adapter
+        for (int i = 0; i < mModelsList.size(); i++) {
+            BaseModel model = mModelsList.get(i);
+
+            if (!(model instanceof Rating)) {
+                continue;
+            }
+
+            if (((Rating) model).getAuthorId().equals(mUser.firebaseId)) {
+                notifyItemChanged(i);
+
+                return;
+            }
+        }
     }
 
     public interface ClickHandler {
@@ -200,11 +384,13 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
 
     public class GuideDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ViewDataBinding mBinding;
+        private GuideDetailsAdapter mAdapter;
 
-        public GuideDetailsViewHolder(ViewDataBinding binding) {
+        public GuideDetailsViewHolder(ViewDataBinding binding, GuideDetailsAdapter adapter) {
             super(binding.getRoot());
 
             mBinding = binding;
+            mAdapter = adapter;
 
             if (mBinding instanceof ListItemAuthorBinding) {
                 mBinding.getRoot().setOnClickListener(this);
@@ -245,6 +431,26 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
 
                 ((ListItemAuthorBinding) mBinding).setVm(
                         new AuthorViewModel(mActivity, (Author) model));
+            } else if (model instanceof Rating) {
+
+
+                if (mIsInEditMode && ((Rating) model).getAuthorId().equals(mUser.firebaseId)) {
+
+                    // If the Rating does not contain an AuthorId, it is a new Rating for the user
+                    // to rate the Guide with
+                    RatingViewModel vm = new RatingViewModel((Rating) model, mAdapter, mUser);
+
+                    ((ListItemRatingEditBinding) mBinding).setVm(vm);
+                } else {
+
+                    RatingViewModel vm = new RatingViewModel((Rating) model, mAdapter);
+
+                    if (!mModelsList.get(position - 1).getClass().equals(Rating.class)) {
+                        vm.showHeading();
+                    }
+
+                    ((ListItemRatingBinding) mBinding).setVm(vm);
+                }
             }
 
             // Immediately bind the data into the Views

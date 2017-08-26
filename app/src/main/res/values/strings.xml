@@ -127,6 +127,13 @@
     <!-- Saved Guides Fragment Strings -->
     <string name="saved_guides_empty_text">No saved guides.</string>
 
+    <!-- Rating Related Strings -->
+    <string name="list_rating_heading">Guide Reviews</string>
+    <string name="list_rating_title_text">Rate this guide</string>
+    <string name="list_rating_comments_hint">Comments (Optional)</string>
+    <string name="list_rating_button_text">Rate</string>
+    <string name="toast_missing_rating_error">Please rate the guide first.</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 
@@ -146,4 +153,6 @@
 
     <string name="list_area_text">Yosemite National Park</string>
     <string name="list_area_state_text">California</string>
+
+    <string name="list_rating_comment_text">This is a test comment to see how a real comment would be displayed. We are making it long to see what it looks like as multiple lines.</string>
 </resources>

@@ -22,14 +22,14 @@ import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
+import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
 
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AUTHOR;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.AREA;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.TRAIL;
 
 /**
  * Tests that storage and database are properly linked
@@ -94,7 +94,7 @@ public class FirebaseTest {
 
         // Validate all the sections
         for (final Section section : sections) {
-            BaseModel model = mDatabase.getRecord(DatabaseProvider.FirebaseType.SECTION, section.firebaseId);
+            BaseModel model = mDatabase.getRecord(FirebaseProviderUtils.FirebaseType.SECTION, section.firebaseId);
             TestUtilities.validateModelValues(section, model);
         }
 

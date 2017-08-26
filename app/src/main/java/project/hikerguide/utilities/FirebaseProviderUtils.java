@@ -1,6 +1,7 @@
 package project.hikerguide.utilities;
 
 import android.net.Uri;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
 import com.firebase.geofire.GeoFire;
@@ -11,6 +12,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -28,17 +31,20 @@ import project.hikerguide.files.abstractfiles.BaseFile;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.Rating;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.Trail;
+import timber.log.Timber;
 
 import static junit.framework.Assert.assertNotNull;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AREA;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.AUTHOR;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.GUIDE;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.SECTION;
-import static project.hikerguide.firebasedatabase.DatabaseProvider.FirebaseType.TRAIL;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.AREA;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.RATING;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.SECTION;
+import static project.hikerguide.utilities.FirebaseProviderUtils.FirebaseType.TRAIL;
 
 /**
  * Utility class for commonly used functions for the DatabaseProvider
@@ -53,13 +59,25 @@ public class FirebaseProviderUtils {
     public static final String BACKDROP_SUFFIX = "_bd";
     public static final String GEOFIRE_PATH = "geofire";
 
+    @IntDef({GUIDE, TRAIL, AUTHOR, SECTION, AREA, RATING})
+    public @interface FirebaseType {
+        int GUIDE = 0;
+        int TRAIL = 1;
+        int AUTHOR = 2;
+        int SECTION = 3;
+        int AREA = 4;
+        int RATING = 5;
+    }
+
+    public static final String RATING_DIRECTORY = "ratings";
+
     /**
      * Helper method for getting the directory of a type
      *
      * @param type    FirebaseType
      * @return The directory that corresponds to the type
      */
-    public static String getDirectoryFromType(@DatabaseProvider.FirebaseType int type) {
+    public static String getDirectoryFromType(@FirebaseType int type) {
         switch (type) {
             case GUIDE:
                 return GuideDatabase.GUIDES;
@@ -112,7 +130,7 @@ public class FirebaseProviderUtils {
      * @param dataSnapshot    The DataSnapShot containing children of the FirebaseType
      * @return An Array of BaseModels corresponding to the FirebaseType parameter
      */
-    public static BaseModel[] getModelsFromSnapshot(@DatabaseProvider.FirebaseType int type, DataSnapshot dataSnapshot) {
+    public static BaseModel[] getModelsFromSnapshot(@FirebaseType int type, DataSnapshot dataSnapshot) {
         // Initialize the List that will store all the BaseModels created from the DataSnapshots
         List<BaseModel> modelList = new ArrayList<>();
 
@@ -148,6 +166,10 @@ public class FirebaseProviderUtils {
                 models = new Area[modelList.size()];
                 break;
 
+            case RATING:
+                models = new Rating[modelList.size()];
+                break;
+
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
         }
 
@@ -162,7 +184,7 @@ public class FirebaseProviderUtils {
      * @param dataSnapshot    The DataSnapshot describing a BaseModel
      * @return A BaseModel with the information contained within the DataSnapshot
      */
-    public static BaseModel getModelFromSnapshot(@DatabaseProvider.FirebaseType int type, DataSnapshot dataSnapshot) {
+    public static BaseModel getModelFromSnapshot(@FirebaseType int type, DataSnapshot dataSnapshot) {
         BaseModel model;
 
         switch (type) {
@@ -186,6 +208,10 @@ public class FirebaseProviderUtils {
                 model = dataSnapshot.getValue(Area.class);
                 break;
 
+            case RATING:
+                model = dataSnapshot.getValue(Rating.class);
+                break;
+
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
         }
 
@@ -204,7 +230,7 @@ public class FirebaseProviderUtils {
      * @param listener      FirebaseListener that will be used to pass the retrieved object to the
      *                      calling Object
      */
-    public static void getModel(@DatabaseProvider.FirebaseType final int type,
+    public static void getModel(@FirebaseType final int type,
                                 @NonNull String firebaseId,
                                 @NonNull final FirebaseListener listener) {
 
@@ -271,7 +297,7 @@ public class FirebaseProviderUtils {
                 if (dataSnapshot.exists()) {
 
                     // Convert the DataSnapshot to an Array of BaseModels
-                    BaseModel[] models = getModelsFromSnapshot(SECTION, dataSnapshot);
+                    Section[] models = (Section[]) getModelsFromSnapshot(SECTION, dataSnapshot);
 
                     // Return the Sections to the calling Object
                     listener.onModelsReady(models);
@@ -343,6 +369,243 @@ public class FirebaseProviderUtils {
 
         FirebaseDatabase.getInstance().getReference()
                 .updateChildren(childUpdates);
+    }
+
+    /**
+     * Updates a User's Firebase Database entry to match the local changes made
+     *
+     * @param user      User to be updated
+     */
+    public static void updateUser(Author user) {
+
+        // Run an update on the values
+        Map<String, Object> childUpdates = new HashMap<>();
+
+        String directory = GuideDatabase.AUTHORS + "/" + user.firebaseId;
+
+        childUpdates.put(directory, user.toMap());
+
+        FirebaseDatabase.getInstance().getReference()
+                .updateChildren(childUpdates);
+    }
+
+    /**
+     * Adds/updates the Rating of a Guide, the Guide's ratings, and the Author's score
+     *
+     * @param rating            Rating to be inserted/updated in the Firebase Database
+     * @param previousRating    The value of the rating of the previous Rating for the Guide by
+     *                          the user
+     */
+    public static void updateRating(final Rating rating, final int previousRating) {
+
+        // Add a FirebaseId to the Rating if it doesn't already have one
+        if (rating.firebaseId == null) {
+            rating.firebaseId = FirebaseDatabase.getInstance().getReference()
+                    .child(RATING_DIRECTORY)
+                    .push()
+                    .getKey();
+        }
+
+        // Update the Guide and the Author
+        updateGuideScore(rating, previousRating);
+        updateAuthorScore(rating, previousRating);
+
+        // Push the Rating to the Firebase Database
+        String directory = RATING_DIRECTORY + "/" + rating.getGuideId() + "/" + rating.firebaseId;
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(directory, rating.toMap());
+
+        FirebaseDatabase.getInstance().getReference()
+                .updateChildren(childUpdates);
+    }
+
+    /**
+     * Updates a Guide's score after their rating has been altered
+     *
+     * @param rating            The Rating to be added to be added the Guide's rating/reviews
+     * @param previousRating    The value of the rating of the previous Rating for the Guide by
+     *                          the user
+     */
+    private static void updateGuideScore(final Rating rating, final int previousRating) {
+
+        // Update the Guide's rating/reviews
+        DatabaseReference guideRef = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.GUIDES)
+                .child(rating.getGuideId());
+
+        guideRef.runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+
+                        // Retrieve the corresponding Guide for the Rating
+                        Guide guide = mutableData.getValue(Guide.class);
+                        guide.rating += rating.getRating() - previousRating;
+
+                        if (previousRating == 0) {
+
+                            // Increment the Guide reviews if it has not previously been rated
+                            guide.reviews++;
+                        }
+
+                        // Update the Firebase Database value
+                        mutableData.setValue(guide);
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+                    }
+                });
+    }
+
+    /**
+     * Updates an Author's score after a rating for one of their Guides has been altered
+     *
+     * @param rating            The Rating to be added to the Author's Map of rated Guides
+     * @param previousRating    The value of the rating of the previous Rating for the Guide by
+     *                          the user
+     */
+    private static void updateAuthorScore(final Rating rating, final int previousRating) {
+
+        // Build the Transaction
+        DatabaseReference authorRef = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.AUTHORS)
+                .child(rating.getGuideAuthorId());
+
+        authorRef.runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+
+                        // Get the Author from the data
+                        Author author = mutableData.getValue(Author.class);
+
+                        // Change the Author's score
+                        author.score += rating.getRating() - previousRating;
+
+                        // Set the data to be updated to Firebase Database
+                        mutableData.setValue(author);
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                        Timber.e("Error updating author's score: " + databaseError);
+                    }
+                });
+    }
+
+    /**
+     * Retrieves ratings for a specific Guide
+     *
+     * @param guide       Guide to retrieve Ratings for
+     * @param page        Correlates to the number of Ratings to be returned
+     * @param listener    Listener that will be used to pass the Ratings to the calling Object
+     */
+    public static void getRatingsForGuide(Guide guide, int page, final FirebaseArrayListener listener) {
+
+        // Setup the query
+        Query ratingQuery = FirebaseDatabase.getInstance().getReference()
+                .child(RATING_DIRECTORY)
+                .orderByKey()
+                .equalTo(guide.firebaseId);
+
+        if (page == 0) {
+
+            // For page 0, only return 5 reviews as a preview of the reviews
+            ratingQuery = ratingQuery.limitToLast(5);
+        } else {
+
+            // For subsequent pages, return an additional 20 for each page
+            ratingQuery = ratingQuery.limitToLast(5 + 20 * page);
+        }
+
+        final Query finalRatingQuery = ratingQuery;
+
+        ratingQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.exists()) {
+
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        // Retrieve the Ratings and pass them to the Listener
+                        Rating[] ratings = (Rating[]) getModelsFromSnapshot(RATING, snapshot);
+
+                        listener.onModelsReady(ratings);
+                    }
+
+                } else {
+
+                    // No data found, return null
+                    listener.onModelsReady(null);
+                }
+                // Remove the Listener
+                finalRatingQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                // Remove the Listener
+                finalRatingQuery.removeEventListener(this);
+            }
+        });
+    }
+
+    /**
+     * Retrieves a Rating specific to a Guide for the logged in Firebase User
+     *
+     * @param guideId     The FirebaseId of the Guide to retrieve the Rating for
+     * @param listener    The Listener that will be used to pass the Rating to the calling Object
+     */
+    public static void getGuideRatingForFirebaseUser(String guideId, final FirebaseListener listener) {
+
+        // Check to ensure the Firebase User is logged in
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) {
+            listener.onModelReady(null);
+            return;
+        }
+
+        // Generate the Query for the Rating
+        final Query ratingQuery = FirebaseDatabase.getInstance().getReference()
+                .child(RATING_DIRECTORY)
+                .child(guideId)
+                .orderByChild(Rating.AUTHOR_ID)
+                .equalTo(user.getUid());
+
+        ratingQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.exists()) {
+
+                    // Retrieve the Rating from the DataSnapshot
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        listener.onModelReady(getModelFromSnapshot(RATING, snapshot));
+                        break;
+                    }
+
+                } else {
+
+                    // Nothing found, return null
+                    listener.onModelReady(null);
+                }
+
+                // Remove the Listener
+                ratingQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                // Remove the Listener
+                ratingQuery.removeEventListener(this);
+            }
+        });
     }
 
     /**

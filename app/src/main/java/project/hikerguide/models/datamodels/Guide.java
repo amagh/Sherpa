@@ -9,7 +9,11 @@ import android.os.Parcelable;
 import com.google.firebase.database.Exclude;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
@@ -17,6 +21,7 @@ import project.hikerguide.files.GpxFile;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.hikerguide.utilities.objects.GpxStats;
 import project.hikerguide.utilities.GpxUtils;
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 7/17/2017.
@@ -38,7 +43,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     private static final String DISTANCE        = "distance";
     private static final String DIFFICULTY      = "difficulty";
     private static final String AREA            = "area";
-    private static final String FAVORITE        = "favorite";
+    private static final String RATERS          = "raters";
 
     // ** Member Variables ** //
     public String trailId;
@@ -55,6 +60,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     public int difficulty;
     public String area;
     private boolean favorite;
+    public Map<String, Rating> raters;
 
     private Uri gpxUri;
 
@@ -173,6 +179,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         map.put(DIFFICULTY, difficulty);
         map.put(AREA, area);
         map.put(HAS_IMAGE, hasImage);
+        map.put(RATERS, raters);
 
         return map;
     }
@@ -215,6 +222,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
      *
      * @return GpxFile corresponding to the original GPX file that was set to the Guide
      */
+    @Exclude
     public GpxFile getGpxFile() {
         return new GpxFile(this.firebaseId, this.gpxUri.getPath());
     }
@@ -233,6 +241,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         return gpxFile;
     }
 
+    @Exclude
     public boolean isFavorite() {
         return favorite;
     }
@@ -240,6 +249,51 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     @Exclude
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
+    }
+
+    /**
+     * Converts the Map of raters into an Array of Ratings to be used to populate the Guide's
+     * ratings
+     *
+     * @return An Array describing the people who have rated this guide, their rating, and their
+     * comments
+     */
+    @Exclude
+    public Rating[] getRatings() {
+
+        // Validate raters
+        if (raters != null) {
+
+            // Create a List to hold the Ratings to be returned
+            List<Rating> ratingList = new ArrayList<>();
+
+            // Iterate through the Map and convert each entry to a Rating
+            for (String authorId : raters.keySet()) {
+
+                Rating rating = raters.get(authorId);
+
+                // Add the authorId to the Rating
+                rating.setAuthorId(authorId);
+
+                // Add the Rating to the List
+                ratingList.add(rating);
+            }
+
+            Collections.sort(ratingList, new Comparator<Rating>() {
+                @Override
+                public int compare(Rating rating, Rating t1) {
+                    return rating.getDate() < t1.getDate()
+                            ? -1
+                            : rating.getDate() > t1.getDate()
+                            ? 1
+                            : 0;
+                }
+            });
+
+            return ratingList.toArray(new Rating[ratingList.size()]);
+        } else {
+            return null;
+        }
     }
 
     //********************************************************************************************//
@@ -292,6 +346,18 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         } else {
             parcel.writeInt(0);
         }
+
+        if (raters != null) {
+            parcel.writeInt(raters.size());
+
+            for (String authorId : raters.keySet()) {
+                parcel.writeString(authorId);
+                parcel.writeString(raters.get(authorId).getAuthorName());
+                parcel.writeInt(raters.get(authorId).getRating());
+                parcel.writeString(raters.get(authorId).getComment());
+                parcel.writeLong(raters.get(authorId).getDate());
+            }
+        }
     }
 
     public static final Parcelable.Creator<Guide> CREATOR = new Parcelable.Creator<Guide>() {
@@ -339,6 +405,24 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
         if (parcel.readInt() == 1) {
             setFavorite(true);
+        }
+
+        int ratings;
+        if ((ratings = parcel.readInt()) != 0) {
+            raters = new HashMap<>();
+
+            for (int i = 0; i < ratings; i++) {
+                String authorId = parcel.readString();
+
+                Rating rating = new Rating();
+
+                rating.setAuthorName(parcel.readString());
+                rating.setRating(parcel.readInt());
+                rating.setComment(parcel.readString());
+                rating.setDateAdded(parcel.readLong());
+
+                raters.put(authorId, rating);
+            }
         }
     }
 }
