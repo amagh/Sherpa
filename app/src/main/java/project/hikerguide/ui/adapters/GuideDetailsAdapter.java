@@ -284,7 +284,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
     private void addUserReview() {
 
         // Check to ensure the User is logged in
-        if (mUser != null) {
+        if (mUser != null && !mUser.firebaseId.equals(mGuide.authorId)) {
             FirebaseProviderUtils.getGuideRatingForFirebaseUser(mGuide.firebaseId, new FirebaseProviderUtils.FirebaseListener() {
                 @Override
                 public void onModelReady(BaseModel model) {
@@ -307,6 +307,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
                         Rating rating = (Rating) model;
                         rating.setGuideId(mGuide.firebaseId);
                         rating.setGuideAuthorId(mGuide.authorId);
+
                         // Add the found Rating to the Adapter
                         addModel(model);
                     }
