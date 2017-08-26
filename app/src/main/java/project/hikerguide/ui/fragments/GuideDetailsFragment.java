@@ -140,7 +140,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         }
 
         // Check whether the Guide has been cached
-        if (isGuideCached()) {
+        if (ContentProviderUtils.isModelInDatabase(getActivity(), mGuide)) {
 
             // Load the Guide from the database
             getActivity().getSupportLoaderManager().initLoader(LOADER_GUIDE, null, this);
@@ -159,7 +159,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         inflater.inflate(R.menu.menu_guide_details, menu);
 
         mCacheMenuItem = menu.getItem(0);
-        if (!isGuideCached()) {
+        if (!ContentProviderUtils.isModelInDatabase(getActivity(), mGuide)) {
             mCacheMenuItem.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_save));
         } else {
             mCacheMenuItem.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_delete_white));
@@ -175,7 +175,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                 return true;
 
             case R.id.menu_save:
-                if (!isGuideCached()) {
+                if (!ContentProviderUtils.isModelInDatabase(getActivity(), mGuide)) {
                     saveFilesForGuide();
                     animateCacheIcon();
                     item.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_delete_white));
@@ -301,7 +301,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
     public void onConnected() {
         FirebaseDatabase.getInstance().goOnline();
 
-        if (!isGuideCached() && mSections == null) {
+        if (!ContentProviderUtils.isModelInDatabase(getActivity(), mGuide) && mSections == null) {
 
             // Set the data for the Adapter
             FirebaseProviderUtils.getModel(
@@ -372,37 +372,6 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
         // Remove the ActionView of the menu icon
         mCacheMenuItem.setActionView(null);
-    }
-
-    /**
-     * Checks whether the Guide is already saved in the database
-     *
-     * @return True if Guide exists in the database. False otherwise.
-     */
-    private boolean isGuideCached() {
-
-        // Query the database to see if the Guide exists in the database
-        Cursor cursor = getActivity().getContentResolver().query(
-                GuideProvider.Guides.CONTENT_URI,
-                null,
-                GuideContract.GuideEntry.FIREBASE_ID + " = ?",
-                new String[] {mGuide.firebaseId},
-                null);
-
-        if (cursor != null) {
-            try {
-                if (cursor.moveToFirst()) {
-
-                    // Guide is in database
-                    return true;
-                }
-            } finally {
-                // Close the Cursor
-                cursor.close();
-            }
-        }
-
-        return false;
     }
 
     /**
