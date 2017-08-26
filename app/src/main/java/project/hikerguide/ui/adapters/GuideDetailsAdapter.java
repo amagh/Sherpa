@@ -433,6 +433,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
                         new AuthorViewModel(mActivity, (Author) model));
             } else if (model instanceof Rating) {
 
+
                 if (mIsInEditMode && ((Rating) model).getAuthorId().equals(mUser.firebaseId)) {
 
                     // If the Rating does not contain an AuthorId, it is a new Rating for the user
@@ -443,6 +444,10 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
                 } else {
 
                     RatingViewModel vm = new RatingViewModel((Rating) model, mAdapter);
+
+                    if (!mModelsList.get(position - 1).getClass().equals(Rating.class)) {
+                        vm.showHeading();
+                    }
 
                     ((ListItemRatingBinding) mBinding).setVm(vm);
                 }

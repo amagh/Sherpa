@@ -39,6 +39,8 @@ public class RatingViewModel extends BaseObservable {
     private Author mUser;
     private GuideDetailsAdapter mAdapter;
 
+    private boolean mShowHeading;
+
     public RatingViewModel(Rating rating, GuideDetailsAdapter adapter, Author author) {
         mOriginalRating = rating;
 
@@ -57,6 +59,10 @@ public class RatingViewModel extends BaseObservable {
     public RatingViewModel(Rating rating, GuideDetailsAdapter adapter) {
         mRating = rating;
         mAdapter = adapter;
+    }
+
+    public void showHeading() {
+        mShowHeading = true;
     }
 
     @Bindable
@@ -170,6 +176,15 @@ public class RatingViewModel extends BaseObservable {
 
             // Rating's authorId matches the logged in User's id, show the button for editing the
             // rating
+            return View.VISIBLE;
+        } else {
+            return View.GONE;
+        }
+    }
+
+    @Bindable
+    public int getRatingHeadingVisibility() {
+        if (mUser != null || mShowHeading) {
             return View.VISIBLE;
         } else {
             return View.GONE;
