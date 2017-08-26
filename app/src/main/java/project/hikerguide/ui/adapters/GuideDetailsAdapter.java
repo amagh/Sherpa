@@ -175,7 +175,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
                 break;
 
             case ADD_RATING_VIEW_TYPE:
-                layoutId = R.layout.list_item_add_rating;
+                layoutId = R.layout.list_item_rating_edit;
                 break;
 
             default: throw new UnsupportedOperationException("Unknown view type: " + viewType);
