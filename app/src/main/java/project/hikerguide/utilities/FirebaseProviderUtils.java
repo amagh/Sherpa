@@ -430,18 +430,17 @@ public class FirebaseProviderUtils {
     private static void updateGuideScore(final Rating rating, final int previousRating) {
 
         // Update the Guide's rating/reviews
-        FirebaseDatabase.getInstance().getReference()
+        DatabaseReference guideRef = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.GUIDES)
-                .child(rating.getGuideId())
-                .runTransaction(new Transaction.Handler() {
+                .child(rating.getGuideId());
+
+        guideRef.runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
 
                         // Retrieve the corresponding Guide for the Rating
                         Guide guide = mutableData.getValue(Guide.class);
                         guide.rating += rating.getRating() - previousRating;
-
-                        Timber.d(guide.toMap().toString());
 
                         if (previousRating == 0) {
 
@@ -471,17 +470,16 @@ public class FirebaseProviderUtils {
     private static void updateAuthorScore(final Rating rating, final int previousRating) {
 
         // Build the Transaction
-        FirebaseDatabase.getInstance().getReference()
+        DatabaseReference authorRef = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.AUTHORS)
-                .child(rating.getGuideAuthorId())
-                .runTransaction(new Transaction.Handler() {
+                .child(rating.getGuideAuthorId());
+
+        authorRef.runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
 
                         // Get the Author from the data
                         Author author = mutableData.getValue(Author.class);
-
-                        Timber.d("New Rating: " + rating.getRating() + " | Previous Rating: " + previousRating);
 
                         // Change the Author's score
                         author.score += rating.getRating() - previousRating;

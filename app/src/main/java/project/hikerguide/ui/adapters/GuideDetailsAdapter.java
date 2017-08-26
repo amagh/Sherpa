@@ -241,7 +241,8 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
         // Iterate through and check to see if the model is already in the Adapter
         for (int i = 0; i < mModelsList.size(); i++) {
 
-            if (mModelsList.get(i).firebaseId.equals(model.firebaseId)) {
+            if (mModelsList.get(i).firebaseId != null &&
+                    mModelsList.get(i).firebaseId.equals(model.firebaseId)) {
 
                 // Model is in Adapter, do nothing
                 return;
@@ -303,6 +304,9 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
                         addModel(rating);
                     } else {
 
+                        Rating rating = (Rating) model;
+                        rating.setGuideId(mGuide.firebaseId);
+                        rating.setGuideAuthorId(mGuide.authorId);
                         // Add the found Rating to the Adapter
                         addModel(model);
                     }
