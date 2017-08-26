@@ -32,12 +32,24 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
  */
 
 public class RatingViewModel extends BaseObservable {
+
+    // ** Member Variables ** //
+    private Rating mOriginalRating;
     private Rating mRating;
     private Author mUser;
     private GuideDetailsAdapter mAdapter;
 
     public RatingViewModel(Rating rating, GuideDetailsAdapter adapter, Author author) {
-        mRating = rating;
+        mOriginalRating = rating;
+
+        mRating = new Rating();
+        mRating.setGuideId(rating.getGuideId());
+        mRating.setGuideAuthorId(rating.getGuideAuthorId());
+        mRating.setAuthorId(rating.getAuthorId());
+        mRating.setAuthorName(rating.getAuthorName());
+        mRating.setRating(rating.getRating());
+        mRating.setComment(rating.getComment());
+
         mAdapter = adapter;
         mUser = author;
     }
@@ -214,17 +226,20 @@ public class RatingViewModel extends BaseObservable {
             return;
         }
 
-        mRating.addDate();
-
         // Check whether the user has previously rated this Guide
         int previousRating = 0;
 
         if (mUser != null) {
-            previousRating = mRating.getRating();
+            previousRating = mOriginalRating.getRating();
         }
 
+        // Update the original Rating with the new Rating values
+        mOriginalRating.setRating(mRating.getRating());
+        mOriginalRating.setComment(mRating.getComment());
+        mOriginalRating.addDate();
+
         // Update the Firebase Database with the rating
-        FirebaseProviderUtils.updateRating(mRating, previousRating);
+        FirebaseProviderUtils.updateRating(mOriginalRating, previousRating);
 
         // Force the Adapter to update the Guide with the new Rating
         mAdapter.updateRating(getRating(), previousRating);
