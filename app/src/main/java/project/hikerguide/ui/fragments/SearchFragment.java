@@ -50,6 +50,7 @@ import project.hikerguide.databinding.FragmentSearchBinding;
 import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.SearchViewModel;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MainActivity;
@@ -221,34 +222,21 @@ public class SearchFragment extends MapboxFragment {
      */
     private void getGuide(String firebaseId) {
 
-        // Get a reference to the Guide in the Firebase Database using the firebaseId
-        final DatabaseReference guideReference = FirebaseDatabase.getInstance().getReference()
-                .child(GuideDatabase.GUIDES)
-                .child(firebaseId);
+        FirebaseProviderUtils.getModel(
+                FirebaseProviderUtils.FirebaseType.GUIDE,
+                firebaseId,
+                new FirebaseProviderUtils.FirebaseListener() {
+                    @Override
+                    public void onModelReady(BaseModel model) {
+                        Guide guide = (Guide) model;
 
-        guideReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Convert the DataSnapshot to a Guide
-                Guide guide = (Guide) FirebaseProviderUtils.getModelFromSnapshot(
-                        FirebaseProviderUtils.FirebaseType.GUIDE,
-                        dataSnapshot);
+                        // Add the Guide to the Adapter
+                        mAdapter.addGuide(guide);
 
-                // Add the Guide to the Adapter
-                mAdapter.addGuide(guide);
-
-                // Get the GPX File for the Guide
-                getGpxForGuide(guide);
-
-                // Remove the Listener
-                guideReference.removeEventListener(this);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+                        // Get the GPX File for the Guide
+                        getGpxForGuide(guide);
+                    }
+                });
     }
 
     /**
@@ -380,6 +368,7 @@ public class SearchFragment extends MapboxFragment {
             }
 
             // Get the Guide data model that entered the search area
+
             getGuide(key);
         }
 
