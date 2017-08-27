@@ -61,6 +61,7 @@ import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.ui.behaviors.FabSpeedDialScrollBehavior;
 import project.hikerguide.ui.dialogs.ProgressDialog;
 import project.hikerguide.utilities.ContentProviderUtils;
+import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
 import timber.log.Timber;
@@ -213,7 +214,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
                 // Start the Activity to display Guide details
                 Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
-                intent.putExtra(GUIDE_KEY, guide);
+                intent.putExtra(GUIDE_KEY, guide.firebaseId);
                 startActivity(intent);
             }
 
@@ -305,8 +306,6 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
     @Override
     public void onActivityResult(final int requestCode, int resultCode, Intent data) {
-
-        Timber.d("Request code:" + requestCode);
 
         if (requestCode == ACCOUNT_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK && data.getBooleanExtra(AUTHOR_KEY, false)) {
@@ -421,6 +420,8 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                     for (int i = guides.length -1; i > -1; i--) {
                         Guide guide = guides[i];
                         mAdapter.addModel(guide);
+
+                        DataCache.getInstance().store(guide);
                     }
                 }
 
