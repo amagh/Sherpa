@@ -119,21 +119,8 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
             Timber.d("No guide passed with the Fragment");
         }
 
-        // Setup the Adapter
-        mAdapter = new GuideDetailsAdapter((GuideDetailsActivity) getActivity(), new GuideDetailsAdapter.ClickHandler() {
-            @Override
-            public void onClickAuthor(Author author) {
-                Intent intent = new Intent(getActivity(), UserActivity.class);
-                intent.putExtra(AUTHOR_KEY, author);
-
-                startActivity(intent);
-            }
-        });
-
-        // Setup the RecyclerView
-        mBinding.setVm(new GuideViewModel(getActivity(), mGuide));
-        mBinding.guideDetailsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mBinding.guideDetailsRv.setAdapter(mAdapter);
+        // Initialize the RecyclerView
+        initRecyclerView();
 
         if (getActivity() instanceof ConnectivityActivity) {
             ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
@@ -165,6 +152,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
             mCacheMenuItem.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_delete_white));
         }
 
+        // Prevent the User from saving the Guide before all elements have been loaded
         if (mGuide == null || mSections == null || mAuthor == null) animateCacheIcon();
     }
 
@@ -357,6 +345,27 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
     }
 
     /**
+     * Sets up the RecyclerView, Adapter, and LayoutManager required to make it work
+     */
+    private void initRecyclerView() {
+        // Setup the Adapter
+        mAdapter = new GuideDetailsAdapter((GuideDetailsActivity) getActivity(), new GuideDetailsAdapter.ClickHandler() {
+            @Override
+            public void onClickAuthor(Author author) {
+                Intent intent = new Intent(getActivity(), UserActivity.class);
+                intent.putExtra(AUTHOR_KEY, author);
+
+                startActivity(intent);
+            }
+        });
+
+        // Setup the RecyclerView
+        mBinding.setVm(new GuideViewModel(getActivity(), mGuide));
+        mBinding.guideDetailsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mBinding.guideDetailsRv.setAdapter(mAdapter);
+    }
+
+    /**
      * Replaces the save icon with an indeterminate ProgressBar to inform the user of background
      * actions.
      */
@@ -410,6 +419,9 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         });
     }
 
+    /**
+     * Deletes the guide from local storage
+     */
     private void deleteGuide() {
         OfflineGuideManager manager = new OfflineGuideManager(mGuide, mSections, mAuthor);
         manager.delete((GuideDetailsActivity) getActivity(), new MapUtils.MapboxDeleteCallback() {
