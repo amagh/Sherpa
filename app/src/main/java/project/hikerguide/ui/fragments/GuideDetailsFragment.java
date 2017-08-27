@@ -58,6 +58,7 @@ import project.hikerguide.ui.dialogs.ProgressDialog;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.MapUtils;
+import project.hikerguide.utilities.OfflineGuideManager;
 import timber.log.Timber;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
@@ -81,7 +82,6 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
     private Section[] mSections;
     private Author mAuthor;
     private GuideDetailsAdapter mAdapter;
-    private DownloadListener mListener;
     private MenuItem mCacheMenuItem;
 
     public GuideDetailsFragment() {}
@@ -164,6 +164,8 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         } else {
             mCacheMenuItem.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_delete_white));
         }
+
+        if (mGuide == null || mSections == null || mAuthor == null) animateCacheIcon();
     }
 
     @Override
@@ -176,7 +178,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
             case R.id.menu_save:
                 if (!ContentProviderUtils.isModelInDatabase(getActivity(), mGuide)) {
-                    saveFilesForGuide();
+                    saveGuide();
                     animateCacheIcon();
                     item.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_delete_white));
                 } else {
@@ -207,6 +209,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                 selection = GuideContract.GuideEntry.FIREBASE_ID + " = ?";
                 selectionArgs = new String[] {mGuide.firebaseId};
 
+                stopCacheIcon();
                 break;
 
             case LOADER_SECTION:
@@ -215,6 +218,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                 selectionArgs = new String[] {mGuide.firebaseId};
                 sortOrder = GuideContract.SectionEntry.SECTION + " ASC";
 
+                stopCacheIcon();
                 break;
 
             case LOADER_AUTHOR:
@@ -222,6 +226,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                 selection = GuideContract.AuthorEntry.FIREBASE_ID + " = ?";
                 selectionArgs = new String[] {mGuide.authorId};
 
+                stopCacheIcon();
                 break;
         }
 
@@ -312,6 +317,8 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                         public void onModelReady(BaseModel model) {
                             mGuide = (Guide) model;
                             mAdapter.addModel(mGuide);
+
+                            stopCacheIcon();
                         }
                     });
 
@@ -324,6 +331,8 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                             for (Section section : mSections) {
                                 mAdapter.addModel(section);
                             }
+
+                            stopCacheIcon();
                         }
                     });
 
@@ -335,6 +344,8 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                         public void onModelReady(BaseModel model) {
                             mAuthor = (Author) model;
                             mAdapter.addModel(mAuthor);
+
+                            stopCacheIcon();
                         }
                     });
         }
@@ -370,267 +381,42 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
      */
     private void stopCacheIcon() {
 
+        // Only stop the loading icon once all required items have been loaded
+        if (mGuide == null || mSections == null || mAuthor == null) return;
+
         // Remove the ActionView of the menu icon
-        mCacheMenuItem.setActionView(null);
+        if (mCacheMenuItem != null) mCacheMenuItem.setActionView(null);
     }
 
     /**
-     * Saves all the Files associated with a Guide
-     * e.g. Image files & GPX files
-     */
-    private void saveFilesForGuide() {
-
-        ProgressDialog dialog = new ProgressDialog();
-        dialog.setCancelable(false);
-        dialog.setTitle(getActivity().getString(R.string.progress_download_files_title));
-        dialog.setIndeterminate(true);
-
-        dialog.show(getActivity().getSupportFragmentManager(), null);
-
-        // Init the DownloadListener
-        if (mListener == null) {
-            mListener = new DownloadListener(dialog);
-        }
-
-        // Save the GPX and Image associated with the Guide
-        if (mGuide != null) {
-            saveFile(mGuide.generateGpxFileForDownload(getActivity()));
-            saveFile(mGuide.generateImageFileForDownload(getActivity()));
-        }
-
-        // Save the image for the Author
-        if (mAuthor != null) {
-            ImageFile file = mAuthor.generateImageFileForDownload(getActivity());
-
-            // If the Author's image has previously been saved, then do nothing
-            if (!file.exists()) {
-                saveFile(file);
-            }
-        }
-
-        // Iterate through the Sections and save any images associated with them
-        if (mSections != null && mSections.length > 0) {
-
-            for (Section section : mSections) {
-                if (section.hasImage) {
-                    saveFile(section.generateImageFileForDownload(getActivity()));
-                }
-            }
-        }
-    }
-
-    /**
-     * Saves a BaseFile to Internal Storage
-     *
-     * @param file    BaseFile to save the download to
-     */
-    private void saveFile(final BaseFile file) {
-
-        // Generate a StorageTask for the download
-        StorageReference reference = FirebaseStorage.getInstance().getReference();
-        StorageTask<FileDownloadTask.TaskSnapshot> task =
-                FirebaseProviderUtils.getReferenceForFile(reference, file)
-                .getFile(file);
-
-        // Add the Task to the Listener
-        mListener.addDownloadTask(task);
-
-        task.addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-
-                // Remove the Task from the Listener
-                mListener.removeDownloadTask(taskSnapshot.getTask());
-
-                if (file instanceof GpxFile) {
-                    mGuide.setGpxUri(file);
-                }
-            }
-        });
-    }
-
-    /**
-     * Saves a Guide and all related Sections/Author in the database so it can be accessed offline
+     * Saves the Guide to be used offline
      */
     private void saveGuide() {
 
-        // Save the data models to the database
-        if (mGuide != null) {
-            ContentProviderUtils.insertModel(getActivity(), mGuide);
-        }
+        // Init the OfflineGuideManager
+        OfflineGuideManager manager = new OfflineGuideManager(mGuide, mSections, mAuthor);
 
-        if (mAuthor != null) {
-            ContentProviderUtils.insertModel(getActivity(), mAuthor);
-        }
-
-        if (mSections != null && mSections.length > 0) {
-            ContentProviderUtils.bulkInsertSections(getActivity(), mSections);
-        }
-
-        // Show a ProgressDialog to inform the user of the progress of the map download
-        final ProgressDialog dialog = new ProgressDialog();
-
-        // Set the Title for the Dialog
-        dialog.setTitle(getActivity().getString(R.string.progress_download_map_title));
-
-        // Prevent user from closing the Dialog when clicking outside
-        dialog.setCancelable(false);
-
-        dialog.show(getActivity().getSupportFragmentManager(), null);
-
-        // Save the map tiles for offline use
-        MapUtils.saveMapboxOffline(getActivity(), mGuide, new MapUtils.MapboxDownloadCallback() {
+        // Cache the Guide to local storage
+        manager.cache((GuideDetailsActivity) getActivity(), new MapUtils.MapboxDownloadCallback() {
             @Override
             public void onDownloadComplete() {
-                Toast.makeText(getActivity(),
-                        getActivity().getString(R.string.mapbox_downloaded),
-                        Toast.LENGTH_LONG)
-                        .show();
-
-                dialog.dismiss();
-
-                // Reset the ActionBar icon
                 stopCacheIcon();
             }
 
             @Override
             public void onUpdateProgress(double progress) {
 
-                // Update the ProgressBar
-                dialog.updateProgress((int) progress);
             }
         });
     }
 
-
-    /**
-     * Deletes the Guide, Sections, and Author from the database
-     */
     private void deleteGuide() {
-
-        // Delete the Guide from the database
-        getActivity().getContentResolver().delete(
-                GuideProvider.Guides.CONTENT_URI,
-                GuideContract.GuideEntry.FIREBASE_ID + " = ?",
-                new String[] {mGuide.firebaseId});
-
-        // Delete the associated GPX and image files
-        mGuide.generateGpxFileForDownload(getActivity()).delete();
-        mGuide.generateImageFileForDownload(getActivity()).delete();
-
-        // Delete the sections from the database
-        getActivity().getContentResolver().delete(
-                GuideProvider.Sections.CONTENT_URI,
-                GuideContract.SectionEntry.GUIDE_ID + " = ?",
-                new String[] {mGuide.firebaseId});
-
-        // Delete any localled saved image files
-        for (Section section : mSections) {
-            if (section.hasImage) {
-                section.generateImageFileForDownload(getActivity()).delete();
-            }
-        }
-
-        // Query the database to see if any other saved guides are authored by the same Author
-        Cursor cursor = getActivity().getContentResolver().query(
-                GuideProvider.Guides.CONTENT_URI,
-                null,
-                GuideContract.GuideEntry.AUTHOR_ID + " = ?",
-                new String[] {mAuthor.firebaseId},
-                null);
-
-        // Check that the Cursor is valid
-        if (cursor != null) {
-
-            // Check the count of the Cursor
-            if (cursor.getCount() == 0) {
-
-                // No other Guides with same Author. Delete Author from database
-                getActivity().getContentResolver().delete(
-                        GuideProvider.Authors.CONTENT_URI,
-                        GuideContract.AuthorEntry.FIREBASE_ID + " = ?",
-                        new String[] {mAuthor.firebaseId});
-
-                mAuthor.generateImageFileForDownload(getActivity()).delete();
-            }
-
-            // Close the Cursor
-            cursor.close();
-        }
-
-        // Show the ProgressDialog
-        final ProgressDialog dialog = new ProgressDialog();
-        dialog.setTitle(getActivity().getString(R.string.progress_delete_map_title));
-        dialog.setIndeterminate(true);
-        dialog.setCancelable(false);
-
-        dialog.show(getActivity().getSupportFragmentManager(), null);
-
-        // Delete the downloaded map tiles
-        MapUtils.deleteMapboxOffline(getActivity(), mGuide, new MapUtils.MapboxDeleteCallback() {
+        OfflineGuideManager manager = new OfflineGuideManager(mGuide, mSections, mAuthor);
+        manager.delete((GuideDetailsActivity) getActivity(), new MapUtils.MapboxDeleteCallback() {
             @Override
             public void onComplete() {
-
-                // Dismiss the Dialog
-                dialog.dismiss();
-
-                // Notify user of success
-                Toast.makeText(getActivity(),
-                        getActivity().getString(R.string.mapbox_deleted),
-                        Toast.LENGTH_LONG)
-                        .show();
-
-                // Reset the ActionBar icon
                 stopCacheIcon();
             }
         });
-    }
-
-    private class DownloadListener {
-        // ** Member Variables ** //
-        private ProgressDialog mDialog;
-        private List<StorageTask<FileDownloadTask.TaskSnapshot>> mTaskList;
-
-
-        public DownloadListener(ProgressDialog dialog) {
-            mDialog = dialog;
-        }
-
-        /**
-         * Adds a download task to be monitored
-         *
-         * @param task    Download task to be monitored
-         */
-        public void addDownloadTask(StorageTask<FileDownloadTask.TaskSnapshot> task) {
-
-            // Init the List to keep track of tasks
-            if (mTaskList == null) {
-                mTaskList = new ArrayList<>();
-            }
-
-            // Add the task to the List
-            mTaskList.add(task);
-        }
-
-        /**
-         * Removes a download task as it finishes
-         *
-         * @param task    The task to be removed
-         */
-        public void removeDownloadTask(StorageTask<FileDownloadTask.TaskSnapshot> task) {
-
-            // Remove the task from the List
-            mTaskList.remove(task);
-
-            if (mTaskList.size() == 0) {
-
-                // If there are no more tasks left, then begin saving the guide to the database
-                // The files must be downloaded first so that when the guide is saved to the
-                // database the Uri of the files can also be saved to the database.
-                saveGuide();
-
-                mDialog.dismiss();
-            }
-        }
     }
 }
