@@ -28,6 +28,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
+import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
 /**
@@ -88,6 +89,7 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
                 public void onModelReady(BaseModel model) {
                     mAuthor = (Author) model;
 
+                    // For checking to see if a guide has been favorite'd by the user
                     mAdapter.setAuthor(mAuthor);
                 }
             });
@@ -124,6 +126,11 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
 
                 // Hide ProgressBar
                 mBinding.guideListPb.setVisibility(View.GONE);
+
+                DataCache cache = DataCache.getInstance();
+                for (Guide guide : guideList) {
+                    cache.store(guide);
+                }
 
                 guideQuery.removeEventListener(this);
             }
