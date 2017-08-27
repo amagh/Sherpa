@@ -261,41 +261,20 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
         // Iterate through the List and retrieve each Guide from Firebase
         for (String firebaseId : guideIdList) {
 
-            // Get StorageReference for Guide
-            final DatabaseReference guideRef = FirebaseDatabase.getInstance().getReference()
-                    .child(GuideDatabase.GUIDES)
-                    .child(firebaseId);
+            FirebaseProviderUtils.getModel(
+                    FirebaseProviderUtils.FirebaseType.GUIDE,
+                    firebaseId,
+                    new FirebaseProviderUtils.FirebaseListener() {
+                        @Override
+                        public void onModelReady(BaseModel model) {
 
-            guideRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+                            // Add the Guide to the Adapter
+                            mAdapter.addGuide((Guide) model);
 
-                    // Check that DataSnapshop is valid
-                    if (dataSnapshot.exists()) {
-
-                        // Create Guide from DataSnapshot
-                        Guide guide = (Guide) FirebaseProviderUtils.getModelFromSnapshot(
-                                FirebaseProviderUtils.FirebaseType.GUIDE,
-                                dataSnapshot);
-
-                        // Add the Guide to the Adapter
-                        mAdapter.addGuide(guide);
-                    }
-
-                    // Hide ProgressBar
-                    mBinding.favoritesPb.setVisibility(View.GONE);
-
-                    // Remove the Listener
-                    guideRef.removeEventListener(this);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                    // Remove the Listener
-                    guideRef.removeEventListener(this);
-                }
-            });
+                            // Hide ProgressBar
+                            mBinding.favoritesPb.setVisibility(View.GONE);
+                        }
+                    });
         }
     }
 
