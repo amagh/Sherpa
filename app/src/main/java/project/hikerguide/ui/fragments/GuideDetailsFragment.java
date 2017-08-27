@@ -19,32 +19,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.StorageTask;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
-import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.data.GuideProvider;
 import project.hikerguide.databinding.FragmentGuideDetailsBinding;
-import project.hikerguide.files.GpxFile;
-import project.hikerguide.files.ImageFile;
-import project.hikerguide.files.abstractfiles.BaseFile;
-import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
@@ -54,13 +35,11 @@ import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.UserActivity;
 import project.hikerguide.ui.adapters.GuideDetailsAdapter;
-import project.hikerguide.ui.dialogs.ProgressDialog;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.MapUtils;
 import project.hikerguide.utilities.OfflineGuideManager;
-import timber.log.Timber;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
@@ -299,7 +278,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
         if (mGuide.authorId != null && mSections != null && mAuthor != null) return;
 
-        if (!ContentProviderUtils.isModelInDatabase(getActivity(), mGuide) && mSections == null) {
+        if (!ContentProviderUtils.isGuideCachedInDatabase(getActivity(), mGuide) && mSections == null) {
             getDataFromFirebase();
         } else {
             initLoaders();
