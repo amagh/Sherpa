@@ -119,6 +119,8 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
         if (mGuideList == null || mGuideList.size() == 0) {
             loadFavorites();
+        } else {
+            mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
         }
     }
 
