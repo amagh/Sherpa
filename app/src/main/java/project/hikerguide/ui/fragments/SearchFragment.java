@@ -86,10 +86,41 @@ public class SearchFragment extends MapboxFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Get a reference to the ViewDataBinding and inflate the View
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false);
+        mBinding.setVm(new SearchViewModel((MainActivity) getActivity()));
+
+        // Initialize the Mapbox MapView
+        initMapView(savedInstanceState);
+
+        // Initialize the RecyclerView
+        initRecyclerView();
+
+        return mBinding.getRoot();
+    }
+
+    /**
+     * Animates the movement of the camera for MapboxMap to a new target
+     *
+     * @param target    Location to move the camera to
+     */
+    public void moveMapCamera(LatLng target) {
+        if (mMapboxMap != null) {
+            // Move the camera to the correct position
+            mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+                    .target(target)
+                    .zoom(10)
+                    .build()), 1500);
+        }
+    }
+
+    /**
+     * Initializes the Mapbox MapView to respond to to user actions on the Map
+     *
+     * @param savedInstanceState    The SavedInstanceState Bundle to pass to the MapView
+     */
+    private void initMapView(Bundle savedInstanceState) {
 
         // Attach the MapView to the Fragment's Lifecycle
         attachMapView(mBinding.searchMv);
-        mBinding.setVm(new SearchViewModel((MainActivity) getActivity()));
         mBinding.searchMv.onCreate(savedInstanceState);
 
         // Get a reference of the MapboxMap to manipulate camera position and add Polylines
@@ -98,9 +129,7 @@ public class SearchFragment extends MapboxFragment {
             public void onMapReady(MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
 
-                // Set map style
-                mMapboxMap.setStyle(Style.OUTDOORS);
-
+                // Re-run GeoFire Query whenever the user moves the map
                 mMapboxMap.setOnCameraIdleListener(new MapboxMap.OnCameraIdleListener() {
                     @Override
                     public void onCameraIdle() {
@@ -120,14 +149,7 @@ public class SearchFragment extends MapboxFragment {
                             // Get the coordinates of the corner of the map
                             LatLng corner = mMapboxMap.getProjection().fromScreenLocation(new PointF(0, mMapView.getY()));
 
-                            // Calculate the distance from the center to the corner of the map
-                            GeodeticCalculator calculator = new GeodeticCalculator();
-                            GeodeticMeasurement measurement = calculator.calculateGeodeticMeasurement(Ellipsoid.WGS84,
-                                    new GlobalPosition(location.latitude, location.longitude, 0),
-                                    new GlobalPosition(corner.getLatitude(), corner.getLongitude(), 0));
-
-                            // Convert distance from meters to kilometers
-                            double searchRadius = measurement.getPointToPointDistance() / 1000;
+                            double searchRadius = calculateSearchRadius(location, corner);
 
                             // Use GeoFire to query for Guides in the area that was searched
                             queryGeoFire(location, searchRadius);
@@ -144,7 +166,14 @@ public class SearchFragment extends MapboxFragment {
                 });
             }
         });
+    }
 
+    /**
+     * Sets up the RecyclerView and all components required to allow it to function
+     */
+    private void initRecyclerView() {
+
+        // Set up the Adapter
         mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
             @Override
             public void onGuideClicked(Guide guide) {
@@ -170,23 +199,6 @@ public class SearchFragment extends MapboxFragment {
         // Set the LayoutManager and Adapter for the RecyclerView
         mBinding.searchResultsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mBinding.searchResultsRv.setAdapter(mAdapter);
-
-        return mBinding.getRoot();
-    }
-
-    /**
-     * Animates the movement of the camera for MapboxMap to a new target
-     *
-     * @param target    Location to move the camera to
-     */
-    public void moveMapCamera(LatLng target) {
-        if (mMapboxMap != null) {
-            // Move the camera to the correct position
-            mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-                    .target(target)
-                    .zoom(10)
-                    .build()), 1500);
-        }
     }
 
     /**
@@ -213,6 +225,26 @@ public class SearchFragment extends MapboxFragment {
             mGeoQuery.setCenter(location);
             mGeoQuery.setRadius(searchRadius);
         }
+    }
+
+    /**
+     * Calculates the distance from the center of the Mapbox MapView to the corner to be used as a
+     * search radius for GeoFire Queries
+     *
+     * @param mapCenter    GeoLocation center of the Map
+     * @param mapCorner    LatLng coordinates for the corner of the Mapbox MapView
+     * @return The distance from the mapCenter to the mapCorner in kilometers
+     */
+    private double calculateSearchRadius(GeoLocation mapCenter, LatLng mapCorner) {
+
+        // Calculate the distance from the center to the corner of the map
+        GeodeticCalculator calculator = new GeodeticCalculator();
+        GeodeticMeasurement measurement = calculator.calculateGeodeticMeasurement(Ellipsoid.WGS84,
+                new GlobalPosition(mapCenter.latitude, mapCenter.longitude, 0),
+                new GlobalPosition(mapCorner.getLatitude(), mapCorner.getLongitude(), 0));
+
+        // Convert distance from meters to kilometers
+        return measurement.getPointToPointDistance() / 1000;
     }
 
     /**
