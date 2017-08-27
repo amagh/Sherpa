@@ -1,5 +1,6 @@
 package project.hikerguide.models.viewmodels;
 
+import android.content.IntentSender;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -12,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -197,6 +199,25 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+        // Check if the failure has a resolution
+        if (connectionResult.hasResolution()) {
+            try {
+
+                // Attempt to resolve the issue
+                connectionResult.startResolutionForResult(mActivity, 0);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        } else {
+
+            // Prompt the user to fix the issue
+            GoogleApiAvailability.getInstance().getErrorDialog(
+                    mActivity,
+                    GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(mActivity),
+                    0)
+                    .show();
+        }
 
     }
 }
