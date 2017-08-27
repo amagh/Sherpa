@@ -268,6 +268,11 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
                     Rating[] ratings = (Rating[]) models;
 
                     for (Rating rating : ratings) {
+
+                        // Set the guideId and guideAuthorId for the Ratings as they are not saved
+                        // in the Firebase Database
+                        rating.setGuideId(mGuide.firebaseId);
+                        rating.setGuideAuthorId(mGuide.authorId);
                         addModel(rating);
                     }
                 }
