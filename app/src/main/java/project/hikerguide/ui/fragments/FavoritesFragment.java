@@ -41,6 +41,7 @@ import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
+import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
@@ -93,7 +94,7 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
                 // Open the GuideDetailsActivity
                 Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
-                intent.putExtra(GUIDE_KEY, guide);
+                intent.putExtra(GUIDE_KEY, guide.firebaseId);
 
                 startActivity(intent);
             }
@@ -261,20 +262,37 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
         // Iterate through the List and retrieve each Guide from Firebase
         for (String firebaseId : guideIdList) {
 
-            FirebaseProviderUtils.getModel(
-                    FirebaseProviderUtils.FirebaseType.GUIDE,
-                    firebaseId,
-                    new FirebaseProviderUtils.FirebaseListener() {
-                        @Override
-                        public void onModelReady(BaseModel model) {
+            // Check to see if the Guide exists in cache
+            Guide guide = (Guide) DataCache.getInstance().get(firebaseId);
 
-                            // Add the Guide to the Adapter
-                            mAdapter.addGuide((Guide) model);
+            if (guide != null) {
 
-                            // Hide ProgressBar
-                            mBinding.favoritesPb.setVisibility(View.GONE);
-                        }
-                    });
+                // Add the Guide to the Adapter
+                mAdapter.addGuide(guide);
+
+                // Hide ProgressBar
+                mBinding.favoritesPb.setVisibility(View.GONE);
+            } else {
+
+                // Guide not in cache, download from Firebase Database
+                FirebaseProviderUtils.getModel(
+                        FirebaseProviderUtils.FirebaseType.GUIDE,
+                        firebaseId,
+                        new FirebaseProviderUtils.FirebaseListener() {
+                            @Override
+                            public void onModelReady(BaseModel model) {
+
+                                // Add the Guide to the Adapter
+                                mAdapter.addGuide((Guide) model);
+
+                                // Store the Model in DataCache
+                                DataCache.getInstance().store(model);
+
+                                // Hide ProgressBar
+                                mBinding.favoritesPb.setVisibility(View.GONE);
+                            }
+                        });
+            }
         }
     }
 
