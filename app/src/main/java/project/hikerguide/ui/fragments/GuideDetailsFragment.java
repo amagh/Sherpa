@@ -291,7 +291,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
         if (mGuide.authorId != null && mSections != null && mAuthor != null) return;
 
-        if (ContentProviderUtils.isModelInDatabase(getActivity(), mGuide)) {
+        if (ContentProviderUtils.isGuideCachedInDatabase(getActivity(), mGuide)) {
             initLoaders();
         }
     }
