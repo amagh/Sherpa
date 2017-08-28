@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -84,15 +86,31 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
         FirebaseDatabase.getInstance().goOnline();
 
         if (mAuthor == null) {
-            FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
-                @Override
-                public void onModelReady(BaseModel model) {
-                    mAuthor = (Author) model;
 
-                    // For checking to see if a guide has been favorite'd by the user
-                    mAdapter.setAuthor(mAuthor);
-                }
-            });
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            if (user == null) return;
+
+            // Retrieve the current user from DataCache
+            mAuthor = (Author) DataCache.getInstance().get(user.getUid());
+
+            if (mAuthor != null) {
+
+                // For checking to see if a guide has been favorite'd by the user
+                mAdapter.setAuthor(mAuthor);
+            } else {
+
+                // User not found in cache. Load from Firebase
+                FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
+                    @Override
+                    public void onModelReady(BaseModel model) {
+                        mAuthor = (Author) model;
+
+                        // For checking to see if a guide has been favorite'd by the user
+                        mAdapter.setAuthor(mAuthor);
+                    }
+                });
+            }
         }
 
         // If Adapter is empty, load the Guides from Firebase
