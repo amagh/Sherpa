@@ -24,6 +24,7 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
+import project.hikerguide.utilities.DataCache;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 
@@ -87,7 +88,10 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
 
                 // Add each Guide from the database to the Adapter
                 do {
-                    mAdapter.addGuide(Guide.createGuideFromCursor(data));
+                    Guide guide = Guide.createGuideFromCursor(data);
+                    mAdapter.addGuide(guide);
+
+                    DataCache.getInstance().store(guide);
                 } while (data.moveToNext());
             } else {
                 mBinding.savedGuidesEmptyTv.setVisibility(View.VISIBLE);
@@ -115,7 +119,7 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
 
                 // Start the GuideDetailsActivity for the selected Guide
                 Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
-                intent.putExtra(GUIDE_KEY, guide);
+                intent.putExtra(GUIDE_KEY, guide.firebaseId);
 
                 startActivity(intent);
             }
