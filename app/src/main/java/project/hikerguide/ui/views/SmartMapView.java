@@ -1,6 +1,7 @@
 package project.hikerguide.ui.views;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -10,6 +11,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 
 import project.hikerguide.R;
 import project.hikerguide.ui.activities.MapboxActivity;
+import project.hikerguide.ui.fragments.MapboxFragment;
 
 /**
  * Created by Alvin on 7/24/2017.
@@ -47,5 +49,20 @@ public class SmartMapView extends MapView {
         onStart();
 
         activity.attachMapView(this);
+    }
+
+    public void startMapView(MapboxFragment fragment, Bundle savedInstanceState) {
+        if (mStarted) {
+            return;
+        }
+
+        mStarted = true;
+
+        onCreate(savedInstanceState);
+
+        setStyleUrl(fragment.getString(R.string.outdoors_style));
+        onStart();
+
+        fragment.attachMapView(this);
     }
 }

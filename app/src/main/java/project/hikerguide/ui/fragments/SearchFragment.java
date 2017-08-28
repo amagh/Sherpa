@@ -122,8 +122,7 @@ public class SearchFragment extends MapboxFragment {
     private void initMapView(Bundle savedInstanceState) {
 
         // Attach the MapView to the Fragment's Lifecycle
-        attachMapView(mBinding.searchMv);
-        mBinding.searchMv.onCreate(savedInstanceState);
+        mBinding.searchMv.startMapView(this, savedInstanceState);
 
         // Get a reference of the MapboxMap to manipulate camera position and add Polylines
         mBinding.searchMv.getMapAsync(new OnMapReadyCallback() {
