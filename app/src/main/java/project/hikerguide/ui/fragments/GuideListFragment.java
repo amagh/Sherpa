@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +34,8 @@ import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
+
 /**
  * Created by Alvin on 7/21/2017.
  */
@@ -45,6 +48,7 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
     private FragmentGuideListBinding mBinding;
     private GuideAdapter mAdapter;
     private Author mAuthor;
+    private List<Guide> mGuideList;
 
     public GuideListFragment() {}
 
@@ -56,22 +60,7 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
         ((MainActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
 
         // Initialize the GuideAdapter
-        mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
-            @Override
-            public void onGuideClicked(Guide guide) {
-                // Pass the clicked Guide to the Activity so it can start the GuideDetailsActivity
-                ((MainActivity) getActivity()).onGuideClicked(guide);
-            }
-
-            @Override
-            public void onGuideLongClicked(Guide guide) {
-
-            }
-        });
-
-        // Set the Adapter and LayoutManager for the RecyclerView
-        mBinding.guideListRv.setAdapter(mAdapter);
-        mBinding.guideListRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        initRecyclerView();
 
         if (getActivity() instanceof ConnectivityActivity) {
             ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
@@ -138,15 +127,15 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
                         FirebaseProviderUtils.FirebaseType.GUIDE,
                         dataSnapshot);
 
-                List<Guide> guideList = Arrays.asList(guides);
-                Collections.reverse(guideList);
-                mAdapter.setGuides(guideList);
+                mGuideList = Arrays.asList(guides);
+                Collections.reverse(mGuideList);
+                mAdapter.setGuides(mGuideList);
 
                 // Hide ProgressBar
                 mBinding.guideListPb.setVisibility(View.GONE);
 
                 DataCache cache = DataCache.getInstance();
-                for (Guide guide : guideList) {
+                for (Guide guide : mGuideList) {
                     cache.store(guide);
                 }
 
@@ -159,6 +148,43 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
                 guideQuery.removeEventListener(this);
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        ArrayList<String> guideIdList = new ArrayList<>();
+
+        for (Guide guide : mGuideList) {
+            guideIdList.add(guide.firebaseId);
+        }
+
+        outState.putStringArrayList(GUIDE_KEY, guideIdList);
+    }
+
+    /**
+     * Sets up the Recycler View and the elements required to make it work
+     */
+    private void initRecyclerView() {
+
+        // Set up the GuideAdapter to populate the RecyclerView
+        mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
+            @Override
+            public void onGuideClicked(Guide guide) {
+                // Pass the clicked Guide to the Activity so it can start the GuideDetailsActivity
+                ((MainActivity) getActivity()).onGuideClicked(guide);
+            }
+
+            @Override
+            public void onGuideLongClicked(Guide guide) {
+
+            }
+        });
+
+        // Set the Adapter and LayoutManager for the RecyclerView
+        mBinding.guideListRv.setAdapter(mAdapter);
+        mBinding.guideListRv.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     public interface OnGuideClickListener {
