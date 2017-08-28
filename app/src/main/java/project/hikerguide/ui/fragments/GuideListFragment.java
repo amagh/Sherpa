@@ -40,8 +40,6 @@ import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
  */
 
 public class GuideListFragment extends Fragment implements ConnectivityActivity.ConnectivityCallback{
-    // ** Constants ** //
-    private static final int GUIDES_LOADER = 4349;
 
     // ** Member Variables ** //
     private FragmentGuideListBinding mBinding;
@@ -70,6 +68,8 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
             // Load the Guide associated with each guideId from cache
             loadDataFromCache(guideIdList);
         }
+
+        // Check to see if the device is connected to a network
         if (getActivity() instanceof ConnectivityActivity) {
             ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
         }
@@ -84,30 +84,8 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
 
         if (mAuthor == null) {
 
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-            if (user == null) return;
-
-            // Retrieve the current user from DataCache
-            mAuthor = (Author) DataCache.getInstance().get(user.getUid());
-
-            if (mAuthor != null) {
-
-                // For checking to see if a guide has been favorite'd by the user
-                mAdapter.setAuthor(mAuthor);
-            } else {
-
-                // User not found in cache. Load from Firebase
-                FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
-                    @Override
-                    public void onModelReady(BaseModel model) {
-                        mAuthor = (Author) model;
-
-                        // For checking to see if a guide has been favorite'd by the user
-                        mAdapter.setAuthor(mAuthor);
-                    }
-                });
-            }
+            // Attempt to load a logged in user's favorite data
+            loadFavoriteData();
         }
 
         // If Adapter is empty, load the Guides from Firebase
@@ -158,9 +136,44 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
         });
     }
 
+    /**
+     * Loads a logged in user's favorite data from Firebase
+     */
+    private void loadFavoriteData() {
+
+        // Check if the user is logged into their account
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // Not logged in, nothing to do
+        if (user == null) return;
+
+        // Retrieve the current user from DataCache
+        mAuthor = (Author) DataCache.getInstance().get(user.getUid());
+
+        if (mAuthor != null) {
+
+            // For checking to see if a guide has been favorite'd by the user
+            mAdapter.setAuthor(mAuthor);
+        } else {
+
+            // User not found in cache. Load from Firebase
+            FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
+                @Override
+                public void onModelReady(BaseModel model) {
+                    mAuthor = (Author) model;
+
+                    // For checking to see if a guide has been favorite'd by the user
+                    mAdapter.setAuthor(mAuthor);
+                }
+            });
+        }
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        if (mGuideList == null || mGuideList.size() == 0) return;
 
         // Save the FirebaseId of the Guides to be loaded when Fragment is re-created
         ArrayList<String> guideIdList = new ArrayList<>();
@@ -196,6 +209,11 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
         mBinding.guideListRv.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
+    /**
+     * Retrieves Guides from cache
+     *
+     * @param guideIdList    A list of FirebaseIds for guides to retrieve from DataCache
+     */
     private void loadDataFromCache(List<String> guideIdList) {
 
         // Initialize mGuideList
