@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,8 +78,8 @@ public class SearchFragment extends MapboxFragment {
     private MapboxMap mMapboxMap;
     private GuideAdapter mAdapter;
     private GeoQuery mGeoQuery;
-    private List<Guide> mGuideList;
-    private Map<String, PolylineOptions> mGuidePolylineMap;
+    private List<Guide> mGuideList = new ArrayList<>();
+    private Map<String, PolylineOptions> mGuidePolylineMap = new HashMap<>();
     private String highlightedId;
 
     public SearchFragment() {
@@ -96,7 +97,44 @@ public class SearchFragment extends MapboxFragment {
         // Initialize the RecyclerView
         initRecyclerView();
 
+        // Check to see if there are any guides to be loaded
+        if (savedInstanceState != null) {
+
+            // Get a List of the FirebaseIds of guides to restore
+            List<String> guideIdList = savedInstanceState.getStringArrayList(GUIDE_KEY);
+
+            if (guideIdList != null && guideIdList.size() > 0) {
+
+                // Hide the search instructions
+                if (mBinding.searchInstructionTv.getVisibility() == View.VISIBLE) {
+                    mBinding.searchInstructionTv.setVisibility(View.GONE);
+                }
+
+                // Retrieve the Guide
+                for (String guideId : guideIdList) {
+                    getGuide(guideId);
+                }
+            }
+        }
+
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Check to see if there are elements that need to be saved
+        if (mGuideList == null ||  mGuideList.size() == 0) return;
+
+        // Store the FirebaseIds of the guides currently displayed
+        ArrayList<String> guideIdList = new ArrayList<>();
+
+        for (Guide guide : mGuideList) {
+            guideIdList.add(guide.firebaseId);
+        }
+
+        outState.putStringArrayList(GUIDE_KEY, guideIdList);
     }
 
     /**
@@ -165,6 +203,15 @@ public class SearchFragment extends MapboxFragment {
                         }
                     }
                 });
+
+                for (String guideId : mGuidePolylineMap.keySet()) {
+
+                    PolylineOptions polylineOptions = mGuidePolylineMap.get(guideId);
+                    mMapboxMap.addPolyline(polylineOptions
+                            .width(2)
+                            // Set the color using the the colorPosition and the ColorGenerator
+                            .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(guideId))));
+                }
             }
         });
     }
@@ -193,6 +240,7 @@ public class SearchFragment extends MapboxFragment {
 
         // Set the GuideAdapter to use the search layout
         mAdapter.setUseSearchLayout(true);
+        mAdapter.setGuides(mGuideList);
 
         // Set the LayoutManager and Adapter for the RecyclerView
         mBinding.searchResultsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -213,8 +261,6 @@ public class SearchFragment extends MapboxFragment {
             // Use GeoFire to build a query
             GeoFire geofire = FirebaseProviderUtils.getGeoFireInstance();
             mGeoQuery = geofire.queryAtLocation(location, searchRadius);
-
-            mAdapter.setGuides(mGuideList);
 
             mGeoQuery.addGeoQueryEventListener(geoQueryEventListener);
         } else {
@@ -335,11 +381,13 @@ public class SearchFragment extends MapboxFragment {
 
                 mGuidePolylineMap.put(guide.firebaseId, polylineOptions);
 
-                // Add the Polyline to the MapboxMap
-                mMapboxMap.addPolyline(polylineOptions
-                        .width(2)
-                        // Set the color using the the colorPosition and the ColorGenerator
-                        .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(guide.firebaseId))));
+                if (mMapboxMap != null) {
+                    // Add the Polyline to the MapboxMap
+                    mMapboxMap.addPolyline(polylineOptions
+                            .width(2)
+                            // Set the color using the the colorPosition and the ColorGenerator
+                            .color(ColorGenerator.getColor(getActivity(), mAdapter.getPosition(guide.firebaseId))));
+                }
             }
         });
     }
@@ -399,23 +447,12 @@ public class SearchFragment extends MapboxFragment {
         @Override
         public void onKeyEntered(String key, GeoLocation location) {
 
-            // Initialize the list to hold the Guides
-            if (mGuideList == null) {
-                mGuideList = new ArrayList<>();
-            }
-
-            // Init a List to hold the PolylineOptions if it is null
-            if (mGuidePolylineMap == null) {
-                mGuidePolylineMap = new HashMap<>();
-            }
-
             // Hide the search instructions
             if (mBinding.searchInstructionTv.getVisibility() == View.VISIBLE) {
                 mBinding.searchInstructionTv.setVisibility(View.GONE);
             }
 
             // Get the Guide data model that entered the search area
-
             getGuide(key);
         }
 
