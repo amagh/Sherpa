@@ -38,6 +38,7 @@ import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
+import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 /**
@@ -54,6 +55,7 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
     private FragmentFavoritesBinding mBinding;
     private GuideAdapter mAdapter;
     private List<Guide> mGuideList;
+    private Author mAuthor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,6 +68,23 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
         // Initialize the RecyclerView
         initRecyclerView();
+
+        // Check to see if data can be loaded from cache on config change
+        if (savedInstanceState != null) {
+
+            // Load user's data from cache
+            if (savedInstanceState.containsKey(AUTHOR_KEY)) {
+                String authorId = savedInstanceState.getString(AUTHOR_KEY);
+                mAuthor = (Author) DataCache.getInstance().get(authorId);
+            }
+
+            // Load Guides from cache
+            if (savedInstanceState.containsKey(GUIDE_KEY)) {
+                List<String> guideIdList = savedInstanceState.getStringArrayList(GUIDE_KEY);
+
+                loadFavoritesFromCache(guideIdList);
+            }
+        }
 
         // Begin listening for network status changes
         ((MainActivity) getActivity()).setConnectivityCallback(this);
@@ -123,12 +142,12 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
         FirebaseDatabase.getInstance().goOffline();
 
         // Reset the List used by the Adapter so it displays fresh data
-        if (mGuideList.size() > 0) {
-
-            mAdapter.notifyItemRangeRemoved(0, mGuideList.size());
-            mGuideList = new ArrayList<>();
-            mAdapter.setGuides(mGuideList);
-        }
+//        if (mGuideList.size() > 0) {
+//
+//            mAdapter.notifyItemRangeRemoved(0, mGuideList.size());
+//            mGuideList = new ArrayList<>();
+//            mAdapter.setGuides(mGuideList);
+//        }
     }
 
     @Override
@@ -173,6 +192,25 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mAuthor != null) {
+            outState.putString(AUTHOR_KEY, mAuthor.firebaseId);
+        }
+
+        if (mGuideList != null && mGuideList.size() > 0) {
+            ArrayList<String> guideIdList = new ArrayList<>();
+
+            for (Guide guide : mGuideList) {
+                guideIdList.add(guide.firebaseId);
+            }
+
+            outState.putStringArrayList(GUIDE_KEY, guideIdList);
+        }
+    }
+
     /**
      * Loads the favorites for the user either from a local database if they do not have a Firebase
      * Account or the online database if they do
@@ -188,12 +226,12 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
             loadFavoritesFromDatabase();
         } else {
 
-            Author author = (Author) DataCache.getInstance().get(user.getUid());
+            mAuthor = (Author) DataCache.getInstance().get(user.getUid());
 
-            if (author != null) {
+            if (mAuthor != null) {
 
                 // Load the user's favorites
-                loadFavorites(author);
+                loadFavorites(mAuthor);
             }
 
             // Load from online
@@ -249,6 +287,28 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
         if (guideIdList.size() == 0) {
             showEmptyText();
+        }
+    }
+
+    /**
+     * Loads Guides from cache to populate the Adapter
+     *
+     * @param guideIdList    List of FirebaseId for Guides to load from cache
+     */
+    private void loadFavoritesFromCache(List<String> guideIdList) {
+
+        // Ensure List has items to load
+        if (guideIdList != null && guideIdList.size() > 0) {
+
+            // Hide the Progressbar
+            mBinding.favoritesPb.setVisibility(View.GONE);
+
+            // Load each Guide from cache
+            for (String guideId : guideIdList) {
+                Guide guide = (Guide) DataCache.getInstance().get(guideId);
+
+                mAdapter.addGuide(guide);
+            }
         }
     }
 
