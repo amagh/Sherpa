@@ -193,6 +193,40 @@ public class ContentProviderUtils {
     }
 
     /**
+     * Checks whether a model has been cached
+     *
+     * @param context    Interface to global Context
+     * @param guide      The Guide to be checked whether it has been cached in the database
+     * @return True if the Guide is cached. False otherwise.
+     */
+    public static boolean isGuideCachedInDatabase(Context context, Guide guide) {
+        // Query the database for the model's FirebaseId
+        Cursor cursor = context.getContentResolver().query(
+                getUriForModel(guide),
+                null,
+                GuideContract.GuideEntry.FIREBASE_ID + " = ? AND " + GuideContract.GuideEntry.IMAGE_URI + " IS NOT NULL",
+                new String[] {guide.firebaseId},
+                null
+        );
+
+        // Check if Cursor is valid
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+
+                    // Entry exists in database
+                    return true;
+                }
+            } finally {
+                // Close the Cursor
+                cursor.close();
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Toggles the favorite status of a Guide in the local database
      *
      * @param context    Interface to global Context

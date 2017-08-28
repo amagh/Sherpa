@@ -15,11 +15,7 @@ import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,10 +26,8 @@ import java.util.Map;
 
 import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
-import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.data.GuideProvider;
 import project.hikerguide.databinding.FragmentFavoritesBinding;
-import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
@@ -41,6 +35,7 @@ import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
+import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
@@ -93,7 +88,7 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
                 // Open the GuideDetailsActivity
                 Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
-                intent.putExtra(GUIDE_KEY, guide);
+                intent.putExtra(GUIDE_KEY, guide.firebaseId);
 
                 startActivity(intent);
             }
@@ -117,7 +112,9 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
         FirebaseDatabase.getInstance().goOnline();
 
         if (mGuideList == null || mGuideList.size() == 0) {
-            loadFavorites();
+            loadUser();
+        } else {
+            mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
         }
     }
 
@@ -180,7 +177,7 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
      * Loads the favorites for the user either from a local database if they do not have a Firebase
      * Account or the online database if they do
      */
-    private void loadFavorites() {
+    private void loadUser() {
 
         // Check whether the user is logged in
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -191,49 +188,67 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
             loadFavoritesFromDatabase();
         } else {
 
+            Author author = (Author) DataCache.getInstance().get(user.getUid());
+
+            if (author != null) {
+
+                // Load the user's favorites
+                loadFavorites(author);
+            }
+
             // Load from online
             FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
                 @Override
                 public void onModelReady(BaseModel model) {
 
-                    // Pass the Author data model to the Adapter so the Guides can set their
-                    // favorite status appropriately
-                    Author author = (Author) model;
-                    mAdapter.setAuthor(author);
-
-                    // Verify that the Author has a list of favorites
-                    if (author.favorites == null) {
-                        showEmptyText();
-
-                        return;
-                    }
-
-                    // Retrieve the User's favorite'd Guides and sort them alphabetically by Trail
-                    // name
-                    List<Map.Entry<String, String>> entryList = new LinkedList<>(author.favorites.entrySet());
-                    Collections.sort(entryList, new Comparator<Map.Entry<String, String>>() {
-                        @Override
-                        public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
-                            return o1.getValue().compareTo(o2.getValue());
-                        }
-                    });
-
-                    // Init List of Guide FirebaseIds to pass to be retrieved from Firebase Database
-                    List<String> guideIdList = new ArrayList<>();
-
-                    // Add each key from the sorted List
-                    for (Map.Entry<String, String> entry : entryList) {
-                        guideIdList.add(entry.getKey());
-                    }
-
-                    // Retrieve the Guides from Firebase Database
-                    getGuides(guideIdList);
-
-                    if (guideIdList.size() == 0) {
-                        showEmptyText();
-                    }
+                    // Load the user's favorites
+                    loadFavorites((Author) model);
                 }
             });
+        }
+    }
+
+    /**
+     * Retrieves the user's favorite'd guides from Firebase
+     *
+     * @param author    User to retrieve favorite items for
+     */
+    private void loadFavorites(Author author) {
+
+        // Pass the Author data model to the Adapter so the Guides can set their
+        // favorite status appropriately
+        mAdapter.setAuthor(author);
+
+        // Verify that the Author has a list of favorites
+        if (author.favorites == null) {
+            showEmptyText();
+
+            return;
+        }
+
+        // Retrieve the User's favorite'd Guides and sort them alphabetically by Trail
+        // name
+        List<Map.Entry<String, String>> entryList = new LinkedList<>(author.favorites.entrySet());
+        Collections.sort(entryList, new Comparator<Map.Entry<String, String>>() {
+            @Override
+            public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
+                return o1.getValue().compareTo(o2.getValue());
+            }
+        });
+
+        // Init List of Guide FirebaseIds to pass to be retrieved from Firebase Database
+        List<String> guideIdList = new ArrayList<>();
+
+        // Add each key from the sorted List
+        for (Map.Entry<String, String> entry : entryList) {
+            guideIdList.add(entry.getKey());
+        }
+
+        // Retrieve the Guides from Firebase Database
+        getGuides(guideIdList);
+
+        if (guideIdList.size() == 0) {
+            showEmptyText();
         }
     }
 
@@ -261,20 +276,37 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
         // Iterate through the List and retrieve each Guide from Firebase
         for (String firebaseId : guideIdList) {
 
-            FirebaseProviderUtils.getModel(
-                    FirebaseProviderUtils.FirebaseType.GUIDE,
-                    firebaseId,
-                    new FirebaseProviderUtils.FirebaseListener() {
-                        @Override
-                        public void onModelReady(BaseModel model) {
+            // Check to see if the Guide exists in cache
+            Guide guide = (Guide) DataCache.getInstance().get(firebaseId);
 
-                            // Add the Guide to the Adapter
-                            mAdapter.addGuide((Guide) model);
+            if (guide != null) {
 
-                            // Hide ProgressBar
-                            mBinding.favoritesPb.setVisibility(View.GONE);
-                        }
-                    });
+                // Add the Guide to the Adapter
+                mAdapter.addGuide(guide);
+
+                // Hide ProgressBar
+                mBinding.favoritesPb.setVisibility(View.GONE);
+            } else {
+
+                // Guide not in cache, download from Firebase Database
+                FirebaseProviderUtils.getModel(
+                        FirebaseProviderUtils.FirebaseType.GUIDE,
+                        firebaseId,
+                        new FirebaseProviderUtils.FirebaseListener() {
+                            @Override
+                            public void onModelReady(BaseModel model) {
+
+                                // Add the Guide to the Adapter
+                                mAdapter.addGuide((Guide) model);
+
+                                // Store the Model in DataCache
+                                DataCache.getInstance().store(model);
+
+                                // Hide ProgressBar
+                                mBinding.favoritesPb.setVisibility(View.GONE);
+                            }
+                        });
+            }
         }
     }
 

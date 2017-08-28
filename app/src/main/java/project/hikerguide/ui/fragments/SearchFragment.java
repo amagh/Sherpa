@@ -56,9 +56,11 @@ import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MainActivity;
 import project.hikerguide.ui.adapters.GuideAdapter;
 import project.hikerguide.utilities.ColorGenerator;
+import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.SaveUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 import static project.hikerguide.utilities.FirebaseProviderUtils.GPX_EXT;
@@ -179,10 +181,7 @@ public class SearchFragment extends MapboxFragment {
             public void onGuideClicked(Guide guide) {
 
                 // Launch the Activity detailing the Guide when the user clicks on it
-                Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
-                intent.putExtra(GUIDE_KEY, guide);
-
-                startActivity(intent);
+                ((MainActivity) getActivity()).onGuideClicked(guide);
             }
 
             @Override
@@ -254,21 +253,38 @@ public class SearchFragment extends MapboxFragment {
      */
     private void getGuide(String firebaseId) {
 
-        FirebaseProviderUtils.getModel(
-                FirebaseProviderUtils.FirebaseType.GUIDE,
-                firebaseId,
-                new FirebaseProviderUtils.FirebaseListener() {
-                    @Override
-                    public void onModelReady(BaseModel model) {
-                        Guide guide = (Guide) model;
+        // Check to see if the Guide has been cached
+        Guide guide = (Guide) DataCache.getInstance().get(firebaseId);
 
-                        // Add the Guide to the Adapter
-                        mAdapter.addGuide(guide);
+        if (guide != null) {
 
-                        // Get the GPX File for the Guide
-                        getGpxForGuide(guide);
-                    }
-                });
+            // Add the cached Guide to the Adapter
+            mAdapter.addGuide(guide);
+
+            // Get the GPX File for the Guide
+            getGpxForGuide(guide);
+
+        } else {
+
+            // Guide not in cache. Download the data from Firebase
+            FirebaseProviderUtils.getModel(
+                    FirebaseProviderUtils.FirebaseType.GUIDE,
+                    firebaseId,
+                    new FirebaseProviderUtils.FirebaseListener() {
+                        @Override
+                        public void onModelReady(BaseModel model) {
+                            Guide guide = (Guide) model;
+
+                            // Add the Guide to the Adapter
+                            mAdapter.addGuide(guide);
+
+                            DataCache.getInstance().store(guide);
+
+                            // Get the GPX File for the Guide
+                            getGpxForGuide(guide);
+                        }
+                    });
+        }
     }
 
     /**
@@ -409,7 +425,9 @@ public class SearchFragment extends MapboxFragment {
 
             // Remove the Guide and its Polyline track
             mAdapter.removeGuide(key);
-            mMapboxMap.removePolyline(mGuidePolylineMap.get(key).getPolyline());
+            PolylineOptions options = mGuidePolylineMap.get(key);
+
+            if (options != null ) mMapboxMap.removePolyline(options.getPolyline());
             mGuidePolylineMap.remove(key);
 
             // Update the colors of the lines so they match the new position of the Guides

@@ -94,7 +94,7 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
         // Create a new Intent to launch the GuideDetailsActivity and add the clicked Guide as an
         // extra
         Intent intent = new Intent(this, GuideDetailsActivity.class);
-        intent.putExtra(GUIDE_KEY, guide);
+        intent.putExtra(GUIDE_KEY, guide.firebaseId);
         startActivity(intent);
     }
 

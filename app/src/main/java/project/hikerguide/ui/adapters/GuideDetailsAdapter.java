@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +31,7 @@ import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.models.viewmodels.RatingViewModel;
 import project.hikerguide.models.viewmodels.SectionViewModel;
 import project.hikerguide.ui.activities.MapboxActivity;
+import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 
 /**
@@ -133,18 +137,29 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
         mActivity = activity;
         mClickHandler = clickHandler;
 
-        FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
-            @Override
-            public void onModelReady(BaseModel model) {
-                mUser = (Author) model;
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-                if (mGuide != null) {
+        if (user != null) {
 
-                    // Add the user's review of the Guide
-                    addUserReview();
+            // Attempt to retrieve current user from cache
+            mUser = (Author) DataCache.getInstance().get(user.getUid());
+
+            // Successfully retrieved. No need to retrieve the user from Firebase
+            if (mUser != null) return;
+
+            FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
+                @Override
+                public void onModelReady(BaseModel model) {
+                    mUser = (Author) model;
+
+                    if (mGuide != null) {
+
+                        // Add the user's review of the Guide
+                        addUserReview();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override

@@ -13,6 +13,7 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.viewmodels.GuideDetailsMapViewModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
+import project.hikerguide.utilities.DataCache;
 import timber.log.Timber;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
@@ -33,15 +34,15 @@ public class GuideDetailsMapFragment extends Fragment {
     /**
      * Factory for creating a GuideDetailsMapFragment for a specific Guide
      *
-     * @param guide    Guide whose details will be shown in the Fragment
+     * @param guideId    Guide whose details will be shown in the Fragment
      * @return A GuideDetailsMapFragment with a Bundle attached for displaying details for a Guide
      */
-    public static GuideDetailsMapFragment newInstance(Guide guide) {
+    public static GuideDetailsMapFragment newInstance(String guideId) {
         // Init the Bundle that will be passed with the Fragment
         Bundle args = new Bundle();
 
         // Put the Guide from the signature into the Bundle
-        args.putParcelable(GUIDE_KEY, guide);
+        args.putString(GUIDE_KEY, guideId);
 
         // Initialize the Fragment and attach the args
         GuideDetailsMapFragment fragment = new GuideDetailsMapFragment();
@@ -57,8 +58,10 @@ public class GuideDetailsMapFragment extends Fragment {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_guide_details_map, container, false);
 
         // Retrieve the Guide to populate the GuideViewModel
-        if (getArguments() != null && getArguments().getParcelable(GUIDE_KEY) != null) {
-            mGuide = getArguments().getParcelable(GUIDE_KEY);
+        if (getArguments() != null && getArguments().getString(GUIDE_KEY) != null) {
+            String guideId = getArguments().getString(GUIDE_KEY);
+            mGuide = (Guide) DataCache.getInstance().get(guideId);
+
         } else {
             Timber.d("No Guide passed in the Bundle!");
         }

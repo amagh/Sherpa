@@ -15,7 +15,6 @@ import java.util.List;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ActivityGuideDetailsBinding;
-import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.ui.adapters.GuideDetailsFragmentAdapter;
 import project.hikerguide.ui.fragments.GuideDetailsFragment;
 import project.hikerguide.ui.fragments.GuideDetailsMapFragment;
@@ -31,7 +30,7 @@ public class GuideDetailsActivity extends MapboxActivity implements ViewPager.On
     // ** Member Variables ** //
     private ActivityGuideDetailsBinding mBinding;
     private GuideDetailsFragmentAdapter mAdapter;
-    private Guide mGuide;
+    private String mGuideId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +38,8 @@ public class GuideDetailsActivity extends MapboxActivity implements ViewPager.On
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_guide_details);
 
         // Get the Guide passed in the Intent
-        if (getIntent().getParcelableExtra(GUIDE_KEY) != null) {
-            mGuide = getIntent().getParcelableExtra(GUIDE_KEY);
+        if (getIntent().getStringExtra(GUIDE_KEY) != null) {
+            mGuideId = getIntent().getStringExtra(GUIDE_KEY);
         } else {
             Timber.d("No guide passed in Intent!");
         }
@@ -59,8 +58,8 @@ public class GuideDetailsActivity extends MapboxActivity implements ViewPager.On
 
         // Initialize the Fragments that will be contained by the ViewPager
         List<Fragment> fragmentList = new ArrayList<>();
-        fragmentList.add(GuideDetailsFragment.newInstance(mGuide));
-        fragmentList.add(GuideDetailsMapFragment.newInstance(mGuide));
+        fragmentList.add(GuideDetailsFragment.newInstance(mGuideId));
+        fragmentList.add(GuideDetailsMapFragment.newInstance(mGuideId));
 
         // Set the List of Fragments for the Adapter
         mAdapter.swapFragmentList(fragmentList);
