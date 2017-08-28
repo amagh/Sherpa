@@ -128,7 +128,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         inflater.inflate(R.menu.menu_guide_details, menu);
 
         mCacheMenuItem = menu.getItem(0);
-        if (!ContentProviderUtils.isModelInDatabase(getActivity(), mGuide)) {
+        if (!ContentProviderUtils.isGuideCachedInDatabase(getActivity(), mGuide)) {
             mCacheMenuItem.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_save));
         } else {
             mCacheMenuItem.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_delete_white));
@@ -147,7 +147,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                 return true;
 
             case R.id.menu_save:
-                if (!ContentProviderUtils.isModelInDatabase(getActivity(), mGuide)) {
+                if (!ContentProviderUtils.isGuideCachedInDatabase(getActivity(), mGuide)) {
                     saveGuide();
                     animateCacheIcon();
                     item.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_delete_white));
