@@ -305,7 +305,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
             @Override
             public void onClickAuthor(Author author) {
                 Intent intent = new Intent(getActivity(), UserActivity.class);
-                intent.putExtra(AUTHOR_KEY, author);
+                intent.putExtra(AUTHOR_KEY, author.firebaseId);
 
                 startActivity(intent);
             }
