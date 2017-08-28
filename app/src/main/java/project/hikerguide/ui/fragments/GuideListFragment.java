@@ -24,7 +24,6 @@ import java.util.List;
 import project.hikerguide.R;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.databinding.FragmentGuideListBinding;
-import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
@@ -62,6 +61,15 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
         // Initialize the GuideAdapter
         initRecyclerView();
 
+        // Check if there are guides to be loaded from savedInstanceState
+        if (savedInstanceState != null) {
+
+            // Retrieve the list of guideIds to be retrieved
+            List<String> guideIdList = savedInstanceState.getStringArrayList(GUIDE_KEY);
+
+            // Load the Guide associated with each guideId from cache
+            loadDataFromCache(guideIdList);
+        }
         if (getActivity() instanceof ConnectivityActivity) {
             ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
         }
@@ -154,6 +162,7 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        // Save the FirebaseId of the Guides to be loaded when Fragment is re-created
         ArrayList<String> guideIdList = new ArrayList<>();
 
         for (Guide guide : mGuideList) {
@@ -185,6 +194,24 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
         // Set the Adapter and LayoutManager for the RecyclerView
         mBinding.guideListRv.setAdapter(mAdapter);
         mBinding.guideListRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    private void loadDataFromCache(List<String> guideIdList) {
+
+        // Initialize mGuideList
+        mGuideList = new ArrayList<>();
+
+        for (String guideId : guideIdList) {
+
+            // Retrieve Guides from DataCache
+            Guide guide = (Guide) DataCache.getInstance().get(guideId);
+
+            // Add the Guide to the mGuideList and Adapter
+            mGuideList.add(guide);
+            mAdapter.addGuide(guide);
+
+            mBinding.guideListPb.setVisibility(View.GONE);
+        }
     }
 
     public interface OnGuideClickListener {
