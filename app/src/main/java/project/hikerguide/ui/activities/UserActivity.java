@@ -4,7 +4,11 @@ import android.os.Bundle;
 
 import project.hikerguide.R;
 import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.ui.fragments.UserFragment;
+import project.hikerguide.utilities.DataCache;
+import project.hikerguide.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
 
@@ -22,14 +26,39 @@ public class UserActivity extends ConnectivityActivity {
         setContentView(R.layout.activity_user);
 
         // Pass the Author from the Intent to the Fragment to be inflated into the fragment_container
-        if (getIntent().getParcelableExtra(AUTHOR_KEY) != null) {
-            Author author = getIntent().getParcelableExtra(AUTHOR_KEY);
+        if (getIntent().getStringExtra(AUTHOR_KEY) != null) {
 
-            UserFragment fragment = UserFragment.newInstance(author);
+            // Retrieve the Author from cache
+            String authorId = getIntent().getStringExtra(AUTHOR_KEY);
+            Author author = (Author) DataCache.getInstance().get(authorId);
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, fragment)
-                    .commit();
+            if (author != null) {
+                UserFragment fragment = UserFragment.newInstance(author);
+
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, fragment)
+                        .commit();
+            } else {
+                loadAuthorFromFirebase(authorId);
+            }
         }
+    }
+
+    private void loadAuthorFromFirebase(String authorId) {
+        FirebaseProviderUtils.getModel(
+                FirebaseProviderUtils.FirebaseType.AUTHOR,
+                authorId,
+                new FirebaseProviderUtils.FirebaseListener() {
+                    @Override
+                    public void onModelReady(BaseModel model) {
+                        Author author = (Author) model;
+
+                        UserFragment fragment = UserFragment.newInstance(author);
+
+                        getSupportFragmentManager().beginTransaction()
+                                .add(R.id.fragment_container, fragment)
+                                .commit();
+                    }
+                });
     }
 }
