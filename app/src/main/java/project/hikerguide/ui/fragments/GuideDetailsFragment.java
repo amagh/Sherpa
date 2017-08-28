@@ -229,6 +229,8 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
                     // Set the Guide to the Adapter
                     mAdapter.addModel(mGuide);
+
+                    stopCacheIcon();
                 }
 
                 break;
@@ -247,6 +249,8 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                         // Pass mSections to the Adapter
                         mAdapter.addModel(mSections[i]);
                     }
+
+                    stopCacheIcon();
                 }
 
                 break;
@@ -261,6 +265,8 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
                     // Set the Author to the Adapter
                     mAdapter.addModel(mAuthor);
+
+                    stopCacheIcon();
                 }
 
                 break;
