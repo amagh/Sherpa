@@ -135,9 +135,7 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
 
         // Resize the image for any Sections that have images
         for (Section section : mSections) {
-            if (section.hasImage) {
-                SaveUtils.resizeImageForModel(section);
-            }
+            if (section.hasImage) SaveUtils.resizeImageForModel(section);
         }
     }
 
@@ -153,18 +151,18 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
         Map<String, Object> childUpdates = new HashMap<>();
 
         // Upload the Area if it does not exist in the Firebase Database
-        if (mArea.firebaseId == null || mArea.isDraft()) {
+        if (mArea.firebaseId.equals(AREA_KEY) || mArea.isDraft()) {
             addChildUpdate(mArea, childUpdates);
         }
 
         // Upload the trail
-        if (mTrail.firebaseId == null || mTrail.isDraft()) {
+        if (mTrail.firebaseId.equals(TRAIL_KEY) || mTrail.isDraft()) {
             mTrail.areaId = mArea.firebaseId;
             addChildUpdate(mTrail, childUpdates);
         }
 
         // Upload the Guide
-        if (mGuide.firebaseId == null || mGuide.isDraft()) {
+        if (mGuide.firebaseId.equals(GUIDE_KEY) || mGuide.isDraft()) {
 
             // Set the variables of the Guide to those from the associated Area and trail
             mGuide.trailId = mTrail.firebaseId;

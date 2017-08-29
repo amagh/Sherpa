@@ -873,7 +873,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
         // Add temporary FirebaseId to any data model that doesn't have one yet
         if (mGuide.firebaseId == null) {
-            mGuide.firebaseId = "guideId";
+            mGuide.firebaseId = GUIDE_KEY;
         }
 
         for (Section section : mSections) {
@@ -881,11 +881,11 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         }
 
         if (mTrail.firebaseId == null) {
-            mTrail.firebaseId = "trailId";
+            mTrail.firebaseId = TRAIL_KEY;
         }
 
         if (mArea.firebaseId == null) {
-            mArea.firebaseId = "areaId";
+            mArea.firebaseId = AREA_KEY;
         }
 
         // Cache the data
