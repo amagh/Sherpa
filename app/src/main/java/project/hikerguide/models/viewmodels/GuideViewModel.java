@@ -239,6 +239,7 @@ public class GuideViewModel extends BaseObservable {
             Glide.with(imageView.getContext())
                     .using(new FirebaseImageLoader())
                     .load(FirebaseProviderUtils.getReferenceFromUri(image))
+                    .thumbnail(0.1f)
                     .into(imageView);
         } else {
             // No StorageReference, load local file using the File's Uri

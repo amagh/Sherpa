@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.Exclude;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +29,8 @@ public class Section extends BaseModelWithImage implements Parcelable {
     public String guideId;
     public int section;
     public String content;
+
+    private float ratio;    // The ratio to be used for the ImageView
 
     public Section() {}
 
@@ -91,6 +95,15 @@ public class Section extends BaseModelWithImage implements Parcelable {
         map.put(HAS_IMAGE, hasImage);
 
         return map;
+    }
+
+    @Exclude
+    public float getRatio() {
+        return ratio;
+    }
+
+    public void setRatio(float ratio) {
+        this.ratio = ratio;
     }
 
     //********************************************************************************************//

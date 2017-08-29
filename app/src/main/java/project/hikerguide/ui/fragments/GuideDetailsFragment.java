@@ -317,6 +317,8 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
             }
         });
 
+        mAdapter.setHasStableIds(true);
+
         // Setup the RecyclerView
         mBinding.guideDetailsRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mBinding.guideDetailsRv.setAdapter(mAdapter);

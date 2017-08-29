@@ -7,9 +7,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -246,12 +251,17 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
         return super.getItemViewType(position);
     }
 
+    @Override
+    public long getItemId(int position) {
+        return mModelsList.get(position).firebaseId.hashCode();
+    }
+
     /**
      * Adds a model to the Adapter to be displayed
      *
      * @param model    Model to be added to the Adapter
      */
-    public void addModel(BaseModel model) {
+    public void addModel(final BaseModel model) {
 
         // Iterate through and check to see if the model is already in the Adapter
         for (int i = 0; i < mModelsList.size(); i++) {
@@ -439,6 +449,15 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
 
                 // Load the correct ViewDataBinding depending on whether the section has an image
                 if (((Section) mModelsList.get(position)).hasImage) {
+
+                    // Set the ratio to be used by the ImageView if it has been set in the Section
+                    // ** This allows for the height of the ImageView to be calculated correctly
+                    // and maintains the correct position in the RecyclerView upon configuration
+                    // change **
+                    if (((Section) model).getRatio() != 0) {
+                        ((ListItemSectionImageBinding) mBinding).listSectionImageIv
+                                .setAspectRatio(((Section) model).getRatio());
+                    }
 
                     ((ListItemSectionImageBinding) mBinding).setVm(
                             new SectionViewModel((Section) model));

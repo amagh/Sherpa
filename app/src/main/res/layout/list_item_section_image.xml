@@ -21,13 +21,14 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin">
 
-        <ImageView
+        <project.hikerguide.ui.views.AspectRatioImageView
             android:id="@+id/list_section_image_iv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
             app:image="@{vm.image}"
+            app:section="@{vm.section}"
             tools:src="@drawable/placeholder_section_image"/>
 
         <TextView

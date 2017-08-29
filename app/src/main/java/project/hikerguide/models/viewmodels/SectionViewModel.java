@@ -14,12 +14,17 @@ import android.widget.ImageView;
 
 import com.android.databinding.library.baseAdapters.BR;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.ui.activities.CreateGuideActivity;
+import project.hikerguide.ui.views.AspectRatioImageView;
+import project.hikerguide.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
 import static project.hikerguide.utilities.FirebaseProviderUtils.IMAGE_PATH;
@@ -77,6 +82,55 @@ public class SectionViewModel extends BaseObservable {
             return Uri.parse(FirebaseStorage.getInstance().getReference()
                     .child(IMAGE_PATH)
                     .child(mSection.firebaseId + JPEG_EXT).toString());
+        }
+    }
+
+    @Bindable
+    public Section getSection() {
+        return mSection;
+    }
+
+    @BindingAdapter({"image", "section"})
+    public static void loadImage(AspectRatioImageView imageView, Uri image, final Section section) {
+
+        if (image == null) return;
+
+        // Check whether to load image from File or from Firebase Storage
+        if (image.getScheme().matches("gs")) {
+
+            // Load from Firebase Storage
+            Glide.with(imageView.getContext())
+                    .using(new FirebaseImageLoader())
+                    .load(FirebaseProviderUtils.getReferenceFromUri(image))
+                    .listener(new RequestListener<StorageReference, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, StorageReference model,
+                                                   Target<GlideDrawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, StorageReference model,
+                                                       Target<GlideDrawable> target, boolean isFromMemoryCache,
+                                                       boolean isFirstResource) {
+
+                            // Check whether the aspet ratio of the image needs to be added to the Section
+                            if (section.getRatio() == 0) {
+
+                                // Calculate the aspect ratio of the image and set it to the Section
+                                float ratio = (float) resource.getIntrinsicHeight() / (float) resource.getIntrinsicWidth();
+                                section.setRatio(ratio);
+                            }
+                            return false;
+                        }
+                    })
+                    .thumbnail(0.1f)
+                    .into(imageView);
+        } else {
+            // No StorageReference, load local file using the File's Uri
+            Glide.with(imageView.getContext())
+                    .load(image)
+                    .into(imageView);
         }
     }
 
