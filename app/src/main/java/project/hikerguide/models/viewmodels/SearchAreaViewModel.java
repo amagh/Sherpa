@@ -212,7 +212,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
     public static void initMap(SmartMapView mapView, MapboxActivity activity) {
 
         // Start the Map's LifeCycle and attach it to the Activity LifeCycle
-        mapView.startMapView(activity);
+        mapView.startMapView(activity, null);
     }
 
     @BindingAdapter("latLng")

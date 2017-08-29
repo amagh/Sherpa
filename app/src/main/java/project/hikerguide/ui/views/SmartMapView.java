@@ -36,14 +36,14 @@ public class SmartMapView extends MapView {
         super(context, options);
     }
 
-    public void startMapView(MapboxActivity activity) {
+    public void startMapView(MapboxActivity activity, Bundle savedInstanceState) {
         if (mStarted) {
             return;
         }
 
         mStarted = true;
 
-        onCreate(null);
+        onCreate(savedInstanceState);
 
         setStyleUrl(activity.getString(R.string.outdoors_style));
         onStart();

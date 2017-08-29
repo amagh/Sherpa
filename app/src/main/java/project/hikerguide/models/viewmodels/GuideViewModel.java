@@ -308,7 +308,7 @@ public class GuideViewModel extends BaseObservable {
 
         // The MapView will retain it's internal LifeCycle regardless of how many times it's
         // rendered
-        mapView.startMapView(activity);
+        mapView.startMapView(activity, null);
 
         // Only get the MapboxMap if it hasn't been set yet
         if (viewModel.getMapboxMap() == null) {
