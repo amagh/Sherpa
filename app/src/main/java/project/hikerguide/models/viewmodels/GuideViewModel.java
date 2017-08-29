@@ -349,6 +349,8 @@ public class GuideViewModel extends BaseObservable {
             mapView.startMapView(activity, savedInstanceState);
         }
 
+        if (viewModel == null) return;
+
         // Only get the MapboxMap if it hasn't been set yet
         if (viewModel.getMapboxMap() == null) {
             mapView.getMapAsync(new OnMapReadyCallback() {
