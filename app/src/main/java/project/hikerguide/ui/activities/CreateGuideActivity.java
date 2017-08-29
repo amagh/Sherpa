@@ -101,42 +101,66 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
         initRecyclerView();
 
-        if (getIntent().getData() != null) {
+        if (savedInstanceState != null) {
 
-            mModelList = new ArrayList<>();
-            mAdapter.setModelList(mModelList);
+            // Retrieve the FirebaseIds of the items to restore
+            String guideId = savedInstanceState.getString(GUIDE_KEY);
+            String authorId = savedInstanceState.getString(AUTHOR_KEY);
+            String areaId = savedInstanceState.getString(AREA_KEY);
+            String trailId = savedInstanceState.getString(TRAIL_KEY);
 
-            // Load saved data from database
-            Bundle guideBundle = new Bundle();
-            guideBundle.putString(FIREBASE_ID_KEY, GuideProvider.getIdFromUri(getIntent().getData()));
-            getSupportLoaderManager().initLoader(LOADER_GUIDE_DRAFT, guideBundle, this);
+            // Retrieve items from cache
+            mGuide = (Guide) DataCache.getInstance().get(guideId);
+            mAuthor = (Author) DataCache.getInstance().get(authorId);
+            mArea = (Area) DataCache.getInstance().get(areaId);
+            mTrail = (Trail) DataCache.getInstance().get(trailId);
+            mSections = DataCache.getInstance().getSections(guideId);
 
-        } else {
+            // Set the ViewModel
+            GuideViewModel vm = new GuideViewModel(this, mGuide);
+            mBinding.setVm(vm);
 
-            // Retrieve the passed objects from the Intent
-            mAuthor = getIntent().getParcelableExtra(AUTHOR_KEY);
-            mArea = getIntent().getParcelableExtra(AREA_KEY);
-            mTrail = getIntent().getParcelableExtra(TRAIL_KEY);
-
-            // Start a new Guide
-            mGuide = new Guide();
-
-            // Add the information from the passed objects to the Guide
-            mGuide.authorId = mAuthor.firebaseId;
-            mGuide.authorName = mAuthor.name;
-            mGuide.area = mArea.name;
-
-            if (mTrail.firebaseId != null) {
-                mGuide.trailId = mTrail.firebaseId;
-            }
-
-            mGuide.trailName = mTrail.name;
-
-            // Setup the Adapter
-            mModelList = new ArrayList<>();
-            mAdapter.setModelList(mModelList);
+            // Add Guide and Sections to Adapter
             mAdapter.addModel(mGuide);
-            mBinding.setVm(new GuideViewModel(this,mGuide));
+
+            if (mSections != null) {
+                for (Section section : mSections) {
+                    mAdapter.addModel(section);
+                }
+            }
+        } else {
+            if (getIntent().getData() != null) {
+
+                // Load saved data from database
+                Bundle guideBundle = new Bundle();
+                guideBundle.putString(FIREBASE_ID_KEY, GuideProvider.getIdFromUri(getIntent().getData()));
+                getSupportLoaderManager().initLoader(LOADER_GUIDE_DRAFT, guideBundle, this);
+
+            } else {
+
+                // Retrieve the passed objects from the Intent
+                mAuthor = getIntent().getParcelableExtra(AUTHOR_KEY);
+                mArea = getIntent().getParcelableExtra(AREA_KEY);
+                mTrail = getIntent().getParcelableExtra(TRAIL_KEY);
+
+                // Start a new Guide
+                mGuide = new Guide();
+
+                // Add the information from the passed objects to the Guide
+                mGuide.authorId = mAuthor.firebaseId;
+                mGuide.authorName = mAuthor.name;
+                mGuide.area = mArea.name;
+
+                if (mTrail.firebaseId != null) {
+                    mGuide.trailId = mTrail.firebaseId;
+                }
+
+                mGuide.trailName = mTrail.name;
+
+                // Setup the Adapter
+                mAdapter.addModel(mGuide);
+                mBinding.setVm(new GuideViewModel(this, mGuide));
+            }
         }
 
         setSupportActionBar(mBinding.guideDetailsTb);
@@ -156,6 +180,20 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         mPublishMenuItem.setVisible(false);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Cache data
+        cacheData();
+
+        // Add the FirebaseIds to the SavedInstanceState so they can be restored
+        outState.putString(GUIDE_KEY, mGuide.firebaseId);
+        outState.putString(AUTHOR_KEY, mAuthor.firebaseId);
+        outState.putString(AREA_KEY, mArea.firebaseId);
+        outState.putString(TRAIL_KEY, mTrail.firebaseId);
+    }
+
     /**
      * Initializes the components required for the RecyclerView
      */
@@ -163,6 +201,10 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
         // Init the Adapter
         mAdapter = new EditGuideDetailsAdapter(this);
+
+        // Set the List used to populate the Adapter
+        mModelList = new ArrayList<>();
+        mAdapter.setModelList(mModelList);
 
         // Set the LayoutManager and Adapter to the RecyclerView
         mBinding.guideDetailsRv.setLayoutManager(new LinearLayoutManager(this));
@@ -207,6 +249,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
                             ((ListItemGuideDetailsBinding) binding).getVm().notifyPropertyChanged(BR.gpx);
                             ((ListItemGuideDetailsBinding) binding).getVm().notifyPropertyChanged(BR.distance);
+                            ((ListItemGuideDetailsBinding) binding).getVm().notifyPropertyChanged(BR.elevationVisibility);
                         }
 
                     }
@@ -546,8 +589,10 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
                     // Add each Section created from the Cursor to the Adapter
                     if (mModelList.size() == 1 && data.moveToFirst()) {
+
                         do {
-                            mAdapter.addModel(Section.createSectionFromCursor(data));
+                            Section section = Section.createSectionFromCursor(data);
+                            mAdapter.addModel(section);
                         } while (data.moveToNext());
                     }
 
@@ -648,6 +693,16 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
     private boolean validateGuide() {
 
         boolean valid = true;
+
+        if (mGuide.difficulty == 0) {
+            Toast.makeText(
+                    this,
+                    getString(R.string.create_guide_difficulty_missing_error_text),
+                    Toast.LENGTH_LONG)
+                    .show();
+
+            valid = false;
+        }
 
         // Check that the hero image for the Guide has been set
         if (!mGuide.hasImage) {
@@ -763,7 +818,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         // of each element that depends on another element's FirebaseId.
         // e.g. Set the trailId of the Guide to the trail's FirebaseId
         if (mArea != null) {
-            if (mArea.firebaseId == null) {
+            if (mArea.firebaseId == null || mArea.firebaseId.equals(AREA_KEY)) {
                 mArea.firebaseId = FirebaseDatabase.getInstance().getReference()
                         .child(GuideDatabase.AREAS)
                         .push()
@@ -777,7 +832,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
 
         if (mTrail != null) {
-            if (mTrail.firebaseId == null) {
+            if (mTrail.firebaseId == null || mTrail.firebaseId.equals(TRAIL_KEY)) {
                 mTrail.firebaseId = FirebaseDatabase.getInstance().getReference()
                         .child(GuideDatabase.TRAILS)
                         .push()
@@ -792,15 +847,13 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         }
 
         if (mGuide != null) {
-            if (mGuide.firebaseId == null) {
+            if (mGuide.firebaseId == null || mGuide.firebaseId.equals(GUIDE_KEY)) {
                 mGuide.firebaseId = FirebaseDatabase.getInstance().getReference()
                         .child(GuideDatabase.GUIDES)
                         .push()
                         .getKey();
 
                 mGuide.setDraft(true);
-            } else if (ContentProviderUtils.isModelInDatabase(this, mGuide)) {
-
             }
 
             mGuide.trailId = mTrail.firebaseId;
@@ -876,8 +929,15 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
             mGuide.firebaseId = GUIDE_KEY;
         }
 
-        for (Section section : mSections) {
-            section.guideId = mGuide.firebaseId;
+        // Instantiate mSections
+        validateSections();
+
+        if (mSections != null) {
+            for (Section section : mSections) {
+                section.guideId = mGuide.firebaseId;
+            }
+
+            DataCache.getInstance().store(mSections);
         }
 
         if (mTrail.firebaseId == null) {
@@ -890,7 +950,6 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
         // Cache the data
         DataCache.getInstance().store(mGuide);
-        DataCache.getInstance().store(mSections);
         DataCache.getInstance().store(mTrail);
         DataCache.getInstance().store(mArea);
         DataCache.getInstance().store(mAuthor);

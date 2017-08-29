@@ -197,6 +197,13 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
                 SectionViewModel vm = new SectionViewModel(mActivity, (Section) model);
 
                 if (((Section) model).hasImage) {
+
+                    // Apply the ratio if it has been set
+                    if (((Section) model).getRatio() != 0) {
+                        ((ListItemSectionImageEditBinding) mBinding).listSectionImageIv
+                                .setAspectRatio(((Section) model).getRatio());
+                    }
+
                     ((ListItemSectionImageEditBinding) mBinding).setVm(vm);
                 } else {
                     ((ListItemSectionTextEditBinding) mBinding).setVm(vm);

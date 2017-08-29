@@ -130,6 +130,28 @@ public class SectionViewModel extends BaseObservable {
             // No StorageReference, load local file using the File's Uri
             Glide.with(imageView.getContext())
                     .load(image)
+                    .listener(new RequestListener<Uri, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, Uri model, Target<GlideDrawable> target,
+                                                   boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, Uri model,
+                                                       Target<GlideDrawable> target, boolean isFromMemoryCache,
+                                                       boolean isFirstResource) {
+
+                            // Check whether the aspet ratio of the image needs to be added to the Section
+                            if (section.getRatio() == 0) {
+
+                                // Calculate the aspect ratio of the image and set it to the Section
+                                float ratio = (float) resource.getIntrinsicHeight() / (float) resource.getIntrinsicWidth();
+                                section.setRatio(ratio);
+                            }
+                            return false;
+                        }
+                    })
                     .into(imageView);
         }
     }
