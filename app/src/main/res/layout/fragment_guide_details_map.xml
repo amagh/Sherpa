@@ -24,7 +24,9 @@
             app:activity="@{vm.activity}"
             app:gpx="@{vm.gpx}"
             app:viewModel="@{vm.viewModel}"
-            app:trackUserPosition="@{vm.trackUserPosition}"/>
+            app:trackUserPosition="@{vm.trackUserPosition}"
+            app:savedInstanceState="@{vm.savedInstanceState}"
+            app:fragment="@{vm.fragment}"/>
 
         <ImageView
             android:id="@+id/guide_details_map_back_iv"

@@ -40,7 +40,7 @@ public class MapUtils {
      * @param gpxFile      .gpx file containing a track to be plotted on the MapboxMap
      * @param mapboxMap    MapboxMap where the PolylineOptions will be drawn on
      */
-    public static void addMapOptionsToMap(File gpxFile, final MapboxMap mapboxMap) {
+    public static void addMapOptionsToMap(File gpxFile, final MapboxMap mapboxMap, final boolean moveCamera) {
 
         // Parse the GPX File to get the Mapbox PolyLine and Marker
         GpxUtils.getMapboxOptions(gpxFile, new GpxUtils.MapboxOptionsListener() {
@@ -53,12 +53,14 @@ public class MapUtils {
                 mapboxMap.addPolyline(polylineOptions
                         .width(3));
 
-                // Position the camera such that it fits all the points in the PolyLine
-                CameraPosition position = mapboxMap.getCameraForLatLngBounds(
-                        new LatLngBounds.Builder().includes(polylineOptions.getPoints()).build(),
-                        new int[] {50, 100, 50, 100});
+                if (moveCamera) {
+                    // Position the camera such that it fits all the points in the PolyLine
+                    CameraPosition position = mapboxMap.getCameraForLatLngBounds(
+                            new LatLngBounds.Builder().includes(polylineOptions.getPoints()).build(),
+                            new int[]{50, 100, 50, 100});
 
-                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
+                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
+                }
             }
         });
     }

@@ -22,7 +22,7 @@ import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
  * Created by Alvin on 8/7/2017.
  */
 
-public class GuideDetailsMapFragment extends Fragment {
+public class GuideDetailsMapFragment extends MapboxFragment {
 
 
     // ** Member Variables ** //
@@ -67,7 +67,7 @@ public class GuideDetailsMapFragment extends Fragment {
         }
 
         // Initialize the Map
-        initMap();
+        initMap(savedInstanceState);
         mBinding.setHandler(new GuideDetailsMapViewModel((GuideDetailsActivity) getActivity()));
 
         // Request permission to track user on map
@@ -79,9 +79,10 @@ public class GuideDetailsMapFragment extends Fragment {
     /**
      * Sets up the MapboxMap to show the trail
      */
-    private void initMap() {
+    private void initMap(Bundle savedInstanceState) {
         // Create a GuideViewModel, passing in the Guide
-        GuideViewModel vm = new GuideViewModel(getActivity(), mGuide);
+        GuideViewModel vm = new GuideViewModel(getActivity(), this, mGuide);
+        vm.addSavedInstanceState(savedInstanceState);
 
         // Set the ViewModel to the binding
         mBinding.setVm(vm);

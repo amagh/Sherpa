@@ -8,6 +8,7 @@ import android.databinding.BindingAdapter;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -36,6 +37,7 @@ import project.hikerguide.R;
 import project.hikerguide.firebasestorage.StorageProvider;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.ui.fragments.FavoritesFragment;
+import project.hikerguide.ui.fragments.MapboxFragment;
 import project.hikerguide.ui.views.SmartMapView;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.ui.activities.CreateGuideActivity;
@@ -65,12 +67,17 @@ public class GuideViewModel extends BaseObservable {
     private Context mContext;
     private Guide mGuide;
     private Author mAuthor;
+
     private WeakReference<MapboxActivity> mActivity;
+    private WeakReference<MapboxFragment> mFragment;
+
     private int mColorPosition;
     private boolean mShowImageError;
     private boolean mShowGpxError;
     private MapboxMap mMapboxMap;
     private boolean mTrackUserPosition;
+
+    private Bundle mSavedInstanceState;
 
     public GuideViewModel(Context context, Guide guide) {
         mContext = context;
@@ -95,6 +102,17 @@ public class GuideViewModel extends BaseObservable {
         mColorPosition = colorPosition;
     }
 
+    public GuideViewModel(Context context, MapboxFragment fragment, Guide guide) {
+        mContext = context;
+
+        if (mContext instanceof MapboxActivity) {
+            mActivity = new WeakReference<>((MapboxActivity) mContext);
+        }
+
+        mFragment = new WeakReference<>(fragment);
+        mGuide = guide;
+    }
+
     public void setAuthor(Author author) {
 
         // Set memvar to reference passed Author
@@ -115,6 +133,10 @@ public class GuideViewModel extends BaseObservable {
             // Notify change
             notifyPropertyChanged(BR.favorite);
         }
+    }
+
+    public void addSavedInstanceState(Bundle savedInstanceState) {
+        mSavedInstanceState = savedInstanceState;
     }
 
     @Bindable
@@ -302,13 +324,30 @@ public class GuideViewModel extends BaseObservable {
         return mGuide.elevation != 0 ? View.VISIBLE : View.GONE;
     }
 
-    @BindingAdapter({"activity", "gpx", "viewModel", "trackUserPosition"})
+    @Bindable
+    public Bundle getSavedInstanceState() {
+        return mSavedInstanceState;
+    }
+
+    @Bindable
+    public MapboxFragment getFragment() {
+        return mFragment.get();
+    }
+
+    @BindingAdapter(
+            value = {"activity", "gpx", "viewModel", "trackUserPosition", "savedInstanceState", "fragment"},
+            requireAll = false)
     public static void loadGpxToMap(final SmartMapView mapView, MapboxActivity activity, final File gpx,
-                                    final GuideViewModel viewModel, final boolean trackUserPosition) {
+                                    final GuideViewModel viewModel, final boolean trackUserPosition,
+                                    final Bundle savedInstanceState, MapboxFragment fragment) {
 
         // The MapView will retain it's internal LifeCycle regardless of how many times it's
         // rendered
-        mapView.startMapView(activity, null);
+        if (fragment != null) {
+            mapView.startMapView(fragment, savedInstanceState);
+        } else {
+            mapView.startMapView(activity, savedInstanceState);
+        }
 
         // Only get the MapboxMap if it hasn't been set yet
         if (viewModel.getMapboxMap() == null) {
@@ -415,8 +454,10 @@ public class GuideViewModel extends BaseObservable {
             return;
         }
 
+        boolean moveCamera = mSavedInstanceState == null;
+
         // Parse the GPX File to get the Mapbox PolyLine and Marker
-        addMapOptionsToMap(gpx, mMapboxMap);
+        addMapOptionsToMap(gpx, mMapboxMap, moveCamera);
     }
 
     @BindingAdapter({"gpx", "context"})
