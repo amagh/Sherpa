@@ -47,6 +47,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.adapters.EditGuideDetailsAdapter;
 import project.hikerguide.utilities.ContentProviderUtils;
+import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.GeneralUtils;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
@@ -57,7 +58,6 @@ import static project.hikerguide.ui.activities.CreateGuideActivity.BUNDLE_KEYS.F
 import static project.hikerguide.utilities.Constants.IntentKeys.AREA_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
-import static project.hikerguide.utilities.Constants.IntentKeys.SECTION_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.TRAIL_KEY;
 import static project.hikerguide.utilities.Constants.RequestCodes.REQUEST_CODE_PUBLISH;
 
@@ -400,13 +400,15 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
                 if (sectionsValid && guideValid) {
 
+                    // Save the items to the DataCache
+                    cacheData();
+
                     // Start the PublishActivity and send all elements through the Intent
                     Intent intent = new Intent(this, PublishActivity.class);
-                    intent.putExtra(AUTHOR_KEY, mAuthor);
-                    intent.putExtra(AREA_KEY, mArea);
-                    intent.putExtra(TRAIL_KEY, mTrail);
-                    intent.putExtra(GUIDE_KEY, mGuide);
-                    intent.putExtra(SECTION_KEY, mSections);
+                    intent.putExtra(AUTHOR_KEY, mAuthor.firebaseId);
+                    intent.putExtra(AREA_KEY, mArea.firebaseId);
+                    intent.putExtra(TRAIL_KEY, mTrail.firebaseId);
+                    intent.putExtra(GUIDE_KEY, mGuide.firebaseId);
 
                     startActivityForResult(intent, REQUEST_CODE_PUBLISH);
                 }
@@ -862,5 +864,35 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
         // Close the Activity
         finish();
+    }
+
+    /**
+     * Stores the data to be published in the DataCache
+     */
+    private void cacheData() {
+
+        // Add temporary FirebaseId to any data model that doesn't have one yet
+        if (mGuide.firebaseId == null) {
+            mGuide.firebaseId = "guideId";
+        }
+
+        for (Section section : mSections) {
+            section.guideId = mGuide.firebaseId;
+        }
+
+        if (mTrail.firebaseId == null) {
+            mTrail.firebaseId = "trailId";
+        }
+
+        if (mArea.firebaseId == null) {
+            mArea.firebaseId = "areaId";
+        }
+
+        // Cache the data
+        DataCache.getInstance().store(mGuide);
+        DataCache.getInstance().store(mSections);
+        DataCache.getInstance().store(mTrail);
+        DataCache.getInstance().store(mArea);
+        DataCache.getInstance().store(mAuthor);
     }
 }

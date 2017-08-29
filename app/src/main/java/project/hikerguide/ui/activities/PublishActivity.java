@@ -4,10 +4,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -16,12 +13,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +32,7 @@ import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.PublishViewModel;
 import project.hikerguide.utilities.ContentProviderUtils;
+import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
 import timber.log.Timber;
@@ -45,7 +40,6 @@ import timber.log.Timber;
 import static project.hikerguide.utilities.Constants.IntentKeys.AREA_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
-import static project.hikerguide.utilities.Constants.IntentKeys.SECTION_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.TRAIL_KEY;
 import static project.hikerguide.utilities.FirebaseProviderUtils.getReferenceForFile;
 
@@ -83,20 +77,19 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
         mViewModel = new PublishViewModel();
         mBinding.setVm(mViewModel);
 
-        // Get the data objects passed from the Intent
+        // Retrieve the data from the cache
         Intent intent = getIntent();
 
-        mAuthor = intent.getParcelableExtra(AUTHOR_KEY);
-        mGuide = intent.getParcelableExtra(GUIDE_KEY);
-        mArea = intent.getParcelableExtra(AREA_KEY);
-        mTrail = intent.getParcelableExtra(TRAIL_KEY);
+        String authorId = intent.getStringExtra(AUTHOR_KEY);
+        String guideId = intent.getStringExtra(GUIDE_KEY);
+        String areaId = intent.getStringExtra(AREA_KEY);
+        String trailId = intent.getStringExtra(TRAIL_KEY);
 
-        // Get the Parcelable[] for the Sections
-        Parcelable[] parcelables = intent.getParcelableArrayExtra(SECTION_KEY);
-        mSections = new Section[parcelables.length];
-
-        // Copy the elements from parcelables to mSections as it cannot be directly cast to Section[]
-        System.arraycopy(parcelables, 0, mSections, 0, parcelables.length);
+        mAuthor = (Author) DataCache.getInstance().get(authorId);
+        mGuide = (Guide) DataCache.getInstance().get(guideId);
+        mArea = (Area) DataCache.getInstance().get(areaId);
+        mTrail = (Trail) DataCache.getInstance().get(trailId);
+        mSections = DataCache.getInstance().getSections(guideId);
 
         // Create dummy copies of the BaseModels with their original FirebaseIds
         mDeleteGuide = new Guide();
