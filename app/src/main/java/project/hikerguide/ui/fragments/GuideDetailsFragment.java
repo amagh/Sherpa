@@ -95,7 +95,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         // Initialize the RecyclerView
         initRecyclerView();
 
-        if (getArguments() != null && getArguments().getString(GUIDE_KEY) != null) {
+        if (getArguments() != null && getArguments().containsKey(GUIDE_KEY)) {
 
             String guideId = getArguments().getString(GUIDE_KEY);
 

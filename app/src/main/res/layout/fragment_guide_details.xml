@@ -11,14 +11,17 @@
     </data>
 
     <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/guide_details_cl"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.design.widget.AppBarLayout
+            android:id="@+id/guide_details_abl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <android.support.design.widget.SubtitleCollapsingToolbarLayout
+                android:id="@+id/guide_details_ct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="@{vm.trailName}"
