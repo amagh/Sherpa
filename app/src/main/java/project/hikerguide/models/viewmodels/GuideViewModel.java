@@ -621,6 +621,9 @@ public class GuideViewModel extends BaseObservable {
      */
     public void onClickFavorite(View view) {
 
+        // Toggle the favorite status of the Guide
+        mGuide.setFavorite(!mGuide.isFavorite());
+
         // Add/remove the Guide from the Author's list of favorites
         if (mAuthor != null) {
 

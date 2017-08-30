@@ -234,13 +234,6 @@ public class ContentProviderUtils {
      */
     public static void toggleFavorite(Context context, Guide guide) {
 
-        // Toggle the favorite status of the Guide
-        if (guide.isFavorite()) {
-            guide.setFavorite(false);
-        } else {
-            guide.setFavorite(true);
-        }
-
         // Either insert the Guide or update the value in the database
         if (isModelInDatabase(context, guide)) {
 
