@@ -129,7 +129,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
         if (getArguments() == null || getArguments().getParcelable(AUTHOR_KEY) == null) {
 
             // User is checking their own profile
-            loadUserSelfProfile();
+            loadUserSelfProfile(false);
         } else {
             mAuthor = getArguments().getParcelable(AUTHOR_KEY);
 
@@ -182,8 +182,6 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
         return false;
     }
-
-
 
     /**
      * Sets up the layouts to be appropriate for someone viewing their own profile
@@ -239,7 +237,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
      * Checks that the Firebase User has been added to the Firebase Database and loads their
      * profile from Firebase Database.
      */
-    private void loadUserSelfProfile() {
+    private void loadUserSelfProfile(final boolean cleanDatabase) {
         // Get an instance of the FirebaseUser
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -252,36 +250,29 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
             return;
         }
 
-        // Get a reference to the DatabaseReference corresponding to the user
-        final DatabaseReference authorRef = FirebaseDatabase.getInstance().getReference()
-                .child(GuideDatabase.AUTHORS)
-                .child(user.getUid());
-
-        authorRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onModelReady(BaseModel model) {
 
-                // Check to ensure that the DataSnapshot is valid
-                if (dataSnapshot.exists()) {
+                mAuthor = (Author) model;
 
-                    // Convert the DataSnapshot to an Author Object
-                    mAuthor = (Author) FirebaseProviderUtils
-                            .getModelFromSnapshot(FirebaseProviderUtils.FirebaseType.AUTHOR, dataSnapshot);
-                }
-
-                // Remove Listener
-                authorRef.removeEventListener(this);
-
-                // If the Author does not exist in the Firebase Database, add them
                 if (mAuthor == null) {
 
                     // Transfer the locally favorite'd Guides to their new online profile
                     mAuthor = ContentProviderUtils.generateAuthorFromDatabase(getActivity());
-                    authorRef.setValue(mAuthor);
-                } else {
+                    mAuthor.firebaseId = user.getUid();
 
+                    FirebaseProviderUtils.updateUser(mAuthor);
+                } else if (cleanDatabase) {
                     // Sync the local database of favorite Guides to the online one
-                    ContentProviderUtils.cleanDatabase(getActivity(), mAuthor);
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ContentProviderUtils.cleanDatabase(getActivity(), mAuthor);
+                        }
+                    });
+
+                    thread.start();
                 }
 
                 // Add the Author to the Adapter so their info can be displayed
@@ -294,13 +285,6 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                 // Load the Guides that the Author has created into the Adapter
                 loadGuidesForAuthor();
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-                // Remove Listener
-                authorRef.removeEventListener(this);
-            }
         });
     }
 
@@ -309,7 +293,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
         if (requestCode == ACCOUNT_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK && data.getBooleanExtra(AUTHOR_KEY, false)) {
-                loadUserSelfProfile();
+                loadUserSelfProfile(true);
             } else {
                 // Handle the log out based on the Activity the Fragment is in
                 if (getActivity() instanceof MainActivity) {
