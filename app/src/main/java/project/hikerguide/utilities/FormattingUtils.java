@@ -10,7 +10,7 @@ import project.hikerguide.R;
  * Created by Alvin on 7/27/2017.
  */
 
-public class ConversionUtils {
+public class FormattingUtils {
     // ** Constants ** //
     private static final double METERS_PER_MILE = 1609.34;
     private static final double METERS_PER_FEET = 0.3048;
@@ -60,5 +60,41 @@ public class ConversionUtils {
         } else {
             return elevation;
         }
+    }
+
+    /**
+     * Retrieves the String corresponding to the integer value of the difficulty
+     *
+     * @param context       Interface to global Context
+     * @param difficulty    Integer value for the difficulty of the trail
+     * @return String corresponding to the difficulty level
+     */
+    public static String formatDifficulty(Context context, int difficulty) {
+
+        String difficultyString = "Unknown";
+
+        switch (difficulty) {
+            case 1:
+                difficultyString = context.getString(R.string.difficulty_easy);
+                break;
+
+            case 2:
+                difficultyString = context.getString(R.string.difficulty_moderate);
+                break;
+
+            case 3:
+                difficultyString = context.getString(R.string.difficulty_hard);
+                break;
+
+            case 4:
+                difficultyString = context.getString(R.string.difficulty_expert);
+                break;
+
+            case 5:
+                difficultyString = context.getString(R.string.difficulty_extreme);
+                break;
+        }
+
+        return difficultyString;
     }
 }

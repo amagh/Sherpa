@@ -45,7 +45,7 @@ import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.utilities.ColorGenerator;
 import project.hikerguide.utilities.ContentProviderUtils;
-import project.hikerguide.utilities.ConversionUtils;
+import project.hikerguide.utilities.FormattingUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
 
@@ -153,14 +153,14 @@ public class GuideViewModel extends BaseObservable {
     public String getDistance() {
         return mContext.getString(
                 R.string.list_guide_format_distance_imperial,
-                ConversionUtils.convertDistance(mContext, mGuide.distance));
+                FormattingUtils.convertDistance(mContext, mGuide.distance));
     }
 
     @Bindable
     public String getElevation() {
         return mContext.getString(
                 R.string.list_guide_format_elevation_imperial,
-                ConversionUtils.convertElevation(mContext, mGuide.elevation));
+                FormattingUtils.convertElevation(mContext, mGuide.elevation));
     }
 
     @Bindable
@@ -184,31 +184,7 @@ public class GuideViewModel extends BaseObservable {
 
     @Bindable
     public String getDifficulty() {
-        String difficultyString = "Unknown";
-
-        switch (mGuide.difficulty) {
-            case 1:
-                difficultyString = mContext.getString(R.string.difficulty_easy);
-                break;
-
-            case 2:
-                difficultyString = mContext.getString(R.string.difficulty_moderate);
-                break;
-
-            case 3:
-                difficultyString = mContext.getString(R.string.difficulty_hard);
-                break;
-
-            case 4:
-                difficultyString = mContext.getString(R.string.difficulty_expert);
-                break;
-
-            case 5:
-                difficultyString = mContext.getString(R.string.difficulty_extreme);
-                break;
-        }
-
-        return difficultyString;
+        return FormattingUtils.formatDifficulty(mContext, mGuide.difficulty);
     }
 
     @Bindable
