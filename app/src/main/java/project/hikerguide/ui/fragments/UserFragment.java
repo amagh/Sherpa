@@ -169,6 +169,9 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                 mModelList = new ArrayList<>();
                 mAdapter.setModelList(mModelList);
 
+                // Clean the database to start fresh
+                ContentProviderUtils.cleanDatabase(getActivity(), new Author());
+
                 // Log the User out
                 FirebaseAuth.getInstance().signOut();
 
@@ -264,11 +267,36 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
                     FirebaseProviderUtils.updateUser(mAuthor);
                 } else if (cleanDatabase) {
-                    // Sync the local database of favorite Guides to the online one
+
                     Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
+
+                            // Sync the local database of favorite Guides to the online one
                             ContentProviderUtils.cleanDatabase(getActivity(), mAuthor);
+
+                            if (mAuthor.favorites == null) return;
+
+                            // Add the User's favorites to the local database
+                            for (String guideId : mAuthor.favorites.keySet()) {
+                                Guide guide = (Guide) DataCache.getInstance().get(guideId);
+                                if (guide != null) {
+                                    guide.setFavorite(true);
+                                    ContentProviderUtils.insertModel(getActivity(), guide);
+                                } else {
+                                    FirebaseProviderUtils.getModel(
+                                            FirebaseProviderUtils.FirebaseType.GUIDE,
+                                            guideId,
+                                            new FirebaseProviderUtils.FirebaseListener() {
+                                                @Override
+                                                public void onModelReady(BaseModel model) {
+                                                    Guide guide = (Guide) model;
+                                                    guide.setFavorite(true);
+                                                    ContentProviderUtils.insertModel(getActivity(), guide);
+                                                }
+                                            });
+                                }
+                            }
                         }
                     });
 
