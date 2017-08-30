@@ -110,12 +110,14 @@ public class AuthorViewModel extends BaseObservable {
                 @Override
                 public void onSuccess(StorageMetadata storageMetadata) {
                     // Load from Firebase Storage
-                    Glide.with(imageView.getContext())
-                            .using(new FirebaseImageLoader())
-                            .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
-                            .signature(new StringSignature(storageMetadata.getMd5Hash()))
-                            .error(R.drawable.ic_account_circle)
-                            .into(imageView);
+                    if (imageView.getContext() != null) {
+                        Glide.with(imageView.getContext())
+                                .using(new FirebaseImageLoader())
+                                .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
+                                .signature(new StringSignature(storageMetadata.getMd5Hash()))
+                                .error(R.drawable.ic_account_circle)
+                                .into(imageView);
+                    }
                 }
             });
 
