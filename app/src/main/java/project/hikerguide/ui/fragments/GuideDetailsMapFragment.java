@@ -10,10 +10,12 @@ import android.view.ViewGroup;
 import project.hikerguide.R;
 import project.hikerguide.databinding.FragmentGuideDetailsMapBinding;
 import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.GuideDetailsMapViewModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.utilities.DataCache;
+import project.hikerguide.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
@@ -28,6 +30,7 @@ public class GuideDetailsMapFragment extends MapboxFragment {
     // ** Member Variables ** //
     private FragmentGuideDetailsMapBinding mBinding;
     private Guide mGuide;
+    private boolean mTrackPosition;
 
     public GuideDetailsMapFragment() {}
 
@@ -62,12 +65,22 @@ public class GuideDetailsMapFragment extends MapboxFragment {
             String guideId = getArguments().getString(GUIDE_KEY);
             mGuide = (Guide) DataCache.getInstance().get(guideId);
 
+            if (mGuide == null) {
+                mGuide = new Guide();
+                mGuide.firebaseId = guideId;
+            }
+
         } else {
             Timber.d("No Guide passed in the Bundle!");
         }
 
         // Initialize the Map
-        initMap(savedInstanceState);
+        if (mGuide.authorId != null) {
+            initMap(savedInstanceState);
+        } else {
+            getGuideFromFirebase();
+        }
+
         mBinding.setHandler(new GuideDetailsMapViewModel((GuideDetailsActivity) getActivity()));
 
         // Request permission to track user on map
@@ -80,9 +93,15 @@ public class GuideDetailsMapFragment extends MapboxFragment {
      * Sets up the MapboxMap to show the trail
      */
     private void initMap(Bundle savedInstanceState) {
+        Timber.d("Initializing MapView");
+
         // Create a GuideViewModel, passing in the Guide
         GuideViewModel vm = new GuideViewModel(getActivity(), this, mGuide);
         vm.addSavedInstanceState(savedInstanceState);
+
+        if (mTrackPosition) {
+            vm.setTrackUserPosition(true);
+        }
 
         // Set the ViewModel to the binding
         mBinding.setVm(vm);
@@ -93,9 +112,36 @@ public class GuideDetailsMapFragment extends MapboxFragment {
      */
     public void trackUserPosition() {
 
+        mTrackPosition = true;
+
         // Get the ViewModel that has the MapView and begin tracking location
-        if (mBinding != null) {
+        if (mTrackPosition && mBinding != null && mBinding.getVm() != null) {
             mBinding.getVm().setTrackUserPosition(true);
         }
+    }
+
+    /**
+     * Load the Guide details from Firebase and initialize the MapView for the Guide
+     */
+    private void getGuideFromFirebase() {
+
+        FirebaseProviderUtils.getModel(
+                FirebaseProviderUtils.FirebaseType.GUIDE,
+                mGuide.firebaseId,
+                new FirebaseProviderUtils.FirebaseListener() {
+                    @Override
+                    public void onModelReady(BaseModel model) {
+
+                        // Retrieve the Guide
+                        mGuide = (Guide) model;
+
+                        // Cache the Guide
+                        DataCache.getInstance().store(mGuide);
+
+                        // Initialize the MapView
+                        initMap(null);
+                    }
+                }
+        );
     }
 }

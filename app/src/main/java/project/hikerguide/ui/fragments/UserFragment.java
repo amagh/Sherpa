@@ -25,7 +25,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
@@ -45,7 +44,6 @@ import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.databinding.FragmentUserBinding;
-import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
@@ -64,6 +62,7 @@ import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
+import project.hikerguide.widgets.FavoritesWidgetUpdateService;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
@@ -169,6 +168,11 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                 mModelList = new ArrayList<>();
                 mAdapter.setModelList(mModelList);
 
+                // Clean the database to start fresh
+                ContentProviderUtils.cleanDatabase(getActivity(), new Author());
+
+                FavoritesWidgetUpdateService.updateWidgets(getActivity());
+
                 // Log the User out
                 FirebaseAuth.getInstance().signOut();
 
@@ -264,11 +268,45 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
                     FirebaseProviderUtils.updateUser(mAuthor);
                 } else if (cleanDatabase) {
-                    // Sync the local database of favorite Guides to the online one
+
                     Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
+
+                            // Sync the local database of favorite Guides to the online one
                             ContentProviderUtils.cleanDatabase(getActivity(), mAuthor);
+
+                            if (mAuthor.favorites == null) return;
+
+                            // Add the User's favorites to the local database
+                            for (String guideId : mAuthor.favorites.keySet()) {
+                                Guide guide = (Guide) DataCache.getInstance().get(guideId);
+                                if (guide != null) {
+                                    guide.setFavorite(true);
+                                    ContentProviderUtils.insertModel(getActivity(), guide);
+                                } else {
+                                    FirebaseProviderUtils.getModel(
+                                            FirebaseProviderUtils.FirebaseType.GUIDE,
+                                            guideId,
+                                            new FirebaseProviderUtils.FirebaseListener() {
+                                                @Override
+                                                public void onModelReady(BaseModel model) {
+
+                                                    // Create a Guide from the model
+                                                    Guide guide = (Guide) model;
+
+                                                    // Set it to be a favorite
+                                                    guide.setFavorite(true);
+
+                                                    // Add it to the database
+                                                    ContentProviderUtils.insertModel(getActivity(), guide);
+
+                                                    // Update the Widget
+                                                    FavoritesWidgetUpdateService.updateWidgets(getActivity());
+                                                }
+                                            });
+                                }
+                            }
                         }
                     });
 

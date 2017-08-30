@@ -135,6 +135,9 @@
     <string name="list_rating_button_text">Rate</string>
     <string name="toast_missing_rating_error">Please rate the guide first.</string>
 
+    <!-- Widget Strings -->
+    <string name="widget_title_text">Favorite Guides</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 

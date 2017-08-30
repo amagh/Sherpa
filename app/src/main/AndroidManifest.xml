@@ -3,8 +3,8 @@
           package="project.hikerguide">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:name=".HikerGuideApplication"
@@ -14,10 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_places_api_key" />
+            android:value="@string/google_places_api_key"/>
 
         <activity
             android:name=".ui.activities.MainActivity"
@@ -28,52 +27,56 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".ui.activities.CreateGuideActivity">
+        <activity android:name=".ui.activities.CreateGuideActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity" />
+                android:value=".ui.activities.MainActivity"/>
         </activity>
-
         <activity
             android:name=".ui.activities.AccountActivity"
             android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity" />
+                android:value=".ui.activities.MainActivity"/>
         </activity>
-
         <activity android:name=".ui.activities.UserActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity" />
+                android:value=".ui.activities.MainActivity"/>
         </activity>
 
         <provider
             android:name=".data.generated.GuideProvider"
-            android:authorities="project.hikerguide.data"/>
+            android:authorities="project.hikerguide.data"
+            android:exported="true"/>
 
         <activity android:name=".ui.activities.GuideDetailsActivity">
-
         </activity>
-
         <activity android:name=".ui.activities.AreaActivity">
-
         </activity>
-
         <activity android:name=".ui.activities.TrailActivity">
-
         </activity>
-
-        <activity android:name=".ui.activities.PublishActivity"
+        <activity
+            android:name=".ui.activities.PublishActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog">
-
         </activity>
-
         <activity android:name=".ui.activities.OpenDraftActivity">
-
         </activity>
+
+        <receiver android:name=".widgets.FavoritesWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/favorites_widget_info"/>
+        </receiver>
+
+        <service android:name=".widgets.FavoritesWidgetService"
+                 android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service android:name=".widgets.FavoritesWidgetUpdateService" />
     </application>
 
 </manifest>

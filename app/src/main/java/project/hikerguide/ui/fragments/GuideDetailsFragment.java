@@ -111,7 +111,11 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
             }
         }
 
-        mBinding.setVm(new GuideViewModel(getActivity(), mGuide));
+        if (mGuide.trailName != null) {
+
+            // Set the ViewModel for the Fragment
+            mBinding.setVm(new GuideViewModel(getActivity(), mGuide));
+        }
 
         if (getActivity() instanceof ConnectivityActivity) {
             ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
@@ -229,6 +233,9 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
                     // Set the Guide to the Adapter
                     mAdapter.addModel(mGuide);
+
+                    // Set the ViewModel for the Fragment
+                    mBinding.setVm(new GuideViewModel(getActivity(), mGuide));
 
                     stopCacheIcon();
                 }
@@ -385,9 +392,20 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
                             cache.store(mGuide);
 
+                            mBinding.setVm(new GuideViewModel(getActivity(), mGuide));
+
+                            // Retrieve author info if needed
+                            if (mAuthor == null) {
+                                getAuthorFromFirebase(mGuide.authorId);
+                            }
+
                             stopCacheIcon();
                         }
                     });
+        } else if (mAuthor == null) {
+
+            // Get the Author info from Firebase
+            getAuthorFromFirebase(mGuide.authorId);
         }
 
         if (mSections == null) {
@@ -407,23 +425,28 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                         }
                     });
         }
+    }
 
-        if (mAuthor == null) {
-            FirebaseProviderUtils.getModel(
-                    FirebaseProviderUtils.FirebaseType.AUTHOR,
-                    mGuide.authorId,
-                    new FirebaseProviderUtils.FirebaseListener() {
-                        @Override
-                        public void onModelReady(BaseModel model) {
-                            mAuthor = (Author) model;
-                            mAdapter.addModel(mAuthor);
+    /**
+     * Retrieves Author information from Firebase and adds it to the Adapter
+     *
+     * @param authorId    The FirebaseId of the author to be retrieved from Firebase
+     */
+    private void getAuthorFromFirebase(String authorId) {
+        FirebaseProviderUtils.getModel(
+                FirebaseProviderUtils.FirebaseType.AUTHOR,
+                authorId,
+                new FirebaseProviderUtils.FirebaseListener() {
+                    @Override
+                    public void onModelReady(BaseModel model) {
+                        mAuthor = (Author) model;
+                        mAdapter.addModel(mAuthor);
 
-                            cache.store(mAuthor);
+                        DataCache.getInstance().store(mAuthor);
 
-                            stopCacheIcon();
-                        }
-                    });
-        }
+                        stopCacheIcon();
+                    }
+                });
     }
 
     /**

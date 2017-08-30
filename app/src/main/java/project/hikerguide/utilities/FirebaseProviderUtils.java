@@ -347,13 +347,6 @@ public class FirebaseProviderUtils {
      */
     public static void toggleFirebaseFavorite(Author author, Guide guide) {
 
-        // Check whether the Guide is currently a favorite and switch it in the data model
-        if (guide.isFavorite()) {
-            guide.setFavorite(false);
-        } else {
-            guide.setFavorite(true);
-        }
-
         // Ensure that the List of Guides has been initialized
         if (author.favorites == null) {
             author.favorites = new HashMap<>();
