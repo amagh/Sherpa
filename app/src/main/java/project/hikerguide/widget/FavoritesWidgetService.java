@@ -10,7 +10,10 @@ import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideProvider;
 import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FormattingUtils;
+
+import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 /**
  * Created by Alvin on 8/30/2017.
@@ -78,6 +81,12 @@ public class FavoritesWidgetService extends RemoteViewsService {
 
             // Initialize the RemoteViews
             RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.list_item_widget);
+
+            // Fill in the PendingIntent template passed from FavoritesWidget
+            Intent fillInIntent = new Intent();
+            fillInIntent.putExtra(GUIDE_KEY, guide.firebaseId);
+
+            remoteViews.setOnClickFillInIntent(R.id.list_widget_rl, fillInIntent);
 
             // Bind the data to the Views
             return bind(remoteViews, guide);

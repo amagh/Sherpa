@@ -1,5 +1,6 @@
 package project.hikerguide.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import project.hikerguide.R;
+import project.hikerguide.ui.activities.GuideDetailsActivity;
 
 /**
  * Implementation of App Widget functionality.
@@ -22,6 +24,13 @@ public class FavoritesWidget extends AppWidgetProvider {
 
         // Set the Adapter to the FavoritesWidgetService RemoteViewsFactory
         views.setRemoteAdapter(R.id.widget_lv, intent);
+
+        // Build the Intent for the click response
+        Intent clickIntent = new Intent(context, GuideDetailsActivity.class);
+
+        // Wrap the Intent in a PendingIntent to be used as the template
+        PendingIntent templateIntent = PendingIntent.getActivity(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setPendingIntentTemplate(R.id.widget_lv, templateIntent);
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
