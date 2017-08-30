@@ -48,6 +48,7 @@ import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.FormattingUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
+import project.hikerguide.widget.FavoritesWidgetUpdateService;
 
 import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_FAVORITE;
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
@@ -653,6 +654,9 @@ public class GuideViewModel extends BaseObservable {
                 fragment.removeGuideFromAdapter(mGuide);
             }
         }
+
+        // Update the Widget
+        FavoritesWidgetUpdateService.updateWidgets(mContext);
 
         // Notify change
         notifyPropertyChanged(BR.favorite);

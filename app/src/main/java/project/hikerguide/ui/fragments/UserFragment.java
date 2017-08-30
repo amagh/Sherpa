@@ -64,6 +64,7 @@ import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
+import project.hikerguide.widget.FavoritesWidgetUpdateService;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
@@ -171,6 +172,8 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
                 // Clean the database to start fresh
                 ContentProviderUtils.cleanDatabase(getActivity(), new Author());
+
+                FavoritesWidgetUpdateService.updateWidgets(getActivity());
 
                 // Log the User out
                 FirebaseAuth.getInstance().signOut();
@@ -290,9 +293,18 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                                             new FirebaseProviderUtils.FirebaseListener() {
                                                 @Override
                                                 public void onModelReady(BaseModel model) {
+
+                                                    // Create a Guide from the model
                                                     Guide guide = (Guide) model;
+
+                                                    // Set it to be a favorite
                                                     guide.setFavorite(true);
+
+                                                    // Add it to the database
                                                     ContentProviderUtils.insertModel(getActivity(), guide);
+
+                                                    // Update the Widget
+                                                    FavoritesWidgetUpdateService.updateWidgets(getActivity());
                                                 }
                                             });
                                 }
