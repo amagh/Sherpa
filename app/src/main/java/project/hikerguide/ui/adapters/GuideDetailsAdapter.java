@@ -253,7 +253,11 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
 
     @Override
     public long getItemId(int position) {
-        return mModelsList.get(position).firebaseId.hashCode();
+        if (mModelsList.get(position).firebaseId != null) {
+            return mModelsList.get(position).firebaseId.hashCode();
+        } else {
+            return 0;
+        }
     }
 
     /**
