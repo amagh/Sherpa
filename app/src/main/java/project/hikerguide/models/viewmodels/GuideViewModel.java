@@ -322,7 +322,7 @@ public class GuideViewModel extends BaseObservable {
         // rendered
         if (fragment != null) {
             mapView.startMapView(fragment, savedInstanceState);
-        } else {
+        } else if (activity != null) {
             mapView.startMapView(activity, savedInstanceState);
         }
 
