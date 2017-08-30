@@ -63,7 +63,7 @@
         <activity android:name=".ui.activities.OpenDraftActivity">
         </activity>
 
-        <receiver android:name=".widget.FavoritesWidget">
+        <receiver android:name=".widgets.FavoritesWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -73,10 +73,10 @@
                 android:resource="@xml/favorites_widget_info"/>
         </receiver>
 
-        <service android:name=".widget.FavoritesWidgetService"
+        <service android:name=".widgets.FavoritesWidgetService"
                  android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        <service android:name=".widget.FavoritesWidgetUpdateService" />
+        <service android:name=".widgets.FavoritesWidgetUpdateService" />
     </application>
 
 </manifest>

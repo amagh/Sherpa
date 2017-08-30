@@ -1,4 +1,4 @@
-package project.hikerguide.widget;
+package project.hikerguide.widgets;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +10,6 @@ import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideProvider;
 import project.hikerguide.models.datamodels.Guide;
-import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FormattingUtils;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;

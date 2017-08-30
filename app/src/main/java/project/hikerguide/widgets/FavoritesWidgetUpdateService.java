@@ -1,4 +1,4 @@
-package project.hikerguide.widget;
+package project.hikerguide.widgets;
 
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;

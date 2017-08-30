@@ -48,7 +48,7 @@ import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.FormattingUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.SaveUtils;
-import project.hikerguide.widget.FavoritesWidgetUpdateService;
+import project.hikerguide.widgets.FavoritesWidgetUpdateService;
 
 import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_FAVORITE;
 import static project.hikerguide.utilities.LineGraphUtils.addElevationDataToLineChart;
