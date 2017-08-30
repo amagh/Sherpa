@@ -1,0 +1,26 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/widget_margin">
+
+    <TextView
+        android:id="@+id/widget_tv"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:gravity="center_vertical"
+        android:background="@color/colorPrimary"
+        android:textColor="@android:color/white"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:text="@string/widget_title_text"/>
+
+    <ListView
+        android:id="@+id/widget_lv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/widget_tv"
+        android:background="@android:color/white"/>
+
+</RelativeLayout>
