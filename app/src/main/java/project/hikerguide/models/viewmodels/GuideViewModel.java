@@ -630,6 +630,8 @@ public class GuideViewModel extends BaseObservable {
             // Firebase Database
             FirebaseProviderUtils.toggleFirebaseFavorite(mAuthor, mGuide);
 
+            // Store the favorites in the local database so it can be used to populate the widget
+            ContentProviderUtils.toggleFavorite(mContext, mGuide);
         } else {
 
             // Local Database
