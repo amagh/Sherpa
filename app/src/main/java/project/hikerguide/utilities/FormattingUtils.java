@@ -97,4 +97,39 @@ public class FormattingUtils {
 
         return difficultyString;
     }
+
+    /**
+     * Converts the integer value of a rating to a String representation of that rating
+     *
+     * @param context    Interface to global Context
+     * @param rating     Integer value of the rating
+     * @return String corresponding to the rating
+     */
+    public static String formatRating(Context context, int rating) {
+        String ratingString = "";
+
+        switch (rating) {
+            case 1:
+                ratingString = context.getString(R.string.rating_bad);
+                break;
+
+            case 2:
+                ratingString = context.getString(R.string.rating_poor);
+                break;
+
+            case 3:
+                ratingString = context.getString(R.string.rating_adequate);
+                break;
+
+            case 4:
+                ratingString = context.getString(R.string.rating_good);
+                break;
+
+            case 5:
+                ratingString = context.getString(R.string.rating_excellent);
+                break;
+        }
+
+        return ratingString;
+    }
 }

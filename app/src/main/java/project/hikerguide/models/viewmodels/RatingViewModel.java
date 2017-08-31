@@ -1,5 +1,6 @@
 package project.hikerguide.models.viewmodels;
 
+import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -23,6 +24,7 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Rating;
 import project.hikerguide.ui.adapters.GuideDetailsAdapter;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import project.hikerguide.utilities.FormattingUtils;
 import timber.log.Timber;
 
 import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
@@ -34,6 +36,8 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
 public class RatingViewModel extends BaseObservable {
 
     // ** Member Variables ** //
+    private Context mContext;
+
     private Rating mOriginalRating;
     private Rating mRating;
     private Author mUser;
@@ -41,7 +45,9 @@ public class RatingViewModel extends BaseObservable {
 
     private boolean mShowHeading;
 
-    public RatingViewModel(Rating rating, GuideDetailsAdapter adapter, Author author) {
+    public RatingViewModel(Context context, Rating rating, GuideDetailsAdapter adapter, Author author) {
+        mContext = context;
+
         mOriginalRating = rating;
 
         mRating = new Rating();
@@ -56,7 +62,8 @@ public class RatingViewModel extends BaseObservable {
         mUser = author;
     }
 
-    public RatingViewModel(Rating rating, GuideDetailsAdapter adapter) {
+    public RatingViewModel(Context context, Rating rating, GuideDetailsAdapter adapter) {
+        mContext = context;
         mRating = rating;
         mAdapter = adapter;
     }
@@ -115,6 +122,11 @@ public class RatingViewModel extends BaseObservable {
         this.mRating.setRating(rating);
 
         notifyPropertyChanged(BR.rating);
+    }
+
+    @Bindable
+    public String getRatingDescription() {
+        return FormattingUtils.formatRating(mContext, mRating.getRating());
     }
 
     @Bindable

@@ -35,6 +35,7 @@ import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.data.GuideProvider;
 import project.hikerguide.databinding.ActivityCreateGuideBinding;
 import project.hikerguide.databinding.ListItemGuideDetailsBinding;
+import project.hikerguide.databinding.ListItemGuideDetailsEditBinding;
 import project.hikerguide.databinding.ListItemSectionImageEditBinding;
 import project.hikerguide.databinding.ListItemSectionTextEditBinding;
 import project.hikerguide.models.datamodels.Area;
@@ -734,7 +735,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                             (EditGuideDetailsAdapter.EditViewHolder) mBinding.guideDetailsRv.findViewHolderForAdapterPosition(0);
 
                     // Show the missing GPX error
-                    ListItemGuideDetailsBinding binding = (ListItemGuideDetailsBinding) viewHolder.getBinding();
+                    ListItemGuideDetailsEditBinding binding = (ListItemGuideDetailsEditBinding) viewHolder.getBinding();
                     binding.getVm().setShowGpxError(true);
                 }
             }, 100);

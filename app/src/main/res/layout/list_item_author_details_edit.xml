@@ -16,17 +16,22 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/card_vertical_separation"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin">
 
         <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginTop="16dp"
-            android:padding="4dp"
+            android:layout_width="@dimen/user_edit_icon_size"
+            android:layout_height="@dimen/user_edit_icon_size"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:padding="@dimen/user_edit_icon_padding"
             android:layout_gravity="end"
             android:src="@drawable/ic_close"
             android:tint="@color/red_900"
+            android:contentDescription="@string/content_description_edit_profile_cancel_button"
             android:onClick="@{vm::onClickEdit}"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
             app:editVisibility="@{vm.editVisibility}"/>
 
         <EditText
@@ -65,7 +70,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
+            android:background="?attr/selectableItemBackground"
             android:text="@string/author_edit_accept"
             android:textColor="@color/colorPrimary"
             android:onClick="@{vm::onClickAccept}"
@@ -79,7 +84,7 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="@dimen/list_item_separater_height"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:background="@color/grey_400" />
 

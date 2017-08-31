@@ -151,6 +151,11 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @Bindable
+    public String getContentDescription() {
+        return mContext.getString(R.string.content_description_guide, mGuide.trailName, mGuide.area);
+    }
+
+    @Bindable
     public String getDistance() {
         return mContext.getString(
                 R.string.list_guide_format_distance_imperial,

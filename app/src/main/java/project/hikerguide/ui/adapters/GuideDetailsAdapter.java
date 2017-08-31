@@ -481,12 +481,12 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
 
                     // If the Rating does not contain an AuthorId, it is a new Rating for the user
                     // to rate the Guide with
-                    RatingViewModel vm = new RatingViewModel((Rating) model, mAdapter, mUser);
+                    RatingViewModel vm = new RatingViewModel(mActivity, (Rating) model, mAdapter, mUser);
 
                     ((ListItemRatingEditBinding) mBinding).setVm(vm);
                 } else {
 
-                    RatingViewModel vm = new RatingViewModel((Rating) model, mAdapter);
+                    RatingViewModel vm = new RatingViewModel(mActivity, (Rating) model, mAdapter);
 
                     if (!mModelsList.get(position - 1).getClass().equals(Rating.class)) {
                         vm.showHeading();

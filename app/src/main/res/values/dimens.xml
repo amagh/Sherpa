@@ -3,8 +3,15 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="list_item_separater_height">0.5dp</dimen>
+
+    <item name="activated_alpha" type="dimen" format="float">1</item>
+    <item name="hidden_alpha" type="dimen" format="float">0</item>
+
     <dimen name="guide_details_section_margin">8dp</dimen>
     <dimen name="guide_details_internal_vertical_margin">8dp</dimen>
+    <dimen name="guide_details_difficulty_circle_size">20dp</dimen>
+    <dimen name="guide_details_difficulty_circle_margin">64dp</dimen>
 
     <dimen name="card_vertical_padding">8dp</dimen>
     <dimen name="card_bottom_padding">8dp</dimen>
@@ -18,9 +25,16 @@
     <dimen name="list_guide_favorite_padding">6dp</dimen>
     <dimen name="list_guide_favorite_end_margin">10dp</dimen>
 
+    <dimen name="list_guide_compact_outer_margin">8dp</dimen>
+    <dimen name="list_guide_compact_internal_margin">8dp</dimen>
+    <dimen name="list_guide_compact_image_size">60dp</dimen>
+    <dimen name="list_guide_compact_color_circle_size">16dp</dimen>
+
     <dimen name="guide_details_image_height">250dp</dimen>
     <dimen name="list_guide_details_map_height">200dp</dimen>
     <dimen name="list_guide_details_graph_height">100dp</dimen>
+
+    <dimen name="list_author_image_size">48dp</dimen>
 
     <dimen name="block_text_line_spacing">1dp</dimen>
 
@@ -33,6 +47,7 @@
     <dimen name="search_widget_vertical_margin">8dp</dimen>
     <dimen name="search_map_height">300dp</dimen>
     <dimen name="search_instruction_height">76dp</dimen>
+    <item name="search_widget_deactivated_alpha" type="dimen" format="float">0.75</item>
 
     <dimen name="list_place_vertical_padding">12dp</dimen>
     <dimen name="list_place_text_vertical_separation">2dp</dimen>
@@ -52,8 +67,14 @@
     <dimen name="sign_in_text_horizontal_margin">32dp</dimen>
     <dimen name="create_account_button_top_margin">32dp</dimen>
 
+    <dimen name="user_backdrop_separator_height">2dp</dimen>
+    <dimen name="user_image_size">80dp</dimen>
+    <dimen name="user_edit_icon_size">32dp</dimen>
+    <dimen name="user_edit_icon_padding">4dp</dimen>
+
     <dimen name="create_guide_hero_icon_size">48dp</dimen>
     <dimen name="create_guide_toolbar_icon_padding">12dp</dimen>
+    <dimen name="create_guide_error_icon_top_margin">36dp</dimen>
 
     <dimen name="back_icon_padding">12dp</dimen>
     <dimen name="map_icon_size">32dp</dimen>
@@ -64,6 +85,10 @@
     <dimen name="rating_star_padding">4dp</dimen>
     <dimen name="rating_star_top_margin">4dp</dimen>
     <dimen name="list_rating_horizontal_separation">64dp</dimen>
+
+    <dimen name="google_attribution_progressbar_size">16dp</dimen>
+
+    <dimen name="widget_title_size">56dp</dimen>
 
     <!--
 Refer to App Widget Documentation for margin information

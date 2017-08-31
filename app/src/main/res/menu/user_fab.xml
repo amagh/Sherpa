@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/fab_new_guide"
-        android:title=""
+        android:title="@string/menu_new_guide_title"
         android:icon="@drawable/ic_create"
         android:orderInCategory="1" />
 
     <item
         android:id="@+id/fab_open_draft"
-        android:title=""
+        android:title="@string/menu_guide_draft_title"
         android:icon="@drawable/ic_open_folder"
         android:orderInCategory="2" />
 </menu>

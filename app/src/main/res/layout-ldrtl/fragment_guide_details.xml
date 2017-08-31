@@ -30,6 +30,7 @@
                 app:collapsedTitleTextAppearance="@style/CollapsedToolbarTitleTextAppearance"
                 app:expandedSubtitleTextAppearance="@style/ExpandedToolbarSubtitleTextAppearance"
                 app:collapsedSubtitleTextAppearance="@style/CollapsedToolbarSubtitleTextAppearance"
+                app:expandedTitleGravity="right|bottom"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:contentScrim="@color/colorPrimary">
 
@@ -57,7 +58,6 @@
             android:id="@+id/guide_details_rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:descendantFocusability="afterDescendants"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     </android.support.design.widget.CoordinatorLayout>

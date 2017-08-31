@@ -23,6 +23,7 @@
             android:padding="@dimen/list_section_icon_padding"
             android:layout_gravity="center_vertical"
             android:onTouch="@{vm::onReorderTouch}"
+            android:contentDescription="@string/content_description_reorder_section"
             android:src="@drawable/ic_reorder"/>
 
         <EditText
@@ -35,6 +36,7 @@
             android:lineSpacingExtra="@dimen/block_text_line_spacing"
             android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
             android:text="@={vm.content}"
+            android:nextFocusRight="@+id/list_section_del"
             app:imeAction="@{vm.imeAction}"
             style="@style/TextAppearance.AppCompat.Body1"/>
 
@@ -45,7 +47,10 @@
             android:padding="@dimen/list_section_icon_padding"
             android:layout_gravity="center_vertical"
             android:onClick="@{vm::onDeleteClick}"
-            android:src="@drawable/ic_delete"/>
+            android:src="@drawable/ic_delete"
+            android:focusable="true"
+            android:contentDescription="@string/content_description_delete_section"
+            android:background="?attr/selectableItemBackground"/>
 
     </LinearLayout>
 

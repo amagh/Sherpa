@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -41,8 +42,8 @@ import java.util.List;
 
 import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.BR;
+import project.hikerguide.R;
 import project.hikerguide.data.GuideDatabase;
-import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.ui.views.SmartMapView;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
@@ -183,17 +184,25 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
     @BindingAdapter({"searchTv", "searchIv", "closeIv", "hasFocus"})
     public static void animateFocus(CardView cardView, EditText searchTv, ImageView searchIv, ImageView closeIv, boolean hasFocus) {
 
-        float cardAlpha     = 0.75f;
-        float searchAlpha   = 0;
-        float closeAlpha    = 0;
+        TypedValue activatedAlphaValue      = new TypedValue();
+        TypedValue deactivatedAlphaValue    = new TypedValue();
+        TypedValue hiddenAlphaValue         = new TypedValue();
+
+        cardView.getContext().getResources().getValue(R.dimen.activated_alpha, activatedAlphaValue, true);
+        cardView.getContext().getResources().getValue(R.dimen.search_widget_deactivated_alpha, deactivatedAlphaValue, true);
+        cardView.getContext().getResources().getValue(R.dimen.hidden_alpha, hiddenAlphaValue, true);
+
+        float cardAlpha     = deactivatedAlphaValue.getFloat();
+        float searchAlpha   = hiddenAlphaValue.getFloat();
+        float closeAlpha    = hiddenAlphaValue.getFloat();
 
         if (hasFocus) {
             // Prevent clicking on the close ImageView when it is not visible
             closeIv.setClickable(true);
-            cardAlpha = 1;
-            closeAlpha = 1;
+            cardAlpha   = activatedAlphaValue.getFloat();
+            closeAlpha  = activatedAlphaValue.getFloat();
         } else {
-            searchAlpha = 1;
+            searchAlpha = activatedAlphaValue.getFloat();
 
             // Allow clicking on the close ImageView
             closeIv.setClickable(false);

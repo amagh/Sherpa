@@ -21,6 +21,9 @@
     <string name="list_guide_details_distance_label">Total distance:</string>
     <string name="list_guide_details_elevation_label">Peak elevation \u0394: </string>
 
+    <!--Strings for Guide List Item -->
+    <string name="list_guide_author_label">Author:</string>
+
     <!-- Strings for author -->
     <string name="list_author_heading">About the Author</string>
 
@@ -56,6 +59,7 @@
     <string name="list_guide_format_rating">%1.1f\u2605</string>
     <string name="list_guide_format_rating_zero">0\u2605</string>
     <string name="list_guide_format_reviews">(%d)</string>
+    <string name="content_description_favorite_button">Favorite</string>
 
     <!-- Formatting for author list item -->
     <string name="list_author_format_score">%,d pts</string>
@@ -77,12 +81,18 @@
     <string name="menu_map_title">Map</string>
     <string name="menu_save_title">Save for offline</string>
     <string name="menu_favorite_title">Favorite</string>
+    <string name="content_description_guide">%1$s, %2$s</string>
     <string name="geo_uri_string">geo:0,0?q=<xliff:g id="latitude">%f</xliff:g>,<xliff:g id="longitude">%f</xliff:g>(Trail+Head)</string>
     <string name="error_no_map_app">There is no map application installed. Please install a map application and try again.</string>
     <string name="error_downloading_mapbox">There was an error downloading the map tiles. Please try again later.</string>
     <string name="error_tile_count_exceeded">Reached max tile count. Please remove some offline maps before attempting to save again.</string>
     <string name="mapbox_deleted">Mapbox tiles successfully deleted.</string>
     <string name="mapbox_downloaded">Map downloaded!</string>
+
+    <!-- Guide Details Map Strings -->
+    <string name="content_description_back_button">Return to guide details.</string>
+    <string name="content_description_my_location_button">Go to my location on the map.</string>
+    <string name="content_description_trail_head_button">Directions to trail head.</string>
 
     <!-- Create Guide Strings -->
     <string name="menu_publish_title">Publish Guide</string>
@@ -94,6 +104,12 @@
     <string name="create_guide_difficulty_missing_error_text">Please select a difficulty for the trail before publishing</string>
     <string name="draft_saved">Draft Saved!</string>
     <string name="draft_deleted">Draft Deleted!</string>
+    <string name="content_description_add_section">Add a Text Section</string>
+    <string name="content_description_add_section_image">Add an Image Section</string>
+    <string name="content_description_add_gpx">Add GPX to Guide</string>
+    <string name="content_description_add_guide_image">Guide Image</string>
+    <string name="content_description_delete_section">Delete Section</string>
+    <string name="content_description_reorder_section">Reorder Section</string>
 
     <!-- TrailActivity Strings -->
     <string name="trail_activity_title">Select your trail</string>
@@ -112,6 +128,13 @@
     <!-- User Activity Strings -->
     <string name="menu_user_log_off">Sign out</string>
     <string name="failed_image_upload_text">Failed to upload image. Please try again later.</string>
+    <string name="content_description_author_image">Author Image</string>
+    <string name="content_description_author_backdrop">Author Backdrop</string>
+    <string name="content_description_edit_profile_button">Edit Profile</string>
+    <string name="content_description_edit_profile_cancel_button">Cancel Editing Profile</string>
+    <string name="content_description_create_fab">Add a Guide</string>
+    <string name="menu_new_guide_title">New Guide</string>
+    <string name="menu_guide_draft_title">Open Guide Draft</string>
 
     <!-- Area Activity Strings -->
     <string name="area_search_instruction_text">Search for the park/area where the trail exists</string>
@@ -135,6 +158,13 @@
     <string name="list_rating_comments_hint">Comments (Optional)</string>
     <string name="list_rating_button_text">Rate</string>
     <string name="toast_missing_rating_error">Please rate the guide first.</string>
+    <string name="content_description_edit_rating_button">Edit Rating</string>
+    <string name="content_description_edit_rating_cancel_button">Cancel Editing Rating</string>
+    <string name="rating_excellent">Excellent</string>
+    <string name="rating_good">Good</string>
+    <string name="rating_adequate">Adequate</string>
+    <string name="rating_poor">Poor</string>
+    <string name="rating_bad">Bad</string>
 
     <!-- Widget Strings -->
     <string name="widget_title_text">Favorite Guides</string>

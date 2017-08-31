@@ -122,6 +122,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
         // properly triggered
         mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), new Author()));
         mBinding.fabDial.setMenuListener(this);
+        mBinding.fabDial.getChildAt(0).setContentDescription(getString(R.string.content_description_create_fab));
 
         initRecyclerView();
 
