@@ -79,6 +79,8 @@
     <dimen name="rating_star_top_margin">4dp</dimen>
     <dimen name="list_rating_horizontal_separation">64dp</dimen>
 
+    <dimen name="google_attribution_progressbar_size">16dp</dimen>
+
     <dimen name="widget_title_size">56dp</dimen>
 
     <!--
