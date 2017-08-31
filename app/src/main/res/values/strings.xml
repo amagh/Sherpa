@@ -85,6 +85,11 @@
     <string name="mapbox_deleted">Mapbox tiles successfully deleted.</string>
     <string name="mapbox_downloaded">Map downloaded!</string>
 
+    <!-- Guide Details Map Strings -->
+    <string name="content_description_back_button">Return to guide details.</string>
+    <string name="content_description_my_location_button">Go to my location on the map.</string>
+    <string name="content_description_trail_head_button">Directions to trail head.</string>
+
     <!-- Create Guide Strings -->
     <string name="menu_publish_title">Publish Guide</string>
     <string name="menu_save_draft_title">Save Draft</string>
