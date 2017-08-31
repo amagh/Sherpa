@@ -26,6 +26,7 @@
             android:layout_gravity="end"
             android:src="@drawable/ic_close"
             android:tint="@color/red_900"
+            android:contentDescription="@string/content_description_edit_cancel_button"
             android:onClick="@{vm::onClickEdit}"
             app:editVisibility="@{vm.editVisibility}"/>
 

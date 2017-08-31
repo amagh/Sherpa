@@ -26,6 +26,7 @@
             android:layout_gravity="end"
             android:src="@drawable/ic_create"
             android:tint="@color/grey_400"
+            android:contentDescription="@string/content_description_edit_button"
             android:onClick="@{vm::onClickEdit}"
             app:editVisibility="@{vm.editVisibility}"/>
 

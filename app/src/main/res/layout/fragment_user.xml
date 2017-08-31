@@ -14,11 +14,12 @@
         android:layout_height="match_parent">
 
         <android.support.design.widget.AppBarLayout
-            android:id="@+id/appbar"
+            android:id="@+id/user_ab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <android.support.design.widget.SubtitleCollapsingToolbarLayout
+                android:id="@+id/user_ct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:contentScrim="@color/colorPrimary"
@@ -39,6 +40,7 @@
                     android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
                     android:onClick="@{vm::onClickBackdrop}"
+                    android:contentDescription="@string/content_description_author_backdrop"
                     app:backdrop="@{vm.backdrop}"
                     app:layout_collapseMode="parallax"/>
 
@@ -64,7 +66,7 @@
             android:layout_height="4dp"
             android:background="@color/grey_400"
             app:layout_behavior=".ui.behaviors.VanishingBehavior"
-            app:layout_anchor="@+id/appbar"
+            app:layout_anchor="@+id/user_ab"
             app:layout_anchorGravity="bottom" />
 
         <!-- TODO: Fix VanishingBehavior. Currently, doesn't hide when user flings -->
@@ -73,9 +75,10 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@drawable/ic_account_circle"
+            android:contentDescription="@string/content_description_author_image"
             android:onClick="@{vm::onClickProfileImage}"
             app:layout_behavior=".ui.behaviors.VanishingBehavior"
-            app:layout_anchor="@+id/appbar"
+            app:layout_anchor="@+id/user_ab"
             app:layout_anchorGravity="bottom|center_horizontal"
             app:authorImage="@{vm.authorImage}"
             app:civ_border_width="2dp"
@@ -94,6 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:visibility="gone"
+            android:contentDescription="@string/content_description_create_fab"
             app:fabMenu="@menu/user_fab"
             app:fabGravity="bottom_end"
             app:fabVisibility="@{vm.fabVisibility}"

@@ -121,9 +121,10 @@
     <string name="content_description_author_image">Author Image</string>
     <string name="content_description_author_backdrop">Author Backdrop</string>
     <string name="content_description_edit_button">Edit Profile</string>
+    <string name="content_description_edit_cancel_button">Cancel Edit Profile</string>
     <string name="content_description_create_fab">Add a Guide</string>
-    <string name="content_description_new_guide_button">New Guide</string>
-    <string name="content_description_draft_button">Open Guide Draft</string>
+    <string name="menu_new_guide_title">New Guide</string>
+    <string name="menu_guide_draft_title">Open Guide Draft</string>
 
     <!-- Area Activity Strings -->
     <string name="area_search_instruction_text">Search for the park/area where the trail exists</string>
