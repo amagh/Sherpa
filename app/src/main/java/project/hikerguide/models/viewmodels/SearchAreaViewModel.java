@@ -11,7 +11,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -360,6 +362,21 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+
+        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+
+            // When the user presses the search key on the keyboard, hide the keyboard so the
+            // search results can be seen
+            GeneralUtils.hideKeyboard(textView.getContext(), textView);
+            textView.clearFocus();
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

@@ -83,7 +83,9 @@
                 android:textColorHint="@color/grey_400"
                 android:text="@={vm.query}"
                 android:inputType="textAutoCorrect"
+                android:imeOptions="actionSearch"
                 android:onFocusChange="@{vm::onFocusChanged}"
+                android:onEditorAction="@{vm::onEditorAction}"
                 app:backgroundTint="@android:color/transparent"/>
 
         </android.support.v7.widget.CardView>
