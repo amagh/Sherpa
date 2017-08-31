@@ -26,6 +26,7 @@ import project.hikerguide.ui.adapters.PlaceAdapter;
 import project.hikerguide.ui.fragments.SearchFragment;
 import project.hikerguide.utilities.GeneralUtils;
 import project.hikerguide.utilities.GooglePlacesApiUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_SEARCH;
 
@@ -171,6 +172,14 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
         }
 
         notifyPropertyChanged(BR.hasFocus);
+    }
+
+    public void onMapFocusChanged(View view, boolean hasFocus) {
+
+        if (hasFocus) {
+            Timber.d("Clearing focus");
+            view.clearFocus();
+        }
     }
 
     public void onClickClear(View view) {
