@@ -29,10 +29,11 @@
 
         <ImageView
             android:id="@+id/list_guide_difficulty_circle_1"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="@dimen/guide_details_difficulty_circle_size"
+            android:layout_height="@dimen/guide_details_difficulty_circle_size"
             android:src="@drawable/ic_circle_stroke"
-            android:layout_marginLeft="64dp"
+            android:layout_marginLeft="@dimen/guide_details_difficulty_circle_margin"
+            android:layout_marginStart="@dimen/guide_details_difficulty_circle_margin"
             android:onClick="@{vm::onClickDifficultyCircle}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/list_guide_difficulty_circle_2"
@@ -43,13 +44,12 @@
             app:circle3="@{listGuideDifficultyCircle3}"
             app:circle4="@{listGuideDifficultyCircle4}"
             app:circle5="@{listGuideDifficultyCircle5}"
-            tools:src="@drawable/ic_circle"
-            android:layout_marginStart="64dp"/>
+            tools:src="@drawable/ic_circle"/>
 
         <ImageView
             android:id="@+id/list_guide_difficulty_circle_2"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="@dimen/guide_details_difficulty_circle_size"
+            android:layout_height="@dimen/guide_details_difficulty_circle_size"
             android:src="@drawable/ic_circle_stroke"
             android:onClick="@{vm::onClickDifficultyCircle}"
             app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_1"
@@ -60,8 +60,8 @@
 
         <ImageView
             android:id="@+id/list_guide_difficulty_circle_3"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="@dimen/guide_details_difficulty_circle_size"
+            android:layout_height="@dimen/guide_details_difficulty_circle_size"
             android:src="@drawable/ic_circle_stroke"
             android:onClick="@{vm::onClickDifficultyCircle}"
             app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_2"
@@ -71,8 +71,8 @@
 
         <ImageView
             android:id="@+id/list_guide_difficulty_circle_4"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="@dimen/guide_details_difficulty_circle_size"
+            android:layout_height="@dimen/guide_details_difficulty_circle_size"
             android:src="@drawable/ic_circle_stroke"
             android:onClick="@{vm::onClickDifficultyCircle}"
             app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_3"
@@ -82,16 +82,16 @@
 
         <ImageView
             android:id="@+id/list_guide_difficulty_circle_5"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="@dimen/guide_details_difficulty_circle_size"
+            android:layout_height="@dimen/guide_details_difficulty_circle_size"
             android:src="@drawable/ic_circle_stroke"
-            android:layout_marginRight="64dp"
+            android:layout_marginRight="@dimen/guide_details_difficulty_circle_margin"
+            android:layout_marginEnd="@dimen/guide_details_difficulty_circle_margin"
             android:onClick="@{vm::onClickDifficultyCircle}"
             app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            android:layout_marginEnd="64dp"/>
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
 
         <TextView
             android:id="@+id/list_guide_difficulty_tv"

@@ -10,6 +10,8 @@
 
     <dimen name="guide_details_section_margin">8dp</dimen>
     <dimen name="guide_details_internal_vertical_margin">8dp</dimen>
+    <dimen name="guide_details_difficulty_circle_size">20dp</dimen>
+    <dimen name="guide_details_difficulty_circle_margin">64dp</dimen>
 
     <dimen name="card_vertical_padding">8dp</dimen>
     <dimen name="card_bottom_padding">8dp</dimen>
