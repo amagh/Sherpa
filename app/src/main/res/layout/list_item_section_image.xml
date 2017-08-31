@@ -19,7 +19,8 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin">
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:focusable="true">
 
         <project.hikerguide.ui.views.AspectRatioImageView
             android:id="@+id/list_section_image_iv"

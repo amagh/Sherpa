@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:lineSpacingExtra="@dimen/block_text_line_spacing"
         android:text="@{vm.content}"
+        android:focusable="true"
         style="@style/TextAppearance.AppCompat.Body1"
         tools:text="@string/list_section_text"/>
 
