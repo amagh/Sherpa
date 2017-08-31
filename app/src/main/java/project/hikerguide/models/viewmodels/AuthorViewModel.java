@@ -144,6 +144,9 @@ public class AuthorViewModel extends BaseObservable {
             @Override
             public void onSuccess(StorageMetadata storageMetadata) {
 
+                // Check to ensure Activity is still active prior to loading image
+                if (imageView.getContext() == null) return;
+
                 Glide.with(imageView.getContext())
                         .using(new FirebaseImageLoader())
                         .load(backdrop)
