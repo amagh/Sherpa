@@ -39,6 +39,8 @@
                 android:scaleType="fitXY"
                 android:adjustViewBounds="true"
                 android:onClick="@{vm::onSectionImageClick}"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
                 app:image="@{vm.image}"
                 app:section="@{vm.section}"
                 tools:src="@color/bg_gray"/>
@@ -53,6 +55,7 @@
                 android:textColor="@android:color/black"
                 android:hint="@string/list_section_caption_hint"
                 android:text="@={vm.content}"
+                android:nextFocusRight="@+id/list_section_del"
                 app:imeAction="@{vm.imeAction}"
                 style="@style/TextAppearance.AppCompat.Caption"/>
 
@@ -65,7 +68,9 @@
             android:padding="@dimen/list_section_icon_padding"
             android:layout_gravity="center_vertical"
             android:onClick="@{vm::onDeleteClick}"
-            android:src="@drawable/ic_delete"/>
+            android:src="@drawable/ic_delete"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"/>
 
     </LinearLayout>
 </layout>

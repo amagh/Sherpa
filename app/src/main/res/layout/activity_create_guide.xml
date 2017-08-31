@@ -87,6 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="?attr/actionBarSize"
+            android:descendantFocusability="afterDescendants"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
         <LinearLayout
@@ -104,6 +105,7 @@
                 android:onClick="onClickAddSection"
                 android:src="@drawable/ic_create"
                 android:contentDescription="@string/content_description_add_section"
+                android:focusable="true"
                 android:background="?android:attr/selectableItemBackground"/>
 
             <ImageView
@@ -115,6 +117,7 @@
                 android:onClick="onClickAddGpx"
                 android:src="@drawable/ic_directions_white"
                 android:contentDescription="@string/content_description_add_gpx"
+                android:focusable="true"
                 android:background="?android:attr/selectableItemBackground"/>
 
             <ImageView
@@ -126,6 +129,7 @@
                 android:onClick="onClickAddSectionWithImage"
                 android:src="@drawable/ic_image"
                 android:contentDescription="@string/content_description_add_section_image"
+                android:focusable="true"
                 android:background="?android:attr/selectableItemBackground"/>
         </LinearLayout>
 
