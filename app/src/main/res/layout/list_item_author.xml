@@ -32,8 +32,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/list_author_iv"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="@dimen/list_author_image_size"
+            android:layout_height="@dimen/list_author_image_size"
             android:layout_marginTop="@dimen/guide_details_internal_vertical_margin"
             app:authorImage="@{vm.authorImage}"
             app:layout_constraintStart_toStartOf="parent"

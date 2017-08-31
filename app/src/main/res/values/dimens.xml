@@ -27,6 +27,8 @@
     <dimen name="list_guide_details_map_height">200dp</dimen>
     <dimen name="list_guide_details_graph_height">100dp</dimen>
 
+    <dimen name="list_author_image_size">48dp</dimen>
+
     <dimen name="block_text_line_spacing">1dp</dimen>
 
     <dimen name="search_widget_text_size">21sp</dimen>
