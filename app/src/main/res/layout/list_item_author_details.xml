@@ -18,7 +18,8 @@
         android:layout_marginBottom="@dimen/card_vertical_separation"
         android:orientation="vertical"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginStart="@dimen/activity_horizontal_margin">
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:descendantFocusability="afterDescendants">
 
         <ImageView
             android:layout_width="@dimen/user_edit_icon_size"
@@ -30,6 +31,8 @@
             android:tint="@color/grey_400"
             android:contentDescription="@string/content_description_edit_profile_button"
             android:onClick="@{vm::onClickEdit}"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
             app:editVisibility="@{vm.editVisibility}"/>
 
         <TextView

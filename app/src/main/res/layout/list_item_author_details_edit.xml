@@ -30,6 +30,8 @@
             android:tint="@color/red_900"
             android:contentDescription="@string/content_description_edit_profile_cancel_button"
             android:onClick="@{vm::onClickEdit}"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
             app:editVisibility="@{vm.editVisibility}"/>
 
         <EditText
@@ -68,7 +70,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
+            android:background="?attr/selectableItemBackground"
             android:text="@string/author_edit_accept"
             android:textColor="@color/colorPrimary"
             android:onClick="@{vm::onClickAccept}"
