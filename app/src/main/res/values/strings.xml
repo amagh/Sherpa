@@ -101,6 +101,10 @@
     <string name="create_guide_difficulty_missing_error_text">Please select a difficulty for the trail before publishing</string>
     <string name="draft_saved">Draft Saved!</string>
     <string name="draft_deleted">Draft Deleted!</string>
+    <string name="content_description_add_section">Add a Text Section</string>
+    <string name="content_description_add_section_image">Add an Image Section</string>
+    <string name="content_description_add_gpx">Add GPX to Guide</string>
+    <string name="content_description_add_guide_image">Guide Image</string>
 
     <!-- TrailActivity Strings -->
     <string name="trail_activity_title">Select your trail</string>
