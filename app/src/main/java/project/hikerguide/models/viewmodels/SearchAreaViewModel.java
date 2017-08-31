@@ -190,7 +190,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
         cardView.getContext().getResources().getValue(R.dimen.search_widget_deactivated_alpha, deactivatedAlphaValue, true);
         cardView.getContext().getResources().getValue(R.dimen.hidden_alpha, hiddenAlphaValue, true);
 
-        float cardAlpha     = hiddenAlphaValue.getFloat();
+        float cardAlpha     = deactivatedAlphaValue.getFloat();
         float searchAlpha   = hiddenAlphaValue.getFloat();
         float closeAlpha    = hiddenAlphaValue.getFloat();
 

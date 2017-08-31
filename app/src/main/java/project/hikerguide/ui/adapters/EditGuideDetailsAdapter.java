@@ -11,6 +11,7 @@ import java.util.List;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemGuideDetailsBinding;
+import project.hikerguide.databinding.ListItemGuideDetailsEditBinding;
 import project.hikerguide.databinding.ListItemSectionImageEditBinding;
 import project.hikerguide.databinding.ListItemSectionTextEditBinding;
 import project.hikerguide.models.datamodels.Guide;
@@ -50,7 +51,7 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
         // Set the layout based on the ViewType
         switch (viewType) {
             case EDIT_GUIDE_VIEW_TYPE:
-                layoutId = R.layout.list_item_guide_details;
+                layoutId = R.layout.list_item_guide_details_edit;
                 break;
 
             case EDIT_SECTION_VIEW_TYPE:
@@ -190,7 +191,7 @@ public class EditGuideDetailsAdapter extends RecyclerView.Adapter<EditGuideDetai
             if (model instanceof Guide) {
 
                 GuideViewModel vm = new GuideViewModel(mActivity, (Guide) model);
-                ((ListItemGuideDetailsBinding) mBinding).setVm(vm);
+                ((ListItemGuideDetailsEditBinding) mBinding).setVm(vm);
 
             } else if (model instanceof Section) {
 
