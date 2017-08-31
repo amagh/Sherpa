@@ -39,7 +39,7 @@
             android:layout_marginEnd="@dimen/search_widget_horizontal_margin"
             android:layout_marginTop="@dimen/search_widget_vertical_margin"
             android:layout_marginBottom="@dimen/search_widget_vertical_margin"
-            android:alpha=".75"
+            android:alpha="@dimen/search_widget_deactivated_alpha"
             app:cardBackgroundColor="@android:color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -71,7 +71,7 @@
                     android:src="@drawable/ic_close"
                     android:layout_gravity="center_vertical|start"
                     android:tint="@color/grey_400"
-                    android:alpha="0"
+                    android:alpha="@dimen/hidden_alpha"
                     android:onClick="@{vm::onClickClear}"
                     />
 
@@ -87,6 +87,7 @@
                     android:textColorHint="@color/grey_400"
                     android:text="@={vm.query}"
                     android:inputType="textAutoCorrect"
+                    android:imeOptions="actionSearch|flagNoExtractUi"
                     android:onFocusChange="@{vm::onFocusChanged}"
                     android:gravity="start"
                     app:backgroundTint="@android:color/transparent"
@@ -97,7 +98,7 @@
             <View
                 android:id="@+id/search_divider_v"
                 android:layout_width="match_parent"
-                android:layout_height="0.5dp"
+                android:layout_height="@dimen/list_item_separater_height"
                 android:layout_marginTop="@dimen/search_widget_height"
                 android:background="@color/grey_400"/>
 
