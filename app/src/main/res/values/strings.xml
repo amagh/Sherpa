@@ -108,6 +108,8 @@
     <string name="content_description_add_section_image">Add an Image Section</string>
     <string name="content_description_add_gpx">Add GPX to Guide</string>
     <string name="content_description_add_guide_image">Guide Image</string>
+    <string name="content_description_delete_section">Delete Section</string>
+    <string name="content_description_reorder_section">Reorder Section</string>
 
     <!-- TrailActivity Strings -->
     <string name="trail_activity_title">Select your trail</string>
