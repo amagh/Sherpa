@@ -340,36 +340,6 @@ public class FirebaseProviderUtils {
     }
 
     /**
-     * Adds/removes a Guide from an User's list of favorite Guides
-     *
-     * @param author    Data model representing the Firebase Database entry for the User
-     * @param guide     Guide to be added/removed to the Author's favorite list
-     */
-    public static void toggleFirebaseFavorite(Author author, Guide guide) {
-
-        // Ensure that the List of Guides has been initialized
-        if (author.favorites == null) {
-            author.favorites = new HashMap<>();
-        }
-
-        // Modify the Firebase Database entry
-        if (guide.isFavorite()) {
-            author.favorites.put(guide.firebaseId, guide.trailName);
-        } else {
-            author.favorites.remove(guide.firebaseId);
-        }
-
-        // Push the update to FirebaseDatabase
-        String directory = GuideDatabase.AUTHORS + "/" + author.firebaseId;
-
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(directory, author);
-
-        FirebaseDatabase.getInstance().getReference()
-                .updateChildren(childUpdates);
-    }
-
-    /**
      * Updates a User's Firebase Database entry to match the local changes made
      *
      * @param user      User to be updated
@@ -385,6 +355,69 @@ public class FirebaseProviderUtils {
 
         FirebaseDatabase.getInstance().getReference()
                 .updateChildren(childUpdates);
+    }
+
+    /**
+     * Adds/removes a Guide from an User's list of favorite Guides
+     *
+     * @param guide     Guide to be added/removed to the Author's favorite list
+     */
+    public static void toggleFirebaseFavorite(final Guide guide) {
+
+        // Check to see if the user is logged in
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // If the user is not logged in, do nothing
+        if (user == null) return;
+
+        // Check to see if the user's Author model is cached
+        final Author author = (Author) DataCache.getInstance().get(user.getUid());
+
+        if (author != null) {
+
+            // Toggle the favorite status for the User
+            toggleFavoriteForUser(author, guide);
+        } else {
+
+            // User Object is not cached. Retrieve it from Firebase
+            getAuthorForFirebaseUser(new FirebaseListener() {
+                @Override
+                public void onModelReady(BaseModel model) {
+                    if (model != null) {
+
+                        // Cache the data
+                        Author author = (Author) model;
+                        DataCache.getInstance().store(author);
+
+                        // Toggle the favorite status for the User
+                        toggleFavoriteForUser(author, guide);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Updates the user's favorite Map to either add or remove a guide from it
+     *
+     * @param user     The Author to be modified
+     * @param guide    The Guide that is to be added/removed from favorites
+     */
+    private static void toggleFavoriteForUser(Author user, Guide guide) {
+
+        // Ensure that the List of Guides has been initialized
+        if (user.favorites == null) {
+            user.favorites = new HashMap<>();
+        }
+
+        // Modify the Firebase Database entry
+        if (guide.isFavorite()) {
+            user.favorites.put(guide.firebaseId, guide.trailName);
+        } else {
+            user.favorites.remove(guide.firebaseId);
+        }
+
+        updateUser(user);
     }
 
     /**
