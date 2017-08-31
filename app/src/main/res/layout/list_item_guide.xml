@@ -131,6 +131,7 @@
                 android:padding="@dimen/list_guide_favorite_padding"
                 android:layout_marginRight="@dimen/list_guide_favorite_end_margin"
                 android:layout_marginEnd="@dimen/list_guide_favorite_end_margin"
+                android:contentDescription="@string/content_description_favorite_button"
                 android:onClick="@{vm::onClickFavorite}"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@id/list_guide_author_iv"

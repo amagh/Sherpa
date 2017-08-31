@@ -56,6 +56,7 @@
     <string name="list_guide_format_rating">%1.1f\u2605</string>
     <string name="list_guide_format_rating_zero">0\u2605</string>
     <string name="list_guide_format_reviews">(%d)</string>
+    <string name="content_description_favorite_button">Favorite</string>
 
     <!-- Formatting for author list item -->
     <string name="list_author_format_score">%,d pts</string>
