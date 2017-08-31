@@ -156,6 +156,11 @@
     <string name="list_rating_comments_hint">Comments (Optional)</string>
     <string name="list_rating_button_text">Rate</string>
     <string name="toast_missing_rating_error">Please rate the guide first.</string>
+    <string name="rating_excellent">Excellent</string>
+    <string name="rating_good">Good</string>
+    <string name="rating_adequate">Adequate</string>
+    <string name="rating_poor">Poor</string>
+    <string name="rating_bad">Bad</string>
 
     <!-- Widget Strings -->
     <string name="widget_title_text">Favorite Guides</string>
