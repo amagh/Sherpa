@@ -62,6 +62,8 @@
 
     <dimen name="user_backdrop_separator_height">2dp</dimen>
     <dimen name="user_image_size">80dp</dimen>
+    <dimen name="user_edit_icon_size">32dp</dimen>
+    <dimen name="user_edit_icon_padding">4dp</dimen>
 
     <dimen name="create_guide_hero_icon_size">48dp</dimen>
     <dimen name="create_guide_toolbar_icon_padding">12dp</dimen>
