@@ -56,6 +56,7 @@
             android:padding="@dimen/list_section_icon_padding"
             android:src="@drawable/ic_close"
             android:tint="@color/red_900"
+            android:contentDescription="@string/content_description_edit_rating_cancel_button"
             android:onClick="@{vm::onClickCancelEditRating}"
             app:layout_constraintStart_toEndOf="@id/list_rating_star_5"
             app:layout_constraintEnd_toEndOf="parent"

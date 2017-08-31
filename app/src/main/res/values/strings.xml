@@ -128,8 +128,8 @@
     <string name="failed_image_upload_text">Failed to upload image. Please try again later.</string>
     <string name="content_description_author_image">Author Image</string>
     <string name="content_description_author_backdrop">Author Backdrop</string>
-    <string name="content_description_edit_button">Edit Profile</string>
-    <string name="content_description_edit_cancel_button">Cancel Edit Profile</string>
+    <string name="content_description_edit_profile_button">Edit Profile</string>
+    <string name="content_description_edit_profile_cancel_button">Cancel Editing Profile</string>
     <string name="content_description_create_fab">Add a Guide</string>
     <string name="menu_new_guide_title">New Guide</string>
     <string name="menu_guide_draft_title">Open Guide Draft</string>
@@ -156,6 +156,8 @@
     <string name="list_rating_comments_hint">Comments (Optional)</string>
     <string name="list_rating_button_text">Rate</string>
     <string name="toast_missing_rating_error">Please rate the guide first.</string>
+    <string name="content_description_edit_rating_button">Edit Rating</string>
+    <string name="content_description_edit_rating_cancel_button">Cancel Editing Rating</string>
     <string name="rating_excellent">Excellent</string>
     <string name="rating_good">Good</string>
     <string name="rating_adequate">Adequate</string>
