@@ -91,6 +91,8 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
         // If Adapter is empty, load the Guides from Firebase
         if (mAdapter.isEmpty()) {
             loadGuides();
+        } else {
+            mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
         }
     }
 

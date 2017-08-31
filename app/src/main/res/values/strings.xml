@@ -76,6 +76,7 @@
     <!-- Guide Details Strings -->
     <string name="menu_map_title">Map</string>
     <string name="menu_save_title">Save for offline</string>
+    <string name="menu_favorite_title">Favorite</string>
     <string name="geo_uri_string">geo:0,0?q=<xliff:g id="latitude">%f</xliff:g>,<xliff:g id="longitude">%f</xliff:g>(Trail+Head)</string>
     <string name="error_no_map_app">There is no map application installed. Please install a map application and try again.</string>
     <string name="error_downloading_mapbox">There was an error downloading the map tiles. Please try again later.</string>

@@ -20,6 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
 import project.hikerguide.R;
@@ -131,11 +133,17 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_guide_details, menu);
 
-        mCacheMenuItem = menu.getItem(0);
+        mCacheMenuItem = menu.getItem(1);
         if (!ContentProviderUtils.isGuideCachedInDatabase(getActivity(), mGuide)) {
             mCacheMenuItem.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_save));
         } else {
             mCacheMenuItem.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_delete_white));
+        }
+
+        if (ContentProviderUtils.isGuideFavorite(getActivity(), mGuide)) {
+            menu.getItem(0).setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_star_white));
+        } else {
+            menu.getItem(0).setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_star_border_white));
         }
 
         // Prevent the User from saving the Guide before all elements have been loaded
@@ -159,6 +167,29 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
                     deleteGuide();
                     animateCacheIcon();
                     item.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_save));
+                }
+
+                return true;
+
+            case R.id.menu_favorite:
+
+                // Check if the user is logged in
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                // Toggle the favorite status of the Guide
+                mGuide.setFavorite(!mGuide.isFavorite());
+
+                if (user != null) {
+                    FirebaseProviderUtils.toggleFirebaseFavorite(mGuide);
+                }
+
+                ContentProviderUtils.toggleFavorite(getActivity(), mGuide);
+
+                // Update the icon
+                if (ContentProviderUtils.isGuideFavorite(getActivity(), mGuide)) {
+                    item.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_star_white));
+                } else {
+                    item.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.ic_star_border_white));
                 }
 
                 return true;
