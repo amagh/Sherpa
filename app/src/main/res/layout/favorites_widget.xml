@@ -7,7 +7,7 @@
     <TextView
         android:id="@+id/widget_tv"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="@dimen/widget_title_size"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingStart="@dimen/activity_horizontal_margin"
         android:gravity="center_vertical"
