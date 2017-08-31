@@ -64,7 +64,7 @@
                     android:id="@+id/guide_details_error_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="36dp"
+                    android:layout_marginTop="@dimen/create_guide_error_icon_top_margin"
                     android:layout_gravity="center"
                     android:textColor="@android:color/white"
                     android:text="@string/create_guide_image_missing_error_text"

@@ -60,6 +60,7 @@
 
     <dimen name="create_guide_hero_icon_size">48dp</dimen>
     <dimen name="create_guide_toolbar_icon_padding">12dp</dimen>
+    <dimen name="create_guide_error_icon_top_margin">36dp</dimen>
 
     <dimen name="back_icon_padding">12dp</dimen>
     <dimen name="map_icon_size">32dp</dimen>
