@@ -17,52 +17,52 @@
 
         <ImageView
             android:id="@+id/list_guide_iv"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="@dimen/list_guide_compact_image_size"
+            android:layout_height="@dimen/list_guide_compact_image_size"
             android:scaleType="centerCrop"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="@dimen/list_guide_compact_outer_margin"
+            android:layout_marginStart="@dimen/list_guide_compact_outer_margin"
+            android:layout_marginTop="@dimen/list_guide_compact_outer_margin"
+            android:layout_marginBottom="@dimen/list_guide_compact_outer_margin"
             app:image="@{vm.image}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:src="@drawable/placeholder_guide_image"
-            android:layout_marginStart="8dp"/>
+            tools:src="@drawable/placeholder_guide_image"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/list_guide_track_color_iv"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="@dimen/list_guide_compact_color_circle_size"
+            android:layout_height="@dimen/list_guide_compact_color_circle_size"
+            android:layout_marginRight="@dimen/list_guide_compact_outer_margin"
+            android:layout_marginEnd="@dimen/list_guide_compact_outer_margin"
+            android:layout_marginTop="@dimen/list_guide_compact_outer_margin"
             app:color="@{vm.color}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@color/red_a200"
-            android:layout_marginEnd="8dp"/>
+            tools:src="@color/red_a200"/>
 
         <TextView
             android:id="@+id/list_guide_title_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="@dimen/list_guide_compact_internal_margin"
+            android:layout_marginStart="@dimen/list_guide_compact_internal_margin"
+            android:layout_marginRight="@dimen/list_guide_compact_internal_margin"
+            android:layout_marginEnd="@dimen/list_guide_compact_internal_margin"
             android:maxLines="1"
             android:text="@{vm.trailName}"
             style="@style/Base.TextAppearance.AppCompat.Subhead"
             app:layout_constraintStart_toEndOf="@id/list_guide_iv"
             app:layout_constraintEnd_toStartOf="@id/list_guide_track_color_iv"
             app:layout_constraintTop_toTopOf="@id/list_guide_iv"
-            tools:text="@string/list_guide_title_text"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"/>
+            tools:text="@string/list_guide_title_text"/>
 
         <TextView
             android:id="@+id/list_guide_rating_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="@dimen/text_vertical_margin"
             android:text="@{vm.rating}"
             app:layout_constraintStart_toStartOf="@id/list_guide_title_tv"
             app:layout_constraintTop_toBottomOf="@id/list_guide_title_tv"
@@ -83,12 +83,12 @@
             android:id="@+id/list_guide_distance_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="@dimen/list_guide_compact_outer_margin"
+            android:layout_marginEnd="@dimen/list_guide_compact_outer_margin"
             android:text="@{vm.distance}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBaseline_toBaselineOf="@id/list_guide_rating_tv"
-            tools:text="@string/list_guide_distance_text"
-            android:layout_marginEnd="8dp"/>
+            tools:text="@string/list_guide_distance_text"/>
 
         <TextView
             android:id="@+id/list_guide_author_label_tv"
@@ -96,12 +96,14 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="@id/list_guide_title_tv"
             app:layout_constraintTop_toBottomOf="@id/list_guide_rating_tv"
-            android:text="Author: "/>
+            android:text="@string/list_guide_author_label"/>
 
         <TextView
             android:id="@+id/list_guide_author_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/text_horizontal_margin"
+            android:layout_marginStart="@dimen/text_horizontal_margin"
             android:text="@{vm.author}"
             app:layout_constraintStart_toEndOf="@id/list_guide_author_label_tv"
             app:layout_constraintTop_toBottomOf="@id/list_guide_rating_tv"
@@ -111,12 +113,12 @@
             android:id="@+id/list_guide_difficulty_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="@dimen/list_guide_compact_outer_margin"
+            android:layout_marginEnd="@dimen/list_guide_compact_outer_margin"
             android:text="@{vm.difficulty}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBaseline_toBaselineOf="@id/list_guide_author_label_tv"
-            tools:text="@string/list_guide_difficulty_text"
-            android:layout_marginEnd="8dp"/>
+            tools:text="@string/list_guide_difficulty_text"/>
 
         <View
             android:layout_width="0dp"

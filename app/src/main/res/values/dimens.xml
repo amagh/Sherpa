@@ -23,6 +23,11 @@
     <dimen name="list_guide_favorite_padding">6dp</dimen>
     <dimen name="list_guide_favorite_end_margin">10dp</dimen>
 
+    <dimen name="list_guide_compact_outer_margin">8dp</dimen>
+    <dimen name="list_guide_compact_internal_margin">8dp</dimen>
+    <dimen name="list_guide_compact_image_size">60dp</dimen>
+    <dimen name="list_guide_compact_color_circle_size">16dp</dimen>
+
     <dimen name="guide_details_image_height">250dp</dimen>
     <dimen name="list_guide_details_map_height">200dp</dimen>
     <dimen name="list_guide_details_graph_height">100dp</dimen>

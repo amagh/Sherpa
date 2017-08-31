@@ -21,6 +21,9 @@
     <string name="list_guide_details_distance_label">Total distance:</string>
     <string name="list_guide_details_elevation_label">Peak elevation \u0394: </string>
 
+    <!--Strings for Guide List Item -->
+    <string name="list_guide_author_label">Author:</string>
+
     <!-- Strings for author -->
     <string name="list_author_heading">About the Author</string>
 
