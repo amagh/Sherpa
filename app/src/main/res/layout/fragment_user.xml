@@ -10,6 +10,7 @@
     </data>
 
     <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/user_cl"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -63,7 +64,7 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="4dp"
+            android:layout_height="@dimen/user_backdrop_separator_height"
             android:background="@color/grey_400"
             app:layout_behavior=".ui.behaviors.VanishingBehavior"
             app:layout_anchor="@+id/user_ab"
@@ -72,8 +73,8 @@
         <!-- TODO: Fix VanishingBehavior. Currently, doesn't hide when user flings -->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/user_author_iv"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="@dimen/user_image_size"
+            android:layout_height="@dimen/user_image_size"
             android:src="@drawable/ic_account_circle"
             android:contentDescription="@string/content_description_author_image"
             android:onClick="@{vm::onClickProfileImage}"
@@ -81,7 +82,7 @@
             app:layout_anchor="@+id/user_ab"
             app:layout_anchorGravity="bottom|center_horizontal"
             app:authorImage="@{vm.authorImage}"
-            app:civ_border_width="2dp"
+            app:civ_border_width="@dimen/user_backdrop_separator_height"
             app:civ_border_color="@color/grey_400"
             app:civ_fill_color="@android:color/white"/>
 
