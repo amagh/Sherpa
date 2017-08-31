@@ -17,8 +17,8 @@
             android:id="@+id/search_map_cv"
             android:layout_width="0dp"
             android:layout_height="@dimen/search_map_height"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <project.hikerguide.ui.views.SmartMapView
@@ -42,8 +42,8 @@
             android:alpha=".75"
             app:cardBackgroundColor="@android:color/white"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:searchIv="@{searchIv}"
             app:closeIv="@{searchCloseIv}"
             app:searchTv="@{searchTv}"
@@ -60,7 +60,7 @@
                     android:layout_marginLeft="@dimen/search_widget_icon_horizontal_margin"
                     android:layout_marginStart="@dimen/search_widget_icon_horizontal_margin"
                     android:src="@drawable/places_ic_search"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical|start"/>
 
                 <ImageView
                     android:id="@+id/search_close_iv"
@@ -69,7 +69,7 @@
                     android:layout_marginLeft="@dimen/search_widget_icon_horizontal_margin"
                     android:layout_marginStart="@dimen/search_widget_icon_horizontal_margin"
                     android:src="@drawable/ic_close"
-                    android:layout_gravity="center_vertical"
+                    android:layout_gravity="center_vertical|start"
                     android:tint="@color/grey_400"
                     android:alpha="0"
                     android:onClick="@{vm::onClickClear}"
@@ -88,7 +88,9 @@
                     android:text="@={vm.query}"
                     android:inputType="textAutoCorrect"
                     android:onFocusChange="@{vm::onFocusChanged}"
-                    app:backgroundTint="@android:color/transparent"/>
+                    android:gravity="start"
+                    app:backgroundTint="@android:color/transparent"
+                    android:layout_marginStart="@dimen/search_widget_text_horizontal_margin"/>
 
             </FrameLayout>
 
@@ -118,8 +120,8 @@
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/search_results_rv"
             android:text="@string/search_instruction_search"/>
 
@@ -127,8 +129,8 @@
             android:id="@+id/search_results_rv"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_map_cv"
             app:layout_constraintBottom_toBottomOf="parent"/>
 

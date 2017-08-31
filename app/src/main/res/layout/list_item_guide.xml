@@ -25,11 +25,11 @@
                 android:id="@+id/list_guide_title_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:text="@{vm.trailName}"
                 style="@style/TextAppearance.AppCompat.Subhead"
-                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@string/list_guide_title_text"/>
 
@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:text="@{vm.areaName}"
                 style="@style/TextAppearance.AppCompat.Caption"
-                app:layout_constraintLeft_toLeftOf="@id/list_guide_title_tv"
+                app:layout_constraintStart_toStartOf="@id/list_guide_title_tv"
                 app:layout_constraintTop_toBottomOf="@id/list_guide_title_tv"
                 tools:text="@string/list_area_text"/>
 
@@ -51,7 +51,7 @@
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:text="@{vm.distance}"
                 style="@style/TextAppearance.AppCompat.Caption"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBaseline_toBaselineOf="@id/list_guide_area_tv"
                 tools:text="@string/list_guide_distance_text"/>
 
@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:text="@{vm.rating}"
                 style="@style/TextAppearance.AppCompat.Caption"
-                app:layout_constraintLeft_toLeftOf="@id/list_guide_title_tv"
+                app:layout_constraintStart_toStartOf="@id/list_guide_title_tv"
                 app:layout_constraintTop_toBottomOf="@id/list_guide_area_tv"
                 tools:text="@string/list_guide_rating_text"/>
 
@@ -73,7 +73,7 @@
                 android:layout_marginStart="@dimen/text_horizontal_margin"
                 android:text="@{vm.reviews}"
                 style="@style/TextAppearance.AppCompat.Caption"
-                app:layout_constraintLeft_toRightOf="@id/list_guide_rating_tv"
+                app:layout_constraintStart_toEndOf="@id/list_guide_rating_tv"
                 app:layout_constraintBaseline_toBaselineOf="@id/list_guide_rating_tv"
                 tools:text="@string/list_guide_reviews_text"/>
 
@@ -83,7 +83,7 @@
                 android:layout_height="wrap_content"
                 android:text="@{vm.difficulty}"
                 style="@style/TextAppearance.AppCompat.Caption"
-                app:layout_constraintRight_toRightOf="@id/list_guide_distance_tv"
+                app:layout_constraintEnd_toEndOf="@id/list_guide_distance_tv"
                 app:layout_constraintBaseline_toBaselineOf="@id/list_guide_rating_tv"
                 tools:text="@string/list_guide_difficulty_text"/>
 
@@ -95,9 +95,9 @@
                 android:layout_marginTop="@dimen/card_vertical_padding"
                 app:image="@{vm.image}"
                 app:layout_constraintDimensionRatio="H,16:9"
-                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/list_guide_rating_tv"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 tools:src="@drawable/placeholder_guide_image"
                 />
 
@@ -107,7 +107,7 @@
                 android:layout_height="@dimen/list_guide_author_pic_size"
                 android:layout_marginTop="@dimen/card_vertical_padding"
                 app:authorImage="@{vm.authorImage}"
-                app:layout_constraintLeft_toLeftOf="@id/list_guide_title_tv"
+                app:layout_constraintStart_toStartOf="@id/list_guide_title_tv"
                 app:layout_constraintTop_toBottomOf="@id/list_guide_iv"
                 tools:src="@drawable/placeholder_profile_image"/>
 
@@ -119,7 +119,7 @@
                 android:layout_marginStart="@dimen/text_horizontal_margin"
                 android:text="@{vm.author}"
                 style="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintLeft_toRightOf="@id/list_guide_author_iv"
+                app:layout_constraintStart_toEndOf="@id/list_guide_author_iv"
                 app:layout_constraintTop_toTopOf="@id/list_guide_author_iv"
                 app:layout_constraintBottom_toBottomOf="@id/list_guide_author_iv"
                 tools:text="@string/list_author_text"/>
@@ -133,7 +133,7 @@
                 android:layout_marginEnd="@dimen/list_guide_favorite_end_margin"
                 android:contentDescription="@string/content_description_favorite_button"
                 android:onClick="@{vm::onClickFavorite}"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/list_guide_author_iv"
                 app:layout_constraintBottom_toBottomOf="@id/list_guide_author_iv"
                 android:src="@drawable/ic_star"/>
@@ -145,7 +145,7 @@
                 android:padding="@dimen/list_guide_favorite_padding"
                 android:layout_marginRight="@dimen/list_guide_favorite_end_margin"
                 android:layout_marginEnd="@dimen/list_guide_favorite_end_margin"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/list_guide_author_iv"
                 app:layout_constraintBottom_toBottomOf="@id/list_guide_author_iv"
                 app:favorite="@{vm.favorite}"

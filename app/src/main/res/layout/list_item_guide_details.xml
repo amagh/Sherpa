@@ -34,8 +34,8 @@
             android:src="@drawable/ic_circle_stroke"
             android:layout_marginLeft="64dp"
             android:onClick="@{vm::onClickDifficultyCircle}"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/list_guide_difficulty_circle_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/list_guide_difficulty_circle_2"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:difficultyRating="@{vm.difficultyRating}"
@@ -43,7 +43,8 @@
             app:circle3="@{listGuideDifficultyCircle3}"
             app:circle4="@{listGuideDifficultyCircle4}"
             app:circle5="@{listGuideDifficultyCircle5}"
-            tools:src="@drawable/ic_circle"/>
+            tools:src="@drawable/ic_circle"
+            android:layout_marginStart="64dp"/>
 
         <ImageView
             android:id="@+id/list_guide_difficulty_circle_2"
@@ -51,8 +52,8 @@
             android:layout_height="20dp"
             android:src="@drawable/ic_circle_stroke"
             android:onClick="@{vm::onClickDifficultyCircle}"
-            app:layout_constraintLeft_toRightOf="@id/list_guide_difficulty_circle_1"
-            app:layout_constraintRight_toLeftOf="@+id/list_guide_difficulty_circle_3"
+            app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintEnd_toStartOf="@+id/list_guide_difficulty_circle_3"
             app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             tools:src="@drawable/ic_circle"/>
@@ -63,8 +64,8 @@
             android:layout_height="20dp"
             android:src="@drawable/ic_circle_stroke"
             android:onClick="@{vm::onClickDifficultyCircle}"
-            app:layout_constraintLeft_toRightOf="@id/list_guide_difficulty_circle_2"
-            app:layout_constraintRight_toLeftOf="@+id/list_guide_difficulty_circle_4"
+            app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_2"
+            app:layout_constraintEnd_toStartOf="@+id/list_guide_difficulty_circle_4"
             app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
             app:layout_constraintHorizontal_chainStyle="spread_inside"/>
 
@@ -74,8 +75,8 @@
             android:layout_height="20dp"
             android:src="@drawable/ic_circle_stroke"
             android:onClick="@{vm::onClickDifficultyCircle}"
-            app:layout_constraintLeft_toRightOf="@id/list_guide_difficulty_circle_3"
-            app:layout_constraintRight_toLeftOf="@+id/list_guide_difficulty_circle_5"
+            app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_3"
+            app:layout_constraintEnd_toStartOf="@+id/list_guide_difficulty_circle_5"
             app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
             app:layout_constraintHorizontal_chainStyle="spread_inside"/>
 
@@ -86,10 +87,11 @@
             android:src="@drawable/ic_circle_stroke"
             android:layout_marginRight="64dp"
             android:onClick="@{vm::onClickDifficultyCircle}"
-            app:layout_constraintLeft_toRightOf="@id/list_guide_difficulty_circle_4"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_4"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            android:layout_marginEnd="64dp"/>
 
         <TextView
             android:id="@+id/list_guide_difficulty_tv"
@@ -98,8 +100,8 @@
             android:layout_marginTop="@dimen/text_vertical_margin"
             android:text="@{vm.difficulty}"
             app:layout_constraintTop_toBottomOf="@id/list_guide_difficulty_circle_1"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             style="@style/TextAppearance.AppCompat.Subhead"
             tools:text="@string/difficulty_moderate"
             />
@@ -113,8 +115,8 @@
             app:gpx="@{vm.gpx}"
             app:viewModel="@{vm.viewModel}"
             app:trackUserPosition="@{vm.trackUserPosition}"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/list_guide_difficulty_tv"
             app:mapbox_uiZoomGestures="false"
             app:mapbox_uiScrollGestures="false"
@@ -130,8 +132,8 @@
             android:visibility="gone"
             app:gpxErrorTv="@{guideDetailsMapErrorTv}"
             app:showGpxError="@{vm.showGpxError}"
-            app:layout_constraintLeft_toLeftOf="@id/list_guide_details_map"
-            app:layout_constraintRight_toRightOf="@id/list_guide_details_map"
+            app:layout_constraintStart_toStartOf="@id/list_guide_details_map"
+            app:layout_constraintEnd_toEndOf="@id/list_guide_details_map"
             app:layout_constraintTop_toTopOf="@id/list_guide_details_map"
             app:layout_constraintBottom_toBottomOf="@id/list_guide_details_map"/>
 
@@ -142,8 +144,8 @@
             android:text="@string/create_guide_gpx_missing_error_text"
             android:textColor="@android:color/white"
             android:visibility="gone"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/guide_details_map_error_iv"/>
 
         <com.github.mikephil.charting.charts.LineChart
@@ -154,8 +156,8 @@
             android:visibility="@{vm.elevationVisibility}"
             app:gpx="@{vm.gpx}"
             app:context="@{vm.context}"
-            app:layout_constraintLeft_toLeftOf="@+id/list_guide_details_map"
-            app:layout_constraintRight_toRightOf="@+id/list_guide_details_map"
+            app:layout_constraintStart_toStartOf="@+id/list_guide_details_map"
+            app:layout_constraintEnd_toEndOf="@+id/list_guide_details_map"
             app:layout_constraintTop_toBottomOf="@+id/list_guide_details_map"/>
 
         <TextView
@@ -166,7 +168,7 @@
             android:text="@string/list_guide_details_distance_label"
             style="@style/TextAppearance.AppCompat.Caption"
             app:layout_constraintTop_toBottomOf="@id/list_guide_details_elevation_lc"
-            app:layout_constraintLeft_toLeftOf="@id/list_guide_details_map"
+            app:layout_constraintStart_toStartOf="@id/list_guide_details_map"
             />
 
         <TextView
@@ -178,7 +180,7 @@
             android:text="@{vm.distance}"
             style="@style/TextAppearance.AppCompat.Caption"
             app:layout_constraintBaseline_toBaselineOf="@id/list_guide_details_distance_label_tv"
-            app:layout_constraintLeft_toRightOf="@id/list_guide_details_distance_label_tv"
+            app:layout_constraintStart_toEndOf="@id/list_guide_details_distance_label_tv"
             tools:text="@string/list_guide_distance_text"/>
 
         <TextView
@@ -189,7 +191,7 @@
             android:visibility="@{vm.elevationVisibility}"
             style="@style/TextAppearance.AppCompat.Caption"
             app:layout_constraintBaseline_toBaselineOf="@id/list_guide_details_distance_label_tv"
-            app:layout_constraintLeft_toLeftOf="@id/guideline" />
+            app:layout_constraintStart_toStartOf="@id/guideline" />
 
         <TextView
             android:id="@+id/list_guide_details_elevation_tv"
@@ -201,7 +203,7 @@
             android:visibility="@{vm.elevationVisibility}"
             style="@style/TextAppearance.AppCompat.Caption"
             app:layout_constraintBaseline_toBaselineOf="@id/list_guide_details_distance_label_tv"
-            app:layout_constraintLeft_toRightOf="@id/list_guide_details_elevation_label_tv"
+            app:layout_constraintStart_toEndOf="@id/list_guide_details_elevation_label_tv"
             tools:text="@string/list_guide_details_elevation_text"/>
 
     </android.support.constraint.ConstraintLayout>

@@ -17,8 +17,8 @@
             android:id="@+id/area_cv"
             android:layout_width="0dp"
             android:layout_height="@dimen/search_map_height"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <project.hikerguide.ui.views.SmartMapView
@@ -42,8 +42,8 @@
             android:alpha=".75"
             app:cardBackgroundColor="@android:color/white"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:searchIv="@{areaSearchIv}"
             app:closeIv="@{areaCloseIv}"
             app:searchTv="@{areaSearchTv}"
@@ -97,8 +97,8 @@
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/area_rv"
             app:showInstructions="@{vm.showInstructions}"
             android:text="@string/area_search_instruction_text"/>
@@ -109,8 +109,8 @@
             android:layout_height="0dp"
             app:adapter="@{vm.adapter}"
             app:activity="@{vm.activity}"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/area_cv"
             app:layout_constraintBottom_toBottomOf="parent"/>
 

@@ -24,10 +24,11 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             app:image="@{vm.image}"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:src="@drawable/placeholder_guide_image"/>
+            tools:src="@drawable/placeholder_guide_image"
+            android:layout_marginStart="8dp"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/list_guide_track_color_iv"
@@ -36,9 +37,10 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             app:color="@{vm.color}"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@color/red_a200"/>
+            tools:src="@color/red_a200"
+            android:layout_marginEnd="8dp"/>
 
         <TextView
             android:id="@+id/list_guide_title_tv"
@@ -49,10 +51,12 @@
             android:maxLines="1"
             android:text="@{vm.trailName}"
             style="@style/Base.TextAppearance.AppCompat.Subhead"
-            app:layout_constraintLeft_toRightOf="@id/list_guide_iv"
-            app:layout_constraintRight_toLeftOf="@id/list_guide_track_color_iv"
+            app:layout_constraintStart_toEndOf="@id/list_guide_iv"
+            app:layout_constraintEnd_toStartOf="@id/list_guide_track_color_iv"
             app:layout_constraintTop_toTopOf="@id/list_guide_iv"
-            tools:text="@string/list_guide_title_text"/>
+            tools:text="@string/list_guide_title_text"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"/>
 
         <TextView
             android:id="@+id/list_guide_rating_tv"
@@ -60,7 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@{vm.rating}"
-            app:layout_constraintLeft_toLeftOf="@id/list_guide_title_tv"
+            app:layout_constraintStart_toStartOf="@id/list_guide_title_tv"
             app:layout_constraintTop_toBottomOf="@id/list_guide_title_tv"
             tools:text="@string/list_guide_rating_text"/>
 
@@ -70,9 +74,10 @@
             android:layout_height="wrap_content"
             android:text="@{vm.reviews}"
             android:layout_marginLeft="@dimen/text_horizontal_margin"
-            app:layout_constraintLeft_toRightOf="@id/list_guide_rating_tv"
+            app:layout_constraintStart_toEndOf="@id/list_guide_rating_tv"
             app:layout_constraintBaseline_toBaselineOf="@id/list_guide_rating_tv"
-            tools:text="@string/list_guide_reviews_text"/>
+            tools:text="@string/list_guide_reviews_text"
+            android:layout_marginStart="@dimen/text_horizontal_margin"/>
 
         <TextView
             android:id="@+id/list_guide_distance_tv"
@@ -80,15 +85,16 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:text="@{vm.distance}"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBaseline_toBaselineOf="@id/list_guide_rating_tv"
-            tools:text="@string/list_guide_distance_text"/>
+            tools:text="@string/list_guide_distance_text"
+            android:layout_marginEnd="8dp"/>
 
         <TextView
             android:id="@+id/list_guide_author_label_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="@id/list_guide_title_tv"
+            app:layout_constraintStart_toStartOf="@id/list_guide_title_tv"
             app:layout_constraintTop_toBottomOf="@id/list_guide_rating_tv"
             android:text="Author: "/>
 
@@ -97,7 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{vm.author}"
-            app:layout_constraintLeft_toRightOf="@id/list_guide_author_label_tv"
+            app:layout_constraintStart_toEndOf="@id/list_guide_author_label_tv"
             app:layout_constraintTop_toBottomOf="@id/list_guide_rating_tv"
             tools:text="@string/list_author_text"/>
 
@@ -107,15 +113,16 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:text="@{vm.difficulty}"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBaseline_toBaselineOf="@id/list_guide_author_label_tv"
-            tools:text="@string/list_guide_difficulty_text"/>
+            tools:text="@string/list_guide_difficulty_text"
+            android:layout_marginEnd="8dp"/>
 
         <View
             android:layout_width="0dp"
             android:layout_height="1dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:background="@color/grey_400" />
 

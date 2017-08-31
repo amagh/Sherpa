@@ -16,7 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
             android:layout_marginLeft="@dimen/list_place_horizontal_padding"
-            android:background="@color/grey_400" />
+            android:background="@color/grey_400"
+            android:layout_marginStart="@dimen/list_place_horizontal_padding"/>
 
         <ProgressBar
             android:id="@+id/list_attribution_pb"
@@ -24,7 +25,8 @@
             android:layout_height="16dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/search_widget_icon_horizontal_margin"
-            android:visibility="@{vm.progressVisibility}"/>
+            android:visibility="@{vm.progressVisibility}"
+            android:layout_marginStart="@dimen/search_widget_icon_horizontal_margin"/>
 
         <ImageView
             android:layout_width="wrap_content"

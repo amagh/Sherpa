@@ -21,8 +21,8 @@
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:gravity="center_horizontal"
             android:text="@string/list_rating_heading"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             style="@style/TextAppearance.AppCompat.Subhead"/>
 
@@ -32,8 +32,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/guide_details_internal_vertical_margin"
             android:text="@string/list_rating_title_text"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/list_rating_heading_tv"
             style="@style/TextAppearance.AppCompat.Body2"/>
 
@@ -44,7 +44,7 @@
             android:layout_marginLeft="@dimen/list_rating_horizontal_separation"
             android:layout_marginStart="@dimen/list_rating_horizontal_separation"
             android:layout_marginTop="@dimen/text_vertical_margin"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/list_rating_title_tv"
             app:authorImage="@{vm.authorImage}"
             tools:src="@drawable/ic_account_circle"/>
@@ -57,8 +57,8 @@
             android:src="@drawable/ic_close"
             android:tint="@color/red_900"
             android:onClick="@{vm::onClickCancelEditRating}"
-            app:layout_constraintLeft_toRightOf="@id/list_rating_star_5"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toEndOf="@id/list_rating_star_5"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/list_rating_title_tv"/>
 
         <TextView
@@ -69,8 +69,8 @@
             android:gravity="center_horizontal"
             android:text="@{vm.authorName}"
             android:maxLines="1"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/list_rating_star_1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/list_rating_star_1"
             app:layout_constraintTop_toBottomOf="@id/list_rating_author_iv"
             style="@style/TextAppearance.AppCompat.Body2"/>
 
@@ -82,8 +82,8 @@
             android:layout_marginLeft="@dimen/list_rating_horizontal_separation"
             android:layout_marginStart="@dimen/list_rating_horizontal_separation"
             android:onClick="@{vm::onClickStarRating}"
-            app:layout_constraintLeft_toRightOf="@id/list_rating_author_iv"
-            app:layout_constraintRight_toLeftOf="@+id/list_rating_star_2"
+            app:layout_constraintStart_toEndOf="@id/list_rating_author_iv"
+            app:layout_constraintEnd_toStartOf="@+id/list_rating_star_2"
             app:layout_constraintTop_toTopOf="@id/list_rating_author_iv"
             app:layout_constraintBottom_toBottomOf="@id/list_rating_author_tv"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -100,8 +100,8 @@
             android:layout_height="@dimen/rating_star_size"
             android:padding="@dimen/rating_star_padding"
             android:onClick="@{vm::onClickStarRating}"
-            app:layout_constraintLeft_toRightOf="@id/list_rating_star_1"
-            app:layout_constraintRight_toLeftOf="@+id/list_rating_star_3"
+            app:layout_constraintStart_toEndOf="@id/list_rating_star_1"
+            app:layout_constraintEnd_toStartOf="@+id/list_rating_star_3"
             app:layout_constraintTop_toTopOf="@id/list_rating_author_iv"
             app:layout_constraintBottom_toBottomOf="@id/list_rating_author_tv"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -113,8 +113,8 @@
             android:layout_height="@dimen/rating_star_size"
             android:padding="@dimen/rating_star_padding"
             android:onClick="@{vm::onClickStarRating}"
-            app:layout_constraintLeft_toRightOf="@id/list_rating_star_2"
-            app:layout_constraintRight_toLeftOf="@+id/list_rating_star_4"
+            app:layout_constraintStart_toEndOf="@id/list_rating_star_2"
+            app:layout_constraintEnd_toStartOf="@+id/list_rating_star_4"
             app:layout_constraintTop_toTopOf="@id/list_rating_author_iv"
             app:layout_constraintBottom_toBottomOf="@id/list_rating_author_tv"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -126,8 +126,8 @@
             android:layout_height="@dimen/rating_star_size"
             android:padding="@dimen/rating_star_padding"
             android:onClick="@{vm::onClickStarRating}"
-            app:layout_constraintLeft_toRightOf="@id/list_rating_star_3"
-            app:layout_constraintRight_toLeftOf="@+id/list_rating_star_5"
+            app:layout_constraintStart_toEndOf="@id/list_rating_star_3"
+            app:layout_constraintEnd_toStartOf="@+id/list_rating_star_5"
             app:layout_constraintTop_toTopOf="@id/list_rating_author_iv"
             app:layout_constraintBottom_toBottomOf="@id/list_rating_author_tv"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -141,8 +141,8 @@
             android:layout_marginRight="@dimen/list_rating_horizontal_separation"
             android:layout_marginEnd="@dimen/list_rating_horizontal_separation"
             android:onClick="@{vm::onClickStarRating}"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/list_rating_star_4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/list_rating_star_4"
             app:layout_constraintTop_toTopOf="@id/list_rating_author_iv"
             app:layout_constraintBottom_toBottomOf="@id/list_rating_author_tv"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -158,10 +158,12 @@
             android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
             android:hint="@string/list_rating_comments_hint"
             android:text="@={vm.comment}"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/list_rating_author_tv"
-            style="@style/TextAppearance.AppCompat.Body1" />
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"/>
 
         <Button
             android:id="@+id/list_rating_btn"
@@ -171,8 +173,8 @@
             android:textColor="@color/colorPrimary"
             android:onClick="@{vm::onClickRate}"
             android:layout_marginBottom="@dimen/guide_details_internal_vertical_margin"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/list_rating_comment_tv"
             app:layout_constraintBottom_toBottomOf="parent"
             style="@style/Widget.AppCompat.Button.Borderless"/>
