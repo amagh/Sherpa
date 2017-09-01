@@ -23,6 +23,8 @@ import project.hikerguide.models.viewmodels.AreaViewModel;
 import project.hikerguide.models.viewmodels.AttributionViewModel;
 import project.hikerguide.models.viewmodels.DoubleSearchViewModel;
 import project.hikerguide.models.viewmodels.PlaceViewModel;
+import project.hikerguide.ui.adapters.interfaces.ClickHandler;
+import project.hikerguide.ui.adapters.abstractadapters.HideableAdapter;
 
 import static project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType.ATTRIBUTION;
 import static project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType.ATTRIBUTION_GOOGLE;
@@ -35,7 +37,7 @@ import static project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType.SE
  * Created by Alvin on 9/1/2017.
  */
 
-public class NewAreaAdapter extends RecyclerView.Adapter<NewAreaAdapter.AreaViewHolder> implements Hideable {
+public class NewAreaAdapter extends HideableAdapter<NewAreaAdapter.AreaViewHolder> {
 
     // ** Constants ** //
     private static final int AREA_VIEW_TYPE         = 5096;
