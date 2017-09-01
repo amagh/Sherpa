@@ -160,6 +160,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
 
                                         // Set the Area to the memvar and notify
                                         mArea = area;
+                                        changeMapCamera(new LatLng(mArea.latitude, mArea.longitude));
                                         notifyPropertyChanged(BR.adapter);
                                     }
                         });
@@ -167,6 +168,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
 
                         // Set the Area to the memvar and notify
                         mArea = (Area) clickedItem;
+                        changeMapCamera(new LatLng(mArea.latitude, mArea.longitude));
                         notifyPropertyChanged(BR.adapter);
                     }
                 }
@@ -202,6 +204,8 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                 break;
 
             case AREA_FOCUS:
+                mArea = null;
+
             case TRAIL_FOCUS:
                 mAdapter.show();
         }
@@ -308,8 +312,16 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
             switch (view.getId()) {
 
                 case R.id.search_area_tv:
-                    setFocus(AREA_FOCUS);
+                    if (mArea == null) {
+                        setFocus(AREA_FOCUS);
+                    } else {
+                        setFocus(TRAIL_FOCUS);
+                    }
                     break;
+
+                case R.id.search_area_dummy_tv: {
+                    setFocus(AREA_FOCUS);
+                }
             }
         }
     }
