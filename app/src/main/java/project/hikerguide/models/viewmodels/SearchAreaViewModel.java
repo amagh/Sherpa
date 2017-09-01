@@ -110,7 +110,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                         mSearchHandler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                GooglePlacesApiUtils.queryGooglePlaces(mGoogleApiClient, mQuery, new GooglePlacesApiUtils.QueryCallback() {
+                                GooglePlacesApiUtils.queryGooglePlaces(mGoogleApiClient, mQuery, new GooglePlacesApiUtils.GooglePlacesQueryListener() {
                                     @Override
                                     public void onQueryReady(List<PlaceModel> placeModelList) {
 

@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import java.util.ArrayList;
 import java.util.List;
 
+import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
 
 /**
@@ -58,7 +59,7 @@ public class GooglePlacesApiUtils {
      *                           the calling Object
      */
     public static void queryGooglePlaces(GoogleApiClient googleApiClient, String query,
-                                         final QueryCallback callback) {
+                                         final GooglePlacesQueryListener callback) {
 
         // Max LatLngBounds possible
         LatLngBounds bounds = new LatLngBounds(
@@ -103,7 +104,7 @@ public class GooglePlacesApiUtils {
      * @param callback           Callback Interface that will be used to pass teh results back to
      *                           the calling Object
      */
-    public static void getMapboxLatLngForPlaceId(GoogleApiClient googleApiClient, String placeId, final CoordinateCallback callback) {
+    public static void getMapboxLatLngForPlaceId(GoogleApiClient googleApiClient, String placeId, final CoordinateListener callback) {
 
         // Query Places API to get the Place
         Places.GeoDataApi.getPlaceById(googleApiClient, placeId).setResultCallback(new ResultCallback<PlaceBuffer>() {
@@ -129,17 +130,65 @@ public class GooglePlacesApiUtils {
     }
 
     /**
+     * Converts a PlaceModel to an Area
+     *
+     * @param googleApiClient    For connecting to Google Places API to pull the required
+     *                           information to create the Area
+     * @param placeModel         The PlaceModel to be converted to an Area
+     * @param listener           Listener for informing the calling Object that the conversion has
+     *                           completed
+     */
+    public static void convertPlaceModelToArea(@NonNull GoogleApiClient googleApiClient,
+                                               PlaceModel placeModel, final ConversionListener listener) {
+
+        // Get the detailed information by querying Google Places with the PlaceId
+        Places.GeoDataApi.getPlaceById(googleApiClient, placeModel.placeId).setResultCallback(new ResultCallback<PlaceBuffer>() {
+            @Override
+            public void onResult(@NonNull PlaceBuffer places) {
+
+                if (places.getStatus().isSuccess() && places.getCount() > 0) {
+
+                    // Init a new Area
+                    Area area = new Area();
+
+                    // Get the Place
+                    Place place = places.get(0);
+
+                    // Add the details to the new Area and pass it to the Listener
+                    LatLng latLng = place.getLatLng();
+                    area.name = place.getName().toString();
+                    area.state = place.getAddress().toString();
+
+                    area.latitude = latLng.latitude;
+                    area.longitude = latLng.longitude;
+
+                    listener.onPlaceConvertedToArea(area);
+
+                    places.release();
+                }
+            }
+        });
+    }
+
+    /**
      * Callback Interface for passing search results from a Google Places query to the calling
      * Object
      **/
-    public interface QueryCallback {
+    public interface GooglePlacesQueryListener {
         void onQueryReady(List<PlaceModel> placeModelList);
     }
 
     /**
      * Callback Interface for passing coordinates to the calling Object
      */
-    public interface CoordinateCallback {
+    public interface CoordinateListener {
         void onCoordinatesReady(com.mapbox.mapboxsdk.geometry.LatLng latLng);
+    }
+
+    /**
+     * Listener for passing a converted PlaceModel to Area to the receiver
+     */
+    public interface ConversionListener {
+        void onPlaceConvertedToArea(Area area);
     }
 }

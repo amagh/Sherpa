@@ -69,7 +69,7 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
                         GooglePlacesApiUtils.getMapboxLatLngForPlaceId(
                                 mGoogleApiClient,
                                 placeModel.placeId,
-                                new GooglePlacesApiUtils.CoordinateCallback() {
+                                new GooglePlacesApiUtils.CoordinateListener() {
 
                                     @Override
                                     public void onCoordinatesReady(LatLng latLng) {
@@ -147,7 +147,7 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
             mSearchHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    GooglePlacesApiUtils.queryGooglePlaces(mGoogleApiClient, mQuery, new GooglePlacesApiUtils.QueryCallback() {
+                    GooglePlacesApiUtils.queryGooglePlaces(mGoogleApiClient, mQuery, new GooglePlacesApiUtils.GooglePlacesQueryListener() {
                         @Override
                         public void onQueryReady(List<PlaceModel> placeModelList) {
                             mAdapter.setPlaceList(placeModelList);
