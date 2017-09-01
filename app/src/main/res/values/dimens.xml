@@ -49,9 +49,12 @@
     <dimen name="search_instruction_height">76dp</dimen>
     <item name="search_widget_deactivated_alpha" type="dimen" format="float">0.75</item>
 
-    <dimen name="list_place_vertical_padding">12dp</dimen>
-    <dimen name="list_place_text_vertical_separation">2dp</dimen>
-    <dimen name="list_place_horizontal_padding">72dp</dimen>
+    <dimen name="list_search_vertical_padding">12dp</dimen>
+    <dimen name="list_search_text_vertical_separation">2dp</dimen>
+    <dimen name="list_search_horizontal_padding">72dp</dimen>
+    <dimen name="list_search_nav_button_size">48dp</dimen>
+    <dimen name="list_search_nav_button_top_padding">12dp</dimen>
+    <dimen name="list_search_nav_button_padding">6dp</dimen>
 
     <dimen name="list_section_icon_size">32dp</dimen>
     <dimen name="list_section_icon_padding">4dp</dimen>
