@@ -1,6 +1,5 @@
 package project.hikerguide.ui.adapters;
 
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.support.annotation.IntDef;
@@ -36,7 +35,7 @@ import static project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType.SE
  * Created by Alvin on 9/1/2017.
  */
 
-public class NewAreaAdapter extends RecyclerView.Adapter<NewAreaAdapter.AreaViewHolder> {
+public class NewAreaAdapter extends RecyclerView.Adapter<NewAreaAdapter.AreaViewHolder> implements Hideable {
 
     // ** Constants ** //
     private static final int AREA_VIEW_TYPE         = 5096;
@@ -45,7 +44,7 @@ public class NewAreaAdapter extends RecyclerView.Adapter<NewAreaAdapter.AreaView
     private static final int ATTRIBUTION_VIEW_TYPE  = 7329;
 
     @IntDef({HIDDEN, SEARCH_MORE, ATTRIBUTION, ATTRIBUTION_PROGRESS, ATTRIBUTION_GOOGLE, ATTRIBUTION_GOOGLE_PROGRESS})
-    @interface ExtraListItemType {
+    public @interface ExtraListItemType {
         int HIDDEN                          = 0;
         int SEARCH_MORE                     = 1;
         int ATTRIBUTION                     = 2;
@@ -186,6 +185,8 @@ public class NewAreaAdapter extends RecyclerView.Adapter<NewAreaAdapter.AreaView
      * Removes all items from the Adapter
      */
     public void clear() {
+
+        setExtraItemType(HIDDEN);
         mSortedList.clear();
     }
 
@@ -228,7 +229,11 @@ public class NewAreaAdapter extends RecyclerView.Adapter<NewAreaAdapter.AreaView
     public void setExtraItemType(@ExtraListItemType int type) {
         mExtraItemType = type;
 
-        if (mExtraItemType != HIDDEN) notifyItemChanged(mSortedList.size());
+        if (mExtraItemType == HIDDEN) {
+            notifyItemRemoved(mSortedList.size());
+        } else {
+            notifyItemChanged(mSortedList.size());
+        }
     }
 
     class AreaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
