@@ -12,6 +12,7 @@ import project.hikerguide.BR;
 
 public class AttributionViewModel extends BaseObservable {
     private boolean mShowProgress = false;
+    private boolean mShowAttribution = true;
 
     @Bindable
     public int getProgressVisibility() {
@@ -20,6 +21,17 @@ public class AttributionViewModel extends BaseObservable {
         } else {
             return View.GONE;
         }
+    }
+
+    @Bindable
+    public int getAttributionVisibility() {
+        return mShowAttribution ? View.VISIBLE : View.INVISIBLE;
+    }
+
+    public void setShowAttribution(boolean showAttribution) {
+        mShowAttribution = showAttribution;
+
+        notifyPropertyChanged(BR.attributionVisibility);
     }
 
     public void setShowProgress(boolean showProgress) {

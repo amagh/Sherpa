@@ -72,9 +72,11 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
     private AreaActivity mActivity;
     private String mQuery;
     private com.mapbox.mapboxsdk.geometry.LatLng mLatLng;
+
+    private Handler mSearchHandler;
     private boolean mSearchHasFocus = false;
+
     private GoogleApiClient mGoogleApiClient;
-    private boolean mShowInstructions = true;
 
     public SearchAreaViewModel(AreaActivity activity) {
         mActivity = activity;
@@ -89,12 +91,39 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
                 @Override
                 public void onClickArea(Object object) {
                     if (object == null) {
-                        GooglePlacesApiUtils.queryGooglePlaces(mGoogleApiClient, mQuery, new GooglePlacesApiUtils.QueryCallback() {
+
+                        // Show the attribution with Google
+                        mAdapter.setShowGoogleAttribution(true);
+
+                        // Show the ProgressBar while search is processing
+                        mAdapter.setShowAttributionProgressBar(true);
+
+                        // Cancel any previous searches
+                        if (mSearchHandler != null) {
+                            mSearchHandler.removeCallbacksAndMessages(null);
+                        }
+
+                        mSearchHandler = new Handler();
+
+                        // Run the search after a delay to allow the user time to finish typing
+                        // their query
+                        mSearchHandler.postDelayed(new Runnable() {
                             @Override
-                            public void onQueryReady(List<PlaceModel> placeModelList) {
-                                mAdapter.setAreaList(new ArrayList<Object>(placeModelList));
+                            public void run() {
+                                GooglePlacesApiUtils.queryGooglePlaces(mGoogleApiClient, mQuery, new GooglePlacesApiUtils.QueryCallback() {
+                                    @Override
+                                    public void onQueryReady(List<PlaceModel> placeModelList) {
+
+                                        // Hide the ProgressBar
+                                        mAdapter.setShowAttributionProgressBar(false);
+
+                                        // Set the results to the Adapter
+                                        mAdapter.setAreaList(new ArrayList<Object>(placeModelList));
+                                    }
+                                });
                             }
-                        });
+                        }, SEARCH_DELAY);
+
                     } else {
                         // Start TrailActivity
                         if (object instanceof Area) {
@@ -142,32 +171,50 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
 
         if (mQuery != null && !mQuery.isEmpty() && mQuery.length() > 2) {
             // Query the Firebase Database
-            queryFirebaseDatabase(mQuery);
+            queryFirebaseDatabase(mQuery, true);
 
-            mShowInstructions = false;
         } else {
             // Empty the Adapter
-            mAdapter.setAreaList(null);
+            mAdapter.setAreaList(new ArrayList<>());
 
-            mShowInstructions = true;
         }
-
-        notifyPropertyChanged(BR.showInstructions);
     }
 
-    @Bindable
-    public boolean getShowInstructions() {
-        return mShowInstructions;
-    }
-
+    /**
+     * Detects change in focus and modifies the Adapter for the search bar and the opacity to match
+     * the focus
+     *
+     * @param view        View that gained/lost focus
+     * @param hasFocus    Boolean value for whether the View has focus
+     */
     public void onFocusChanged(View view, boolean hasFocus) {
         mSearchHasFocus = hasFocus;
 
-        if (hasFocus) setQuery(mQuery);
+        if (hasFocus) {
+
+            // Show the attribution bar that includes the ProgressBar for search queries
+            mAdapter.setShowAttribution(true);
+
+            if (mQuery != null && !mQuery.isEmpty() && mQuery.length() > 2) {
+
+                // If the user did not specifically clear the query, re-run the query when the
+                // search bar regains focus
+                queryFirebaseDatabase(mQuery, false);
+            }
+        } else {
+
+            // Hide the attribution bar from the search bar when not in focus
+            mAdapter.setShowAttribution(false);
+        }
 
         notifyPropertyChanged(BR.hasFocus);
     }
 
+    /**
+     * Clears focus and text from the search bar
+     *
+     * @param view    View that was clicked
+     */
     public void onClickClear(View view) {
 
         // Set the focus to false
@@ -175,6 +222,9 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
 
         // Clear the query
         mQuery = null;
+
+        // Clear the Adapter
+        mAdapter.clearAdapter();
 
         // Hide the keyboard
         GeneralUtils.hideKeyboard(mActivity, view);
@@ -261,50 +311,80 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
      * Queries the Firebase Database for a matching Area
      *
      * @param query    The query for the Firebase Database
+     * @param delay    True if there should be a delay on the search. False if search immediately
      */
-    private void queryFirebaseDatabase(String query) {
+    private void queryFirebaseDatabase(final String query, boolean delay) {
 
-        // Build a Query for the Firebase Database
-        final Query firebaseQuery = FirebaseDatabase.getInstance().getReference()
-                .child(GuideDatabase.AREAS)
-                .orderByChild("lowerCaseName")
-                .startAt(query.toLowerCase())
-                .endAt(query.toLowerCase() + "z");
+        // When querying Firebase, do not show the attribution for Google
+        mAdapter.setShowGoogleAttribution(false);
 
-        firebaseQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        // Show the ProgressBar so the user is notified that search is underway
+        mAdapter.setShowAttributionProgressBar(true);
+
+        // Cancel any searches that are in progress
+        if (mSearchHandler != null) {
+            mSearchHandler.removeCallbacksAndMessages(null);
+        }
+
+        // Set the search delay as necessary
+        int searchDelay;
+        if (delay) {
+            searchDelay = SEARCH_DELAY;
+        } else {
+            searchDelay = 0;
+        }
+
+        mSearchHandler = new Handler();
+
+        mSearchHandler.postDelayed(new Runnable() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                int delay = 0;
+            public void run() {
+                // Build a Query for the Firebase Database
+                final Query firebaseQuery = FirebaseDatabase.getInstance().getReference()
+                        .child(GuideDatabase.AREAS)
+                        .orderByChild(Area.LOWER_CASE_NAME)
+                        .startAt(query.toLowerCase())
+                        .endAt(query.toLowerCase() + "z");
 
-                // Check that the DataSnapshot is valid
-                if (dataSnapshot.exists()) {
-
-                    // Convert to a List of Areas and then pass it to the Adapter
-                    Object[] areas = (Object[]) FirebaseProviderUtils.getModelsFromSnapshot(FirebaseProviderUtils.FirebaseType.AREA, dataSnapshot);
-                    mAdapter.setAreaList(Arrays.asList(areas));
-
-                    delay = SEARCH_DELAY;
-                }
-
-                // Show option to search for more after 1.5s
-                new Handler().postDelayed(new Runnable() {
+                firebaseQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void run() {
-                        mAdapter.showSearchMore();
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        int delay = 0;
+
+                        // Check that the DataSnapshot is valid
+                        if (dataSnapshot.exists()) {
+
+                            // Convert to a List of Areas and then pass it to the Adapter
+                            Object[] areas = (Object[]) FirebaseProviderUtils.getModelsFromSnapshot(FirebaseProviderUtils.FirebaseType.AREA, dataSnapshot);
+                            mAdapter.setShowAttributionProgressBar(false);
+                            mAdapter.setAreaList(Arrays.asList(areas));
+
+                            delay = SEARCH_DELAY;
+                        }
+
+                        // Show option to search for more after 1.5s
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                if (mQuery != null && !mQuery.isEmpty()) mAdapter.showSearchMore();
+                            }
+                        }, delay);
+
+                        // Remove Listener
+                        firebaseQuery.removeEventListener(this);
                     }
-                }, delay);
 
-                // Remove Listener
-                firebaseQuery.removeEventListener(this);
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                        // Remove Listener
+                        firebaseQuery.removeEventListener(this);
+                    }
+                });
             }
+        }, searchDelay);
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-                // Remove Listener
-                firebaseQuery.removeEventListener(this);
-            }
-        });
     }
 
     GoogleApiClient getGoogleApiClient() {

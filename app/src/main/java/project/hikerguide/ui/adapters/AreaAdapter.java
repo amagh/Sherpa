@@ -12,10 +12,12 @@ import java.util.List;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemAreaBinding;
+import project.hikerguide.databinding.ListItemGoogleAttributionBinding;
 import project.hikerguide.databinding.ListItemPlaceNavBinding;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.models.viewmodels.AreaViewModel;
+import project.hikerguide.models.viewmodels.AttributionViewModel;
 import project.hikerguide.models.viewmodels.PlaceViewModel;
 import project.hikerguide.models.viewmodels.SearchAreaViewModel;
 
@@ -28,12 +30,16 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
     private static final int AREA_VIEW_TYPE         = 0;
     private static final int PLACE_VIEW_TYPE        = 1;
     private static final int SEARCH_MORE_VIEW_TYPE  = 2;
+    private static final int ATTRIBUTION_VIEW_TYPE  = 3;
 
     // ** Member Variables ** //
     private List<Object> mAreaList;
     private ClickHandler mClickHandler;
     private SearchAreaViewModel mViewModel;
-    private boolean mShowSearchMore = false;
+    private boolean mShowSearchMore             = false;
+    private boolean mShowGoogleAttribution      = false;
+    private boolean mShowAttribution            = false;
+    private boolean mShowAttributionProgressBar = false;
 
     public AreaAdapter(SearchAreaViewModel viewModel, ClickHandler clickHandler) {
         mViewModel = viewModel;
@@ -58,6 +64,10 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
             case SEARCH_MORE_VIEW_TYPE:
                 layoutId = R.layout.list_item_search_more;
                 break;
+
+            case ATTRIBUTION_VIEW_TYPE:
+                layoutId = R.layout.list_item_google_attribution;
+                break;
         }
 
         // Init the ViewDataBinding
@@ -67,7 +77,7 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
 
     @Override
     public void onBindViewHolder(AreaViewHolder holder, int position) {
-        if (position == mAreaList.size()) {
+        if (position == mAreaList.size() && mShowSearchMore) {
             return;
         }
 
@@ -78,7 +88,7 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
     @Override
     public int getItemCount() {
         if (mAreaList != null) {
-            if (mShowSearchMore) {
+            if ((mShowSearchMore && mAreaList.size() > 0) || mShowAttribution) {
                 return mAreaList.size() + 1;
             }
             return mAreaList.size();
@@ -92,7 +102,11 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
 
         // Return the ViewType based on the type of Objects stored in the List
         if (position == mAreaList.size()) {
-            return SEARCH_MORE_VIEW_TYPE;
+            if (mShowSearchMore) {
+                return SEARCH_MORE_VIEW_TYPE;
+            } else if (mShowAttribution) {
+                return ATTRIBUTION_VIEW_TYPE;
+            }
         } else if (mAreaList.get(position) instanceof Area) {
             return AREA_VIEW_TYPE;
         } else if (mAreaList.get(position) instanceof PlaceModel) {
@@ -111,18 +125,94 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
         notifyDataSetChanged();
     }
 
+    public void clearAdapter() {
+        mAreaList = new ArrayList<>();
+
+        mShowSearchMore             = false;
+        mShowAttribution            = false;
+        mShowGoogleAttribution      = false;
+        mShowAttributionProgressBar = false;
+
+        notifyDataSetChanged();
+    }
+
     /**
      * Adds an additional list item to allow users to search Google Places for their query
      */
     public void showSearchMore() {
         if (!mShowSearchMore) {
             mShowSearchMore = true;
+            mShowAttribution = false;
 
             if (mAreaList == null) {
                 mAreaList = new ArrayList<>();
             }
 
             notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * Sets whether the attribution bar should be shown
+     *
+     * @param showAttribution    Boolean value for whether attribution bar should be shown
+     */
+    public void setShowAttribution(boolean showAttribution) {
+
+        mShowAttribution = showAttribution;
+
+        // Instantiate mAreaList if necessary
+        if (mAreaList == null) {
+            mAreaList = new ArrayList<>();
+        }
+
+        if (mShowAttribution) {
+
+            // Hide the search more list item as they do not show at the same time
+            mShowSearchMore = false;
+            notifyItemChanged(mAreaList.size());
+        } else {
+
+            // Hide the progress bar so that it doesn't show when the search bar regains focus
+            mShowAttributionProgressBar = false;
+            notifyItemRemoved(mAreaList.size());
+        }
+    }
+
+    /**
+     * Sets whether the Google Attribution should be shown in the attribution bar. When running
+     * queries against the Firebase Database, there is no need to show the Google Attribution.
+     * However, when running a query against Google Places API, the attribution is necessary.
+     *
+     * @param showGoogleAttribution    Boolean value for whether the attribution bar should show
+     *                                 the Google logo
+     */
+    public void setShowGoogleAttribution(boolean showGoogleAttribution) {
+
+        mShowGoogleAttribution = showGoogleAttribution;
+
+       if (mShowGoogleAttribution) {
+
+           // If showing the Google Attribution, then the attribution bar must also be showing
+           setShowAttribution(true);
+       }
+
+        notifyItemChanged(mAreaList.size());
+    }
+
+    /**
+     * Sets whether the progress bar in the attribution bar should be showing to indicate an on-
+     * going search.
+     *
+     * @param showProgressBar    Boolean value for whether the ProgressBar should show in the
+     *                           attribution bar
+     */
+    public void setShowAttributionProgressBar(boolean showProgressBar) {
+
+        mShowAttributionProgressBar = showProgressBar;
+
+        if (mShowAttribution) {
+            notifyItemChanged(mAreaList.size());
         }
     }
 
@@ -139,10 +229,28 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
 
             mBinding = binding;
 
-            mBinding.getRoot().setOnClickListener(this);
+            if (!(mBinding instanceof ListItemGoogleAttributionBinding)) {
+                mBinding.getRoot().setOnClickListener(this);
+            }
         }
 
         private void bind(int position) {
+
+            // ViewHolder for attribution
+            if (position == mAreaList.size() && mShowAttribution) {
+
+                // Initialize the ViewModel
+                AttributionViewModel vm = new AttributionViewModel();
+
+                // Set whether the Progressbar and Google logo should be showing the in attribution
+                // bar
+                vm.setShowProgress(mShowAttributionProgressBar);
+                vm.setShowAttribution(mShowGoogleAttribution);
+
+                ((ListItemGoogleAttributionBinding) mBinding).setVm(vm);
+
+                return;
+            }
 
             // Get reference to the Object at the corresponding position
             Object object = mAreaList.get(position);
@@ -155,8 +263,6 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
                 PlaceViewModel vm = new PlaceViewModel((PlaceModel) object, mViewModel);
                 ((ListItemPlaceNavBinding) mBinding).setVm(vm);
             }
-
-
         }
 
         @Override

@@ -17,7 +17,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 public class Area extends BaseModel implements Parcelable {
     // ** Constants ** //
     private static final String NAME            = "name";
-    private static final String LOWER_CASE_NAME = "lowerCaseName";
+    public static final String LOWER_CASE_NAME = "lowerCaseName";
     private static final String LATITUDE        = "latitude";
     private static final String LONGITUDE       = "longitude";
     private static final String STATE           = "state";
