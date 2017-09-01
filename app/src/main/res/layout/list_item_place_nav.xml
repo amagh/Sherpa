@@ -14,21 +14,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ImageView
+            android:id="@+id/place_geo_iv"
+            android:layout_width="@dimen/list_search_nav_button_size"
+            android:layout_height="@dimen/list_search_nav_button_size"
+            android:paddingTop="@dimen/list_search_nav_button_top_padding"
+            android:paddingLeft="@dimen/list_search_nav_button_padding"
+            android:paddingStart="@dimen/list_search_nav_button_padding"
+            android:paddingRight="@dimen/list_search_nav_button_padding"
+            android:paddingEnd="@dimen/list_search_nav_button_padding"
+            android:src="@drawable/mapbox_marker_icon_default"
+            android:tint="@color/colorPrimaryLight"
+            android:onClick="@{vm::onClickGeolocation}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/place_primary_tv"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
         <TextView
             android:id="@+id/place_primary_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/text_horizontal_margin"
-            android:layout_marginEnd="@dimen/text_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/list_search_vertical_padding"
+            android:layout_marginLeft="@dimen/list_search_horizontal_padding"
+            android:layout_marginStart="@dimen/list_search_horizontal_padding"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:maxLines="1"
             android:text="@{vm.primaryText}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/place_geo_iv"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            style="@style/TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.AppCompat.Body1"
             tools:text="@string/list_area_text"
             />
 
@@ -36,36 +53,16 @@
             android:id="@+id/place_secondary_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/list_search_text_vertical_separation"
+            android:layout_marginBottom="@dimen/list_search_vertical_padding"
             android:maxLines="1"
             android:text="@{vm.secondaryText}"
             app:layout_constraintStart_toStartOf="@+id/place_primary_tv"
             app:layout_constraintEnd_toEndOf="@+id/place_primary_tv"
             app:layout_constraintTop_toBottomOf="@+id/place_primary_tv"
             app:layout_constraintBottom_toBottomOf="parent"
+            style="@style/TextAppearance.AppCompat.Caption"
             tools:text="@string/list_area_state_text"/>
-
-        <ImageView
-            android:id="@+id/place_geo_iv"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:padding="8dp"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:src="@drawable/ic_directions"
-            android:tint="@color/grey_400"
-            android:onClick="@{vm::onClickGeolocation}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="@color/grey_400"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </android.support.constraint.ConstraintLayout>
 
