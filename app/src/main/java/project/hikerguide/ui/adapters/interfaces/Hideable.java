@@ -1,4 +1,4 @@
-package project.hikerguide.ui.adapters;
+package project.hikerguide.ui.adapters.interfaces;
 
 /**
  * Created by Alvin on 9/1/2017.
