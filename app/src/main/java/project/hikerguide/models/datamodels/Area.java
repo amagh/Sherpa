@@ -8,13 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import project.hikerguide.data.GuideContract;
+import project.hikerguide.models.AreaAdapterSortable;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 
 /**
  * Created by Alvin on 7/18/2017.
  */
 
-public class Area extends BaseModel implements Parcelable {
+public class Area extends BaseModel implements Parcelable, AreaAdapterSortable {
     // ** Constants ** //
     private static final String NAME            = "name";
     public static final String LOWER_CASE_NAME = "lowerCaseName";
@@ -81,6 +82,11 @@ public class Area extends BaseModel implements Parcelable {
         map.put(STATE, state);
 
         return map;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     //********************************************************************************************//
