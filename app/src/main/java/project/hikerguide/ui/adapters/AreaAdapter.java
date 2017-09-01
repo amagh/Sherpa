@@ -257,11 +257,11 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
 
             // Check the type of Object it is and load the proper ViewModel
             if (object instanceof Area) {
-                AreaViewModel vm = new AreaViewModel((Area) object, mViewModel);
-                ((ListItemAreaBinding) mBinding).setVm(vm);
+//                AreaViewModel vm = new AreaViewModel((Area) object, mViewModel);
+//                ((ListItemAreaBinding) mBinding).setVm(vm);
             } else if (object instanceof PlaceModel) {
-                PlaceViewModel vm = new PlaceViewModel((PlaceModel) object, mViewModel);
-                ((ListItemPlaceNavBinding) mBinding).setVm(vm);
+//                PlaceViewModel vm = new PlaceViewModel((PlaceModel) object, mViewModel);
+//                ((ListItemPlaceNavBinding) mBinding).setVm(vm);
             }
         }
 

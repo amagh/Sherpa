@@ -16,9 +16,9 @@ import project.hikerguide.utilities.GooglePlacesApiUtils;
 public class PlaceViewModel extends BaseObservable {
     // ** Member Variables ** //
     private PlaceModel mPlaceModel;
-    private SearchAreaViewModel mViewModel;
+    private DoubleSearchViewModel mViewModel;
 
-    public PlaceViewModel(PlaceModel placeModel, SearchAreaViewModel viewModel) {
+    public PlaceViewModel(PlaceModel placeModel, DoubleSearchViewModel viewModel) {
         mPlaceModel = placeModel;
         mViewModel = viewModel;
     }
@@ -38,7 +38,7 @@ public class PlaceViewModel extends BaseObservable {
         // Get the LatLng corresponding to the PlaceId of the PlaceModel
         GooglePlacesApiUtils.getMapboxLatLngForPlaceId(mViewModel.getGoogleApiClient(),
                 mPlaceModel.placeId,
-                new GooglePlacesApiUtils.CoordinateCallback() {
+                new GooglePlacesApiUtils.CoordinateListener() {
             @Override
             public void onCoordinatesReady(LatLng latLng) {
 

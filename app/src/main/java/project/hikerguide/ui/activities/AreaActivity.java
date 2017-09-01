@@ -6,7 +6,7 @@ import android.os.Bundle;
 import project.hikerguide.R;
 import project.hikerguide.databinding.ActivityAreaBinding;
 import project.hikerguide.models.datamodels.Author;
-import project.hikerguide.models.viewmodels.SearchAreaViewModel;
+import project.hikerguide.models.viewmodels.DoubleSearchViewModel;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
 
@@ -27,7 +27,7 @@ public class AreaActivity extends MapboxActivity {
         mAuthor = getIntent().getParcelableExtra(AUTHOR_KEY);
 
         // Initialize ViewModel for the layout
-        SearchAreaViewModel vm = new SearchAreaViewModel(this);
+        DoubleSearchViewModel vm = new DoubleSearchViewModel(this);
         mBinding.setVm(vm);
     }
 

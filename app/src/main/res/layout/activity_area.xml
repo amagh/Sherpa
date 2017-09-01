@@ -6,11 +6,7 @@
     <data>
         <variable
             name="vm"
-            type="project.hikerguide.models.viewmodels.SearchAreaViewModel" />
-
-        <variable
-            name="tvm"
-            type="project.hikerguide.models.viewmodels.SearchTrailViewModel" />
+            type="project.hikerguide.models.viewmodels.DoubleSearchViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -22,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:activity="@{vm.activity}"
-            app:latLng="@{vm.latLng}"
+            app:viewModel="@{vm.viewModel}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -44,7 +40,7 @@
             app:searchIv="@{searchAreaIv}"
             app:closeIv="@{searchAreaCloseIv}"
             app:searchTv="@{searchAreaTv}"
-            app:hasFocus="@{vm.hasFocus}"
+            app:focus="@{vm.focus}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
