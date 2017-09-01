@@ -140,7 +140,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
     public void setQuery(String query) {
         mQuery = query;
 
-        if (!mQuery.isEmpty() && mQuery.length() > 2) {
+        if (mQuery != null && !mQuery.isEmpty() && mQuery.length() > 2) {
             // Query the Firebase Database
             queryFirebaseDatabase(mQuery);
 
@@ -162,6 +162,8 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
 
     public void onFocusChanged(View view, boolean hasFocus) {
         mSearchHasFocus = hasFocus;
+
+        if (hasFocus) setQuery(mQuery);
 
         notifyPropertyChanged(BR.hasFocus);
     }
@@ -354,6 +356,15 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
      * @param latLng    The coordinates to move the camera to
      */
     void changeMapCamera(com.mapbox.mapboxsdk.geometry.LatLng latLng) {
+
+        mSearchHasFocus = false;
+        notifyPropertyChanged(BR.hasFocus);
+
+        // Hide the keyboard
+        GeneralUtils.hideKeyboard(mActivity, mActivity.getCurrentFocus());
+
+        mAdapter.setAreaList(null);
+
         mLatLng = latLng;
         notifyPropertyChanged(BR.latLng);
     }
