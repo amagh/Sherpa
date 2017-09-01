@@ -159,20 +159,24 @@ public class NewAreaAdapter extends RecyclerView.Adapter<NewAreaAdapter.AreaView
      *
      * @param sortableList    List of Items to be displayed in the Adapter
      */
-    public void setAdapterItems(List<AreaAdapterSortable> sortableList) {
+    public void setAdapterItems(List<? extends AreaAdapterSortable> sortableList) {
 
         // Start batch operation
         mSortedList.beginBatchedUpdates();
 
         // Remove any items from the Adapter that are not in the sortableList
-        for (AreaAdapterSortable sortable : sortableList) {
-            if (mSortedList.indexOf(sortable) == SortedList.INVALID_POSITION) {
-                mSortedList.remove(sortable);
+        for (int i = mSortedList.size() - 1; i >= 0; i--) {
+            if (!sortableList.contains(mSortedList.get(i))) {
+                mSortedList.removeItemAt(i);
             }
         }
 
         // Add all items from the sortableList to the Adapter
-        mSortedList.addAll(sortableList);
+        for (AreaAdapterSortable sortable : sortableList) {
+            if (mSortedList.indexOf(sortable) == SortedList.INVALID_POSITION) {
+                mSortedList.add(sortable);
+            }
+        }
 
         // End the batch operation
         mSortedList.endBatchedUpdates();
