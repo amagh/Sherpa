@@ -32,4 +32,34 @@
         <item name="android:padding">@dimen/sign_in_text_padding</item>
         <item name="backgroundTint">@android:color/white</item>
     </style>
+
+    <style name="SearchListItem.PrimaryText" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/list_search_vertical_padding</item>
+        <item name="android:layout_marginLeft">@dimen/list_search_horizontal_padding</item>
+        <item name="android:layout_marginStart">@dimen/list_search_horizontal_padding</item>
+        <item name="android:layout_marginRight">@dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginEnd">@dimen/activity_horizontal_margin</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="SearchListItem.SecondaryText" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/list_search_text_vertical_separation</item>
+        <item name="android:layout_marginBottom">@dimen/list_search_vertical_padding</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="SearchListItemImage">
+        <item name="android:layout_width">@dimen/list_search_nav_button_size</item>
+        <item name="android:layout_height">@dimen/list_search_nav_button_size</item>
+        <item name="android:paddingTop">@dimen/list_search_nav_button_top_padding</item>
+        <item name="android:paddingLeft">@dimen/list_search_nav_button_padding</item>
+        <item name="android:paddingStart">@dimen/list_search_nav_button_padding</item>
+        <item name="android:paddingRight">@dimen/list_search_nav_button_padding</item>
+        <item name="android:paddingEnd">@dimen/list_search_nav_button_padding</item>
+        <item name="android:tint">@color/colorPrimaryLight</item>
+    </style>
 </resources>

@@ -36,35 +36,23 @@
 
         <TextView
             android:id="@+id/area_name_tv"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/list_search_vertical_padding"
-            android:layout_marginLeft="@dimen/list_search_horizontal_padding"
-            android:layout_marginStart="@dimen/list_search_horizontal_padding"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:maxLines="1"
             android:text="@{vm.name}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            style="@style/TextAppearance.AppCompat.Body1"
+            style="@style/SearchListItem.PrimaryText"
             tools:text="@string/list_area_text"
             />
 
         <TextView
             android:id="@+id/area_state_tv"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/list_search_text_vertical_separation"
-            android:layout_marginBottom="@dimen/list_search_vertical_padding"
-            android:maxLines="1"
             android:text="@{vm.state}"
             app:layout_constraintStart_toStartOf="@+id/area_name_tv"
             app:layout_constraintEnd_toEndOf="@+id/area_name_tv"
             app:layout_constraintTop_toBottomOf="@+id/area_name_tv"
             app:layout_constraintBottom_toBottomOf="parent"
-            style="@style/TextAppearance.AppCompat.Caption"
+            style="@style/SearchListItem.SecondaryText"
             tools:text="@string/list_area_state_text"/>
 
     </android.support.constraint.ConstraintLayout>
