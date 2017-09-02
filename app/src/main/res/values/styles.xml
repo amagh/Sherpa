@@ -60,6 +60,8 @@
         <item name="android:paddingStart">@dimen/list_search_nav_button_padding</item>
         <item name="android:paddingRight">@dimen/list_search_nav_button_padding</item>
         <item name="android:paddingEnd">@dimen/list_search_nav_button_padding</item>
+        <item name="android:layout_marginLeft">@dimen/list_search_nav_left_margin</item>
+        <item name="android:layout_marginStart">@dimen/list_search_nav_left_margin</item>
         <item name="android:tint">@color/colorPrimaryLight</item>
     </style>
 </resources>

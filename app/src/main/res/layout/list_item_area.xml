@@ -18,21 +18,12 @@
 
         <ImageView
             android:id="@+id/area_geo_iv"
-            android:layout_width="@dimen/list_search_nav_button_size"
-            android:layout_height="@dimen/list_search_nav_button_size"
-            android:paddingTop="@dimen/list_search_nav_button_top_padding"
-            android:paddingLeft="@dimen/list_search_nav_button_padding"
-            android:paddingStart="@dimen/list_search_nav_button_padding"
-            android:paddingRight="@dimen/list_search_nav_button_padding"
-            android:paddingEnd="@dimen/list_search_nav_button_padding"
             android:src="@drawable/mapbox_marker_icon_default"
-            android:tint="@color/colorPrimaryLight"
             android:onClick="@{vm::onClickGeolocation}"
-            android:visibility="@{vm.latLngVisibility}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/area_name_tv"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            style="@style/SearchListItemImage"/>
 
         <TextView
             android:id="@+id/area_name_tv"

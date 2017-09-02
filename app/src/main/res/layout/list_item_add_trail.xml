@@ -14,10 +14,11 @@
             android:layout_width="@dimen/list_search_nav_button_size"
             android:layout_height="@dimen/list_search_nav_button_size"
             android:padding="@dimen/list_search_icon_padding"
+            android:layout_marginLeft="@dimen/list_search_nav_left_margin"
+            android:layout_marginStart="@dimen/list_search_nav_left_margin"
             android:tint="@color/grey_400"
             android:src="@drawable/ic_add"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/list_add_trail_tv"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 

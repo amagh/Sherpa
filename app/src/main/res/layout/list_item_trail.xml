@@ -20,7 +20,6 @@
             android:id="@+id/list_trail_iv"
             android:src="@drawable/mapbox_marker_icon_default"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/list_trail_tv"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             style="@style/SearchListItemImage"/>
