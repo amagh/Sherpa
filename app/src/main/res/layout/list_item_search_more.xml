@@ -9,38 +9,20 @@
 
         <TextView
             android:id="@+id/search_more_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/text_horizontal_margin"
-            android:layout_marginEnd="@dimen/text_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:text="@string/search_more_text"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            style="@style/TextAppearance.AppCompat.Body2"/>
+            style="@style/SearchListItem.PrimaryText"/>
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:text="@string/search_more_text_2"
-            android:layout_marginTop="@dimen/text_vertical_margin"
             app:layout_constraintStart_toStartOf="@+id/search_more_tv"
             app:layout_constraintEnd_toEndOf="@+id/search_more_tv"
             app:layout_constraintTop_toBottomOf="@+id/search_more_tv"
             app:layout_constraintBottom_toBottomOf="parent"
-            style="@style/TextAppearance.AppCompat.Body1"/>
+            style="@style/SearchListItem.SecondaryText"/>
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="@color/grey_400"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </android.support.constraint.ConstraintLayout>
 
