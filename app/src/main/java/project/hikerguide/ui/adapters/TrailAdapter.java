@@ -1,8 +1,10 @@
 package project.hikerguide.ui.adapters;
 
 import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,22 +15,27 @@ import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemTrailBinding;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.viewmodels.TrailViewModel;
+import project.hikerguide.ui.adapters.abstractadapters.HideableAdapter;
+import project.hikerguide.ui.adapters.interfaces.ClickHandler;
 
 /**
  * Created by Alvin on 8/3/2017.
  */
 
-public class TrailAdapter extends RecyclerView.Adapter<TrailAdapter.TrailViewHolder> {
+public class TrailAdapter extends HideableAdapter<TrailAdapter.TrailViewHolder> {
+
+    // ** Constants ** //
+    private static final int TRAIL_VIEW_TYPE        = 6684;
+    private static final int ADD_TRAIL_VIEW_TYPE    = 5342;
+
     // ** Member Variables ** //
-    private final SortedList.Callback<Trail> mCallback = new SortedList.Callback<Trail>() {
+    private ClickHandler<Trail> mClickHandler;
+    private boolean mHideAdapter;
+
+    private final SortedListAdapterCallback<Trail> mCallback = new SortedListAdapterCallback<Trail>(this) {
         @Override
         public int compare(Trail o1, Trail o2) {
             return o1.name.compareTo(o2.name);
-        }
-
-        @Override
-        public void onChanged(int position, int count) {
-            notifyItemRangeChanged(position, count);
         }
 
         @Override
@@ -40,27 +47,10 @@ public class TrailAdapter extends RecyclerView.Adapter<TrailAdapter.TrailViewHol
         public boolean areItemsTheSame(Trail item1, Trail item2) {
             return item1 == item2;
         }
-
-        @Override
-        public void onInserted(int position, int count) {
-            notifyItemRangeInserted(position, count);
-        }
-
-        @Override
-        public void onRemoved(int position, int count) {
-            notifyItemRangeRemoved(position, count);
-        }
-
-        @Override
-        public void onMoved(int fromPosition, int toPosition) {
-            notifyItemMoved(fromPosition, toPosition);
-        }
     };
-
     private final SortedList<Trail> mTrailList = new SortedList<>(Trail.class, mCallback);
-    private final ClickHandler mClickHandler;
 
-    public TrailAdapter(ClickHandler clickHandler) {
+    public TrailAdapter(ClickHandler<Trail> clickHandler) {
         mClickHandler = clickHandler;
     }
 
@@ -71,18 +61,41 @@ public class TrailAdapter extends RecyclerView.Adapter<TrailAdapter.TrailViewHol
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         int layoutId = R.layout.list_item_trail;
 
-        ListItemTrailBinding binding = DataBindingUtil.inflate(inflater, layoutId, parent, false);
+        switch (viewType) {
+            case TRAIL_VIEW_TYPE: layoutId = R.layout.list_item_trail;
+                break;
+
+            case ADD_TRAIL_VIEW_TYPE: layoutId = R.layout.list_item_add_trail;
+                break;
+        }
+
+        ViewDataBinding binding = DataBindingUtil.inflate(inflater, layoutId, parent, false);
         return new TrailViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(TrailViewHolder holder, int position) {
-        holder.bind(position);
+        if (position < mTrailList.size()) {
+            holder.bind(position);
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position == mTrailList.size()) {
+            return ADD_TRAIL_VIEW_TYPE;
+        } else {
+            return TRAIL_VIEW_TYPE;
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mTrailList.size();
+        if (mHideAdapter) {
+            return 0;
+        } else {
+            return mTrailList.size() + 1;
+        }
     }
 
     /**
@@ -90,17 +103,15 @@ public class TrailAdapter extends RecyclerView.Adapter<TrailAdapter.TrailViewHol
      *
      * @param trailList    List to replace the contents of mTrailList with
      */
-    public void replaceAll(List<Trail> trailList) {
+    public void setAdapterItems(List<Trail> trailList) {
 
         // Start a batched operation
         mTrailList.beginBatchedUpdates();
 
         // Iterate through and remove any Trails that are not the List from the signature
         for (int i = mTrailList.size() - 1; i >= 0; i--) {
-            Trail trail = mTrailList.get(i);
-
-            if (!trailList.contains(trail)) {
-                mTrailList.remove(trail);
+            if (!trailList.contains(mTrailList.get(i))) {
+                mTrailList.removeItemAt(i);
             }
         }
 
@@ -109,30 +120,34 @@ public class TrailAdapter extends RecyclerView.Adapter<TrailAdapter.TrailViewHol
         mTrailList.endBatchedUpdates();
     }
 
-    public interface ClickHandler {
-        void onClickTrail(Trail trail);
+    /**
+     * Hides the Adapter, but keeps the items in the Adapter so they can be re-displayed later in
+     * {@link #show()}
+     */
+    public void hide() {
+        mHideAdapter = true;
+
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Shows the Adapter and any items that were in place before {@link #hide()} was called
+     */
+    public void show() {
+        mHideAdapter = false;
+
+        notifyDataSetChanged();
     }
 
     class TrailViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // ** Member Variables ** //
-        private ListItemTrailBinding mBinding;
+        private ViewDataBinding mBinding;
 
-        TrailViewHolder(ListItemTrailBinding binding) {
+        TrailViewHolder(ViewDataBinding binding) {
             super(binding.getRoot());
 
             mBinding = binding;
             mBinding.getRoot().setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-
-            // Get the Trail that was Clicked
-            int position = getAdapterPosition();
-            Trail trail = mTrailList.get(position);
-
-            // Pass the Trail through the ClickHandler
-            mClickHandler.onClickTrail(trail);
         }
 
         void bind(int position) {
@@ -142,7 +157,24 @@ public class TrailAdapter extends RecyclerView.Adapter<TrailAdapter.TrailViewHol
 
             // Instantiate the ViewModel and bind it to the ListItemTrailBinding
             TrailViewModel vm = new TrailViewModel(trail);
-            mBinding.setVm(vm);
+            ((ListItemTrailBinding) mBinding).setVm(vm);
+        }
+
+        @Override
+        public void onClick(View view) {
+
+            // Get the Trail that was Clicked
+            int position = getAdapterPosition();
+
+            Trail trail = null;
+
+            // Get reference to the corresponding Trail
+            if (position < mTrailList.size()) {
+                trail = mTrailList.get(position);
+            }
+
+            // Pass the Trail through the ClickHandler
+            mClickHandler.onClick(trail);
         }
     }
 }
