@@ -111,14 +111,6 @@
     <string name="content_description_delete_section">Delete Section</string>
     <string name="content_description_reorder_section">Reorder Section</string>
 
-    <!-- TrailActivity Strings -->
-    <string name="trail_activity_title">Select your trail</string>
-
-    <!-- Add Trail Dialog Strings -->
-    <string name="add_trail_hint">Trail name</string>
-    <string name="add_trail_title">Add a New Trail</string>
-    <string name="add_trail_warn_add_text">Please add a trail name before continuing.</string>
-
     <!-- Progressbar Dialog Strings -->
     <string name="progress_download_map_title">Downloading Map Tiles</string>
     <string name="progress_delete_map_title">Deleting Map Tiles</string>
@@ -136,8 +128,13 @@
     <string name="menu_new_guide_title">New Guide</string>
     <string name="menu_guide_draft_title">Open Guide Draft</string>
 
-    <!-- Area Activity Strings -->
-    <string name="area_search_instruction_text">Search for the park/area where the trail exists</string>
+    <!-- Area/Trail Activity Strings -->
+    <string name="area_search_instruction_text">Search for park/area</string>
+    <string name="trail_activity_title">Select your trail</string>
+    <string name="add_trail_hint">Trail name</string>
+    <string name="add_trail_title">Add a New Trail</string>
+    <string name="add_trail_warn_add_text">Please add a trail name before continuing.</string>
+    <string name="add_trail_item_text">Can\'t find the trail you\'re looking for?</string>
 
     <!-- Publish Activity Strings -->
     <string name="publish_title_text">Publishing Guide. Please wait…</string>
