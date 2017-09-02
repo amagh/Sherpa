@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import project.hikerguide.BR;
+import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.files.GpxFile;
 import project.hikerguide.files.ImageFile;
@@ -684,6 +685,49 @@ public class FirebaseProviderUtils {
 
                 // Remove Listener
                 firebaseQuery.removeEventListener(this);
+            }
+        });
+    }
+
+    /**
+     * Filters the Firebase Data for Trails that match an Area's FirebaseId
+     *
+     * @param area        Area to search for matching Trails
+     * @param listener    The Listener to pass the results to the receiver
+     */
+    public static void queryFirebaseForTrails(Area area, final FirebaseArrayListener listener) {
+
+        // Query the Firebase Database
+        final Query trailQuery = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.TRAILS)
+                .orderByChild(GuideContract.TrailEntry.AREA_ID)
+                .equalTo(area.firebaseId);
+
+        trailQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                // Check that the result is valid
+                if (dataSnapshot.exists()) {
+
+                    // Retrieve the Trails from the DataSnapshot
+                    Trail[] trails = (Trail[]) FirebaseProviderUtils.getModelsFromSnapshot(FirebaseProviderUtils.FirebaseType.TRAIL, dataSnapshot);
+
+                    // Pass the Trails to the Listener
+                    listener.onModelsReady(trails);
+                } else {
+                    listener.onModelsReady(new Trail[0]);
+                }
+
+                // Remove Listener
+                trailQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                // Remove Listener
+                trailQuery.removeEventListener(this);
             }
         });
     }

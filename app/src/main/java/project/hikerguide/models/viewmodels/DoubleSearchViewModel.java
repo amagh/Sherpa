@@ -1,5 +1,7 @@
 package project.hikerguide.models.viewmodels;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -24,6 +26,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,9 +38,11 @@ import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.ui.activities.MapboxActivity;
+import project.hikerguide.ui.adapters.TrailAdapter;
 import project.hikerguide.ui.adapters.abstractadapters.HideableAdapter;
 import project.hikerguide.ui.adapters.interfaces.ClickHandler;
 import project.hikerguide.ui.adapters.NewAreaAdapter;
+import project.hikerguide.ui.dialogs.AddTrailDialog;
 import project.hikerguide.ui.views.SmartMapView;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GeneralUtils;
@@ -45,8 +50,9 @@ import project.hikerguide.utilities.GooglePlacesApiUtils;
 import project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType;
 
 import static project.hikerguide.models.viewmodels.DoubleSearchViewModel.FocusItems.AREA_FOCUS;
-import static project.hikerguide.models.viewmodels.DoubleSearchViewModel.FocusItems.NO_FOCUS;
+import static project.hikerguide.models.viewmodels.DoubleSearchViewModel.FocusItems.AREA_NO_FOCUS;
 import static project.hikerguide.models.viewmodels.DoubleSearchViewModel.FocusItems.TRAIL_FOCUS;
+import static project.hikerguide.models.viewmodels.DoubleSearchViewModel.FocusItems.TRAIL_NO_FOCUS;
 
 /**
  * Created by Alvin on 9/1/2017.
@@ -57,11 +63,12 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     // ** Constants ** //
     private static final int SEARCH_DELAY = 1000;
 
-    @IntDef({NO_FOCUS, AREA_FOCUS, TRAIL_FOCUS})
+    @IntDef({AREA_NO_FOCUS, TRAIL_NO_FOCUS, AREA_FOCUS, TRAIL_FOCUS})
     @interface FocusItems {
-        int NO_FOCUS    = 0;
-        int AREA_FOCUS  = 1;
-        int TRAIL_FOCUS = 2;
+        int AREA_NO_FOCUS   = 0;
+        int TRAIL_NO_FOCUS  = 1;
+        int AREA_FOCUS      = 2;
+        int TRAIL_FOCUS     = 3;
     }
 
     // ** Member Variables ** //
@@ -73,6 +80,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
 
     private String mQuery;
     private MapboxMap mMapboxMap;
+    private List<Trail> mTrailList;
 
     private Handler mSearchHandler;
     private GoogleApiClient mGoogleApiClient;
@@ -104,8 +112,9 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
             mSearchHandler = new Handler();
         }
 
-        if (query.length() > 2) {
-            if (mArea == null && mAdapter instanceof NewAreaAdapter) {
+        if (mArea == null && mAdapter instanceof NewAreaAdapter) {
+
+            if (query.length() > 2) {
 
                 // Show the ProgressBar in the attribution bar
                 ((NewAreaAdapter) mAdapter).setExtraItemType(ExtraListItemType.ATTRIBUTION_PROGRESS);
@@ -114,10 +123,17 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                 mSearchHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        queryFirebase(query);
+                        queryFirebaseArea(query);
                     }
                 }, SEARCH_DELAY);
+            } else {
+                ((NewAreaAdapter) mAdapter).clear();
+                ((NewAreaAdapter) mAdapter).setExtraItemType(ExtraListItemType.ATTRIBUTION);
             }
+        } else if (mArea != null && mAdapter instanceof TrailAdapter) {
+
+            // Filter the Trail list to only show things that match the user's query
+            filter(query);
         }
     }
 
@@ -159,18 +175,36 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                                     public void onPlaceConvertedToArea(Area area) {
 
                                         // Set the Area to the memvar and notify
-                                        mArea = area;
-                                        changeMapCamera(new LatLng(mArea.latitude, mArea.longitude));
-                                        notifyPropertyChanged(BR.adapter);
+                                        setArea(area);
                                     }
                         });
                     } else {
 
                         // Set the Area to the memvar and notify
-                        mArea = (Area) clickedItem;
-                        changeMapCamera(new LatLng(mArea.latitude, mArea.longitude));
-                        notifyPropertyChanged(BR.adapter);
+                        setArea((Area) clickedItem);
                     }
+                }
+            });
+        } else if (mArea != null && (mAdapter == null || !(mAdapter instanceof TrailAdapter))) {
+
+
+            mAdapter = new TrailAdapter(new ClickHandler<Trail>() {
+                @Override
+                public void onClick(Trail clickedItem) {
+                    if (clickedItem == null) {
+                        AddTrailDialog dialog = new AddTrailDialog();
+                        dialog.setDialogListener(new AddTrailDialog.DialogListener() {
+                            @Override
+                            public void onTrailNamed(Trail trail) {
+
+                            }
+                        });
+
+                        dialog.show(mActivity.getSupportFragmentManager(), null);
+                    } else {
+                        
+                    }
+
                 }
             });
         }
@@ -199,12 +233,15 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
         mFocus = focus;
 
         switch (mFocus) {
-            case NO_FOCUS:
+            case AREA_NO_FOCUS:
+                setArea(null);
+
+            case TRAIL_NO_FOCUS:
                 mAdapter.hide();
                 break;
 
             case AREA_FOCUS:
-                mArea = null;
+                setArea(null);
 
             case TRAIL_FOCUS:
                 mAdapter.show();
@@ -231,12 +268,14 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
         float searchAlpha   = hiddenAlphaValue.getFloat();
         float closeAlpha    = hiddenAlphaValue.getFloat();
 
-        if (focus != NO_FOCUS) {
+        if (focus != AREA_NO_FOCUS && focus != TRAIL_NO_FOCUS) {
 
             // Prevent clicking on the close ImageView when it is not visible
             closeIv.setClickable(true);
             cardAlpha   = activatedAlphaValue.getFloat();
             closeAlpha  = activatedAlphaValue.getFloat();
+
+            searchTv.requestFocus();
         } else {
             searchAlpha = activatedAlphaValue.getFloat();
 
@@ -253,6 +292,45 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                 .target(searchIv).alpha(searchAlpha)
                 .target(closeIv).alpha(closeAlpha)
                 .start();
+    }
+
+    @BindingAdapter({"searchCardView", "focus"})
+    public static void animateMovement(final CardView dummyCardView, CardView searchCardView, @FocusItems int focus) {
+        switch (focus) {
+
+            case AREA_FOCUS:
+            case AREA_NO_FOCUS:
+
+                // Set the search box to the original position
+                if (dummyCardView.getVisibility() != View.INVISIBLE) {
+                    searchCardView.setY(dummyCardView.getY());
+                }
+
+                // Hide the dummy view
+                dummyCardView.setVisibility(View.INVISIBLE);
+                break;
+
+            case TRAIL_NO_FOCUS:
+                break;
+
+            case TRAIL_FOCUS:
+
+                // Animate the card to its new position under the dummy search box
+                new AdditiveAnimator().setDuration(200)
+                        .addListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                                // Show the dummy search box
+                                dummyCardView.setVisibility(View.VISIBLE);
+
+                                super.onAnimationStart(animation);
+                            }
+                        })
+                        .target(searchCardView).translationY(dummyCardView.getHeight())
+                        .start();
+
+        }
     }
 
     @Bindable
@@ -277,26 +355,97 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     }
 
     /**
+     * Sets the Area selected by the User to be passed to the CreateGuideActivity. It also triggers
+     * multiple actions to be done to switch the interface to allow the user to select a Trail
+     *
+     * @param area    Area that is selected
+     */
+    private void setArea(Area area) {
+
+        // Check is the Area is being reset to null or if a user selected an actual Area
+        if (area == null && mArea != null) {
+
+            // Area is being reset. Set the query to match the name of the area that was previously
+            // selected
+            mQuery = mArea.name;
+        } else {
+
+            // Set the query to null to allow the user to filter for a Trail
+            mQuery = null;
+        }
+
+        // Set the memvar to the selected Area
+        mArea = area;
+
+        if (mAdapter instanceof NewAreaAdapter) {
+
+            // Clear the Adapter if applicable
+            ((NewAreaAdapter) mAdapter).clear();
+        }
+
+        // Notify changes
+        notifyPropertyChanged(BR.adapter);
+        notifyPropertyChanged(BR.area);
+        notifyPropertyChanged(BR.query);
+
+        if (mArea != null) {
+
+            // If the user has selected an actual area, move the camera to the location
+            changeMapCamera(new LatLng(mArea.latitude, mArea.longitude));
+
+            // Set the Adapter to display Trails within the area
+            getTrailsFromFirebase();
+
+            // Set the focus correctly to animate changes in UI
+            setFocus(TRAIL_FOCUS);
+        }
+    }
+
+    @Bindable
+    public Area getArea() {
+        return mArea;
+    }
+
+    @BindingAdapter("area")
+    public static void setEditText(EditText dummyText, Area area) {
+        if (area != null) {
+
+            // Set the dummy text to the name of the Area
+            dummyText.setText(area.name);
+        }
+    }
+
+    /**
      * Clears focus and text from the search bar
      *
      * @param view    View that was clicked
      */
     public void onClickClear(View view) {
 
-        // Set the focus to false
-        setFocus(NO_FOCUS);
+        if (view.getId() == R.id.search_area_close_iv) {
+            if (mArea == null) {
+                setFocus(AREA_NO_FOCUS);
+            } else {
+                setFocus(TRAIL_NO_FOCUS);
+            }
+        } else {
+
+            // Set the focus to false
+            setFocus(AREA_NO_FOCUS);
+        }
 
         // Clear the query
         mQuery = null;
 
         // Clear the Adapter
-        ((NewAreaAdapter) mAdapter).clear();
+        if (mAdapter instanceof NewAreaAdapter) {
+            ((NewAreaAdapter) mAdapter).clear();
+        }
 
         // Hide the keyboard
         GeneralUtils.hideKeyboard(mActivity, view);
 
         notifyPropertyChanged(BR.query);
-        notifyPropertyChanged(BR.hasFocus);
     }
 
     /**
@@ -320,7 +469,9 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                     break;
 
                 case R.id.search_area_dummy_tv: {
+                    mQuery = mArea.name;
                     setFocus(AREA_FOCUS);
+                    notifyPropertyChanged(BR.query);
                 }
             }
         }
@@ -359,7 +510,9 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
      *
      * @param query    Query to send to the Firebase Database
      */
-    private void queryFirebase(String query) {
+    private void queryFirebaseArea(String query) {
+
+        query = query.trim();
 
         // Cast the Adapter to NewAreaAdapter for convenience
         final NewAreaAdapter adapter = (NewAreaAdapter) mAdapter;
@@ -407,6 +560,56 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     }
 
     /**
+     * Pulls the list of Trails that belong to an Area and displays them in the Adapter
+     */
+    private void getTrailsFromFirebase() {
+
+        FirebaseProviderUtils.queryFirebaseForTrails(mArea, new FirebaseProviderUtils.FirebaseArrayListener() {
+            @Override
+            public void onModelsReady(BaseModel[] models) {
+                Trail[] trails = (Trail[]) models;
+
+                // Pass the Trails to the Adapter
+                mTrailList = Arrays.asList(trails);
+                resetAdapterList();
+            }
+        });
+    }
+
+    /**
+     * Filters the list of Trails for only those that match the query
+     *
+     * @param query    Query to filter for
+     */
+    private void filter(String query) {
+
+        // Convert to lower case
+        String queryLowerCase = query.toLowerCase();
+
+        // Create a List that will contain all the Trails that match the query
+        List<Trail> filteredTrailList = new ArrayList<>();
+
+        // Iterate through and check each Trail for those that match
+        if (mTrailList != null && mTrailList.size() > 0) {
+            for (Trail trail : mTrailList) {
+                if (trail.name.toLowerCase().contains(queryLowerCase)) {
+                    filteredTrailList.add(trail);
+                }
+            }
+        }
+
+        // Replace the contents of the Adapter with the filtered List
+        ((TrailAdapter) mAdapter).setAdapterItems(filteredTrailList);
+    }
+
+    /**
+     * Replaces the contents of the Adapter with the master list of all trails in the Area
+     */
+    private void resetAdapterList() {
+        ((TrailAdapter) mAdapter).setAdapterItems(mTrailList);
+    }
+
+    /**
      * Setter for MapboxMap for this ViewModel. This allows the variable to be set when the
      * ViewModel is passed as a parameter in
      * {@link #initMap(SmartMapView, MapboxActivity, DoubleSearchViewModel)}
@@ -434,7 +637,11 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
         }
 
         // Hide the Adapter
-        setFocus(NO_FOCUS);
+        if (mArea != null) {
+            setFocus(TRAIL_NO_FOCUS);
+        } else {
+            setFocus(AREA_NO_FOCUS);
+        }
 
         // Animate the camera movement
         mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()

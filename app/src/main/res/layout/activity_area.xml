@@ -114,6 +114,71 @@
 
         </android.support.v7.widget.CardView>
 
+        <android.support.v7.widget.CardView
+            android:id="@+id/search_area_dummy_cv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/search_widget_horizontal_margin"
+            android:layout_marginStart="@dimen/search_widget_horizontal_margin"
+            android:layout_marginRight="@dimen/search_widget_horizontal_margin"
+            android:layout_marginEnd="@dimen/search_widget_horizontal_margin"
+            android:layout_marginTop="@dimen/search_widget_vertical_margin"
+            android:descendantFocusability="afterDescendants"
+            app:cardBackgroundColor="@android:color/white"
+            app:searchCardView="@{searchAreaCv}"
+            app:focus="@{vm.focus}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/search_widget_height">
+
+                <ImageView
+                    android:id="@+id/search_area_close_dummy_iv"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:padding="4dp"
+                    android:layout_marginLeft="14dp"
+                    android:layout_marginStart="14dp"
+                    android:src="@drawable/ic_close"
+                    android:layout_gravity="center_vertical|start"
+                    android:tint="@color/grey_400"
+                    android:onClick="@{vm::onClickClear}"
+                    />
+
+                <EditText
+                    android:id="@+id/search_area_dummy_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/search_widget_text_horizontal_margin"
+                    android:hint="@string/area_search_instruction_text"
+                    android:textSize="@dimen/search_widget_text_size"
+                    android:fontFamily="sans-serif"
+                    android:textColorHint="@color/grey_400"
+                    android:inputType="textAutoCorrect"
+                    android:imeOptions="actionSearch|flagNoExtractUi"
+                    android:onFocusChange="@{vm::onFocusChanged}"
+                    android:gravity="start"
+                    android:nextFocusUp="@id/search_area_close_iv"
+                    android:nextFocusDown="@+id/search_area_rv"
+                    app:backgroundTint="@android:color/transparent"
+                    app:area="@{vm.area}"
+                    android:layout_marginStart="@dimen/search_widget_text_horizontal_margin"/>
+
+            </FrameLayout>
+
+            <View
+                android:id="@+id/search_area_divider_dummy_v"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/list_item_separater_height"
+                android:layout_marginTop="@dimen/search_widget_height"
+                android:background="@color/grey_400"/>
+
+        </android.support.v7.widget.CardView>
+
     </android.support.constraint.ConstraintLayout>
 
 </layout>
