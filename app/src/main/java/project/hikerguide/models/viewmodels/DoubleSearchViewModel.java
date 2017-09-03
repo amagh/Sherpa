@@ -245,6 +245,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                 setArea(null);
 
             case TRAIL_FOCUS:
+                setTrail(null);
                 mAdapter.show();
         }
 
@@ -269,21 +270,36 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
         float searchAlpha   = hiddenAlphaValue.getFloat();
         float closeAlpha    = hiddenAlphaValue.getFloat();
 
-        if (focus != AREA_NO_FOCUS && focus != TRAIL_NO_FOCUS) {
+        // Set new alphas based on what is focused
+        switch (focus) {
 
-            // Prevent clicking on the close ImageView when it is not visible
-            closeIv.setClickable(true);
-            cardAlpha   = activatedAlphaValue.getFloat();
-            closeAlpha  = activatedAlphaValue.getFloat();
+            case FocusItems.AREA_FOCUS:
+            case FocusItems.TRAIL_FOCUS:
+            case FocusItems.TRAIL_NO_FOCUS:
+                searchTv.requestFocus();
 
-            searchTv.requestFocus();
-        } else {
-            searchAlpha = activatedAlphaValue.getFloat();
+                // Prevent clicking on the close ImageView when it is not visible
+                closeIv.setClickable(true);
+                cardAlpha   = activatedAlphaValue.getFloat();
+                closeAlpha  = activatedAlphaValue.getFloat();
 
-            // Allow clicking on the close ImageView
-            closeIv.setClickable(false);
+                break;
 
-            // Clear the Focus from the EditText
+            case FocusItems.AREA_NO_FOCUS:
+                searchAlpha = activatedAlphaValue.getFloat();
+
+                // Allow clicking on the close ImageView
+                closeIv.setClickable(false);
+
+                // Clear the Focus from the EditText
+                searchTv.clearFocus();
+
+                break;
+        }
+
+        if (focus == TRAIL_NO_FOCUS) {
+
+            // Clear the focus from the search box
             searchTv.clearFocus();
         }
 
@@ -437,15 +453,17 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
         if (mTrail == null) {
 
             // Cleared selected trail - reset the Adapter
-            resetAdapterList();
+            if (mAdapter instanceof TrailAdapter) {
+                resetAdapterList();
+            }
         } else {
 
             // Trail selected - set the Trail name as the query in the search box
             mQuery = trail.name;
-        }
 
-        // Set the focus
-        setFocus(TRAIL_NO_FOCUS);
+            // Set the focus
+            setFocus(TRAIL_NO_FOCUS);
+        }
 
         // Notify changes
         notifyPropertyChanged(BR.query);
