@@ -1,14 +1,19 @@
 package project.hikerguide.ui.activities;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ActivityAreaBinding;
+import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.viewmodels.DoubleSearchViewModel;
 
+import static project.hikerguide.utilities.Constants.IntentKeys.AREA_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
+import static project.hikerguide.utilities.Constants.IntentKeys.TRAIL_KEY;
 
 /**
  * Created by Alvin on 8/1/2017.
@@ -31,7 +36,23 @@ public class AreaActivity extends MapboxActivity {
         mBinding.setVm(vm);
     }
 
-    public Author getAuthor() {
-        return mAuthor;
+    /**
+     * Launches the CreateGuideActivity
+     *
+     * @param area     Area selected by the user to be passed in the Intent
+     * @param trail    Trail selected by the user to be passed in the Intent
+     */
+    public void startCreateGuideActivity(Area area, Trail trail) {
+
+        // Init the Intent to launch CreateGuideActivity
+        Intent intent = new Intent(this, CreateGuideActivity.class);
+
+        // Add the models to the Intent
+        intent.putExtra(AUTHOR_KEY, mAuthor);
+        intent.putExtra(AREA_KEY, area);
+        intent.putExtra(TRAIL_KEY, trail);
+
+        // Start the Activity
+        startActivity(intent);
     }
 }
