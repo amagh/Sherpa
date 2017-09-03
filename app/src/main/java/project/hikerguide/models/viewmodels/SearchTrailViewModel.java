@@ -25,7 +25,6 @@ import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.BR;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
-import project.hikerguide.firebasedatabase.DatabaseProvider;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.ui.activities.CreateGuideActivity;
 import project.hikerguide.ui.activities.TrailActivity;
@@ -80,13 +79,13 @@ public class SearchTrailViewModel extends BaseObservable {
     @Bindable
     public TrailAdapter getAdapter() {
         if (mAdapter == null) {
-            mAdapter = new TrailAdapter(new TrailAdapter.ClickHandler() {
-                @Override
-                public void onClickTrail(Trail trail) {
-
-                    startActivity(trail);
-                }
-            });
+//            mAdapter = new TrailAdapter(new TrailAdapter.ClickHandler() {
+//                @Override
+//                public void onClickTrail(Trail trail) {
+//
+//                    startActivity(trail);
+//                }
+//            });
         }
 
         return mAdapter;
@@ -217,7 +216,7 @@ public class SearchTrailViewModel extends BaseObservable {
      * Replaces the contents of the Adapter with the master list of all trails in the Area
      */
     private void resetAdapterList() {
-        mAdapter.replaceAll(mTrailList);
+        mAdapter.setAdapterItems(mTrailList);
     }
 
     /**
@@ -243,7 +242,7 @@ public class SearchTrailViewModel extends BaseObservable {
         }
 
         // Replace the contents of the Adapter with the filtered List
-        mAdapter.replaceAll(filteredTrailList);
+        mAdapter.setAdapterItems(filteredTrailList);
     }
 
     private void startActivity(Trail trail) {

@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -187,7 +188,6 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
             });
         } else if (mArea != null && (mAdapter == null || !(mAdapter instanceof TrailAdapter))) {
 
-
             mAdapter = new TrailAdapter(new ClickHandler<Trail>() {
                 @Override
                 public void onClick(Trail clickedItem) {
@@ -196,13 +196,13 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                         dialog.setDialogListener(new AddTrailDialog.DialogListener() {
                             @Override
                             public void onTrailNamed(Trail trail) {
-
+                                setTrail(trail);
                             }
                         });
 
                         dialog.show(mActivity.getSupportFragmentManager(), null);
                     } else {
-                        
+                        setTrail(clickedItem);
                     }
 
                 }
@@ -237,6 +237,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                 setArea(null);
 
             case TRAIL_NO_FOCUS:
+                GeneralUtils.hideKeyboard(mActivity, mActivity.getCurrentFocus());
                 mAdapter.hide();
                 break;
 
@@ -383,6 +384,8 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
             ((NewAreaAdapter) mAdapter).clear();
         }
 
+        GeneralUtils.hideKeyboard(mActivity, mActivity.getCurrentFocus());
+
         // Notify changes
         notifyPropertyChanged(BR.adapter);
         notifyPropertyChanged(BR.area);
@@ -413,6 +416,59 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
             // Set the dummy text to the name of the Area
             dummyText.setText(area.name);
         }
+    }
+
+    @Bindable
+    public Trail getTrail() {
+        return mTrail;
+    }
+
+    /**
+     * Sets the Trail selected by the User to be used as the basis for the Guide
+     *
+     * @param trail    Trail that was selected
+     */
+    public void setTrail(Trail trail) {
+
+        // Get a reference to the selected Trail
+        mTrail = trail;
+
+        // Check whether the user has selected a Trail or has cleared a selected Trail
+        if (mTrail == null) {
+
+            // Cleared selected trail - reset the Adapter
+            resetAdapterList();
+        } else {
+
+            // Trail selected - set the Trail name as the query in the search box
+            mQuery = trail.name;
+        }
+
+        // Set the focus
+        setFocus(TRAIL_NO_FOCUS);
+
+        // Notify changes
+        notifyPropertyChanged(BR.query);
+        notifyPropertyChanged(BR.trail);
+    }
+
+    @BindingAdapter("trail")
+    public static void animateNextButton(FloatingActionButton fab, Trail trail) {
+
+        // Animate the button to allow the user to progress to the next stage depending on whether
+        // mTrail has been set
+        float scale = 0;
+
+        if (trail != null) {
+
+            // Trail has been selected. Show the button
+            scale = 1;
+        }
+
+        new AdditiveAnimator().setDuration(150)
+                .target(fab)
+                .scale(scale)
+                .start();;
     }
 
     /**

@@ -489,7 +489,7 @@ public class SearchAreaViewModel extends BaseObservable implements GoogleApiClie
         // Instantiate an Intent and add the Area and Author to it
         Intent intent = new Intent(mActivity, TrailActivity.class);
         intent.putExtra(AREA_KEY, area);
-        intent.putExtra(AUTHOR_KEY, mActivity.getAuthor());
+//        intent.putExtra(AUTHOR_KEY, mActivity.getAuthor());
 
         mActivity.startActivity(intent);
 
