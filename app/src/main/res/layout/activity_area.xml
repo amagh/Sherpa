@@ -184,6 +184,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/search_area_next_button_bottom_margin"
             android:src="@drawable/ic_next_white"
+            android:onClick="@{vm::onClickNextFab}"
             app:trail="@{vm.trail}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

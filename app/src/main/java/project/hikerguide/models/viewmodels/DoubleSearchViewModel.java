@@ -38,6 +38,7 @@ import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
+import project.hikerguide.ui.activities.AreaActivity;
 import project.hikerguide.ui.activities.MapboxActivity;
 import project.hikerguide.ui.adapters.TrailAdapter;
 import project.hikerguide.ui.adapters.abstractadapters.HideableAdapter;
@@ -73,7 +74,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     }
 
     // ** Member Variables ** //
-    private MapboxActivity mActivity;
+    private AreaActivity mActivity;
     private HideableAdapter mAdapter;
 
     private Area mArea;
@@ -89,7 +90,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     @FocusItems
     private int mFocus;
 
-    public DoubleSearchViewModel(MapboxActivity activity) {
+    public DoubleSearchViewModel(AreaActivity activity) {
         mActivity = activity;
 
         // Initialize the GoogleApiClient
@@ -139,7 +140,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     }
 
     @Bindable
-    public MapboxActivity getActivity() {
+    public AreaActivity getActivity() {
         return mActivity;
     }
 
@@ -356,7 +357,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     }
 
     @BindingAdapter({"activity", "viewModel"})
-    public static void initMap(SmartMapView mapView, MapboxActivity activity, final DoubleSearchViewModel viewModel) {
+    public static void initMap(SmartMapView mapView, AreaActivity activity, final DoubleSearchViewModel viewModel) {
 
         // Start the Map's LifeCycle and attach it to the Activity LifeCycle
         mapView.startMapView(activity, null);
@@ -551,6 +552,12 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
         }
     }
 
+    public void onClickNextFab(View view) {
+        if (mArea != null && mTrail != null) {
+            mActivity.startCreateGuideActivity(mArea, mTrail);
+        }
+    }
+
     /**
      * Queries Google Places API for results that match the user's query
      *
@@ -686,7 +693,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     /**
      * Setter for MapboxMap for this ViewModel. This allows the variable to be set when the
      * ViewModel is passed as a parameter in
-     * {@link #initMap(SmartMapView, MapboxActivity, DoubleSearchViewModel)}
+     * {@link #initMap(SmartMapView, AreaActivity, DoubleSearchViewModel)}
      *
      * @param mapboxMap    The MapboxMap that will be set as the memver variable
      */
