@@ -215,7 +215,7 @@ public class GpxUtils {
 
                 listener.onOptionReady(markerOptions, polylineOptions);
             }
-        }).start();
+        }).run();
 
     }
 

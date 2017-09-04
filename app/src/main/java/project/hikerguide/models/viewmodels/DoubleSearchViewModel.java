@@ -21,6 +21,8 @@ import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -29,7 +31,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.BR;
@@ -50,6 +54,7 @@ import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GeneralUtils;
 import project.hikerguide.utilities.GooglePlacesApiUtils;
 import project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType;
+import timber.log.Timber;
 
 import static project.hikerguide.models.viewmodels.DoubleSearchViewModel.FocusItems.AREA_FOCUS;
 import static project.hikerguide.models.viewmodels.DoubleSearchViewModel.FocusItems.AREA_NO_FOCUS;
@@ -83,6 +88,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     private String mQuery;
     private MapboxMap mMapboxMap;
     private List<Trail> mTrailList;
+    private Map<Trail, Marker> mTrailMap;
 
     private Handler mSearchHandler;
     private GoogleApiClient mGoogleApiClient;
@@ -462,6 +468,9 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
             // Trail selected - set the Trail name as the query in the search box
             mQuery = trail.name;
 
+            // Move the camera to the trail location
+            changeMapCamera(new LatLng(mTrail.getLatitude(), mTrail.getLongitude()));
+
             // Set the focus
             setFocus(TRAIL_NO_FOCUS);
         }
@@ -552,8 +561,15 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
         }
     }
 
+    /**
+     * Clicks respose for when user clicks the next FAB
+     *
+     * @param view    View that was clicked
+     */
     public void onClickNextFab(View view) {
         if (mArea != null && mTrail != null) {
+
+            // Start the CreateGuideActivity, passing in the selected Area and Trail
             mActivity.startCreateGuideActivity(mArea, mTrail);
         }
     }
@@ -679,6 +695,25 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
             }
         }
 
+        // Remove Markers from the Map
+        if (mTrailMap != null) {
+            for (Trail trail : mTrailMap.keySet()) {
+                if (!filteredTrailList.contains(trail)) {
+                    mMapboxMap.removeMarker(mTrailMap.get(trail));
+                    mTrailMap.remove(trail);
+                }
+            }
+        } else {
+            mTrailMap = new HashMap<>();
+        }
+
+        // Add Markers to the Map to represent the approximate location of each Trail
+        for (Trail trail : filteredTrailList) {
+            if (!mTrailMap.keySet().contains(trail)) {
+                addMarkerForTrail(trail);
+            }
+        }
+
         // Replace the contents of the Adapter with the filtered List
         ((TrailAdapter) mAdapter).setAdapterItems(filteredTrailList);
     }
@@ -688,6 +723,33 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
      */
     private void resetAdapterList() {
         ((TrailAdapter) mAdapter).setAdapterItems(mTrailList);
+
+        // Init the Map to hold the Markers
+        if (mTrailMap == null) {
+            mTrailMap = new HashMap<>();
+        }
+
+        // Add the Marker for each Trail to the Map
+        for (Trail trail : mTrailList) {
+            if (!mTrailMap.containsKey(trail)) {
+                addMarkerForTrail(trail);
+            }
+        }
+    }
+
+    /**
+     * Adds a Marker to the MapboxMap at the location of a Trail
+     *
+     * @param trail    Trail to be given a Marker on the MapboxMap
+     */
+    private void addMarkerForTrail(Trail trail) {
+        MarkerOptions options = new MarkerOptions()
+                .position(new LatLng(trail.getLatitude(), trail.getLongitude()));
+
+        mMapboxMap.addMarker(options);
+
+        List<Marker> markerList = mMapboxMap.getMarkers();
+        mTrailMap.put(trail, markerList.get(markerList.size() - 1));
     }
 
     /**

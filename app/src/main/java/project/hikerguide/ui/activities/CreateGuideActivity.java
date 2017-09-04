@@ -248,9 +248,9 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                         if (viewHolder != null) {
                             ViewDataBinding binding = viewHolder.getBinding();
 
-                            ((ListItemGuideDetailsBinding) binding).getVm().notifyPropertyChanged(BR.gpx);
-                            ((ListItemGuideDetailsBinding) binding).getVm().notifyPropertyChanged(BR.distance);
-                            ((ListItemGuideDetailsBinding) binding).getVm().notifyPropertyChanged(BR.elevationVisibility);
+                            ((ListItemGuideDetailsEditBinding) binding).getVm().notifyPropertyChanged(BR.gpx);
+                            ((ListItemGuideDetailsEditBinding) binding).getVm().notifyPropertyChanged(BR.distance);
+                            ((ListItemGuideDetailsEditBinding) binding).getVm().notifyPropertyChanged(BR.elevationVisibility);
                         }
 
                     }
