@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.databinding.library.baseAdapters.BR;
 import com.bumptech.glide.Glide;
@@ -199,8 +200,21 @@ public class AuthorViewModel extends BaseObservable {
         // time the ViewModel is loaded as well
         if (fragment != null && accepted) {
             // Set the Author parameters to match the text that the user has altered
-            author.name = nameEditText.getText().toString();
-            author.description = descriptionEditText.getText().toString();
+            author.name = nameEditText.getText().toString().trim();
+            author.description = descriptionEditText.getText().toString().trim();
+
+            // Check to ensure the entered name is not blank
+            if (author.name.isEmpty()) {
+
+                // Show Toast to user to instruct them to enter a name
+                Toast.makeText(
+                        nameEditText.getContext(),
+                        nameEditText.getContext().getString(R.string.author_name_empty_error_message),
+                        Toast.LENGTH_LONG)
+                        .show();
+
+                return;
+            }
 
             // Update the Author's values in the Firebase Database and switch the layout
             fragment.updateAuthorValues();

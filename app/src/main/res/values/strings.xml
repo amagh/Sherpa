@@ -122,6 +122,7 @@
 
     <!-- User Activity Strings -->
     <string name="author_name_default">Hiker</string>
+    <string name="author_name_empty_error_message">Name cannot be blank</string>
 
     <string name="menu_user_log_off">Sign out</string>
     <string name="menu_new_guide_title">New Guide</string>
