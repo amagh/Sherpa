@@ -241,7 +241,9 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
 
         switch (mFocus) {
             case AREA_NO_FOCUS:
-                setArea(null);
+                if (mArea != null) {
+                    setArea(null);
+                }
 
             case TRAIL_NO_FOCUS:
                 GeneralUtils.hideKeyboard(mActivity, mActivity.getCurrentFocus());
@@ -249,7 +251,9 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                 break;
 
             case AREA_FOCUS:
-                setArea(null);
+                if (mArea != null) {
+                    setArea(null);
+                }
 
             case TRAIL_FOCUS:
                 setTrail(null);
