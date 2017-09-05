@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideProvider;
 import project.hikerguide.models.datamodels.Area;
@@ -342,6 +343,7 @@ public class ContentProviderUtils {
 
                 // Create a new Author Object and set the favoritesMaps to its favorites
                 Author author = new Author();
+                author.name = context.getString(R.string.author_name_default);
                 author.favorites = favoritesMap;
 
                 return author;

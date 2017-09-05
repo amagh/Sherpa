@@ -98,12 +98,15 @@
     <string name="menu_publish_title">Publish Guide</string>
     <string name="menu_save_draft_title">Save Draft</string>
     <string name="menu_delete_draft">Delete Draft</string>
+
     <string name="create_guide_image_missing_error_text">Please add an image</string>
     <string name="create_guide_gpx_missing_error_text">Please add a GPX file</string>
     <string name="create_guide_no_sections_error">Please add some content to your guide before publishing</string>
     <string name="create_guide_difficulty_missing_error_text">Please select a difficulty for the trail before publishing</string>
+
     <string name="draft_saved">Draft Saved!</string>
     <string name="draft_deleted">Draft Deleted!</string>
+
     <string name="content_description_add_section">Add a Text Section</string>
     <string name="content_description_add_section_image">Add an Image Section</string>
     <string name="content_description_add_gpx">Add GPX to Guide</string>
@@ -118,15 +121,19 @@
     <string name="progress_upload_files_title">Uploading Files</string>
 
     <!-- User Activity Strings -->
+    <string name="author_name_default">Hiker</string>
+
     <string name="menu_user_log_off">Sign out</string>
+    <string name="menu_new_guide_title">New Guide</string>
+    <string name="menu_guide_draft_title">Open Guide Draft</string>
+
     <string name="failed_image_upload_text">Failed to upload image. Please try again later.</string>
+
     <string name="content_description_author_image">Author Image</string>
     <string name="content_description_author_backdrop">Author Backdrop</string>
     <string name="content_description_edit_profile_button">Edit Profile</string>
     <string name="content_description_edit_profile_cancel_button">Cancel Editing Profile</string>
     <string name="content_description_create_fab">Add a Guide</string>
-    <string name="menu_new_guide_title">New Guide</string>
-    <string name="menu_guide_draft_title">Open Guide Draft</string>
 
     <!-- Area/Trail Activity Strings -->
     <string name="area_search_instruction_text">Search for park/area</string>
@@ -154,9 +161,12 @@
     <string name="list_rating_title_text">Rate this guide</string>
     <string name="list_rating_comments_hint">Comments (Optional)</string>
     <string name="list_rating_button_text">Rate</string>
+
     <string name="toast_missing_rating_error">Please rate the guide first.</string>
+
     <string name="content_description_edit_rating_button">Edit Rating</string>
     <string name="content_description_edit_rating_cancel_button">Cancel Editing Rating</string>
+
     <string name="rating_excellent">Excellent</string>
     <string name="rating_good">Good</string>
     <string name="rating_adequate">Adequate</string>
