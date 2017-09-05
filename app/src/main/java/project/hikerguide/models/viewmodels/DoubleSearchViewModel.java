@@ -684,6 +684,8 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
      */
     private void filter(String query) {
 
+        query = query.trim();
+
         // Convert to lower case
         String queryLowerCase = query.toLowerCase();
 
