@@ -19,7 +19,7 @@ import static project.hikerguide.utilities.Constants.IntentKeys.TRAIL_KEY;
  * Created by Alvin on 8/1/2017.
  */
 
-public class AreaActivity extends MapboxActivity {
+public class SelectAreaTrailActivity extends MapboxActivity {
 
     // ** Constants ** //
     private static final String QUERY_KEY = "query";
@@ -31,7 +31,7 @@ public class AreaActivity extends MapboxActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_area);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_select_area_trail);
 
         mAuthor = getIntent().getParcelableExtra(AUTHOR_KEY);
 

@@ -26,18 +26,18 @@ import project.hikerguide.models.viewmodels.PlaceViewModel;
 import project.hikerguide.ui.adapters.interfaces.ClickHandler;
 import project.hikerguide.ui.adapters.abstractadapters.HideableAdapter;
 
-import static project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType.ATTRIBUTION;
-import static project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType.ATTRIBUTION_GOOGLE;
-import static project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType.ATTRIBUTION_GOOGLE_PROGRESS;
-import static project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType.ATTRIBUTION_PROGRESS;
-import static project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType.HIDDEN;
-import static project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType.SEARCH_MORE;
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.ATTRIBUTION;
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.ATTRIBUTION_GOOGLE;
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.ATTRIBUTION_GOOGLE_PROGRESS;
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.ATTRIBUTION_PROGRESS;
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.HIDDEN;
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.SEARCH_MORE;
 
 /**
  * Created by Alvin on 9/1/2017.
  */
 
-public class NewAreaAdapter extends HideableAdapter<NewAreaAdapter.AreaViewHolder> {
+public class AreaAdapter extends HideableAdapter<AreaAdapter.AreaViewHolder> {
 
     // ** Constants ** //
     private static final int AREA_VIEW_TYPE         = 5096;
@@ -60,7 +60,7 @@ public class NewAreaAdapter extends HideableAdapter<NewAreaAdapter.AreaViewHolde
     private ClickHandler<Object> mClickHandler;
     private boolean mHideAdapter;
 
-    @NewAreaAdapter.ExtraListItemType
+    @AreaAdapter.ExtraListItemType
     private int mExtraItemType;
 
     private SortedListAdapterCallback<AreaAdapterSortable> mCallback = new SortedListAdapterCallback<AreaAdapterSortable>(this) {
@@ -81,7 +81,7 @@ public class NewAreaAdapter extends HideableAdapter<NewAreaAdapter.AreaViewHolde
     };
     private SortedList<AreaAdapterSortable> mSortedList = new SortedList<>(AreaAdapterSortable.class, mCallback);
 
-    public NewAreaAdapter(DoubleSearchViewModel viewModel, ClickHandler<Object> clickHandler) {
+    public AreaAdapter(DoubleSearchViewModel viewModel, ClickHandler<Object> clickHandler) {
         mViewModel = viewModel;
         mClickHandler = clickHandler;
     }

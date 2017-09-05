@@ -42,19 +42,18 @@ import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
-import project.hikerguide.ui.activities.AreaActivity;
+import project.hikerguide.ui.activities.SelectAreaTrailActivity;
 import project.hikerguide.ui.activities.MapboxActivity;
+import project.hikerguide.ui.adapters.AreaAdapter;
 import project.hikerguide.ui.adapters.TrailAdapter;
 import project.hikerguide.ui.adapters.abstractadapters.HideableAdapter;
 import project.hikerguide.ui.adapters.interfaces.ClickHandler;
-import project.hikerguide.ui.adapters.NewAreaAdapter;
 import project.hikerguide.ui.dialogs.AddTrailDialog;
 import project.hikerguide.ui.views.SmartMapView;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.GeneralUtils;
 import project.hikerguide.utilities.GooglePlacesApiUtils;
-import project.hikerguide.ui.adapters.NewAreaAdapter.ExtraListItemType;
-import timber.log.Timber;
+import project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType;
 
 import static project.hikerguide.models.viewmodels.DoubleSearchViewModel.FocusItems.AREA_FOCUS;
 import static project.hikerguide.models.viewmodels.DoubleSearchViewModel.FocusItems.AREA_NO_FOCUS;
@@ -79,7 +78,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     }
 
     // ** Member Variables ** //
-    private AreaActivity mActivity;
+    private SelectAreaTrailActivity mActivity;
     private HideableAdapter mAdapter;
 
     private Area mArea;
@@ -96,7 +95,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     @FocusItems
     private int mFocus;
 
-    public DoubleSearchViewModel(AreaActivity activity) {
+    public DoubleSearchViewModel(SelectAreaTrailActivity activity) {
         mActivity = activity;
 
         // Initialize the GoogleApiClient
@@ -113,7 +112,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
         mQuery = query;
 
         // Reset the Area/Trail if the user changes the query
-        if (mAdapter instanceof NewAreaAdapter && mArea != null && !mQuery.equals(mArea.name)) {
+        if (mAdapter instanceof AreaAdapter && mArea != null && !mQuery.equals(mArea.name)) {
             setArea(null);
         } else if (mAdapter instanceof TrailAdapter && mTrail != null && !mQuery.equals(mTrail.name)) {
             setTrail(null);
@@ -127,12 +126,12 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
             mSearchHandler = new Handler();
         }
 
-        if (mArea == null && mAdapter instanceof NewAreaAdapter) {
+        if (mArea == null && mAdapter instanceof AreaAdapter) {
 
             if (query.length() > 2) {
 
                 // Show the ProgressBar in the attribution bar
-                ((NewAreaAdapter) mAdapter).setExtraItemType(ExtraListItemType.ATTRIBUTION_PROGRESS);
+                ((AreaAdapter) mAdapter).setExtraItemType(ExtraListItemType.ATTRIBUTION_PROGRESS);
 
                 // Search Firebase after a delay to allow the user time to finish typing their query
                 mSearchHandler.postDelayed(new Runnable() {
@@ -142,8 +141,8 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                     }
                 }, SEARCH_DELAY);
             } else {
-                ((NewAreaAdapter) mAdapter).clear();
-                ((NewAreaAdapter) mAdapter).setExtraItemType(ExtraListItemType.ATTRIBUTION);
+                ((AreaAdapter) mAdapter).clear();
+                ((AreaAdapter) mAdapter).setExtraItemType(ExtraListItemType.ATTRIBUTION);
             }
         } else if (mArea != null && mAdapter instanceof TrailAdapter) {
 
@@ -153,7 +152,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     }
 
     @Bindable
-    public AreaActivity getActivity() {
+    public SelectAreaTrailActivity getActivity() {
         return mActivity;
     }
 
@@ -161,10 +160,10 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     public HideableAdapter getAdapter() {
 
         // Check which type of Adapter needs to be returned
-        if (mArea == null && (mAdapter == null || !(mAdapter instanceof NewAreaAdapter))) {
+        if (mArea == null && (mAdapter == null || !(mAdapter instanceof AreaAdapter))) {
 
             // If the Area has not yet been set, then return area AreaAdapter
-            mAdapter = new NewAreaAdapter(this, new ClickHandler<Object>() {
+            mAdapter = new AreaAdapter(this, new ClickHandler<Object>() {
                 @Override
                 public void onClick(Object clickedItem) {
 
@@ -172,8 +171,8 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                     if (clickedItem == null) {
 
                         // Show the Google attribution and progress bar
-                        if (mAdapter instanceof NewAreaAdapter) {
-                            ((NewAreaAdapter) mAdapter)
+                        if (mAdapter instanceof AreaAdapter) {
+                            ((AreaAdapter) mAdapter)
                                     .setExtraItemType(ExtraListItemType.ATTRIBUTION_GOOGLE_PROGRESS);
                         }
 
@@ -420,7 +419,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     }
 
     @BindingAdapter({"activity", "viewModel"})
-    public static void initMap(SmartMapView mapView, AreaActivity activity, final DoubleSearchViewModel viewModel) {
+    public static void initMap(SmartMapView mapView, SelectAreaTrailActivity activity, final DoubleSearchViewModel viewModel) {
 
         // Start the Map's LifeCycle and attach it to the Activity LifeCycle
         mapView.startMapView(activity, null);
@@ -458,10 +457,10 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
         // Set the memvar to the selected Area
         mArea = area;
 
-        if (mAdapter instanceof NewAreaAdapter) {
+        if (mAdapter instanceof AreaAdapter) {
 
             // Clear the Adapter if applicable
-            ((NewAreaAdapter) mAdapter).clear();
+            ((AreaAdapter) mAdapter).clear();
         }
 
         GeneralUtils.hideKeyboard(mActivity, mActivity.getCurrentFocus());
@@ -579,8 +578,8 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
         mQuery = null;
 
         // Clear the Adapter
-        if (mAdapter instanceof NewAreaAdapter) {
-            ((NewAreaAdapter) mAdapter).clear();
+        if (mAdapter instanceof AreaAdapter) {
+            ((AreaAdapter) mAdapter).clear();
         }
 
         // Hide the keyboard
@@ -638,8 +637,8 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
      */
     private void queryGooglePlaces(String query) {
 
-        // Case the Adapter to NewAreaAdapter for convenience
-        final NewAreaAdapter adapter = (NewAreaAdapter) mAdapter;
+        // Case the Adapter to AreaAdapter for convenience
+        final AreaAdapter adapter = (AreaAdapter) mAdapter;
 
         // Query Google Place API
         GooglePlacesApiUtils.queryGooglePlaces(mGoogleApiClient, query, new GooglePlacesApiUtils.GooglePlacesQueryListener() {
@@ -668,8 +667,8 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
 
         query = query.trim();
 
-        // Cast the Adapter to NewAreaAdapter for convenience
-        final NewAreaAdapter adapter = (NewAreaAdapter) mAdapter;
+        // Cast the Adapter to AreaAdapter for convenience
+        final AreaAdapter adapter = (AreaAdapter) mAdapter;
 
         // Query Firebase with the user's query
         FirebaseProviderUtils.queryFirebaseForAreas(query, new FirebaseProviderUtils.FirebaseArrayListener() {
@@ -677,7 +676,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
             public void onModelsReady(BaseModel[] models) {
 
                 // Hide the attribution bar
-                adapter.setExtraItemType(NewAreaAdapter.ExtraListItemType.HIDDEN);
+                adapter.setExtraItemType(AreaAdapter.ExtraListItemType.HIDDEN);
 
                 // Time to delay the search more list item from showing
                 int delaySearchMore = SEARCH_DELAY;
@@ -705,7 +704,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
 
                         // Only show the option if the user hasn't already selected an Area
                         if (mArea == null) {
-                            adapter.setExtraItemType(NewAreaAdapter.ExtraListItemType.SEARCH_MORE);
+                            adapter.setExtraItemType(AreaAdapter.ExtraListItemType.SEARCH_MORE);
                         }
                     }
                 }, delaySearchMore);
@@ -824,7 +823,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     /**
      * Setter for MapboxMap for this ViewModel. This allows the variable to be set when the
      * ViewModel is passed as a parameter in
-     * {@link #initMap(SmartMapView, AreaActivity, DoubleSearchViewModel)}
+     * {@link #initMap(SmartMapView, SelectAreaTrailActivity, DoubleSearchViewModel)}
      *
      * @param mapboxMap    The MapboxMap that will be set as the memver variable
      */
