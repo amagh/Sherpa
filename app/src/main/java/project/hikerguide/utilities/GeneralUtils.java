@@ -47,6 +47,8 @@ public class GeneralUtils {
      * @param view       View to use to get the WindowToken
      */
     public static void hideKeyboard(Context context, View view) {
+        if (view == null) return;
+
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }

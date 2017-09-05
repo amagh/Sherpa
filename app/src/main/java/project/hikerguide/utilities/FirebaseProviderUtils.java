@@ -1,6 +1,7 @@
 package project.hikerguide.utilities;
 
 import android.net.Uri;
+import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
@@ -19,11 +20,13 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import project.hikerguide.BR;
+import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.files.GpxFile;
 import project.hikerguide.files.ImageFile;
@@ -635,6 +638,96 @@ public class FirebaseProviderUtils {
 
                 // Remove the Listener
                 ratingQuery.removeEventListener(this);
+            }
+        });
+    }
+
+    /**
+     * Queries Firebase for Areas that match the query
+     *
+     * @param query       The query to filter the Firebase Database for
+     * @param listener    The Listener to pass the results to the calling Object
+     */
+    public static void queryFirebaseForAreas(String query, final FirebaseArrayListener listener) {
+
+        // Build a Query for the Firebase Database
+        final Query firebaseQuery = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.AREAS)
+                .orderByChild(Area.LOWER_CASE_NAME)
+                .startAt(query.toLowerCase())
+                .endAt(query.toLowerCase() + "z");
+
+        firebaseQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                // Check that the DataSnapshot is valid
+                if (dataSnapshot.exists()) {
+
+                    // Pass the Array to listener
+                    Area[] areas = (Area[]) FirebaseProviderUtils.getModelsFromSnapshot(
+                            FirebaseProviderUtils.FirebaseType.AREA,
+                            dataSnapshot);
+
+                    listener.onModelsReady(areas);
+                } else {
+
+                    // Return an empty Array
+                    listener.onModelsReady(new Area[0]);
+                }
+
+                // Remove Listener
+                firebaseQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                // Remove Listener
+                firebaseQuery.removeEventListener(this);
+            }
+        });
+    }
+
+    /**
+     * Filters the Firebase Data for Trails that match an Area's FirebaseId
+     *
+     * @param area        Area to search for matching Trails
+     * @param listener    The Listener to pass the results to the receiver
+     */
+    public static void queryFirebaseForTrails(Area area, final FirebaseArrayListener listener) {
+
+        // Query the Firebase Database
+        final Query trailQuery = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.TRAILS)
+                .orderByChild(GuideContract.TrailEntry.AREA_ID)
+                .equalTo(area.firebaseId);
+
+        trailQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                // Check that the result is valid
+                if (dataSnapshot.exists()) {
+
+                    // Retrieve the Trails from the DataSnapshot
+                    Trail[] trails = (Trail[]) FirebaseProviderUtils.getModelsFromSnapshot(FirebaseProviderUtils.FirebaseType.TRAIL, dataSnapshot);
+
+                    // Pass the Trails to the Listener
+                    listener.onModelsReady(trails);
+                } else {
+                    listener.onModelsReady(new Trail[0]);
+                }
+
+                // Remove Listener
+                trailQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                // Remove Listener
+                trailQuery.removeEventListener(this);
             }
         });
     }

@@ -12,19 +12,35 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/list_trail_iv"
+            android:src="@drawable/mapbox_marker_icon_default"
+            android:onClick="@{vm::onClickGeoLocation}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            style="@style/SearchListItemImage"/>
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:id="@+id/list_trail_tv"
             android:text="@{vm.name}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            style="@style/TextAppearance.AppCompat.Subhead"
+            style="@style/SearchListItem.PrimaryText"
             tools:text="@string/list_guide_title_text"/>
+
+        <TextView
+            app:layout_constraintStart_toStartOf="@+id/list_trail_tv"
+            app:layout_constraintEnd_toEndOf="@+id/list_trail_tv"
+            app:layout_constraintTop_toBottomOf="@+id/list_trail_tv"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="@string/list_area_text"
+            style="@style/SearchListItem.SecondaryText"/>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

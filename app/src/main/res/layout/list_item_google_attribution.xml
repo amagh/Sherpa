@@ -15,8 +15,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/list_item_separater_height"
-            android:layout_marginLeft="@dimen/list_place_horizontal_padding"
-            android:layout_marginStart="@dimen/list_place_horizontal_padding"
+            android:layout_marginLeft="@dimen/list_search_horizontal_padding"
+            android:layout_marginStart="@dimen/list_search_horizontal_padding"
             android:background="@color/grey_400"/>
 
         <ProgressBar
@@ -31,10 +31,11 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/list_place_horizontal_padding"
-            android:layout_marginStart="@dimen/list_place_horizontal_padding"
-            android:layout_marginTop="@dimen/list_place_vertical_padding"
-            android:layout_marginBottom="@dimen/list_place_vertical_padding"
+            android:layout_marginLeft="@dimen/list_search_horizontal_padding"
+            android:layout_marginStart="@dimen/list_search_horizontal_padding"
+            android:layout_marginTop="@dimen/list_search_vertical_padding"
+            android:layout_marginBottom="@dimen/list_search_vertical_padding"
+            android:visibility="@{vm.attributionVisibility}"
             android:src="@drawable/powered_by_google_light" />
 
     </FrameLayout>

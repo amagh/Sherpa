@@ -16,15 +16,20 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 
 public class Trail extends BaseModel implements Parcelable {
     // ** Constants ** //
-    private static final String AREA_ID = "areaId";
-    private static final String NAME = "name";
-    private static final String LOWER_CASE_NAME = "lowerCaseName";
-    private static final String NOTES = "notes";
+    private static final String AREA_ID             = "areaId";
+    private static final String NAME                = "name";
+    private static final String LOWER_CASE_NAME     = "lowerCaseName";
+    private static final String NOTES               = "notes";
+    private static final String LATITUDE            = "latitude";
+    private static final String LONGITUDE           = "longitude";
 
     // ** Member Variables ** //
     public String areaId;
     public String name;
     public String notes;
+
+    private double latitude;
+    private double longitude;
 
     public Trail() {}
 
@@ -80,8 +85,30 @@ public class Trail extends BaseModel implements Parcelable {
         map.put(NAME, name);
         map.put(LOWER_CASE_NAME, name.toLowerCase());
         map.put(NOTES, notes);
+        map.put(LATITUDE, latitude);
+        map.put(LONGITUDE, longitude);
 
         return map;
+    }
+
+    //********************************************************************************************//
+    //*********************************** Getters & Setters **************************************//
+    //********************************************************************************************//
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     //********************************************************************************************//

@@ -15,6 +15,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -309,6 +310,39 @@ public class GpxUtils {
                 }
             }
         }).run();
+    }
+
+    /**
+     * Retrieves the coordinates of the mid-point of a Gpx File
+     *
+     * @param gpxFile    Gpx File to find the mid-point for.
+     * @return LatLngs coordinates for the mid-point of the Gpx File
+     */
+    public static LatLng getMidPoint(File gpxFile) {
+        try {
+            // Create a FileInputStream from the Gpx File
+            InputStream inStream = new FileInputStream(gpxFile);
+
+            // Parse to a Gpx
+            Gpx parsedGpx = new GPXParser().parse(inStream);
+
+            // Close the FileInputStream
+            inStream.close();
+
+            if (parsedGpx != null) {
+                // Get the TrackPoints from the Gpx
+                List<TrackPoint> points = parsedGpx.getTracks().get(0).getTrackSegments().get(0).getTrackPoints();
+
+                // Get the TrackPoint at the middle of the List
+                TrackPoint point = points.get(points.size() / 2);
+
+                return new LatLng(point.getLatitude(), point.getLongitude());
+            }
+        } catch (XmlPullParserException | IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public interface MapboxOptionsListener {

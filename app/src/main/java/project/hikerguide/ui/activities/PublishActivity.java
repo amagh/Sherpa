@@ -15,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import project.hikerguide.models.viewmodels.PublishViewModel;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import project.hikerguide.utilities.GpxUtils;
 import project.hikerguide.utilities.SaveUtils;
 import timber.log.Timber;
 
@@ -157,7 +159,17 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
 
         // Upload the trail
         if (mTrail.firebaseId.equals(TRAIL_KEY) || mTrail.isDraft()) {
+
             mTrail.areaId = mArea.firebaseId;
+
+            // Set the mid-point of the Trail
+            LatLng trailMidPoint = GpxUtils.getMidPoint(mGuide.getGpxFile());
+
+            if (trailMidPoint != null) {
+                mTrail.setLatitude(trailMidPoint.getLatitude());
+                mTrail.setLongitude(trailMidPoint.getLongitude());
+            }
+
             addChildUpdate(mTrail, childUpdates);
         }
 

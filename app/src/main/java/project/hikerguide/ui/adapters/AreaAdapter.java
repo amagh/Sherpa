@@ -2,176 +2,327 @@ package project.hikerguide.ui.adapters;
 
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
+import android.support.annotation.IntDef;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemAreaBinding;
+import project.hikerguide.databinding.ListItemGoogleAttributionBinding;
 import project.hikerguide.databinding.ListItemPlaceNavBinding;
+import project.hikerguide.models.AreaAdapterSortable;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.models.viewmodels.AreaViewModel;
+import project.hikerguide.models.viewmodels.AttributionViewModel;
+import project.hikerguide.models.viewmodels.DoubleSearchViewModel;
 import project.hikerguide.models.viewmodels.PlaceViewModel;
-import project.hikerguide.models.viewmodels.SearchAreaViewModel;
+import project.hikerguide.ui.adapters.interfaces.ClickHandler;
+import project.hikerguide.ui.adapters.abstractadapters.HideableAdapter;
+
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.ATTRIBUTION;
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.ATTRIBUTION_GOOGLE;
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.ATTRIBUTION_GOOGLE_PROGRESS;
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.ATTRIBUTION_PROGRESS;
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.HIDDEN;
+import static project.hikerguide.ui.adapters.AreaAdapter.ExtraListItemType.SEARCH_MORE;
 
 /**
- * Created by Alvin on 8/2/2017.
+ * Created by Alvin on 9/1/2017.
  */
 
-public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder> {
+public class AreaAdapter extends HideableAdapter<AreaAdapter.AreaViewHolder> {
+
     // ** Constants ** //
-    private static final int AREA_VIEW_TYPE         = 0;
-    private static final int PLACE_VIEW_TYPE        = 1;
-    private static final int SEARCH_MORE_VIEW_TYPE  = 2;
+    private static final int AREA_VIEW_TYPE         = 5096;
+    private static final int PLACE_VIEW_TYPE        = 3025;
+    private static final int SEARCH_MORE_VIEW_TYPE  = 5395;
+    private static final int ATTRIBUTION_VIEW_TYPE  = 7329;
+
+    @IntDef({HIDDEN, SEARCH_MORE, ATTRIBUTION, ATTRIBUTION_PROGRESS, ATTRIBUTION_GOOGLE, ATTRIBUTION_GOOGLE_PROGRESS})
+    public @interface ExtraListItemType {
+        int HIDDEN                          = 0;
+        int SEARCH_MORE                     = 1;
+        int ATTRIBUTION                     = 2;
+        int ATTRIBUTION_PROGRESS            = 3;
+        int ATTRIBUTION_GOOGLE              = 4;
+        int ATTRIBUTION_GOOGLE_PROGRESS     = 5;
+    }
 
     // ** Member Variables ** //
-    private List<Object> mAreaList;
-    private ClickHandler mClickHandler;
-    private SearchAreaViewModel mViewModel;
-    private boolean mShowSearchMore = false;
+    private DoubleSearchViewModel mViewModel;
+    private ClickHandler<Object> mClickHandler;
+    private boolean mHideAdapter;
 
-    public AreaAdapter(SearchAreaViewModel viewModel, ClickHandler clickHandler) {
+    @AreaAdapter.ExtraListItemType
+    private int mExtraItemType;
+
+    private SortedListAdapterCallback<AreaAdapterSortable> mCallback = new SortedListAdapterCallback<AreaAdapterSortable>(this) {
+        @Override
+        public int compare(AreaAdapterSortable o1, AreaAdapterSortable o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+
+        @Override
+        public boolean areContentsTheSame(AreaAdapterSortable oldItem, AreaAdapterSortable newItem) {
+            return oldItem.getName().equals(newItem.getName());
+        }
+
+        @Override
+        public boolean areItemsTheSame(AreaAdapterSortable item1, AreaAdapterSortable item2) {
+            return item1 == item2;
+        }
+    };
+    private SortedList<AreaAdapterSortable> mSortedList = new SortedList<>(AreaAdapterSortable.class, mCallback);
+
+    public AreaAdapter(DoubleSearchViewModel viewModel, ClickHandler<Object> clickHandler) {
         mViewModel = viewModel;
         mClickHandler = clickHandler;
     }
 
     @Override
     public AreaViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // Init the variables for DataBinding
+
+        // Init the LayoutInflater to be used for DataBinding
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
+        // Set the layoutId to be inflated
         int layoutId = -1;
-
         switch (viewType) {
-            case AREA_VIEW_TYPE:
-                layoutId = R.layout.list_item_area;
+
+            case AREA_VIEW_TYPE:            layoutId = R.layout.list_item_area;
                 break;
 
-            case PLACE_VIEW_TYPE:
-                layoutId = R.layout.list_item_place_nav;
+            case PLACE_VIEW_TYPE:           layoutId = R.layout.list_item_place_nav;
                 break;
 
-            case SEARCH_MORE_VIEW_TYPE:
-                layoutId = R.layout.list_item_search_more;
+            case SEARCH_MORE_VIEW_TYPE:     layoutId = R.layout.list_item_search_more;
+                break;
+
+            case ATTRIBUTION_VIEW_TYPE:     layoutId = R.layout.list_item_google_attribution;
                 break;
         }
 
-        // Init the ViewDataBinding
+        // Inflate the View
         ViewDataBinding binding = DataBindingUtil.inflate(inflater, layoutId, parent, false);
+
         return new AreaViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(AreaViewHolder holder, int position) {
-        if (position == mAreaList.size()) {
-            return;
+        if (position != mSortedList.size() || mExtraItemType != SEARCH_MORE) {
+            holder.bind(position);
         }
-
-        // Bind the Data to the View
-        holder.bind(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        if (mAreaList != null) {
-            if (mShowSearchMore) {
-                return mAreaList.size() + 1;
-            }
-            return mAreaList.size();
-        }
-
-        return 0;
     }
 
     @Override
     public int getItemViewType(int position) {
 
-        // Return the ViewType based on the type of Objects stored in the List
-        if (position == mAreaList.size()) {
-            return SEARCH_MORE_VIEW_TYPE;
-        } else if (mAreaList.get(position) instanceof Area) {
+        // Handle the ViewType for the extra list item
+        if (position == mSortedList.size()) {
+            if (mExtraItemType == SEARCH_MORE) {
+                return SEARCH_MORE_VIEW_TYPE;
+            } else {
+                return ATTRIBUTION_VIEW_TYPE;
+            }
+        }
+
+        // Handle the ViewType for any item in mSortedList
+        Object object = mSortedList.get(position);
+
+        if (object instanceof Area) {
             return AREA_VIEW_TYPE;
-        } else if (mAreaList.get(position) instanceof PlaceModel) {
+        } else if (object instanceof PlaceModel) {
             return PLACE_VIEW_TYPE;
         }
 
         return super.getItemViewType(position);
     }
 
-    public void setAreaList(List<Object> areaList) {
-        mAreaList = areaList;
+    @Override
+    public int getItemCount() {
+        if (mHideAdapter) return 0;
 
-        // Hide the search more list item
-        mShowSearchMore = false;
+        if (mExtraItemType == HIDDEN) return mSortedList.size();
+
+        return mSortedList.size() + 1;
+    }
+
+    /**
+     * Sets the List of items to be displayed by the Adapter
+     *
+     * @param sortableList    List of Items to be displayed in the Adapter
+     */
+    public void setAdapterItems(List<? extends AreaAdapterSortable> sortableList) {
+
+        // Start batch operation
+        mSortedList.beginBatchedUpdates();
+
+        // Remove any items from the Adapter that are not in the sortableList
+        for (int i = mSortedList.size() - 1; i >= 0; i--) {
+            boolean exists = false;
+
+            // Iterate through the list of items to be added and check if any of the names match
+            for (int j = sortableList.size() - 1; j >= 0; j--) {
+                if (mSortedList.get(i).getName().equals(sortableList.get(j).getName())) {
+
+                    // Names match, do not add the item to the Adapter
+                    sortableList.remove(j);
+
+                    exists = true;
+                }
+            }
+
+            // Remove the item from the Adapter if it does not exist in the list to be added
+            if (!exists) mSortedList.removeItemAt(i);
+        }
+
+        // Add all items from the sortableList to the Adapter
+        for (AreaAdapterSortable sortable : sortableList) {
+            if (mSortedList.indexOf(sortable) == SortedList.INVALID_POSITION) {
+                mSortedList.add(sortable);
+            }
+        }
+
+        // End the batch operation
+        mSortedList.endBatchedUpdates();
+    }
+
+    /**
+     * Removes all items from the Adapter
+     */
+    public void clear() {
+
+        setExtraItemType(HIDDEN);
+        mSortedList.clear();
+    }
+
+    /**
+     * Hides the Adapter, but keeps the items in the Adapter so they can be re-displayed later in
+     * {@link #show()}
+     */
+    public void hide() {
+        mHideAdapter = true;
 
         notifyDataSetChanged();
     }
 
     /**
-     * Adds an additional list item to allow users to search Google Places for their query
+     * Shows the Adapter and any items that were in place before {@link #hide()} was called
      */
-    public void showSearchMore() {
-        if (!mShowSearchMore) {
-            mShowSearchMore = true;
+    public void show() {
+        mHideAdapter = false;
 
-            if (mAreaList == null) {
-                mAreaList = new ArrayList<>();
-            }
+        notifyDataSetChanged();
+    }
 
-            notifyDataSetChanged();
+    /**
+     * Sets the layout for the extra item in the Adapter that is not a data model to be displayed.
+     * This can be used to:
+     *
+     *      Hide the extra list item in the case that the search box is not
+     *      in focus
+     *
+     *      Show the list item to allow the user to search for more items using the Google Places
+     *      API
+     *
+     *      Show the attribution bar (with or without the Google attribution logo)
+     *
+     *      Show the attribution bar (with or without the Google attribution logo) with a progress
+     *      bar to indicate an ongoing search
+     *
+     * @param type    The type of layout to be used
+     */
+    public void setExtraItemType(@ExtraListItemType int type) {
+        mExtraItemType = type;
+
+        if (mExtraItemType == HIDDEN) {
+            notifyItemRemoved(mSortedList.size());
+        } else {
+            notifyItemChanged(mSortedList.size());
         }
     }
 
-    public interface ClickHandler {
-        void onClickArea(Object object);
-    }
-
     class AreaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        // ** Member Variables ** //
-        ViewDataBinding mBinding;
 
-        public AreaViewHolder(ViewDataBinding binding) {
+        // ** Constants ** //
+        private ViewDataBinding mBinding;
+
+        AreaViewHolder(ViewDataBinding binding) {
             super(binding.getRoot());
 
             mBinding = binding;
 
-            mBinding.getRoot().setOnClickListener(this);
+            // Add the ClickListener for any item that is not the attribution bar
+            if (!(mBinding instanceof ListItemGoogleAttributionBinding)) {
+                mBinding.getRoot().setOnClickListener(this);
+            }
         }
 
-        private void bind(int position) {
+        void bind(int position) {
 
-            // Get reference to the Object at the corresponding position
-            Object object = mAreaList.get(position);
+            // Check whether the position corresponds to an Object in mSortedList
+            if (position == mSortedList.size() && mExtraItemType != SEARCH_MORE) {
 
-            // Check the type of Object it is and load the proper ViewModel
-            if (object instanceof Area) {
-                AreaViewModel vm = new AreaViewModel((Area) object, mViewModel);
-                ((ListItemAreaBinding) mBinding).setVm(vm);
-            } else if (object instanceof PlaceModel) {
-                PlaceViewModel vm = new PlaceViewModel((PlaceModel) object, mViewModel);
-                ((ListItemPlaceNavBinding) mBinding).setVm(vm);
+                // Handle Attribution Bar layout
+                AttributionViewModel vm = new AttributionViewModel();
+
+                switch (mExtraItemType) {
+
+                    case ExtraListItemType.ATTRIBUTION_GOOGLE_PROGRESS:
+                        vm.setShowProgress(true);
+
+                    case ExtraListItemType.ATTRIBUTION_GOOGLE:
+                        vm.setShowAttribution(true);
+                        break;
+
+                    case ExtraListItemType.ATTRIBUTION_PROGRESS:
+                        vm.setShowProgress(true);
+
+                    case ExtraListItemType.ATTRIBUTION:
+                        vm.setShowAttribution(false);
+                        break;
+                }
+
+                ((ListItemGoogleAttributionBinding) mBinding).setVm(vm);;
+            } else {
+
+                // Handle layout for any item in mSortedList
+                Object object = mSortedList.get(position);
+
+                if (object instanceof Area) {
+                    AreaViewModel vm = new AreaViewModel((Area) object, mViewModel);
+
+                    ((ListItemAreaBinding) mBinding).setVm(vm);
+                } else {
+                    PlaceViewModel vm = new PlaceViewModel((PlaceModel) object, mViewModel);
+
+                    ((ListItemPlaceNavBinding) mBinding).setVm(vm);
+                }
             }
-
-
         }
 
         @Override
         public void onClick(View view) {
 
-            // Get the position that was clicked
+            // Get the position of the clicked ViewHolder in the Adapter
             int position = getAdapterPosition();
 
-            if (position == mAreaList.size()) {
-                mClickHandler.onClickArea(null);
-                return;
+            Object object = null;
+
+            // Set the Object to the corresponding Object in mSortedList if valid
+            if (position < mSortedList.size()) {
+                object = mSortedList.get(position);
             }
 
-            // Pass the Area associated with the ViewHolder to the ClickHandler
-            mClickHandler.onClickArea(mAreaList.get(position));
+            mClickHandler.onClick(object);
         }
     }
 }

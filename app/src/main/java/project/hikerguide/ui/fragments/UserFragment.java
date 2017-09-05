@@ -49,7 +49,7 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.ui.activities.AccountActivity;
-import project.hikerguide.ui.activities.AreaActivity;
+import project.hikerguide.ui.activities.SelectAreaTrailActivity;
 import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.MainActivity;
@@ -512,7 +512,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
             case R.id.fab_new_guide:
 
                 // Launch Activity flow to start a new Guide
-                Intent intent = new Intent(getActivity(), AreaActivity.class);
+                Intent intent = new Intent(getActivity(), SelectAreaTrailActivity.class);
                 intent.putExtra(AUTHOR_KEY, mAuthor);
                 startActivity(intent);
 
