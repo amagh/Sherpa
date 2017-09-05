@@ -422,7 +422,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
     public static void initMap(SmartMapView mapView, SelectAreaTrailActivity activity, final DoubleSearchViewModel viewModel) {
 
         // Start the Map's LifeCycle and attach it to the Activity LifeCycle
-        mapView.startMapView(activity, null);
+        mapView.startMapView(activity);
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override

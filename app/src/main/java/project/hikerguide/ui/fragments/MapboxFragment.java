@@ -16,10 +16,13 @@ import project.hikerguide.R;
 public class MapboxFragment extends Fragment {
     // ** Member Variables ** //
     MapView mMapView;
+    Bundle mSavedInstanceState;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mSavedInstanceState = savedInstanceState;
 
         Mapbox.getInstance(getActivity(), getString(R.string.mapbox_token));
 
@@ -86,5 +89,9 @@ public class MapboxFragment extends Fragment {
 
     public void attachMapView(MapView mapView) {
         mMapView = mapView;
+    }
+
+    public Bundle getSavedInstanceState() {
+        return mSavedInstanceState;
     }
 }

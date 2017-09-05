@@ -92,7 +92,7 @@ public class SearchFragment extends MapboxFragment {
         mBinding.setVm(new SearchViewModel((MainActivity) getActivity()));
 
         // Initialize the Mapbox MapView
-        initMapView(savedInstanceState);
+        initMapView();
 
         // Initialize the RecyclerView
         initRecyclerView();
@@ -154,13 +154,11 @@ public class SearchFragment extends MapboxFragment {
 
     /**
      * Initializes the Mapbox MapView to respond to to user actions on the Map
-     *
-     * @param savedInstanceState    The SavedInstanceState Bundle to pass to the MapView
      */
-    private void initMapView(Bundle savedInstanceState) {
+    private void initMapView() {
 
         // Attach the MapView to the Fragment's Lifecycle
-        mBinding.searchMv.startMapView(this, savedInstanceState);
+        mBinding.searchMv.startMapView(this);
 
         // Get a reference of the MapboxMap to manipulate camera position and add Polylines
         mBinding.searchMv.getMapAsync(new OnMapReadyCallback() {

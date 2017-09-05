@@ -36,14 +36,14 @@ public class SmartMapView extends MapView {
         super(context, options);
     }
 
-    public void startMapView(MapboxActivity activity, Bundle savedInstanceState) {
+    public void startMapView(MapboxActivity activity) {
         if (mStarted) {
             return;
         }
 
         mStarted = true;
 
-        onCreate(savedInstanceState);
+        onCreate(activity.getSavedInstanceState());
 
         setStyleUrl(activity.getString(R.string.outdoors_style));
         onStart();
@@ -51,14 +51,14 @@ public class SmartMapView extends MapView {
         activity.attachMapView(this);
     }
 
-    public void startMapView(MapboxFragment fragment, Bundle savedInstanceState) {
+    public void startMapView(MapboxFragment fragment) {
         if (mStarted) {
             return;
         }
 
         mStarted = true;
 
-        onCreate(savedInstanceState);
+        onCreate(fragment.getSavedInstanceState());
 
         setStyleUrl(fragment.getString(R.string.outdoors_style));
         onStart();

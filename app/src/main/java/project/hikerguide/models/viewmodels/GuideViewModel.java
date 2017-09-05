@@ -318,18 +318,18 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @BindingAdapter(
-            value = {"activity", "gpx", "viewModel", "trackUserPosition", "savedInstanceState", "fragment"},
+            value = {"activity", "gpx", "viewModel", "trackUserPosition", "fragment"},
             requireAll = false)
     public static void loadGpxToMap(final SmartMapView mapView, MapboxActivity activity, final File gpx,
                                     final GuideViewModel viewModel, final boolean trackUserPosition,
-                                    final Bundle savedInstanceState, MapboxFragment fragment) {
+                                    MapboxFragment fragment) {
 
         // The MapView will retain it's internal LifeCycle regardless of how many times it's
         // rendered
         if (fragment != null) {
-            mapView.startMapView(fragment, savedInstanceState);
+            mapView.startMapView(fragment);
         } else if (activity != null) {
-            mapView.startMapView(activity, savedInstanceState);
+            mapView.startMapView(activity);
         }
 
         if (viewModel == null) return;

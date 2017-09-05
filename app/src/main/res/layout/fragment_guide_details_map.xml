@@ -25,7 +25,6 @@
             app:gpx="@{vm.gpx}"
             app:viewModel="@{vm.viewModel}"
             app:trackUserPosition="@{vm.trackUserPosition}"
-            app:savedInstanceState="@{vm.savedInstanceState}"
             app:fragment="@{vm.fragment}"/>
 
         <ImageView

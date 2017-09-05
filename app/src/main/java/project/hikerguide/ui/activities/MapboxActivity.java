@@ -19,10 +19,13 @@ public class MapboxActivity extends ConnectivityActivity {
     // ** Member Variables ** //
     MapView mMapView;
     Set<MapView> mMapSet;
+    Bundle mSavedInstanceState;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mSavedInstanceState = savedInstanceState;
 
         Mapbox.getInstance(this, getString(R.string.mapbox_token));
 
@@ -112,5 +115,9 @@ public class MapboxActivity extends ConnectivityActivity {
         mMapSet.add(mapView);
 
         mMapView = mapView;
+    }
+
+    public Bundle getSavedInstanceState() {
+        return mSavedInstanceState;
     }
 }
