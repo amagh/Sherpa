@@ -138,6 +138,8 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
     private Author mUser;
     private boolean mIsInEditMode;
 
+    private GuideViewModel mGuideViewModel;
+
     public GuideDetailsAdapter(MapboxActivity activity, ClickHandler clickHandler) {
         mActivity = activity;
         mClickHandler = clickHandler;
@@ -207,8 +209,13 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
 
     @Override
     public void onBindViewHolder(GuideDetailsViewHolder holder, int position) {
-        // Bind the data to the Views
-        holder.bind(position);
+
+        // For the ViewHolder with the guide details, only bind data if the ViewModel has not been
+        // instantiated prior
+        if (position > 0 || mGuideViewModel == null) {
+            // Bind the data to the Views
+            holder.bind(position);
+        }
     }
 
     @Override
@@ -446,9 +453,13 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
             // the position
             if (model instanceof Guide) {
 
-                ((ListItemGuideDetailsBinding) mBinding).setVm(
-                        // Pass in the MapboxActivity for lifecycle purposes
-                        new GuideViewModel(mActivity, (Guide) model));
+                // Init the ViewModel for the Guide Details
+                if (mGuideViewModel == null) {
+                    // Pass in the MapboxActivity for lifecycle purposes
+                    mGuideViewModel = new GuideViewModel(mActivity, (Guide) model);
+                }
+
+                ((ListItemGuideDetailsBinding) mBinding).setVm(mGuideViewModel);
             } else if (model instanceof Section) {
 
                 // Load the correct ViewDataBinding depending on whether the section has an image
