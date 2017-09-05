@@ -20,6 +20,10 @@ import static project.hikerguide.utilities.Constants.IntentKeys.TRAIL_KEY;
  */
 
 public class AreaActivity extends MapboxActivity {
+
+    // ** Constants ** //
+    private static final String QUERY_KEY = "query";
+
     // ** Member Variables ** //
     ActivityAreaBinding mBinding;
     Author mAuthor;
@@ -34,6 +38,24 @@ public class AreaActivity extends MapboxActivity {
         // Initialize ViewModel for the layout
         DoubleSearchViewModel vm = new DoubleSearchViewModel(this);
         mBinding.setVm(vm);
+
+        if (savedInstanceState != null) {
+            Area area = savedInstanceState.getParcelable(AREA_KEY);
+            Trail trail = savedInstanceState.getParcelable(TRAIL_KEY);
+            String query = savedInstanceState.getString(QUERY_KEY);
+
+            if (area != null) {
+                mBinding.getVm().setArea(area);
+            }
+
+            if (trail != null) {
+                mBinding.getVm().setTrail(trail);
+            }
+
+            if (query != null) {
+                mBinding.getVm().setQuery(query);
+            }
+        }
     }
 
     /**
@@ -54,5 +76,18 @@ public class AreaActivity extends MapboxActivity {
 
         // Start the Activity
         startActivity(intent);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Area area = mBinding.getVm().getArea();
+        Trail trail = mBinding.getVm().getTrail();
+        String query = mBinding.getVm().getQuery();
+
+        outState.putParcelable(AREA_KEY, area);
+        outState.putParcelable(TRAIL_KEY, trail);
+        outState.putString(QUERY_KEY, query);
     }
 }
