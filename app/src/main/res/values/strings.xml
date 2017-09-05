@@ -172,6 +172,10 @@
     <string name="save_dialog_confirm_exit">Exit</string>
     <string name="save_dialog_return">Return</string>
 
+    <!-- DeleteDialog Strings -->
+    <string name="delete_dialog_title">Delete Guide Draft</string>
+    <string name="delete_dialog_message">Confirm deletion of draft. This action cannot be undone.</string>
+    
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 

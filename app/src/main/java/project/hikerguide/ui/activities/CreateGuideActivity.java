@@ -47,6 +47,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.adapters.EditGuideDetailsAdapter;
+import project.hikerguide.ui.dialogs.DeleteDialog;
 import project.hikerguide.ui.dialogs.SaveDialog;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.DataCache;
@@ -472,7 +473,17 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                 return true;
 
             case R.id.menu_delete_draft:
-                deleteDraft();
+
+                // Show a Dialog confirming the user wants to delete the Guide
+                DeleteDialog dialog = new DeleteDialog();
+                dialog.setOnClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        deleteDraft();
+                    }
+                });
+
+                dialog.show(getSupportFragmentManager(), null);
 
                 return true;
         }
