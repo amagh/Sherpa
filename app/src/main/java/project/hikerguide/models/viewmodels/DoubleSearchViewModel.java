@@ -199,10 +199,26 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                 @Override
                 public void onClick(Trail clickedItem) {
                     if (clickedItem == null) {
+
+                        // User selected item to add a Trail. Show Dialog to allow Trail name to be
+                        // input
                         AddTrailDialog dialog = new AddTrailDialog();
                         dialog.setDialogListener(new AddTrailDialog.DialogListener() {
                             @Override
                             public void onTrailNamed(Trail trail) {
+
+                                // Iterate through the list of Trails and ensure a Trail with the
+                                // same name doesn't already exist in the database for this Area
+                                for (Trail existingTrail : mTrailList) {
+                                    if (existingTrail.name.equals(trail.name)) {
+
+                                        // Match found, re-reference trail to the exist Trail
+                                        trail = existingTrail;
+
+                                        break;
+                                    }
+                                }
+
                                 setTrail(trail);
                             }
                         });
@@ -211,7 +227,6 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
                     } else {
                         setTrail(clickedItem);
                     }
-
                 }
             });
         }
