@@ -166,6 +166,12 @@
     <!-- Widget Strings -->
     <string name="widget_title_text">Favorite Guides</string>
 
+    <!-- SaveDialog Strings -->
+    <string name="save_dialog_title">Caution</string>
+    <string name="save_dialog_message">Are you sure you want to exit without saving your draft?</string>
+    <string name="save_dialog_confirm_exit">Exit</string>
+    <string name="save_dialog_return">Return</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 

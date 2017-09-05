@@ -1,5 +1,6 @@
 package project.hikerguide.ui.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
@@ -34,7 +35,6 @@ import project.hikerguide.data.GuideContract;
 import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.data.GuideProvider;
 import project.hikerguide.databinding.ActivityCreateGuideBinding;
-import project.hikerguide.databinding.ListItemGuideDetailsBinding;
 import project.hikerguide.databinding.ListItemGuideDetailsEditBinding;
 import project.hikerguide.databinding.ListItemSectionImageEditBinding;
 import project.hikerguide.databinding.ListItemSectionTextEditBinding;
@@ -47,6 +47,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.adapters.EditGuideDetailsAdapter;
+import project.hikerguide.ui.dialogs.SaveDialog;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.GeneralUtils;
@@ -94,6 +95,8 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
     private int mFilePickerModelPosition = -1;
     private MenuItem mPublishMenuItem;
 
+    private boolean mSaved = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,7 +135,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         } else {
             if (getIntent().getData() != null) {
 
-                // Load saved data from database
+                // Load mSaved data from database
                 Bundle guideBundle = new Bundle();
                 guideBundle.putString(FIREBASE_ID_KEY, GuideProvider.getIdFromUri(getIntent().getData()));
                 getSupportLoaderManager().initLoader(LOADER_GUIDE_DRAFT, guideBundle, this);
@@ -218,6 +221,8 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        mSaved = false;
 
         // Process the selected File based on the request code
         switch (requestCode) {
@@ -400,6 +405,8 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
             }
 
             mAdapter.notifyItemMoved(start, end);
+
+            mSaved = false;
             return true;
         }
 
@@ -637,6 +644,8 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                 ((ListItemSectionTextEditBinding) viewHolder.getBinding()).listSectionTextTv.requestFocus();
             }
         }, 50);
+
+        mSaved = false;
     }
 
     /**
@@ -652,6 +661,8 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
         // Open the FilePicker to allow selection of a photo to include
         GeneralUtils.openFilePicker(this, GeneralUtils.DEFAULT_REQUEST_CODE, FilePickerConst.FILE_TYPE_MEDIA);
+
+        mSaved = false;
     }
 
     /**
@@ -686,6 +697,8 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
      */
     public void removeModel(BaseModel model) {
         mAdapter.removeModel(model);
+
+        mSaved = false;
     }
 
     /**
@@ -889,6 +902,8 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                 getString(R.string.draft_saved),
                 Toast.LENGTH_LONG)
                 .show();;
+
+        mSaved = true;
     }
 
     /**
@@ -954,5 +969,31 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         DataCache.getInstance().store(mTrail);
         DataCache.getInstance().store(mArea);
         DataCache.getInstance().store(mAuthor);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        // Check whether the Guide has been saved as a draft yet
+        if (mSaved) {
+
+            // Proceed to exit normally
+            super.onBackPressed();
+        } else {
+
+            // Show a Dialog to confirm the user wants to exit without saving progress
+            SaveDialog dialog = new SaveDialog();
+            dialog.setOnClickListener(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    // User selected to exit without saving
+                    mSaved = true;
+                    onBackPressed();
+                }
+            });
+
+            dialog.show(getSupportFragmentManager(), null);
+        }
     }
 }

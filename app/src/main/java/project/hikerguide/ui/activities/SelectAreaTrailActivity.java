@@ -5,7 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 
 import project.hikerguide.R;
-import project.hikerguide.databinding.ActivityAreaBinding;
+import project.hikerguide.databinding.ActivitySelectAreaTrailBinding;
 import project.hikerguide.models.datamodels.Area;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Trail;
@@ -25,7 +25,7 @@ public class SelectAreaTrailActivity extends MapboxActivity {
     private static final String QUERY_KEY = "query";
 
     // ** Member Variables ** //
-    ActivityAreaBinding mBinding;
+    ActivitySelectAreaTrailBinding mBinding;
     Author mAuthor;
 
     @Override
@@ -39,6 +39,7 @@ public class SelectAreaTrailActivity extends MapboxActivity {
         DoubleSearchViewModel vm = new DoubleSearchViewModel(this);
         mBinding.setVm(vm);
 
+        // Restore user's data
         if (savedInstanceState != null) {
             Area area = savedInstanceState.getParcelable(AREA_KEY);
             Trail trail = savedInstanceState.getParcelable(TRAIL_KEY);
@@ -76,12 +77,15 @@ public class SelectAreaTrailActivity extends MapboxActivity {
 
         // Start the Activity
         startActivity(intent);
+
+        finish();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        // Save user's data
         Area area = mBinding.getVm().getArea();
         Trail trail = mBinding.getVm().getTrail();
         String query = mBinding.getVm().getQuery();
