@@ -54,8 +54,6 @@
         </activity>
         <activity android:name=".ui.activities.AreaActivity">
         </activity>
-        <activity android:name=".ui.activities.TrailActivity">
-        </activity>
         <activity
             android:name=".ui.activities.PublishActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog">

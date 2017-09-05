@@ -8,9 +8,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -19,7 +23,9 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.List;
 
+import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.BR;
+import project.hikerguide.R;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.adapters.PlaceAdapter;
@@ -107,6 +113,44 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         }
+    }
+
+    @BindingAdapter({"searchTv", "searchIv", "closeIv", "hasFocus"})
+    public static void animateFocus(CardView cardView, EditText searchTv, ImageView searchIv, ImageView closeIv, boolean hasFocus) {
+
+        TypedValue activatedAlphaValue      = new TypedValue();
+        TypedValue deactivatedAlphaValue    = new TypedValue();
+        TypedValue hiddenAlphaValue         = new TypedValue();
+
+        cardView.getContext().getResources().getValue(R.dimen.activated_alpha, activatedAlphaValue, true);
+        cardView.getContext().getResources().getValue(R.dimen.search_widget_deactivated_alpha, deactivatedAlphaValue, true);
+        cardView.getContext().getResources().getValue(R.dimen.hidden_alpha, hiddenAlphaValue, true);
+
+        float cardAlpha     = deactivatedAlphaValue.getFloat();
+        float searchAlpha   = hiddenAlphaValue.getFloat();
+        float closeAlpha    = hiddenAlphaValue.getFloat();
+
+        if (hasFocus) {
+            // Prevent clicking on the close ImageView when it is not visible
+            closeIv.setClickable(true);
+            cardAlpha   = activatedAlphaValue.getFloat();
+            closeAlpha  = activatedAlphaValue.getFloat();
+        } else {
+            searchAlpha = activatedAlphaValue.getFloat();
+
+            // Allow clicking on the close ImageView
+            closeIv.setClickable(false);
+
+            // Clear the Focus from the EditText
+            searchTv.clearFocus();
+        }
+
+        // Animate changes
+        new AdditiveAnimator().setDuration(150)
+                .target(cardView).alpha(cardAlpha)
+                .target(searchIv).alpha(searchAlpha)
+                .target(closeIv).alpha(closeAlpha)
+                .start();
     }
 
     @Bindable
