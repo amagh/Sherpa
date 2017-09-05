@@ -167,9 +167,21 @@ public class NewAreaAdapter extends HideableAdapter<NewAreaAdapter.AreaViewHolde
 
         // Remove any items from the Adapter that are not in the sortableList
         for (int i = mSortedList.size() - 1; i >= 0; i--) {
-            if (!sortableList.contains(mSortedList.get(i))) {
-                mSortedList.removeItemAt(i);
+            boolean exists = false;
+
+            // Iterate through the list of items to be added and check if any of the names match
+            for (int j = sortableList.size() - 1; j >= 0; j--) {
+                if (mSortedList.get(i).getName().equals(sortableList.get(j).getName())) {
+
+                    // Names match, do not add the item to the Adapter
+                    sortableList.remove(j);
+
+                    exists = true;
+                }
             }
+
+            // Remove the item from the Adapter if it does not exist in the list to be added
+            if (!exists) mSortedList.removeItemAt(i);
         }
 
         // Add all items from the sortableList to the Adapter
