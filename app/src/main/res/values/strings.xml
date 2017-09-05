@@ -175,6 +175,10 @@
     <!-- DeleteDialog Strings -->
     <string name="delete_dialog_title">Delete Guide Draft</string>
     <string name="delete_dialog_message">Confirm deletion of draft. This action cannot be undone.</string>
+
+    <!-- PublishDialog Strings -->
+    <string name="publish_dialog_title">Publish Guide</string>
+    <string name="publish_dialog_message">Confirm publishing of Guide in current state.</string>
     
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>

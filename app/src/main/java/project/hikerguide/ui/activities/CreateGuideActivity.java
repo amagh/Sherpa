@@ -48,6 +48,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.hikerguide.models.viewmodels.GuideViewModel;
 import project.hikerguide.ui.adapters.EditGuideDetailsAdapter;
 import project.hikerguide.ui.dialogs.DeleteDialog;
+import project.hikerguide.ui.dialogs.PublishDialog;
 import project.hikerguide.ui.dialogs.SaveDialog;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.DataCache;
@@ -446,24 +447,34 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         switch (item.getItemId()) {
             case R.id.menu_publish:
 
-                // Validate the Sections and Guide to ensure all required elements are present
-                boolean sectionsValid = validateSections();
-                boolean guideValid = validateGuide();
+                // Show Dialog confirming user wants to publish
+                PublishDialog publishDialog = new PublishDialog();
+                publishDialog.setOnClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                if (sectionsValid && guideValid) {
+                        // Validate the Sections and Guide to ensure all required elements are present
+                        boolean sectionsValid = validateSections();
+                        boolean guideValid = validateGuide();
 
-                    // Save the items to the DataCache
-                    cacheData();
+                        if (sectionsValid && guideValid) {
 
-                    // Start the PublishActivity and send all elements through the Intent
-                    Intent intent = new Intent(this, PublishActivity.class);
-                    intent.putExtra(AUTHOR_KEY, mAuthor.firebaseId);
-                    intent.putExtra(AREA_KEY, mArea.firebaseId);
-                    intent.putExtra(TRAIL_KEY, mTrail.firebaseId);
-                    intent.putExtra(GUIDE_KEY, mGuide.firebaseId);
+                            // Save the items to the DataCache
+                            cacheData();
 
-                    startActivityForResult(intent, REQUEST_CODE_PUBLISH);
-                }
+                            // Start the PublishActivity and send all elements through the Intent
+                            Intent intent = new Intent(CreateGuideActivity.this, PublishActivity.class);
+                            intent.putExtra(AUTHOR_KEY, mAuthor.firebaseId);
+                            intent.putExtra(AREA_KEY, mArea.firebaseId);
+                            intent.putExtra(TRAIL_KEY, mTrail.firebaseId);
+                            intent.putExtra(GUIDE_KEY, mGuide.firebaseId);
+
+                            startActivityForResult(intent, REQUEST_CODE_PUBLISH);
+                        }
+                    }
+                });
+
+                publishDialog.show(getSupportFragmentManager(), null);
 
                 return true;
 
@@ -475,15 +486,15 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
             case R.id.menu_delete_draft:
 
                 // Show a Dialog confirming the user wants to delete the Guide
-                DeleteDialog dialog = new DeleteDialog();
-                dialog.setOnClickListener(new DialogInterface.OnClickListener() {
+                DeleteDialog deleteDialog = new DeleteDialog();
+                deleteDialog.setOnClickListener(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         deleteDraft();
                     }
                 });
 
-                dialog.show(getSupportFragmentManager(), null);
+                deleteDialog.show(getSupportFragmentManager(), null);
 
                 return true;
         }
