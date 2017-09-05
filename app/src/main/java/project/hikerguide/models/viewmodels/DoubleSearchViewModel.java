@@ -195,7 +195,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
             });
         } else if (mArea != null && (mAdapter == null || !(mAdapter instanceof TrailAdapter))) {
 
-            mAdapter = new TrailAdapter(new ClickHandler<Trail>() {
+            mAdapter = new TrailAdapter(this, new ClickHandler<Trail>() {
                 @Override
                 public void onClick(Trail clickedItem) {
                     if (clickedItem == null) {

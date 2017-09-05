@@ -14,6 +14,7 @@ import java.util.List;
 import project.hikerguide.R;
 import project.hikerguide.databinding.ListItemTrailBinding;
 import project.hikerguide.models.datamodels.Trail;
+import project.hikerguide.models.viewmodels.DoubleSearchViewModel;
 import project.hikerguide.models.viewmodels.TrailViewModel;
 import project.hikerguide.ui.adapters.abstractadapters.HideableAdapter;
 import project.hikerguide.ui.adapters.interfaces.ClickHandler;
@@ -29,6 +30,7 @@ public class TrailAdapter extends HideableAdapter<TrailAdapter.TrailViewHolder> 
     private static final int ADD_TRAIL_VIEW_TYPE    = 5342;
 
     // ** Member Variables ** //
+    private DoubleSearchViewModel mViewModel;
     private ClickHandler<Trail> mClickHandler;
     private boolean mHideAdapter;
 
@@ -50,7 +52,8 @@ public class TrailAdapter extends HideableAdapter<TrailAdapter.TrailViewHolder> 
     };
     private final SortedList<Trail> mTrailList = new SortedList<>(Trail.class, mCallback);
 
-    public TrailAdapter(ClickHandler<Trail> clickHandler) {
+    public TrailAdapter(DoubleSearchViewModel viewModel, ClickHandler<Trail> clickHandler) {
+        mViewModel = viewModel;
         mClickHandler = clickHandler;
     }
 
@@ -156,7 +159,7 @@ public class TrailAdapter extends HideableAdapter<TrailAdapter.TrailViewHolder> 
             Trail trail = mTrailList.get(position);
 
             // Instantiate the ViewModel and bind it to the ListItemTrailBinding
-            TrailViewModel vm = new TrailViewModel(trail);
+            TrailViewModel vm = new TrailViewModel(mViewModel, trail);
             ((ListItemTrailBinding) mBinding).setVm(vm);
         }
 
