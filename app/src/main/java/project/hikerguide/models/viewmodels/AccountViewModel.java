@@ -19,17 +19,22 @@ import android.widget.Toast;
 
 import com.android.databinding.library.baseAdapters.BR;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.hikerguide.R;
+import project.hikerguide.models.datamodels.Author;
+import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.ui.activities.AccountActivity;
-import project.hikerguide.ui.activities.UserActivity;
+import project.hikerguide.utilities.ContentProviderUtils;
+import project.hikerguide.utilities.FirebaseProviderUtils;
 
 import static project.hikerguide.models.viewmodels.AccountViewModel.UiModes.CREATE_ACCOUNT;
 import static project.hikerguide.models.viewmodels.AccountViewModel.UiModes.SIGN_IN;
@@ -55,6 +60,7 @@ public class AccountViewModel extends BaseObservable {
     @UiModes private int mUiMode;
 
     private String email;
+    private String username;
     private String password;
     private String passwordConfirm;
     private int progressVisibility = View.GONE;
@@ -93,11 +99,12 @@ public class AccountViewModel extends BaseObservable {
         return progressVisibility;
     }
 
-    @BindingAdapter({"passwordTv", "confirmTv", "signInBtn", "createAccountBtn", "switchBtnText", "uiMode"})
-    public static void switchUi(Button switchUiButton, final EditText passwordTv, final EditText confirmTv,
+    @BindingAdapter({"usernameTv", "passwordTv", "confirmTv", "signInBtn", "createAccountBtn", "switchBtnText", "uiMode"})
+    public static void switchUi(Button switchUiButton, final EditText usernameTv, final EditText passwordTv, final EditText confirmTv,
                                 Button signInButton, Button createAccountButton, String switchBtnText, @UiModes int uiMode) {
 
         // Default state variables
+        float usernameAlpha         = 0;
         float confirmAlpha          = 0;
         float signInAlpha           = 1;
         float height                = 0;
@@ -105,20 +112,23 @@ public class AccountViewModel extends BaseObservable {
         if (confirmTv.getHeight() != 0) {
             // Modify variables if in CREATE_ACCOUNT mode
             if (uiMode == CREATE_ACCOUNT) {
-                signInAlpha = 0;                                        // Hide sign in button
-                confirmAlpha = 1;                                       // Show password confirmation
-                confirmTv.setVisibility(View.VISIBLE);                  // Show confirm password field
-                createAccountButton.setVisibility(View.VISIBLE);        // Allow click create acct button
-                signInButton.setVisibility(View.GONE);                  // Prevent click sign in button
+                signInAlpha = 0;                                            // Hide sign in button
+                usernameAlpha = 1;                                          // Show the username
+                confirmAlpha = 1;                                           // Show password confirmation
+                usernameTv.setVisibility(View.VISIBLE);                     // Show the username
+                confirmTv.setVisibility(View.VISIBLE);                      // Show confirm password field
+                createAccountButton.setVisibility(View.VISIBLE);            // Allow click create acct button
+                signInButton.setVisibility(View.GONE);                      // Prevent click sign in button
             } else {
                 ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) confirmTv.getLayoutParams();
-                height = -(params.topMargin + passwordTv.getHeight());  // Move password field up
-                signInButton.setVisibility(View.VISIBLE);               // Allow click sign in button
+                height = -(params.topMargin + confirmTv.getHeight());   // Move password field up
+                signInButton.setVisibility(View.VISIBLE);                   // Allow click sign in button
             }
 
             // Animate state changes
             new AdditiveAnimator().setDuration(150)
                     .target(switchUiButton).alpha(0)
+                    .target(usernameTv).alpha(usernameAlpha)
                     .target(signInButton).alpha(signInAlpha)
                     .target(createAccountButton).alpha(confirmAlpha)
                     .target(passwordTv).translationY(height)
@@ -134,6 +144,7 @@ public class AccountViewModel extends BaseObservable {
             // If in sign-in mode, hide the confirm password EditText so that pressing "Next" on the
             // email EditText, skips directly to the password EditText
             if (uiMode == SIGN_IN) {
+                usernameTv.setVisibility(View.GONE);
                 confirmTv.setVisibility(View.GONE);
                 createAccountButton.setVisibility(View.GONE);
             }
@@ -141,7 +152,7 @@ public class AccountViewModel extends BaseObservable {
             confirmTv.post(new Runnable() {
                 @Override
                 public void run() {
-                    passwordTv.setY(confirmTv.getY());
+                    passwordTv.setY(usernameTv.getY());
                     confirmTv.setVisibility(View.GONE);
                 }
             });
@@ -224,28 +235,70 @@ public class AccountViewModel extends BaseObservable {
             Toast.makeText(mContext, mContext.getString(R.string.no_password_match), Toast.LENGTH_LONG).show();
         } else if (password.length() < 8) {
             Toast.makeText(mContext, mContext.getString(R.string.invalid_password_length_error), Toast.LENGTH_LONG).show();
+        } else if (username.length() < 4) {
+            Toast.makeText(mContext, mContext.getString(R.string.invalid_username_length_error), Toast.LENGTH_LONG).show();
+        } else if (!username.matches("[A-Za-z0-9_]+")) {
+            Toast.makeText(mContext, mContext.getString(R.string.invalid_username_char_error), Toast.LENGTH_LONG).show();
         } else {
 
             // Make ProgressBar visible
             progressVisibility = View.VISIBLE;
             notifyPropertyChanged(BR.progressVisibility);
 
-            // Attempt to create a new account
-            FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
+            // Check that the username is not already taken
+            FirebaseProviderUtils.queryForUsername(username, new FirebaseProviderUtils.FirebaseListener() {
+                @Override
+                public void onModelReady(BaseModel model) {
 
-                            // Hide ProgressBar
-                            progressVisibility = View.GONE;
-                            notifyPropertyChanged(BR.progressVisibility);
+                    if (model != null) {
 
-                            if (task.isSuccessful()) {
-                                mContext.startActivity(new Intent(mContext, UserActivity.class));
-                                ((Activity) mContext).finish();
-                            }
-                        }
-                    });
+                        // Hide ProgressBar
+                        progressVisibility = View.GONE;
+                        notifyPropertyChanged(BR.progressVisibility);
+
+                        Toast.makeText(mContext, "Username already exists. Please change your username and try again.", Toast.LENGTH_LONG).show();
+                    } else {
+                        // Attempt to create a new account
+                        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                        // Hide ProgressBar
+                                        progressVisibility = View.GONE;
+                                        notifyPropertyChanged(BR.progressVisibility);
+
+                                        if (task.isSuccessful()) {
+
+                                            // Get the user's account
+                                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                                            // Create a new Author object, importing any favorites that the user saved
+                                            // to the local database
+                                            Author newAuthor = ContentProviderUtils.generateAuthorFromDatabase(mContext);
+                                            newAuthor.firebaseId = user.getUid();
+                                            newAuthor.setUsername(username);
+
+                                            // Upload the new Author profile to Firebase Database
+                                            FirebaseProviderUtils.updateUser(newAuthor, new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+
+                                                            // Close this Activity
+                                                            Intent intent = new Intent();
+                                                            intent.putExtra(AUTHOR_KEY, true);
+                                                            ((AccountActivity) mContext).setResult(Activity.RESULT_OK, intent);
+                                                            ((AccountActivity) mContext).finish();
+                                                        }
+                                                    });
+                                        }
+                                    }
+                                });
+                    }
+                }
+            });
+
+
         }
     }
 
@@ -303,5 +356,14 @@ public class AccountViewModel extends BaseObservable {
 
     public void setPasswordConfirm(String passwordConfirm) {
         this.passwordConfirm = passwordConfirm;
+    }
+
+    @Bindable
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

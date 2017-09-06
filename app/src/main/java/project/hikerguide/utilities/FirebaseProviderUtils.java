@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.firebase.geofire.GeoFire;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -343,12 +344,17 @@ public class FirebaseProviderUtils {
         }
     }
 
+    public static void updateUser(Author user) {
+        updateUser(user, null);
+    }
+
     /**
      * Updates a User's Firebase Database entry to match the local changes made
      *
      * @param user      User to be updated
+     * @param listener  Listener to pass result to observer
      */
-    public static void updateUser(Author user) {
+    public static void updateUser(Author user, @Nullable OnSuccessListener<Void> listener) {
 
         // Run an update on the values
         Map<String, Object> childUpdates = new HashMap<>();
@@ -358,7 +364,8 @@ public class FirebaseProviderUtils {
         childUpdates.put(directory, user.toMap());
 
         FirebaseDatabase.getInstance().getReference()
-                .updateChildren(childUpdates);
+                .updateChildren(childUpdates)
+                .addOnSuccessListener(listener);
     }
 
     /**
