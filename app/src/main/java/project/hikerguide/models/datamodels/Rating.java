@@ -64,7 +64,6 @@ public class Rating extends BaseModel {
     //*********************************** Getters and Setters ************************************//
     //********************************************************************************************//
 
-    @Exclude
     public String getGuideId() {
         return guideId;
     }
