@@ -9,6 +9,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -133,6 +134,8 @@ public class OpenDraftActivity extends AppCompatActivity implements LoaderManage
 
         // Set the Adapter and LayoutManager for the RecyclerView
         mBinding.draftRv.setAdapter(mAdapter);
-        mBinding.draftRv.setLayoutManager(new LinearLayoutManager(this));
+        mBinding.draftRv.setLayoutManager(new StaggeredGridLayoutManager(
+                getResources().getInteger(R.integer.guide_columns),
+                StaggeredGridLayoutManager.VERTICAL));
     }
 }
