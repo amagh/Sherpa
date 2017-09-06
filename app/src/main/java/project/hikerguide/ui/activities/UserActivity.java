@@ -10,6 +10,7 @@ import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
+import static project.hikerguide.utilities.Constants.FragmentTags.FRAG_TAG_ACCOUNT;
 import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
 
 /**
@@ -26,7 +27,7 @@ public class UserActivity extends ConnectivityActivity {
         setContentView(R.layout.activity_user);
 
         // Pass the Author from the Intent to the Fragment to be inflated into the fragment_container
-        if (getIntent().getStringExtra(AUTHOR_KEY) != null) {
+        if (savedInstanceState == null && getIntent().getStringExtra(AUTHOR_KEY) != null) {
 
             // Retrieve the Author from cache
             String authorId = getIntent().getStringExtra(AUTHOR_KEY);
@@ -36,7 +37,7 @@ public class UserActivity extends ConnectivityActivity {
                 UserFragment fragment = UserFragment.newInstance(author);
 
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container, fragment)
+                        .add(R.id.fragment_container, fragment, FRAG_TAG_ACCOUNT)
                         .commit();
             } else {
                 loadAuthorFromFirebase(authorId);
@@ -44,6 +45,11 @@ public class UserActivity extends ConnectivityActivity {
         }
     }
 
+    /**
+     * Loads an author's details from Firebase
+     *
+     * @param authorId    FirebaseId of the Author to be loaded
+     */
     private void loadAuthorFromFirebase(String authorId) {
         FirebaseProviderUtils.getModel(
                 FirebaseProviderUtils.FirebaseType.AUTHOR,

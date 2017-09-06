@@ -84,6 +84,7 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
     // ** Constants ** //
     public static final int ACCOUNT_ACTIVITY_REQUEST_CODE = 7219;
+    private static final String MODEL_LIST_KEY = "models";
 
     // ** Member Variables ** //
     private FragmentUserBinding mBinding;
@@ -127,27 +128,66 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
         initRecyclerView();
 
-        if (getArguments() == null || getArguments().getParcelable(AUTHOR_KEY) == null) {
+        if (savedInstanceState != null) {
 
-            // User is checking their own profile
-            loadUserSelfProfile(false);
+            // Restore mModelList from SavedInstanceState
+            ArrayList<String> modelIdList = savedInstanceState.getStringArrayList(MODEL_LIST_KEY);
+
+            // Add each model corresponding to the FirebaseId in the List to the Adapter
+            if (modelIdList != null && modelIdList.size() > 0) {
+                for (String firebaseId : modelIdList) {
+
+                    // mAuthor is set once the author has been loaded
+                    if (mAuthor == null) {
+
+                        // Retrieve the Author from DataCache
+                        Author author = (Author) DataCache.getInstance().get(firebaseId);
+
+                        // Check to see if the author loaded from cache
+                        if (author == null) {
+
+                            // Did not load. Load items from web
+                            loadUserSelfProfile(false);
+                            break;
+                        } else {
+
+                            // Set the Author
+                            setAuthor(author);
+                        }
+                    } else {
+
+                        // Hide the ProgressBar
+                        mBinding.userPb.setVisibility(View.GONE);
+
+                        // Add each guide to the Adapter
+                        mAdapter.addModel(DataCache.getInstance().get(firebaseId));
+                    }
+                }
+            }
         } else {
-            mAuthor = getArguments().getParcelable(AUTHOR_KEY);
 
-            // Add the Author to the Adapter so their info can be displayed
-            mAdapter.addModel(mAuthor);
-            mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
+            if (getArguments() == null || getArguments().getParcelable(AUTHOR_KEY) == null) {
 
-            // Load the Guides that the Author has created into the Adapter
-            loadGuidesForAuthor();
+                // User is checking their own profile
+                loadUserSelfProfile(false);
+            } else {
+                mAuthor = getArguments().getParcelable(AUTHOR_KEY);
 
-            // Check if the User is accessing their own page
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                // Add the Author to the Adapter so their info can be displayed
+                mAdapter.addModel(mAuthor);
+                mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
 
-            if (user != null && mAuthor.firebaseId.equals(user.getUid())) {
+                // Load the Guides that the Author has created into the Adapter
+                loadGuidesForAuthor();
 
-                // Setup for someone viewing their own profile
-                setupForSelfProfile();
+                // Check if the User is accessing their own page
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                if (user != null && mAuthor.firebaseId.equals(user.getUid())) {
+
+                    // Setup for someone viewing their own profile
+                    setupForSelfProfile();
+                }
             }
         }
 
@@ -258,19 +298,39 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
             return;
         }
 
+        // First attempt to retrieve the Author from the DataCache
+        Author author = (Author) DataCache.getInstance().get(user.getUid());
+
+        if (!cleanDatabase && author != null) {
+
+            setAuthor(author);
+
+            // Load the Guides that the Author has created into the Adapter
+            loadGuidesForAuthor();
+
+            return;
+        }
+
         FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
             @Override
             public void onModelReady(BaseModel model) {
 
-                mAuthor = (Author) model;
+                final Author author = (Author) model;
 
-                if (mAuthor == null) {
+                if (author == null) {
 
                     // Transfer the locally favorite'd Guides to their new online profile
-                    mAuthor = ContentProviderUtils.generateAuthorFromDatabase(getActivity());
-                    mAuthor.firebaseId = user.getUid();
+                    Author newAuthor = ContentProviderUtils.generateAuthorFromDatabase(getActivity());
+                    newAuthor.firebaseId = user.getUid();
 
-                    FirebaseProviderUtils.updateUser(mAuthor);
+                    // Update the Author's profile on Firebase with the favorites the user had
+                    // before they made a profile
+                    FirebaseProviderUtils.updateUser(newAuthor);
+
+                    // Set the Author in the Adapter and ViewDataBinding
+                    setAuthor(newAuthor);
+
+                    return;
                 } else if (cleanDatabase) {
 
                     Thread thread = new Thread(new Runnable() {
@@ -278,9 +338,9 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                         public void run() {
 
                             // Sync the local database of favorite Guides to the online one
-                            ContentProviderUtils.cleanDatabase(getActivity(), mAuthor);
+                            ContentProviderUtils.cleanDatabase(getActivity(), author);
 
-                            if (mAuthor.favorites == null) return;
+                            if (author.favorites == null) return;
 
                             // Add the User's favorites to the local database
                             for (String guideId : mAuthor.favorites.keySet()) {
@@ -315,19 +375,40 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
                     });
 
                     thread.start();
+
+                    // Store the User in the DataCache
+                    DataCache.getInstance().store(author);
                 }
 
-                // Add the Author to the Adapter so their info can be displayed
-                mAdapter.addModel(mAuthor);
-                mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
-
-                // Setup for someone viewing their own profile
-                setupForSelfProfile();
+                // Set the Author in the Adapter and ViewDataBinding
+                setAuthor(author);
 
                 // Load the Guides that the Author has created into the Adapter
                 loadGuidesForAuthor();
             }
         });
+    }
+
+    /**
+     * Sets the Author information to be displayed in the Adapter and ViewDataBinding. It also
+     * checks to see if a logged in user is checking their own profile and sets it up
+     * appropriately.
+     *
+     * @param author    Author whose information is to be displayed
+     */
+    private void setAuthor(Author author) {
+
+        mAuthor = author;
+
+        // Add the Author to the Adapter so their info can be displayed
+        mAdapter.addModel(mAuthor);
+        mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
+
+        // Setup for someone viewing their own profile
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null && user.getUid().equals(mAuthor.firebaseId)) {
+            setupForSelfProfile();
+        }
     }
 
     @Override
@@ -502,6 +583,22 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
         // Update the values
         FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mModelList != null && mModelList.size() > 0) {
+
+            ArrayList<String> modelIdList = new ArrayList<>();
+
+            for (BaseModel model : mModelList) {
+                modelIdList.add(model.firebaseId);
+            }
+
+            outState.putStringArrayList(MODEL_LIST_KEY, modelIdList);
+        }
     }
 
     @Override

@@ -63,6 +63,7 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
         <View
+            android:id="@+id/user_separator_v"
             android:layout_width="match_parent"
             android:layout_height="@dimen/user_backdrop_separator_height"
             android:background="@color/grey_400"
