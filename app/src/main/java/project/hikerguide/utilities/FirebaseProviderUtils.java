@@ -480,6 +480,13 @@ public class FirebaseProviderUtils {
 
                         // Retrieve the corresponding Guide for the Rating
                         Guide guide = mutableData.getValue(Guide.class);
+
+                        // Re-do the procedure if the Guide is null
+                        if (guide == null) {
+                            updateGuideScore(rating, previousRating);
+                            return Transaction.abort();
+                        }
+
                         guide.rating += rating.getRating() - previousRating;
 
                         if (previousRating == 0) {
@@ -520,6 +527,12 @@ public class FirebaseProviderUtils {
 
                         // Get the Author from the data
                         Author author = mutableData.getValue(Author.class);
+
+                        // Re-do the procedure if the Author is null
+                        if (author == null) {
+                            updateAuthorScore(rating, previousRating);
+                            return Transaction.abort();
+                        }
 
                         // Change the Author's score
                         author.score += rating.getRating() - previousRating;
@@ -625,6 +638,8 @@ public class FirebaseProviderUtils {
                 Rating[] ratings = (Rating[]) models;
 
                 for (Rating rating : ratings) {
+                    Timber.d("Rating: " + rating + ": " + rating.getGuideId());
+                    Timber.d("GuideId: " + guideId);
                     if (rating.getGuideId().equals(guideId)) {
                         listener.onModelReady(rating);
                         return;
