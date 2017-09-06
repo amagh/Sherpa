@@ -10,6 +10,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -228,8 +229,10 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
         });
 
         // Set the LayoutManager and Adapter
-        mBinding.userRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mBinding.userRv.setAdapter(mAdapter);
+        mBinding.userRv.setLayoutManager(new StaggeredGridLayoutManager(
+                getResources().getInteger(R.integer.guide_columns),
+                StaggeredGridLayoutManager.VERTICAL));
 
         // Init the List of Models
         mModelList = new ArrayList<>();
