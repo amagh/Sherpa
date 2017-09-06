@@ -789,6 +789,42 @@ public class FirebaseProviderUtils {
     }
 
     /**
+     * Queries the Firebase Database for an Auther that has a matching username
+     *
+     * @param username    Username to query the Firebase Database for
+     * @param listener    Listener to return the results to the observer
+     */
+    public static void queryForUsername(String username, final FirebaseListener listener) {
+        final Query usernameQuery = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.AUTHORS)
+                .orderByChild(GuideContract.AuthorEntry.LOWER_CASE_USERNAME)
+                .equalTo(username.toLowerCase());
+
+        usernameQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Author author = (Author) getModelFromSnapshot(AUTHOR, snapshot);
+
+                        listener.onModelReady(author);
+                    }
+                } else {
+                    listener.onModelReady(null);
+                }
+
+                usernameQuery.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                usernameQuery.removeEventListener(this);
+            }
+        });
+    }
+
+    /**
      * Returns an instance of GeoFire that is already set to the correct Firebase Database Reference
      *
      * @return a new GeoFire instance
