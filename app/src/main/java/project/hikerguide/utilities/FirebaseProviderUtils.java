@@ -6,6 +6,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
 import com.firebase.geofire.GeoFire;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -440,18 +441,23 @@ public class FirebaseProviderUtils {
                     .getKey();
         }
 
-        // Update the Guide and the Author
-        updateGuideScore(rating, previousRating);
-        updateAuthorScore(rating, previousRating);
-
         // Push the Rating to the Firebase Database
-        String directory = RATING_DIRECTORY + "/" + rating.getGuideId() + "/" + rating.firebaseId;
+        String directory = RATING_DIRECTORY + "/" + rating.firebaseId;
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(directory, rating.toMap());
 
         FirebaseDatabase.getInstance().getReference()
-                .updateChildren(childUpdates);
+                .updateChildren(childUpdates)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                        // Update the Guide and the Author
+                        updateGuideScore(rating, previousRating);
+                        updateAuthorScore(rating, previousRating);
+                    }
+                });
     }
 
     /**
@@ -489,7 +495,7 @@ public class FirebaseProviderUtils {
 
                     @Override
                     public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-
+                        Timber.e("Error updating guide's score: " + databaseError);
                     }
                 });
     }
@@ -594,7 +600,7 @@ public class FirebaseProviderUtils {
      * @param guideId     The FirebaseId of the Guide to retrieve the Rating for
      * @param listener    The Listener that will be used to pass the Rating to the calling Object
      */
-    public static void getGuideRatingForFirebaseUser(String guideId, final FirebaseListener listener) {
+    public static void getGuideRatingForFirebaseUser(final String guideId, final FirebaseListener listener) {
 
         // Check to ensure the Firebase User is logged in
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -604,40 +610,75 @@ public class FirebaseProviderUtils {
             return;
         }
 
-        // Generate the Query for the Rating
-        final Query ratingQuery = FirebaseDatabase.getInstance().getReference()
+        // Get all the Ratings authored by the user
+        getAllRatingsForFirebaseUser(new FirebaseArrayListener() {
+            @Override
+            public void onModelsReady(BaseModel[] models) {
+
+                // Check to see that the array is valid
+                if (models == null || models.length == 0) {
+                    listener.onModelReady(null);
+                    return;
+                }
+
+                // Iterate through each Rating and return the one that matches the guideId
+                Rating[] ratings = (Rating[]) models;
+
+                for (Rating rating : ratings) {
+                    if (rating.getGuideId().equals(guideId)) {
+                        listener.onModelReady(rating);
+                        return;
+                    }
+                }
+
+                // No matches
+                listener.onModelReady(null);
+            }
+        });
+    }
+
+    /**
+     * Queries FirebaseDatabase for any Ratings that are authored by the logged in Firebase User
+     *
+     * @param listener    Listener to return the Ratings to the observer
+     */
+    public static void getAllRatingsForFirebaseUser(final FirebaseArrayListener listener) {
+
+        // Check to ensure the Firebase User is logged in
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) {
+
+            // User not logged in, return null
+            listener.onModelsReady(null);
+            return;
+        }
+
+        // Query database for all Ratings authored by the user
+        final Query ratingsQuery = FirebaseDatabase.getInstance().getReference()
                 .child(RATING_DIRECTORY)
-                .child(guideId)
-                .orderByChild(Rating.AUTHOR_ID)
+                .orderByChild(GuideContract.GuideEntry.AUTHOR_ID)
                 .equalTo(user.getUid());
 
-        ratingQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        ratingsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                if (dataSnapshot.exists()) {
+                // Convert the data to an array of Ratings
+                Rating[] ratings = (Rating[]) getModelsFromSnapshot(RATING, dataSnapshot);
 
-                    // Retrieve the Rating from the DataSnapshot
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        listener.onModelReady(getModelFromSnapshot(RATING, snapshot));
-                        break;
-                    }
-
-                } else {
-
-                    // Nothing found, return null
-                    listener.onModelReady(null);
-                }
+                // Pass it to the observer
+                listener.onModelsReady(ratings);
 
                 // Remove the Listener
-                ratingQuery.removeEventListener(this);
+                ratingsQuery.removeEventListener(this);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
                 // Remove the Listener
-                ratingQuery.removeEventListener(this);
+                ratingsQuery.removeEventListener(this);
             }
         });
     }
