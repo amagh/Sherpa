@@ -67,6 +67,8 @@ public class GuideContract {
         @DataType(DataType.Type.TEXT) @NotNull String FIREBASE_ID                   = "firebaseId";
         @DataType(DataType.Type.TEXT) @NotNull String NAME                          = "name";
         @DataType(DataType.Type.TEXT) @NotNull String LOWER_CASE_NAME               = "lowerCaseName";
+        @DataType(DataType.Type.TEXT) @NotNull String USERNAME                      = "username";
+        @DataType(DataType.Type.TEXT) @NotNull String LOWER_CASE_USERNAME           = "lowerCaseUsername";
         @DataType(DataType.Type.TEXT) String DESCRIPTION                            = "description";
         @DataType(DataType.Type.INTEGER) String SCORE                               = "score";
         @DataType(DataType.Type.TEXT) String IMAGE_URI                              = "imageUri";

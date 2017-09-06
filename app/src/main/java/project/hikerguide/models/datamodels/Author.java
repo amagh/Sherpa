@@ -19,20 +19,21 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModelWithImage;
 
 public class Author extends BaseModelWithImage implements Parcelable {
     // ** Constants ** //
-    private static final String NAME            = "name";
-    private static final String DESCRIPTION     = "description";
-    private static final String LOWER_CASE_NAME = "lowerCaseName";
-    private static final String HAS_IMAGE       = "hasImage";
-    private static final String SCORE           = "score";
-    private static final String FAVORITES       = "favorites";
-    private static final String RATED_GUIDES    = "ratedGuides";
+    private static final String NAME                    = "name";
+    private static final String USERNAME                = "username";
+    private static final String LOWER_CASE_USERNAME     = "lowerCaseUsername";
+    private static final String DESCRIPTION             = "description";
+    private static final String LOWER_CASE_NAME         = "lowerCaseName";
+    private static final String HAS_IMAGE               = "hasImage";
+    private static final String SCORE                   = "score";
+    private static final String FAVORITES               = "favorites";
 
     // ** Member Variables ** //
     public String name;
+    private String username;
     public String description;
     public int score;
     public Map<String, String> favorites;
-    public Map<String, Rating> ratedGuides;
 
     public Author() {}
 
@@ -87,14 +88,27 @@ public class Author extends BaseModelWithImage implements Parcelable {
         Map<String, Object> map = new HashMap<>();
 
         map.put(NAME, name);
+        map.put(USERNAME, username);
+        map.put(LOWER_CASE_USERNAME, username.toLowerCase());
         map.put(DESCRIPTION, description);
         map.put(LOWER_CASE_NAME, name.toLowerCase());
         map.put(HAS_IMAGE, hasImage);
         map.put(SCORE, score);
         map.put(FAVORITES, favorites);
-        map.put(RATED_GUIDES, ratedGuides);
 
         return map;
+    }
+
+    //********************************************************************************************//
+    //************************************ Getters & Setters *************************************//
+    //********************************************************************************************//
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     //********************************************************************************************//
