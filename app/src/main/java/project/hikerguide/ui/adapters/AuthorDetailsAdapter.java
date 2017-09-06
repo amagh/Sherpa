@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +74,14 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
 
     @Override
     public void onBindViewHolder(AuthorDetailsViewHolder holder, int position) {
+
+        if (position == 0) {
+            StaggeredGridLayoutManager.LayoutParams params =
+                    (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
+
+            params.setFullSpan(true);
+        }
+
         holder.bind(position);
     }
 

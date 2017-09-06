@@ -9,6 +9,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,7 +124,9 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
         // Set the Adapter and the LayoutManager
         mBinding.favoritesRv.setAdapter(mAdapter);
-        mBinding.favoritesRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mBinding.favoritesRv.setLayoutManager(new StaggeredGridLayoutManager(
+                getResources().getInteger(R.integer.guide_columns),
+                StaggeredGridLayoutManager.VERTICAL));
     }
 
     @Override

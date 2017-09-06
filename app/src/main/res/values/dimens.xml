@@ -24,6 +24,7 @@
     <dimen name="list_guide_favorite_size">32dp</dimen>
     <dimen name="list_guide_favorite_padding">6dp</dimen>
     <dimen name="list_guide_favorite_end_margin">10dp</dimen>
+    <dimen name="list_guide_horizontal_separation">0dp</dimen>
 
     <dimen name="list_guide_compact_outer_margin">8dp</dimen>
     <dimen name="list_guide_compact_internal_margin">8dp</dimen>

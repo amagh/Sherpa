@@ -9,6 +9,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -136,7 +137,9 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
         mAdapter.setGuides(mGuideList);
 
         // Set the LayoutManager and Adapter for the RecyclerView
-        mBinding.savedGuidesRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mBinding.savedGuidesRv.setAdapter(mAdapter);
+        mBinding.savedGuidesRv.setLayoutManager(new StaggeredGridLayoutManager(
+                getResources().getInteger(R.integer.guide_columns),
+                StaggeredGridLayoutManager.VERTICAL));
     }
 }

@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -208,7 +209,9 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
 
         // Set the Adapter and LayoutManager for the RecyclerView
         mBinding.guideListRv.setAdapter(mAdapter);
-        mBinding.guideListRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mBinding.guideListRv.setLayoutManager(new StaggeredGridLayoutManager(
+                getResources().getInteger(R.integer.guide_columns),
+                StaggeredGridLayoutManager.VERTICAL));
     }
 
     /**
