@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.hikerguide.models.viewmodels.AccountViewModel" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary">
+
+        <ImageView
+            android:id="@+id/sign_in_iv"
+            android:layout_width="@dimen/sign_in_logo_size"
+            android:layout_height="@dimen/sign_in_logo_size"
+            android:layout_marginLeft="@dimen/sign_in_text_horizontal_margin"
+            android:layout_marginStart="@dimen/sign_in_text_horizontal_margin"
+            android:src="@drawable/placeholder_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/sign_in_email_tv"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/switch_ui_fl"/>
+
+        <EditText
+            android:id="@+id/sign_in_email_tv"
+            android:layout_marginLeft="@dimen/sign_in_text_horizontal_margin"
+            android:layout_marginStart="@dimen/sign_in_text_horizontal_margin"
+            android:layout_marginRight="@dimen/sign_in_text_horizontal_margin"
+            android:layout_marginEnd="@dimen/sign_in_text_horizontal_margin"
+            android:layout_marginTop="@dimen/sign_in_email_text_top_margin"
+            android:hint="@string/sign_in_email_hint"
+            android:inputType="textEmailAddress"
+            android:imeOptions="actionNext"
+            android:text="@={vm.email}"
+            app:layout_constraintStart_toEndOf="@+id/sign_in_iv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            style="@style/EditText.SignIn"/>
+
+        <EditText
+            android:id="@+id/sign_in_username_tv"
+            android:layout_marginTop="@dimen/sign_in_password_confirmation_top_margin"
+            android:hint="@string/sign_in_username_hint"
+            android:inputType="text"
+            android:imeOptions="actionNext"
+            android:text="@={vm.username}"
+            android:alpha="0"
+            app:layout_constraintStart_toStartOf="@id/sign_in_email_tv"
+            app:layout_constraintEnd_toEndOf="@id/sign_in_email_tv"
+            app:layout_constraintTop_toBottomOf="@id/sign_in_email_tv"
+            style="@style/EditText.SignIn"
+            tools:alpha="1"/>
+
+        <EditText
+            android:id="@+id/sign_in_password_confirm_tv"
+            android:layout_marginTop="@dimen/sign_in_password_confirmation_top_margin"
+            android:hint="@string/sign_in_password_hint"
+            android:inputType="textPassword"
+            android:imeOptions="actionNext"
+            android:text="@={vm.passwordConfirm}"
+            android:alpha="@dimen/hidden_alpha"
+            android:nextFocusDown="@+id/sign_in_password_tv"
+            app:layout_constraintStart_toStartOf="@id/sign_in_email_tv"
+            app:layout_constraintEnd_toEndOf="@id/sign_in_email_tv"
+            app:layout_constraintTop_toBottomOf="@id/sign_in_username_tv"
+            style="@style/EditText.SignIn"
+            tools:alpha="1"
+            tools:hint="@string/sign_in_password_hint"/>
+
+        <EditText
+            android:id="@+id/sign_in_password_tv"
+            android:layout_marginTop="@dimen/sign_in_password_top_margin"
+            android:inputType="textPassword"
+            android:imeOptions="actionDone"
+            android:text="@={vm.password}"
+            android:hint="@{vm.passwordHint}"
+            android:onEditorAction="@{vm::onPasswordEditorAction}"
+            app:layout_constraintStart_toStartOf="@id/sign_in_email_tv"
+            app:layout_constraintEnd_toEndOf="@id/sign_in_email_tv"
+            app:layout_constraintTop_toBottomOf="@id/sign_in_username_tv"
+            style="@style/EditText.SignIn"
+            tools:hint="@string/sign_in_password_confirm"/>
+
+        <Button
+            android:id="@+id/sign_in_btn"
+            android:layout_width="@dimen/account_button_width"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:text="@string/sign_in_button_text"
+            android:layout_marginTop="@dimen/sign_in_button_top_margin"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="@{vm::onClickSignIn}"
+            app:layout_constraintStart_toStartOf="@id/sign_in_email_tv"
+            app:layout_constraintEnd_toEndOf="@id/sign_in_email_tv"
+            app:layout_constraintTop_toBottomOf="@id/sign_in_email_tv"
+            style="?android:attr/borderlessButtonStyle"/>
+
+        <Button
+            android:id="@+id/create_account_btn"
+            android:layout_width="@dimen/account_button_width"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:text="@string/create_account_button_text"
+            android:layout_marginTop="@dimen/create_account_button_top_margin"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="@{vm::onClickCreateAccount}"
+            android:alpha="0"
+            app:layout_constraintStart_toStartOf="@id/sign_in_email_tv"
+            app:layout_constraintEnd_toEndOf="@id/sign_in_email_tv"
+            app:layout_constraintTop_toBottomOf="@id/sign_in_password_tv"
+            style="?android:attr/borderlessButtonStyle"/>
+
+        <FrameLayout
+            android:id="@+id/switch_ui_fl"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/create_account_button_text"
+                android:textColor="@android:color/white"
+                android:onClick="@{vm::onClickSwitchUi}"
+                android:background="?attr/selectableItemBackground"
+                app:usernameTv="@{signInUsernameTv}"
+                app:passwordTv="@{signInPasswordTv}"
+                app:confirmTv="@{signInPasswordConfirmTv}"
+                app:signInBtn="@{signInBtn}"
+                app:createAccountBtn="@{createAccountBtn}"
+                app:switchBtnText="@{vm.switchBtnText}"
+                app:uiMode="@{vm.uiMode}"
+                style="?android:attr/borderlessButtonStyle"
+                tools:text="@string/create_account_button_text"/>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="@{vm.progressVisibility}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@color/black_alpha_25"
+            tools:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminateTint="@android:color/white"/>
+
+        </FrameLayout>
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>
