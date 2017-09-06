@@ -47,6 +47,7 @@ import project.hikerguide.data.GuideDatabase;
 import project.hikerguide.databinding.FragmentUserBinding;
 import project.hikerguide.models.datamodels.Author;
 import project.hikerguide.models.datamodels.Guide;
+import project.hikerguide.models.datamodels.Rating;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.AuthorViewModel;
 import project.hikerguide.ui.activities.AccountActivity;
@@ -561,42 +562,67 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
      */
     public void updateAuthorValues() {
 
-        // Get the directory where the Author's info is stored on the FirebaseDatabase
-        String directory = GuideDatabase.AUTHORS + "/" + mAuthor.firebaseId;
+        // Get all the Ratings authored by the user so that their values can also be appropriately
+        // updated
+        FirebaseProviderUtils.getAllRatingsForFirebaseUser(new FirebaseProviderUtils.FirebaseArrayListener() {
+            @Override
+            public void onModelsReady(BaseModel[] models) {
 
-        // Create a Map for the update procedure
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(directory, mAuthor.toMap());
+                // Get the directory where the Author's info is stored on the FirebaseDatabase
+                String directory = GuideDatabase.AUTHORS + "/" + mAuthor.firebaseId;
 
-        // Modify the Author name for all Guides written by the Author
-        for (int i = 1; i < mModelList.size(); i++) {
-            Guide guide = (Guide) mModelList.get(i);
-            guide.authorName = mAuthor.name;
+                // Create a Map for the update procedure
+                Map<String, Object> childUpdates = new HashMap<>();
+                childUpdates.put(directory, mAuthor.toMap());
 
-            directory = GuideDatabase.GUIDES + "/" + guide.firebaseId;
+                // Modify the Author name for all Guides written by the Author
+                for (int i = 1; i < mModelList.size(); i++) {
+                    Guide guide = (Guide) mModelList.get(i);
+                    guide.authorName = mAuthor.name;
 
-            childUpdates.put(directory, guide.toMap());
-        }
+                    directory = GuideDatabase.GUIDES + "/" + guide.firebaseId;
 
-        mAdapter.notifyItemRangeChanged(1, mModelList.size());
+                    childUpdates.put(directory, guide.toMap());
+                }
 
-        // Update the values
-        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+                // Modify the Author name for all Ratings written by the Author
+                if (models != null) {
 
+                    Rating[] ratings = (Rating[]) models;
+
+                    for (Rating rating : ratings) {
+                        rating.setAuthorName(mAuthor.name);
+
+                        directory = FirebaseProviderUtils.RATING_DIRECTORY + "/" + rating.firebaseId;
+
+                        childUpdates.put(directory, rating.toMap());
+                    }
+                }
+
+                mAdapter.notifyItemRangeChanged(1, mModelList.size());
+
+                // Update the values
+                FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+            }
+        });
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        // Check that the List used by the Adapter is populated
         if (mModelList != null && mModelList.size() > 0) {
 
+            // Create a List of FirebaseIds of all the models that will need be to retrieved
             ArrayList<String> modelIdList = new ArrayList<>();
 
+            // Add the FirebaseId of each model to the List
             for (BaseModel model : mModelList) {
                 modelIdList.add(model.firebaseId);
             }
 
+            // Add the List to the Bundle
             outState.putStringArrayList(MODEL_LIST_KEY, modelIdList);
         }
     }
