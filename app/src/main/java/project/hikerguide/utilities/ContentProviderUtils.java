@@ -313,6 +313,10 @@ public class ContentProviderUtils {
      */
     public static Author generateAuthorFromDatabase(Context context) {
 
+        // Init a new Author to be returned
+        Author author = new Author();
+        author.name = context.getString(R.string.author_name_default);
+
         // Query the database for favorite Guides
         Cursor cursor = context.getContentResolver().query(
                 GuideProvider.Guides.CONTENT_URI,
@@ -341,16 +345,14 @@ public class ContentProviderUtils {
                 // Close the Cursor
                 cursor.close();
 
-                // Create a new Author Object and set the favoritesMaps to its favorites
-                Author author = new Author();
-                author.name = context.getString(R.string.author_name_default);
+                // Set the favoritesMaps to its favorites
                 author.favorites = favoritesMap;
 
                 return author;
             }
         }
 
-        return new Author();
+        return author;
     }
 
     /**
