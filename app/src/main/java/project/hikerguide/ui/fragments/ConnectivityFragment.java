@@ -46,19 +46,21 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
         // Disconnect from Firebase
         FirebaseDatabase.getInstance().goOffline();
 
-        // Show a Snackbar to inform the user of network connectivity
-        mSnackbar = Snackbar.make(
-                getActivity().findViewById(android.R.id.content),
-                getString(R.string.connectivity_error_no_network),
-                Snackbar.LENGTH_INDEFINITE);
+        if (getActivity().findViewById(android.R.id.content) != null) {
+            // Show a Snackbar to inform the user of network connectivity
+            mSnackbar = Snackbar.make(
+                    getActivity().findViewById(android.R.id.content),
+                    getString(R.string.connectivity_error_no_network),
+                    Snackbar.LENGTH_INDEFINITE);
 
-        mSnackbar.show();
+            mSnackbar.show();
 
-        mSnackbar.getView().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mSnackbar.dismiss();
-            }
-        });
+            mSnackbar.getView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mSnackbar.dismiss();
+                }
+            });
+        }
     }
 }
