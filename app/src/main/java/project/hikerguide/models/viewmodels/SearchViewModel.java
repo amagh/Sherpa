@@ -49,7 +49,6 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     private GoogleApiClient mGoogleApiClient;
     private PlaceAdapter mAdapter;
     private String mQuery;
-    private LatLng mLatLng;
     private boolean mSearchHasFocus = false;
     private Handler mSearchHandler;
 
@@ -88,8 +87,7 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
                     }
 
                     // Remove focus from the search widget
-                    mSearchHasFocus = false;
-                    notifyPropertyChanged(BR.hasFocus);
+                    setFocus(false);
 
                     mQuery = placeModel.primaryText;
                     notifyPropertyChanged(BR.query);
@@ -159,6 +157,25 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
         return mSearchHasFocus;
     }
 
+    private void setFocus(boolean focus) {
+
+        // Set the member variable focus
+        mSearchHasFocus = focus;
+
+        // Show/hide the Adapter
+        if (focus) {
+            mAdapter.show();
+
+            // Show the attribution if the EditText has focus
+            mAdapter.setShowAttribution(true);
+        } else {
+            mAdapter.hide();
+            mAdapter.setShowAttribution(false);
+        }
+
+        notifyPropertyChanged(BR.hasFocus);
+    }
+
     @Bindable
     public String getQuery() {
         return mQuery;
@@ -167,7 +184,7 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     public void setQuery(String query) {
         mQuery = query;
 
-        if (mQuery == null || mQuery.isEmpty() || mQuery.length() < 2 || !mSearchHasFocus) {
+        if (mQuery == null || mQuery.isEmpty() || mQuery.length() < 2) {
 
             // Empty the Adapter
             mAdapter.setPlaceList(null);
@@ -207,36 +224,16 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     }
 
     public void onFocusChanged(View view, boolean hasFocus) {
-        mSearchHasFocus = hasFocus;
-
-        // Show the attribution if the EditText has focus
-        if (mSearchHasFocus) {
-            mAdapter.setShowAttribution(true);
-        } else {
-            mAdapter.setShowAttribution(false);
-        }
-
-        notifyPropertyChanged(BR.hasFocus);
-    }
-
-    public void onMapFocusChanged(View view, boolean hasFocus) {
-
-        if (hasFocus) {
-            Timber.d("Clearing focus");
-            view.clearFocus();
-        }
+        setFocus(hasFocus);
     }
 
     public void onClickClear(View view) {
 
         // Set the focus to false
-        mSearchHasFocus = false;
+        setFocus(false);
 
         // Clear the query
-        mQuery = null;
-
-        notifyPropertyChanged(BR.query);
-        notifyPropertyChanged(BR.hasFocus);
+        setQuery(null);
 
         GeneralUtils.hideKeyboard(mActivity, view);
     }
