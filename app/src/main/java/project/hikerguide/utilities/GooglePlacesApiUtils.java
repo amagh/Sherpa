@@ -155,9 +155,9 @@ public class GooglePlacesApiUtils {
                     Place place = places.get(0);
 
                     // Add the details to the new Area and pass it to the Listener
-                    LatLng latLng = place.getLatLng();
-                    area.name = place.getName().toString();
-                    area.state = place.getAddress().toString();
+                    LatLng latLng   = place.getLatLng();
+                    area.name       = place.getName().toString();
+                    area.location   = place.getAddress().toString();
 
                     area.latitude = latLng.latitude;
                     area.longitude = latLng.longitude;

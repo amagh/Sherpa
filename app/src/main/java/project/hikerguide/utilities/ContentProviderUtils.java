@@ -21,7 +21,6 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.Trail;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
-import timber.log.Timber;
 
 /**
  * Created by Alvin on 8/7/2017.
@@ -575,7 +574,7 @@ public class ContentProviderUtils {
         values.put(GuideContract.AreaEntry.LOWER_CASE_NAME,     area.name.toLowerCase());
         values.put(GuideContract.AreaEntry.LATITUDE,            area.latitude);
         values.put(GuideContract.AreaEntry.LONGITUDE,           area.longitude);
-        values.put(GuideContract.AreaEntry.STATE,               area.state);
+        values.put(GuideContract.AreaEntry.LOCATION,            area.location);
 
         if (area.isDraft()) {
             values.put(GuideContract.AreaEntry.DRAFT,           1);

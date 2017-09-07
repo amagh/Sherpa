@@ -18,14 +18,14 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 public class Area extends BaseModel implements Parcelable, AreaAdapterSortable {
     // ** Constants ** //
     private static final String NAME            = "name";
-    public static final String LOWER_CASE_NAME = "lowerCaseName";
+    public static final String LOWER_CASE_NAME  = "lowerCaseName";
     private static final String LATITUDE        = "latitude";
     private static final String LONGITUDE       = "longitude";
-    private static final String STATE           = "state";
+    private static final String LOCATION        = "location";
 
     // ** Member Variables ** //
     public String name;
-    public String state;
+    public String location;
     public double latitude;
     public double longitude;
 
@@ -48,7 +48,7 @@ public class Area extends BaseModel implements Parcelable, AreaAdapterSortable {
         int idxName         = cursor.getColumnIndex(GuideContract.AreaEntry.NAME);
         int idxLatitude     = cursor.getColumnIndex(GuideContract.AreaEntry.LATITUDE);
         int idxLongitude    = cursor.getColumnIndex(GuideContract.AreaEntry.LONGITUDE);
-        int idxState        = cursor.getColumnIndex(GuideContract.AreaEntry.STATE);
+        int idxLocation     = cursor.getColumnIndex(GuideContract.AreaEntry.LOCATION);
         int idxDraft        = cursor.getColumnIndex(GuideContract.AreaEntry.DRAFT);
 
         // Retrieve the values from the Cursor
@@ -56,7 +56,7 @@ public class Area extends BaseModel implements Parcelable, AreaAdapterSortable {
         String name         = cursor.getString(idxName);
         double latitude     = cursor.getDouble(idxLatitude);
         double longitude    = cursor.getDouble(idxLongitude);
-        String state        = cursor.getString(idxState);
+        String location     = cursor.getString(idxLocation);
         boolean draft       = cursor.getInt(idxDraft) == 1;
 
         // Create a new Area with the values
@@ -65,7 +65,7 @@ public class Area extends BaseModel implements Parcelable, AreaAdapterSortable {
         area.name           = name;
         area.latitude       = latitude;
         area.longitude      = longitude;
-        area.state          = state;
+        area.location       = location;
         area.setDraft(draft);
 
         return area;
@@ -79,7 +79,7 @@ public class Area extends BaseModel implements Parcelable, AreaAdapterSortable {
         map.put(LOWER_CASE_NAME, name.toLowerCase());
         map.put(LATITUDE, latitude);
         map.put(LONGITUDE, longitude);
-        map.put(STATE, state);
+        map.put(LOCATION, location);
 
         return map;
     }
@@ -103,7 +103,7 @@ public class Area extends BaseModel implements Parcelable, AreaAdapterSortable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(firebaseId);
         parcel.writeString(name);
-        parcel.writeString(state);
+        parcel.writeString(location);
         parcel.writeDouble(latitude);
         parcel.writeDouble(longitude);
 
@@ -127,11 +127,11 @@ public class Area extends BaseModel implements Parcelable, AreaAdapterSortable {
     };
 
     private Area(Parcel parcel) {
-        firebaseId = parcel.readString();
-        name = parcel.readString();
-        state = parcel.readString();
-        latitude = parcel.readDouble();
-        longitude = parcel.readDouble();
+        firebaseId  = parcel.readString();
+        name        = parcel.readString();
+        location    = parcel.readString();
+        latitude    = parcel.readDouble();
+        longitude   = parcel.readDouble();
 
         if (parcel.readInt() == 1) {
             setDraft(true);

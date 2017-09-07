@@ -36,7 +36,7 @@ public class AreaViewModel extends BaseObservable {
 
     @Bindable
     public String getState() {
-        return mArea.state;
+        return mArea.location;
     }
 
     @Bindable

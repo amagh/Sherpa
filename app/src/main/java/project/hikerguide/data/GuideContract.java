@@ -98,7 +98,7 @@ public class GuideContract {
         @DataType(DataType.Type.TEXT) @NotNull String LOWER_CASE_NAME               = "lowerCaseName";
         @DataType(DataType.Type.REAL) String LATITUDE                               = "latitude";
         @DataType(DataType.Type.REAL) String LONGITUDE                              = "longitude";
-        @DataType(DataType.Type.TEXT) @NotNull String STATE                         = "state";
+        @DataType(DataType.Type.TEXT) @NotNull String LOCATION                      = "location";
 
         @DataType(DataType.Type.INTEGER) String DRAFT                               = "draft";
     }

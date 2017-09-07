@@ -92,7 +92,7 @@ class TestUtilities {
         values.put(GuideContract.AreaEntry.FIREBASE_ID, "testAreaId");
         values.put(GuideContract.AreaEntry.NAME, "Yosemite");
         values.put(GuideContract.AreaEntry.LOWER_CASE_NAME, "yosemite");
-        values.put(GuideContract.AreaEntry.STATE, "California");
+        values.put(GuideContract.AreaEntry.LOCATION, "California");
 
         return values;
     }
@@ -379,7 +379,7 @@ class TestUtilities {
     static Area getArea1() {
         Area area = new Area("Yosemite Valley");
         area.firebaseId = "testAreaId";
-        area.state = "testState";
+        area.location   = "testLocation";
 
         return area;
     }
