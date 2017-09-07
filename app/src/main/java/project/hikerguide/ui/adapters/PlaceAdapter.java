@@ -15,6 +15,7 @@ import project.hikerguide.databinding.ListItemPlaceBinding;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.models.viewmodels.AttributionViewModel;
 import project.hikerguide.models.viewmodels.PlaceViewModel;
+import project.hikerguide.ui.adapters.interfaces.ClickHandler;
 
 /**
  * Created by Alvin on 8/17/2017.
@@ -28,11 +29,11 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
 
     // ** Member Variables ** //
     private List<PlaceModel> mPlaceList;
-    private ClickHandler mClickHandler;
+    private ClickHandler<PlaceModel> mClickHandler;
     private boolean mShowAttribution = false;
     private boolean mShowProgress = false;
 
-    public PlaceAdapter(ClickHandler clickHandler) {
+    public PlaceAdapter(ClickHandler<PlaceModel> clickHandler) {
         this.mClickHandler = clickHandler;
     }
 
@@ -143,10 +144,6 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         }
     }
 
-    public interface ClickHandler {
-        void onClickPlace(PlaceModel placeModel);
-    }
-
     class PlaceViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // ** Member Variables ** //
@@ -169,7 +166,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
             PlaceModel placeModel = mPlaceList.get(position);
 
             // Pass the PlaceModel to the ClickHandler
-            mClickHandler.onClickPlace(placeModel);
+            mClickHandler.onClick(placeModel);
         }
 
         private void bind(int position) {

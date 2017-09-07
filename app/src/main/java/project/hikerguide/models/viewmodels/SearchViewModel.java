@@ -29,6 +29,7 @@ import project.hikerguide.R;
 import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.adapters.PlaceAdapter;
+import project.hikerguide.ui.adapters.interfaces.ClickHandler;
 import project.hikerguide.ui.fragments.SearchFragment;
 import project.hikerguide.utilities.GeneralUtils;
 import project.hikerguide.utilities.GooglePlacesApiUtils;
@@ -61,9 +62,9 @@ public class SearchViewModel extends BaseObservable implements GoogleApiClient.C
     @Bindable
     public PlaceAdapter getAdapter() {
         if (mAdapter == null) {
-            mAdapter = new PlaceAdapter(new PlaceAdapter.ClickHandler() {
+            mAdapter = new PlaceAdapter(new ClickHandler<PlaceModel>() {
                 @Override
-                public void onClickPlace(PlaceModel placeModel) {
+                public void onClick(PlaceModel placeModel) {
 
                     // Get a reference to SearchFragment
                     final SearchFragment fragment = (SearchFragment) mActivity.getSupportFragmentManager()
