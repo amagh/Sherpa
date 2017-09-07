@@ -46,8 +46,7 @@ import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
  * Created by Alvin on 8/16/2017.
  */
 
-public class FavoritesFragment extends Fragment implements ConnectivityActivity.ConnectivityCallback,
-        LoaderManager.LoaderCallbacks<Cursor> {
+public class FavoritesFragment extends ConnectivityFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // ** Constants ** //
     private static final int FAVORITES_LOADER = 1126;
@@ -131,9 +130,13 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
     @Override
     public void onConnected() {
-        FirebaseDatabase.getInstance().goOnline();
+        super.onConnected();
 
         if (mGuideList == null || mGuideList.size() == 0) {
+
+            // Show the ProgressBar
+            mBinding.favoritesPb.setVisibility(View.VISIBLE);
+
             loadUser();
         } else {
             mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
@@ -142,15 +145,10 @@ public class FavoritesFragment extends Fragment implements ConnectivityActivity.
 
     @Override
     public void onDisconnected() {
-        FirebaseDatabase.getInstance().goOffline();
+        super.onDisconnected();
 
-        // Reset the List used by the Adapter so it displays fresh data
-//        if (mGuideList.size() > 0) {
-//
-//            mAdapter.notifyItemRangeRemoved(0, mGuideList.size());
-//            mGuideList = new ArrayList<>();
-//            mAdapter.setGuides(mGuideList);
-//        }
+        // Hide the ProgressBar
+        mBinding.favoritesPb.setVisibility(View.GONE);
     }
 
     @Override
