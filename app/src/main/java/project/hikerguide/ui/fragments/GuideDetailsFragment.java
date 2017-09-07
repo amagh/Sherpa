@@ -6,7 +6,6 @@ import android.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
@@ -22,7 +21,6 @@ import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 
 import project.hikerguide.R;
 import project.hikerguide.data.GuideContract;
@@ -33,7 +31,6 @@ import project.hikerguide.models.datamodels.Guide;
 import project.hikerguide.models.datamodels.Section;
 import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.models.viewmodels.GuideViewModel;
-import project.hikerguide.ui.activities.ConnectivityActivity;
 import project.hikerguide.ui.activities.GuideDetailsActivity;
 import project.hikerguide.ui.activities.UserActivity;
 import project.hikerguide.ui.adapters.GuideDetailsAdapter;
@@ -42,6 +39,7 @@ import project.hikerguide.utilities.DataCache;
 import project.hikerguide.utilities.FirebaseProviderUtils;
 import project.hikerguide.utilities.MapUtils;
 import project.hikerguide.utilities.OfflineGuideManager;
+import timber.log.Timber;
 
 import static project.hikerguide.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
@@ -50,8 +48,7 @@ import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
  * Created by Alvin on 8/7/2017.
  */
 
-public class GuideDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
-        ConnectivityActivity.ConnectivityCallback {
+public class GuideDetailsFragment extends ConnectivityFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // ** Constants ** //
     private static final int LOADER_GUIDE       = 3564;
@@ -117,10 +114,6 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
             // Set the ViewModel for the Fragment
             mBinding.setVm(new GuideViewModel(getActivity(), mGuide));
-        }
-
-        if (getActivity() instanceof ConnectivityActivity) {
-            ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
         }
 
         // Show the menu
@@ -318,7 +311,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onConnected() {
-        FirebaseDatabase.getInstance().goOnline();
+        super.onConnected();
 
         if (mGuide.authorId != null && mSections != null && mAuthor != null) return;
 
@@ -331,7 +324,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onDisconnected() {
-        FirebaseDatabase.getInstance().goOffline();
+        super.onDisconnected();
 
         if (mGuide.authorId != null && mSections != null && mAuthor != null) return;
 
@@ -440,6 +433,7 @@ public class GuideDetailsFragment extends Fragment implements LoaderManager.Load
         }
 
         if (mSections == null) {
+
             FirebaseProviderUtils.getSectionsForGuide(
                     mGuide.firebaseId,
                     new FirebaseProviderUtils.FirebaseArrayListener() {
