@@ -16,12 +16,13 @@ import project.hikerguide.models.datamodels.PlaceModel;
 import project.hikerguide.models.viewmodels.AttributionViewModel;
 import project.hikerguide.models.viewmodels.PlaceViewModel;
 import project.hikerguide.ui.adapters.interfaces.ClickHandler;
+import project.hikerguide.ui.adapters.interfaces.Hideable;
 
 /**
  * Created by Alvin on 8/17/2017.
  */
 
-public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHolder> {
+public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHolder> implements Hideable {
 
     // ** Constants ** //
     private static final int VIEW_TYPE_PLACE        = 0;
@@ -32,6 +33,8 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
     private ClickHandler<PlaceModel> mClickHandler;
     private boolean mShowAttribution = false;
     private boolean mShowProgress = false;
+
+    private boolean mHideAdapter;
 
     public PlaceAdapter(ClickHandler<PlaceModel> clickHandler) {
         this.mClickHandler = clickHandler;
@@ -70,6 +73,9 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
 
     @Override
     public int getItemCount() {
+
+        if (mHideAdapter) return 0;
+
         if (mPlaceList != null) {
 
             // Add one for the list item for the attribution
@@ -94,6 +100,18 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         } else {
             return VIEW_TYPE_PLACE;
         }
+    }
+
+    @Override
+    public void hide() {
+        mHideAdapter = true;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void show() {
+        mHideAdapter = false;
+        notifyDataSetChanged();
     }
 
     /**
