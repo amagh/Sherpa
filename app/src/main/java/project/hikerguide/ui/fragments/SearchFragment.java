@@ -489,4 +489,21 @@ public class SearchFragment extends MapboxFragment {
 
         }
     };
+
+    @Override
+    public void onConnected() {
+        super.onConnected();
+
+        // Re-run the query
+        String query = mBinding.getVm().getQuery();
+
+        if (query != null) {
+            mBinding.getVm().setQuery(query);
+        }
+    }
+
+    @Override
+    public void onDisconnected() {
+        super.onDisconnected();
+    }
 }
