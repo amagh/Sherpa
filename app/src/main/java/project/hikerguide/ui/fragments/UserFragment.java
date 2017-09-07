@@ -80,8 +80,7 @@ import static project.hikerguide.utilities.FirebaseProviderUtils.JPEG_EXT;
  * Created by Alvin on 8/15/2017.
  */
 
-public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
-        ConnectivityActivity.ConnectivityCallback {
+public class UserFragment extends ConnectivityFragment implements FabSpeedDial.MenuListener {
 
     // ** Constants ** //
     public static final int ACCOUNT_ACTIVITY_REQUEST_CODE = 7219;
@@ -240,8 +239,10 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
         mBinding.getVm().enableEditing();
 
         // Add the SupportActionBar so the menu items can be created, but remove the title
-        ((AppCompatActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(null);
+        if (getActivity() != null) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(null);
+        }
 
         // Set the layout behavior for the FAB
         CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mBinding.fabDial.getLayoutParams();
@@ -661,11 +662,20 @@ public class UserFragment extends Fragment implements FabSpeedDial.MenuListener,
 
     @Override
     public void onConnected() {
-        FirebaseDatabase.getInstance().goOnline();
+        super.onConnected();
+
+        if (mModelList == null || mModelList.size() == 0) {
+
+            // Show the ProgressBar
+            mBinding.userPb.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onDisconnected() {
-        FirebaseDatabase.getInstance().goOffline();
+        super.onDisconnected();
+
+        // Hide the ProgressBar as nothing is actually loading
+        mBinding.userPb.setVisibility(View.GONE);
     }
 }
