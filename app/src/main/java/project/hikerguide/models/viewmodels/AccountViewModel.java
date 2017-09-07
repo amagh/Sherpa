@@ -35,6 +35,7 @@ import project.hikerguide.models.datamodels.abstractmodels.BaseModel;
 import project.hikerguide.ui.activities.AccountActivity;
 import project.hikerguide.utilities.ContentProviderUtils;
 import project.hikerguide.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static project.hikerguide.models.viewmodels.AccountViewModel.UiModes.CREATE_ACCOUNT;
 import static project.hikerguide.models.viewmodels.AccountViewModel.UiModes.SIGN_IN;
@@ -109,7 +110,7 @@ public class AccountViewModel extends BaseObservable {
         float signInAlpha           = 1;
         float height                = 0;
 
-        if (confirmTv.getHeight() != 0) {
+        if (usernameTv.getHeight() != 0) {
             // Modify variables if in CREATE_ACCOUNT mode
             if (uiMode == CREATE_ACCOUNT) {
                 signInAlpha = 0;                                            // Hide sign in button
@@ -149,10 +150,12 @@ public class AccountViewModel extends BaseObservable {
                 createAccountButton.setVisibility(View.GONE);
             }
         } else {
-            confirmTv.post(new Runnable() {
+            usernameTv.post(new Runnable() {
                 @Override
                 public void run() {
-                    passwordTv.setY(usernameTv.getY());
+                    ConstraintLayout.LayoutParams params =
+                            (ConstraintLayout.LayoutParams) usernameTv.getLayoutParams();
+                    passwordTv.setY(usernameTv.getY() + params.topMargin + usernameTv.getHeight());
                     confirmTv.setVisibility(View.GONE);
                     usernameTv.setVisibility(View.GONE);
                 }
