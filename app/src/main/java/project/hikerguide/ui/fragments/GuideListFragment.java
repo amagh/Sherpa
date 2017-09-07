@@ -2,6 +2,7 @@ package project.hikerguide.ui.fragments;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -40,13 +41,15 @@ import static project.hikerguide.utilities.Constants.IntentKeys.GUIDE_KEY;
  * Created by Alvin on 7/21/2017.
  */
 
-public class GuideListFragment extends Fragment implements ConnectivityActivity.ConnectivityCallback{
+public class GuideListFragment extends ConnectivityFragment {
 
     // ** Member Variables ** //
     private FragmentGuideListBinding mBinding;
     private GuideAdapter mAdapter;
     private Author mAuthor;
     private List<Guide> mGuideList;
+
+    private Snackbar mSnackbar;
 
     public GuideListFragment() {}
 
@@ -69,19 +72,18 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
             // Load the Guide associated with each guideId from cache
             loadDataFromCache(guideIdList);
         }
-
-        // Check to see if the device is connected to a network
-        if (getActivity() instanceof ConnectivityActivity) {
-            ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
-        }
+//
+//        // Check to see if the device is connected to a network
+//        if (getActivity() instanceof ConnectivityActivity) {
+//            ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
+//        }
 
         return mBinding.getRoot();
     }
 
     @Override
     public void onConnected() {
-
-        FirebaseDatabase.getInstance().goOnline();
+        super.onConnected();
 
         if (mAuthor == null) {
 
@@ -91,6 +93,10 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
 
         // If Adapter is empty, load the Guides from Firebase
         if (mAdapter.isEmpty()) {
+
+            // Show the ProgressBar
+            mBinding.guideListPb.setVisibility(View.VISIBLE);
+
             loadGuides();
         } else {
             mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
@@ -99,7 +105,9 @@ public class GuideListFragment extends Fragment implements ConnectivityActivity.
 
     @Override
     public void onDisconnected() {
-        FirebaseDatabase.getInstance().goOffline();
+        super.onDisconnected();
+
+        mBinding.guideListPb.setVisibility(View.GONE);
     }
 
     private void loadGuides() {
