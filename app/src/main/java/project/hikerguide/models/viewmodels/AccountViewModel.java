@@ -121,7 +121,7 @@ public class AccountViewModel extends BaseObservable {
                 signInButton.setVisibility(View.GONE);                      // Prevent click sign in button
             } else {
                 ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) confirmTv.getLayoutParams();
-                height = -(params.topMargin + confirmTv.getHeight());   // Move password field up
+                height = -(params.topMargin + confirmTv.getHeight());       // Move password field up
                 signInButton.setVisibility(View.VISIBLE);                   // Allow click sign in button
             }
 
@@ -154,6 +154,7 @@ public class AccountViewModel extends BaseObservable {
                 public void run() {
                     passwordTv.setY(usernameTv.getY());
                     confirmTv.setVisibility(View.GONE);
+                    usernameTv.setVisibility(View.GONE);
                 }
             });
         }
