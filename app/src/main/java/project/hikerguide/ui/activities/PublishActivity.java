@@ -103,7 +103,7 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
         mDeleteTrail = new Trail();
         mDeleteTrail.firebaseId = mTrail.firebaseId;
 
-        setConnectivityCallback(this);
+        addConnectivityCallback(this);
     }
 
     @Override

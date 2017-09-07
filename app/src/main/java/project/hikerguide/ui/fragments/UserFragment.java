@@ -7,9 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -191,7 +189,7 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
             }
         }
 
-        ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
+        ((ConnectivityActivity) getActivity()).addConnectivityCallback(this);
         setHasOptionsMenu(true);
 
         return mBinding.getRoot();

@@ -1,12 +1,8 @@
 package project.hikerguide.ui.fragments;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -28,7 +24,7 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
 
         // Attach the Connectivity Callback
         if (getActivity() instanceof ConnectivityActivity) {
-            ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
+            ((ConnectivityActivity) getActivity()).addConnectivityCallback(this);
         }
     }
 

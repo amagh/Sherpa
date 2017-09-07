@@ -8,12 +8,14 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Alvin on 8/9/2017.
@@ -25,7 +27,7 @@ public class ConnectivityActivity extends AppCompatActivity {
 
     // ** Member Variables ** //
     private ConnectivityListener mConnectivityListener;
-    private ConnectivityCallback mCallback;
+    private Set<ConnectivityCallback> mCallbackSet;
     private boolean connectivityRegistered;
 
     @Override
@@ -60,14 +62,19 @@ public class ConnectivityActivity extends AppCompatActivity {
      *
      * @param callback    Callback to register to the ConnectivityListener
      */
-    public void setConnectivityCallback(ConnectivityCallback callback) {
-        mCallback = callback;
+    public void addConnectivityCallback(ConnectivityCallback callback) {
+
+        if (mCallbackSet == null) {
+            mCallbackSet = new HashSet<>();
+        }
+
+        mCallbackSet.add(callback);
 
         // Immediately inform the observer of the network status
         if (isConnectedToNetwork()) {
-            mCallback.onConnected();
+            callback.onConnected();
         } else {
-            mCallback.onDisconnected();
+            callback.onDisconnected();
         }
     }
 
@@ -127,13 +134,13 @@ public class ConnectivityActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
 
             // Notify observer of connectivity status
-            if (isConnectedToNetwork()) {
-                if (mCallback != null) {
-                    mCallback.onConnected();
+            if (isConnectedToNetwork() && mCallbackSet != null && mCallbackSet.size() > 0) {
+                for (ConnectivityCallback callback : mCallbackSet) {
+                    callback.onConnected();
                 }
-            } else {
-                if (mCallback != null) {
-                    mCallback.onDisconnected();
+            } else if (mCallbackSet != null && mCallbackSet.size() > 0){
+                for (ConnectivityCallback callback : mCallbackSet) {
+                    callback.onDisconnected();
                 }
             }
         }

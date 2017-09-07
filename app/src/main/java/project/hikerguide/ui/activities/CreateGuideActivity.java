@@ -438,7 +438,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
         mPublishMenuItem = menu.getItem(0);
 
         // Begin listening to network status
-        setConnectivityCallback(this);
+        addConnectivityCallback(this);
         return true;
     }
 
