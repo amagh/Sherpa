@@ -13,7 +13,7 @@ import project.hikerguide.R;
  * Created by Alvin on 7/25/2017.
  */
 
-public class MapboxFragment extends Fragment {
+public class MapboxFragment extends ConnectivityFragment {
     // ** Member Variables ** //
     MapView mMapView;
     Bundle mSavedInstanceState;
