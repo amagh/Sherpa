@@ -516,15 +516,17 @@ public class ContentProviderUtils {
     private static ContentValues getValuesForAuthor(Author author) {
         ContentValues values = new ContentValues();
 
-        values.put(GuideContract.AuthorEntry.FIREBASE_ID,       author.firebaseId);
-        values.put(GuideContract.AuthorEntry.NAME,              author.name);
-        values.put(GuideContract.AuthorEntry.LOWER_CASE_NAME,   author.name.toLowerCase());
-        values.put(GuideContract.AuthorEntry.DESCRIPTION,       author.description);
-        values.put(GuideContract.AuthorEntry.SCORE,             author.score);
+        values.put(GuideContract.AuthorEntry.FIREBASE_ID,           author.firebaseId);
+        values.put(GuideContract.AuthorEntry.NAME,                  author.name);
+        values.put(GuideContract.AuthorEntry.LOWER_CASE_NAME,       author.name.toLowerCase());
+        values.put(GuideContract.AuthorEntry.USERNAME,              author.getUsername());
+        values.put(GuideContract.AuthorEntry.LOWER_CASE_USERNAME,   author.getUsername().toLowerCase());
+        values.put(GuideContract.AuthorEntry.DESCRIPTION,           author.description);
+        values.put(GuideContract.AuthorEntry.SCORE,                 author.score);
 
         // Add image Uri if the Guide has an image
         if (author.hasImage) {
-            values.put(GuideContract.AuthorEntry.IMAGE_URI,     author.getImageUri().toString());
+            values.put(GuideContract.AuthorEntry.IMAGE_URI,         author.getImageUri().toString());
         }
 
         if (author.isDraft()) {
