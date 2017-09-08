@@ -1,5 +1,5 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Hiker Guide</string>
+    <string name="app_name">Sherpa</string>
     <string name="title_guides">Newest Guides</string>
     <string name="title_search">Search</string>
     <string name="title_account">Account</string>

@@ -6,7 +6,7 @@
     <data>
         <variable
             name="vm"
-            type="project.hikerguide.models.viewmodels.PlaceViewModel" />
+            type="project.sherpa.models.viewmodels.PlaceViewModel" />
     </data>
 
     <LinearLayout

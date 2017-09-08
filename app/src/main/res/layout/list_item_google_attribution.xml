@@ -5,7 +5,7 @@
     <data>
         <variable
             name="vm"
-            type="project.hikerguide.models.viewmodels.AttributionViewModel" />
+            type="project.sherpa.models.viewmodels.AttributionViewModel" />
     </data>
 
     <FrameLayout

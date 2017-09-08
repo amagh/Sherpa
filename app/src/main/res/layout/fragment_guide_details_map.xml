@@ -6,18 +6,18 @@
     <data>
         <variable
             name="vm"
-            type="project.hikerguide.models.viewmodels.GuideViewModel" />
+            type="project.sherpa.models.viewmodels.GuideViewModel" />
 
         <variable
             name="handler"
-            type="project.hikerguide.models.viewmodels.GuideDetailsMapViewModel" />
+            type="project.sherpa.models.viewmodels.GuideDetailsMapViewModel" />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <project.hikerguide.ui.views.SmartMapView
+        <project.sherpa.ui.views.SmartMapView
             android:id="@+id/guide_details_mv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
