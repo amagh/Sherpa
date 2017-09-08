@@ -189,7 +189,9 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
             }
         }
 
-        ((ConnectivityActivity) getActivity()).addConnectivityCallback(this);
+        // Load the logged in user so that the favorites can be synced
+        loadUserForFavorites();
+
         setHasOptionsMenu(true);
 
         return mBinding.getRoot();
@@ -225,6 +227,41 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         }
 
         return false;
+    }
+
+    /**
+     * Loads the logged in user's profile from Firebase Database and adds it to the Adapter so that
+     * favorite'd Guides can be synced
+     */
+    private void loadUserForFavorites() {
+
+        // Check if the user is logged in
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) return;
+
+        // Attempt to retrieve the user's profile from the DataCache
+        Author author = (Author) DataCache.getInstance().get(user.getUid());
+
+        if (author != null) {
+
+            // Set the User to the Adapter so the favorite's can be synced
+            mAdapter.setUser(author);
+        } else {
+
+            // Load the Author from Firebase and set it to the Adapter
+            FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
+                @Override
+                public void onModelReady(BaseModel model) {
+
+                    if (model == null) return;
+
+                    Author author = (Author) model;
+
+                    mAdapter.setUser(author);
+                }
+            });
+        }
     }
 
     /**

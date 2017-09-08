@@ -38,7 +38,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
     private boolean mEnableEdit = false;
     private boolean mIsInEditMode = false;
     private GuideAdapter.ClickHandler mClickHandler;
-
+    private Author mUser;
 
     public AuthorDetailsAdapter(AppCompatActivity activity, GuideAdapter.ClickHandler clickHandler) {
         mActivity = new WeakReference<>(activity);
@@ -158,6 +158,18 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
         notifyItemChanged(0);
     }
 
+    /**
+     * Sets the Firebase User's profile to the Adapter's field so that it can be loaded to each
+     * GuideViewModel to check whether that Guide has been favorite'd
+     *
+     * @param user    Author's whose favorites are to be synced to the Adapter's loaded Guides
+     */
+    public void setUser(Author user) {
+        mUser = user;
+
+        notifyDataSetChanged();
+    }
+
     class AuthorDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         // ** Member Variables ** //
         private ViewDataBinding mBinding;
@@ -207,6 +219,13 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
                 }
             } else if (model instanceof Guide) {
                 GuideViewModel vm = new GuideViewModel(mBinding.getRoot().getContext(), (Guide) model);
+
+                if (mUser != null) {
+
+                    // Add the Author to the ViewModel for checking favorites
+                    vm.setAuthor(mUser);
+                }
+
                 ((ListItemGuideBinding) mBinding).setVm(vm);
             }
         }
