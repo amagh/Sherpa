@@ -85,6 +85,7 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
 
         mNavigation = (BottomNavigationView) findViewById(R.id.navigation);
         mNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        switchFragments(R.id.navigation_home);
 
         Mapbox.getInstance(this, getString(R.string.mapbox_token));
     }
