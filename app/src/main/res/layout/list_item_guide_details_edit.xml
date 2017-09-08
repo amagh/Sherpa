@@ -7,7 +7,7 @@
     <data>
         <variable
             name="vm"
-            type="project.hikerguide.models.viewmodels.GuideViewModel" />
+            type="project.sherpa.models.viewmodels.GuideViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -112,7 +112,7 @@
             tools:text="@string/difficulty_moderate"
             />
 
-        <project.hikerguide.ui.views.SmartMapView
+        <project.sherpa.ui.views.SmartMapView
             android:id="@+id/list_guide_details_map"
             android:layout_width="0dp"
             android:layout_height="@dimen/list_guide_details_map_height"

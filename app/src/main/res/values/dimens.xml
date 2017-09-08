@@ -14,7 +14,6 @@
     <dimen name="guide_details_difficulty_circle_margin">64dp</dimen>
 
     <dimen name="card_vertical_padding">8dp</dimen>
-    <dimen name="card_bottom_padding">8dp</dimen>
     <dimen name="card_vertical_separation">8dp</dimen>
 
     <dimen name="text_horizontal_margin">4dp</dimen>

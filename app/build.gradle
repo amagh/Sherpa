@@ -1,10 +1,18 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'fakesherpakey'
+            keyPassword 'password'
+            storeFile file('/udacitykey.jks')
+            storePassword 'password'
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
     defaultConfig {
-        applicationId "project.hikerguide"
+        applicationId "project.sherpa"
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
@@ -17,6 +25,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
 

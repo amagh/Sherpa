@@ -7,7 +7,7 @@
     <data>
         <variable
             name="vm"
-            type="project.hikerguide.models.viewmodels.AccountViewModel" />
+            type="project.sherpa.models.viewmodels.AccountViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -20,7 +20,7 @@
             android:layout_width="@dimen/sign_in_logo_size"
             android:layout_height="@dimen/sign_in_logo_size"
             android:layout_marginTop="@dimen/sign_in_logo_top_margin"
-            android:src="@drawable/placeholder_icon"
+            android:src="@mipmap/ic_launcher"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -115,6 +115,7 @@
             style="?android:attr/borderlessButtonStyle"/>
 
         <FrameLayout
+            android:id="@+id/switch_ui_fl"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimaryDark"

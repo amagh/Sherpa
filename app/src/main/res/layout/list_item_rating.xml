@@ -7,7 +7,7 @@
     <data>
         <variable
             name="vm"
-            type="project.hikerguide.models.viewmodels.RatingViewModel" />
+            type="project.sherpa.models.viewmodels.RatingViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout

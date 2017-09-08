@@ -7,7 +7,7 @@
     <data>
         <variable
             name="vm"
-            type="project.hikerguide.models.viewmodels.AuthorViewModel" />
+            type="project.sherpa.models.viewmodels.AuthorViewModel" />
     </data>
 
     <LinearLayout

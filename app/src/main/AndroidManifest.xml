@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="project.hikerguide">
+          package="project.sherpa">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
-        android:name=".HikerGuideApplication"
+        android:name=".SherpaApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -47,7 +47,7 @@
 
         <provider
             android:name=".data.generated.GuideProvider"
-            android:authorities="project.hikerguide.data"
+            android:authorities="project.sherpa.data"
             android:exported="true"/>
 
         <activity android:name=".ui.activities.GuideDetailsActivity">

@@ -7,7 +7,7 @@
     <data>
         <variable
             name="vm"
-            type="project.hikerguide.models.viewmodels.SectionViewModel" />
+            type="project.sherpa.models.viewmodels.SectionViewModel" />
     </data>
 
     <LinearLayout
@@ -33,7 +33,7 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <project.hikerguide.ui.views.AspectRatioImageView
+            <project.sherpa.ui.views.AspectRatioImageView
                 android:id="@+id/list_section_image_iv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

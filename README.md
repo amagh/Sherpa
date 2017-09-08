@@ -1,4 +1,4 @@
-# Hiker-Guide
+# Sherpa
 
 (WIP) Android Application for hikers to use to discover new trails and guide them when they go. Experienced hikers can document trails
 they have taken; showing the trail conditions, difficult spots, and the reward that awaits them when other hikers follow their guides. 

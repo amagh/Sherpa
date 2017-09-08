@@ -5,7 +5,7 @@
     <data>
         <variable
             name="vm"
-            type="project.hikerguide.models.viewmodels.SectionViewModel" />
+            type="project.sherpa.models.viewmodels.SectionViewModel" />
     </data>
 
     <TextView
