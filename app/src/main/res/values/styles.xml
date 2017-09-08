@@ -1,11 +1,67 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="ExpandedToolbarTitleTextAppearance" parent="TextAppearance.AppCompat.Headline">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="CollapsedToolbarTitleTextAppearance" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="ExpandedToolbarSubtitleTextAppearance" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="CollapsedToolbarSubtitleTextAppearance" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="EditText.SignIn" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorHint">@color/white_alpha_75</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/sign_in_text_padding</item>
+        <item name="backgroundTint">@android:color/white</item>
+    </style>
+
+    <style name="SearchListItem.PrimaryText" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/list_search_vertical_padding</item>
+        <item name="android:layout_marginLeft">@dimen/list_search_horizontal_padding</item>
+        <item name="android:layout_marginStart">@dimen/list_search_horizontal_padding</item>
+        <item name="android:layout_marginRight">@dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginEnd">@dimen/activity_horizontal_margin</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="SearchListItem.SecondaryText" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/list_search_text_vertical_separation</item>
+        <item name="android:layout_marginBottom">@dimen/list_search_vertical_padding</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="SearchListItemImage">
+        <item name="android:layout_width">@dimen/list_search_nav_button_size</item>
+        <item name="android:layout_height">@dimen/list_search_nav_button_size</item>
+        <item name="android:paddingTop">@dimen/list_search_nav_button_top_padding</item>
+        <item name="android:paddingLeft">@dimen/list_search_nav_button_padding</item>
+        <item name="android:paddingStart">@dimen/list_search_nav_button_padding</item>
+        <item name="android:paddingRight">@dimen/list_search_nav_button_padding</item>
+        <item name="android:paddingEnd">@dimen/list_search_nav_button_padding</item>
+        <item name="android:layout_marginLeft">@dimen/list_search_nav_left_margin</item>
+        <item name="android:layout_marginStart">@dimen/list_search_nav_left_margin</item>
+        <item name="android:tint">@color/colorPrimaryLight</item>
+    </style>
 </resources>

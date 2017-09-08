@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" >
+
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.GuideViewModel" />
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/guide_details_cl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/guide_details_abl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.SubtitleCollapsingToolbarLayout
+                android:id="@+id/guide_details_ct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@{vm.trailName}"
+                app:subtitle="@{vm.areaName}"
+                app:expandedTitleTextAppearance="@style/ExpandedToolbarTitleTextAppearance"
+                app:collapsedTitleTextAppearance="@style/CollapsedToolbarTitleTextAppearance"
+                app:expandedSubtitleTextAppearance="@style/ExpandedToolbarSubtitleTextAppearance"
+                app:collapsedSubtitleTextAppearance="@style/CollapsedToolbarSubtitleTextAppearance"
+                app:expandedTitleGravity="right|bottom"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:contentScrim="@color/colorPrimary">
+
+                <ImageView
+                    android:id="@+id/guide_details_iv"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/guide_details_image_height"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/content_description_add_guide_image"
+                    android:onClick="@{vm::onClickHeroImage}"
+                    app:image="@{vm.image}"
+                    app:layout_collapseMode="parallax"/>
+                
+                <ImageView
+                    android:id="@+id/guide_details_icon_iv"
+                    android:layout_width="@dimen/create_guide_hero_icon_size"
+                    android:layout_height="@dimen/create_guide_hero_icon_size"
+                    android:layout_gravity="center"
+                    android:visibility="@{vm.iconVisibility}"
+                    android:src="@drawable/ic_image"/>
+                
+                <ImageView
+                    android:id="@+id/guide_details_error_iv"
+                    android:layout_width="@dimen/create_guide_hero_icon_size"
+                    android:layout_height="@dimen/create_guide_hero_icon_size"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_error_outline"/>
+
+                <TextView
+                    android:id="@+id/guide_details_error_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/create_guide_error_icon_top_margin"
+                    android:layout_gravity="center"
+                    android:textColor="@android:color/white"
+                    android:text="@string/create_guide_image_missing_error_text"
+                    app:errorIconIv="@{guideDetailsErrorIv}"
+                    app:imageIconIv="@{guideDetailsIconIv}"
+                    app:showImageError="@{vm.showImageError}"/>
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/guide_details_tb"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:popupTheme="@style/AppTheme.PopupOverlay"
+                    app:layout_collapseMode="pin" />
+
+            </android.support.design.widget.SubtitleCollapsingToolbarLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/guide_details_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="?attr/actionBarSize"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorAccent"
+            android:layout_gravity="bottom">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:padding="@dimen/create_guide_toolbar_icon_padding"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:onClick="onClickAddSection"
+                android:src="@drawable/ic_create"
+                android:contentDescription="@string/content_description_add_section"
+                android:background="?android:attr/selectableItemBackground"/>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:padding="@dimen/create_guide_toolbar_icon_padding"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:onClick="onClickAddGpx"
+                android:src="@drawable/ic_directions_white"
+                android:contentDescription="@string/content_description_add_gpx"
+                android:background="?android:attr/selectableItemBackground"/>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:padding="@dimen/create_guide_toolbar_icon_padding"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:onClick="onClickAddSectionWithImage"
+                android:src="@drawable/ic_image"
+                android:contentDescription="@string/content_description_add_section_image"
+                android:background="?android:attr/selectableItemBackground"/>
+        </LinearLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</layout>

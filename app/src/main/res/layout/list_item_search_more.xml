@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/search_more_tv"
+            android:text="@string/search_more_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            style="@style/SearchListItem.PrimaryText"/>
+
+        <TextView
+            android:text="@string/search_more_text_2"
+            app:layout_constraintStart_toStartOf="@+id/search_more_tv"
+            app:layout_constraintEnd_toEndOf="@+id/search_more_tv"
+            app:layout_constraintTop_toBottomOf="@+id/search_more_tv"
+            app:layout_constraintBottom_toBottomOf="parent"
+            style="@style/SearchListItem.SecondaryText"/>
+
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>

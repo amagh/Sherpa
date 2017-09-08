@@ -1,0 +1,295 @@
+package project.sherpa.models.viewmodels;
+
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.databinding.BindingAdapter;
+import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.android.databinding.library.baseAdapters.BR;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+
+import java.lang.ref.WeakReference;
+
+import droidninja.filepicker.FilePickerConst;
+import io.github.yavski.fabspeeddial.FabSpeedDial;
+import project.sherpa.R;
+import project.sherpa.models.datamodels.Author;
+import project.sherpa.ui.fragments.UserFragment;
+import project.sherpa.utilities.FirebaseProviderUtils;
+import project.sherpa.utilities.GeneralUtils;
+
+import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_ACCOUNT;
+import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
+import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
+import static project.sherpa.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
+import static project.sherpa.utilities.FirebaseProviderUtils.IMAGE_PATH;
+import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
+
+/**
+ * Created by Alvin on 7/23/2017.
+ */
+
+public class AuthorViewModel extends BaseObservable {
+    // ** Member Variables ** //
+    private Author mAuthor;
+    private WeakReference<AppCompatActivity> mActivity;
+    private int mEditVisibility = View.INVISIBLE;
+    private boolean mAccepted = false;
+
+    public AuthorViewModel(@NonNull AppCompatActivity activity, @NonNull Author author) {
+        mAuthor = author;
+        mActivity = new WeakReference<>(activity);
+    }
+
+    @Bindable
+    public Author getAuthor() {
+        return mAuthor;
+    }
+
+    @Bindable
+    public UserFragment getFragment() {
+
+        if (mActivity.get() == null) return null;
+
+        // Retrieve the Fragment using the FragmentManager
+        UserFragment fragment = (UserFragment) mActivity.get().getSupportFragmentManager()
+                .findFragmentByTag(FRAG_TAG_ACCOUNT);
+
+        return fragment;
+    }
+
+    @Bindable
+    public String getName() {
+        return mAuthor.name;
+    }
+
+    @Bindable
+    public Uri getAuthorImage() {
+
+        // Check whether the Author has a Uri for an offline ImageUri
+        if (mAuthor.getImageUri() != null) {
+
+            // Return the ImageUri
+            return mAuthor.getImageUri();
+        } else {
+
+            // Parse the StorageReference to a Uri
+            return Uri.parse(FirebaseStorage.getInstance().getReference()
+                    .child(IMAGE_PATH)
+                    .child(mAuthor.firebaseId + JPEG_EXT).toString());
+        }
+    }
+
+    @BindingAdapter("authorImage")
+    public static void loadImage(final ImageView imageView, final Uri authorImage) {
+
+        if (authorImage == null) return;
+
+        // Check whether to load image from File or from Firebase Storage
+        if (authorImage.getScheme().matches("gs")) {
+            StorageReference authorRef = FirebaseProviderUtils.getReferenceFromUri(authorImage);
+
+            if (authorRef == null) return;
+
+            authorRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                @Override
+                public void onSuccess(StorageMetadata storageMetadata) {
+                    // Load from Firebase Storage
+                    if (imageView.getContext() != null) {
+                        Glide.with(imageView.getContext())
+                                .using(new FirebaseImageLoader())
+                                .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
+                                .signature(new StringSignature(storageMetadata.getMd5Hash()))
+                                .error(R.drawable.ic_account_circle)
+                                .into(imageView);
+                    }
+                }
+            });
+
+        } else {
+            // No StorageReference, load local file using the File's Uri
+            Glide.with(imageView.getContext())
+                    .load(authorImage)
+                    .error(R.drawable.ic_account_circle)
+                    .into(imageView);
+        }
+    }
+
+    @Bindable
+    public StorageReference getBackdrop() {
+        return FirebaseStorage.getInstance().getReference()
+                .child(IMAGE_PATH)
+                .child(mAuthor.firebaseId + BACKDROP_SUFFIX + JPEG_EXT);
+    }
+
+    @BindingAdapter("backdrop")
+    public static void loadBackdrop(final ImageView imageView, final StorageReference backdrop) {
+
+        backdrop.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+            @Override
+            public void onSuccess(StorageMetadata storageMetadata) {
+
+                // Check to ensure Activity is still active prior to loading image
+                if (imageView.getContext() == null) return;
+
+                Glide.with(imageView.getContext())
+                        .using(new FirebaseImageLoader())
+                        .load(backdrop)
+                        .signature(new StringSignature(storageMetadata.getMd5Hash()))
+                        .into(imageView);
+            }
+        });
+    }
+
+    @Bindable
+    public String getScore() {
+        return mActivity.get().getString(R.string.list_author_format_score, mAuthor.score);
+    }
+
+    @Bindable
+    public String getDescription() {
+        return mAuthor.description;
+    }
+
+    @Bindable
+    public int getEditVisibility() {
+        return mEditVisibility;
+    }
+
+    @BindingAdapter("editVisibility")
+    public static void setEditVisibility(ImageView imageView, int editVisibility) {
+
+        // Enable/disable click on ImageView depending on whether use is viewing their own profile.
+        // The edit button is only visible when user is viewing their own profile.
+        if (editVisibility == View.INVISIBLE) {
+            imageView.setClickable(false);
+        } else {
+            imageView.setClickable(true);
+        }
+
+        // Set visibility of the edit button
+        imageView.setVisibility(editVisibility);
+    }
+
+    @Bindable
+    public boolean getAccepted() {
+        return mAccepted;
+    }
+
+    @BindingAdapter({"nameTv", "descriptionTv", "author", "fragment", "accepted"})
+    public static void saveInfo(Button button, EditText nameEditText, EditText descriptionEditText,
+                                Author author, UserFragment fragment, boolean accepted) {
+
+        // Check to see that the accept Button has been clicked as this function runs the first
+        // time the ViewModel is loaded as well
+        if (fragment != null && accepted) {
+            // Set the Author parameters to match the text that the user has altered
+            author.name = nameEditText.getText().toString().trim();
+            author.description = descriptionEditText.getText().toString().trim();
+
+            // Check to ensure the entered name is not blank
+            if (author.name.isEmpty()) {
+
+                // Show Toast to user to instruct them to enter a name
+                Toast.makeText(
+                        nameEditText.getContext(),
+                        nameEditText.getContext().getString(R.string.author_name_empty_error_message),
+                        Toast.LENGTH_LONG)
+                        .show();
+
+                return;
+            }
+
+            // Update the Author's values in the Firebase Database and switch the layout
+            fragment.updateAuthorValues();
+            fragment.switchAuthorLayout();
+        }
+    }
+
+    @Bindable
+    public int getFabVisibility() {
+        if (mEditVisibility == View.INVISIBLE) {
+            return View.GONE;
+        } else {
+            return View.VISIBLE;
+        }
+    }
+
+    @BindingAdapter("fabVisibility")
+    public static void setFabVisibility(FabSpeedDial fab, int fabVisibility) {
+
+        // Set the Visibility of the FAB
+        fab.setVisibility(fabVisibility);
+    }
+
+    public void onClickEdit(View view) {
+
+        // Switch the layout between edit and display
+        getFragment().switchAuthorLayout();
+    }
+
+    public void onClickAccept(View view) {
+
+        // Switch the variable to indicate that the user has clicked accept
+        mAccepted = true;
+        notifyPropertyChanged(BR.accepted);
+    }
+
+    public void onClickBackdrop(View view) {
+
+        // Check to ensure the user is clicking their own backdrop image
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || !user.getUid().equals(mAuthor.firebaseId)) {
+            return;
+        }
+
+        // Open FilePicker for selecting backdrop image
+        GeneralUtils.openFilePicker(
+                getFragment(),
+                REQUEST_CODE_BACKDROP,
+                FilePickerConst.FILE_TYPE_MEDIA);
+    }
+
+    public void onClickProfileImage(View view) {
+
+        // Check to ensure the user is clicking their own profile image
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || !user.getUid().equals(mAuthor.firebaseId)) {
+            return;
+        }
+
+        // Open FilePicker for selecting profile image
+        GeneralUtils.openFilePicker(
+                getFragment(),
+                REQUEST_CODE_PROFILE_PIC,
+                FilePickerConst.FILE_TYPE_MEDIA);
+    }
+
+    /**
+     * Enables editing of the information in the author's profile
+     */
+    public void enableEditing() {
+
+        // Set the edit button to visible
+        mEditVisibility = View.VISIBLE;
+
+        notifyPropertyChanged(BR.editVisibility);
+        notifyPropertyChanged(BR.fabVisibility);
+    }
+
+}

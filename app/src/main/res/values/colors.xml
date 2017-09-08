@@ -1,6 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">@color/green_700</color>
+    <color name="colorPrimaryDark">@color/green_900</color>
+    <color name="colorPrimaryLight">@color/green_500</color>
+    <color name="colorAccent">@color/red_a200</color>
+
+    <color name="green_500">#4CAF50</color>
+    <color name="green_700">#388E3C</color>
+    <color name="green_900">#1B5E20</color>
+
+    <color name="red_a200">#FF5252</color>
+    <color name="grey_400">#BDBDBD</color>
+    <color name="white_alpha_75">#BFFFFFFF</color>
+    <color name="black_alpha_25">#40000000</color>
+
+    <!-- Muted Colors for Tracks -->
+    <color name="black">#000000</color>
+    <color name="grey_700">#616161</color>
+    <color name="blue_grey_500">#607D8B</color>
+    <color name="brown_900">#3E2723</color>
+
+    <color name="teal_700">#00796B</color>
+    <color name="blue_900">#0D47A1</color>
+    <color name="deep_purple_900">#311B92</color>
+
+    <color name="red_900">#B71C1C</color>
+    <color name="pink_900">#880E4F</color>
+
+    <array name="track_color_array">
+        <item>@color/black</item>
+        <item>@color/grey_700</item>
+        <item>@color/blue_grey_500</item>
+        <item>@color/brown_900</item>
+        <item>@color/green_900</item>
+        <item>@color/teal_700</item>
+        <item>@color/blue_900</item>
+        <item>@color/deep_purple_900</item>
+        <item>@color/red_900</item>
+        <item>@color/pink_900</item>
+    </array>
+
+    <!-- For highlighting a single track -->
+    <color name="yellow_a200">#FFFF00</color>
+    <color name="colorHighlight">@color/yellow_a200</color>
+
 </resources>

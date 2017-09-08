@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" >
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.SectionViewModel" />
+    </data>
+
+    <TextView
+        android:id="@+id/list_section_text_tv"
+        android:layout_marginTop="@dimen/guide_details_section_margin"
+        android:layout_marginBottom="@dimen/guide_details_section_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="@dimen/block_text_line_spacing"
+        android:text="@{vm.content}"
+        android:focusable="true"
+        style="@style/TextAppearance.AppCompat.Body1"
+        tools:text="@string/list_section_text"/>
+
+</layout>

@@ -1,6 +1,217 @@
-<resources>
-    <string name="app_name">Hiker Guide</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Sherpa</string>
+    <string name="title_guides">Newest Guides</string>
+    <string name="title_search">Search</string>
+    <string name="title_account">Account</string>
+    <string name="title_favorites">Favorites</string>
+    <string name="title_saved_guides">Saved Guides</string>
+    <string name="title_drafts">Saved Guide Drafts</string>
+
+    <string name="gpx_label">GPX</string>
+
+    <!-- User preferences -->
+    <string name="pref_units_key">units</string>
+    <string name="pref_units_imperial">imperial</string>
+    <string name="pref_units_default">@string/pref_units_imperial</string>
+
+    <!-- Strings for guide details -->
+    <string name="list_guide_details_distance_label">Total distance:</string>
+    <string name="list_guide_details_elevation_label">Peak elevation \u0394: </string>
+
+    <!--Strings for Guide List Item -->
+    <string name="list_guide_author_label">Author:</string>
+
+    <!-- Strings for author -->
+    <string name="list_author_heading">About the Author</string>
+
+    <!-- Strings for sections -->
+    <string name="list_section_text_hint">Write your adventure!</string>
+    <string name="list_section_caption_hint">Caption (Optional)</string>
+
+    <!-- Strings for Search Activity -->
+    <string name="search_label">Search</string>
+    <string name="search_more_text">Can\'t find the park or area you are searching for?</string>
+    <string name="search_more_text_2">Click here to find more</string>
+    <string name="search_instruction_search">Search for trails by location by entering a query</string>
+    <string name="search_instruction_no_guides_found">No trails found in the area! Be sure to add your guide if you go on a trail in this area!</string>
+    <string name="search_instruction_zoom_in">Please zoom in to trigger a search.</string>
+
+    <!-- Strings for Account Info -->
+    <string name="sign_in_email_hint">Email</string>
+    <string name="sign_in_username_hint">Username</string>
+    <string name="sign_in_password_hint">Password</string>
+    <string name="sign_in_password_confirm">Password (Confirm)</string>
+    <string name="sign_in_button_text">Sign In</string>
+    <string name="return_to_sign_in_button_text">Return to Sign In</string>
+    <string name="create_account_button_text">Create Account</string>
+    <string name="invalid_email_error">Please enter a valid email address.</string>
+    <string name="no_password_error">Enter a password for your account.</string>
+    <string name="no_password_match">Passwords do not match. Please try again.</string>
+    <string name="invalid_password_length_error">Password must be at least 8 characters.</string>
+    <string name="invalid_username_length_error">Username must be at least 4 characters</string>
+    <string name="invalid_username_char_error">Username may only contain letters, numbers, and underscores</string>
+    <string name="authentication_error">Authentication failed. Please try again.</string>
+
+    <!-- Formatting for guide list item -->
+    <string name="list_guide_format_distance_imperial">%,.2f miles</string>
+    <string name="list_guide_format_distance_chart_imperial">%,.1f mi</string>
+    <string name="list_guide_format_elevation_imperial">%,.0f ft</string>
+    <string name="list_guide_format_rating">%1.1f\u2605</string>
+    <string name="list_guide_format_rating_zero">0\u2605</string>
+    <string name="list_guide_format_reviews">(%d)</string>
+    <string name="content_description_favorite_button">Favorite</string>
+
+    <!-- Formatting for author list item -->
+    <string name="list_author_format_score">%,d pts</string>
+    <string name="author_display_name_hint">Display Name (required for guides)</string>
+    <string name="author_description_hint">Description (Optional)</string>
+    <string name="author_edit_accept">Accept</string>
+
+    <!-- Formatting for difficulty rating -->
+    <string name="difficulty_easy">Easy</string>
+    <string name="difficulty_moderate">Moderate</string>
+    <string name="difficulty_hard">Hard</string>
+    <string name="difficulty_expert">Expert</string>
+    <string name="difficulty_extreme">Extreme</string>
+
+    <!-- Mapbox related Strings -->
+    <string name="outdoors_style">mapbox://styles/mapbox/outdoors-v10</string>
+
+    <!-- Guide Details Strings -->
+    <string name="menu_map_title">Map</string>
+    <string name="menu_save_title">Save for offline</string>
+    <string name="menu_favorite_title">Favorite</string>
+    <string name="content_description_guide">%1$s, %2$s</string>
+    <string name="geo_uri_string">geo:0,0?q=<xliff:g id="latitude">%f</xliff:g>,<xliff:g id="longitude">%f</xliff:g>(Trail+Head)</string>
+    <string name="error_no_map_app">There is no map application installed. Please install a map application and try again.</string>
+    <string name="error_downloading_mapbox">There was an error downloading the map tiles. Please try again later.</string>
+    <string name="error_tile_count_exceeded">Reached max tile count. Please remove some offline maps before attempting to save again.</string>
+    <string name="mapbox_deleted">Mapbox tiles successfully deleted.</string>
+    <string name="mapbox_downloaded">Map downloaded!</string>
+
+    <!-- Guide Details Map Strings -->
+    <string name="content_description_back_button">Return to guide details.</string>
+    <string name="content_description_my_location_button">Go to my location on the map.</string>
+    <string name="content_description_trail_head_button">Directions to trail head.</string>
+
+    <!-- Create Guide Strings -->
+    <string name="menu_publish_title">Publish Guide</string>
+    <string name="menu_save_draft_title">Save Draft</string>
+    <string name="menu_delete_draft">Delete Draft</string>
+
+    <string name="create_guide_image_missing_error_text">Please add an image</string>
+    <string name="create_guide_gpx_missing_error_text">Please add a GPX file</string>
+    <string name="create_guide_no_sections_error">Please add some content to your guide before publishing</string>
+    <string name="create_guide_difficulty_missing_error_text">Please select a difficulty for the trail before publishing</string>
+
+    <string name="draft_saved">Draft Saved!</string>
+    <string name="draft_deleted">Draft Deleted!</string>
+
+    <string name="content_description_add_section">Add a Text Section</string>
+    <string name="content_description_add_section_image">Add an Image Section</string>
+    <string name="content_description_add_gpx">Add GPX to Guide</string>
+    <string name="content_description_add_guide_image">Guide Image</string>
+    <string name="content_description_delete_section">Delete Section</string>
+    <string name="content_description_reorder_section">Reorder Section</string>
+
+    <!-- Progressbar Dialog Strings -->
+    <string name="progress_download_map_title">Downloading Map Tiles</string>
+    <string name="progress_delete_map_title">Deleting Map Tiles</string>
+    <string name="progress_download_files_title">Downloading Files</string>
+    <string name="progress_upload_files_title">Uploading Files</string>
+
+    <!-- User Activity Strings -->
+    <string name="author_name_default">Hiker</string>
+    <string name="author_name_empty_error_message">Name cannot be blank</string>
+
+    <string name="menu_user_log_off">Sign out</string>
+    <string name="menu_new_guide_title">New Guide</string>
+    <string name="menu_guide_draft_title">Open Guide Draft</string>
+
+    <string name="failed_image_upload_text">Failed to upload image. Please try again later.</string>
+
+    <string name="content_description_author_image">Author Image</string>
+    <string name="content_description_author_backdrop">Author Backdrop</string>
+    <string name="content_description_edit_profile_button">Edit Profile</string>
+    <string name="content_description_edit_profile_cancel_button">Cancel Editing Profile</string>
+    <string name="content_description_create_fab">Add a Guide</string>
+
+    <!-- Area/Trail Activity Strings -->
+    <string name="area_search_instruction_text">Search for park/area</string>
+    <string name="add_trail_hint">Trail name</string>
+    <string name="add_trail_title">Add a New Trail</string>
+    <string name="add_trail_warn_add_text">Please add a trail name before continuing.</string>
+    <string name="add_trail_item_text">Can\'t find the trail you\'re looking for?</string>
+
+    <!-- Publish Activity Strings -->
+    <string name="publish_title_text">Publishing Guide. Please wait…</string>
+    <string name="publish_progress_text">Uploading file %1$d of %2$d</string>
+
+    <!-- Open Draft Activity Strings -->
+    <string name="draft_empty_text">No saved drafts.</string>
+
+    <!-- Favorites Fragment Strings -->
+    <string name="favorite_empty_text">Favorite a guide to see it here.</string>
+
+    <!-- Saved Guides Fragment Strings -->
+    <string name="saved_guides_empty_text">No saved guides.</string>
+
+    <!-- Rating Related Strings -->
+    <string name="list_rating_heading">Guide Reviews</string>
+    <string name="list_rating_title_text">Rate this guide</string>
+    <string name="list_rating_comments_hint">Comments (Optional)</string>
+    <string name="list_rating_button_text">Rate</string>
+
+    <string name="toast_missing_rating_error">Please rate the guide first.</string>
+
+    <string name="content_description_edit_rating_button">Edit Rating</string>
+    <string name="content_description_edit_rating_cancel_button">Cancel Editing Rating</string>
+
+    <string name="rating_excellent">Excellent</string>
+    <string name="rating_good">Good</string>
+    <string name="rating_adequate">Adequate</string>
+    <string name="rating_poor">Poor</string>
+    <string name="rating_bad">Bad</string>
+
+    <!-- Widget Strings -->
+    <string name="widget_title_text">Favorite Guides</string>
+
+    <!-- SaveDialog Strings -->
+    <string name="save_dialog_title">Caution</string>
+    <string name="save_dialog_message">Are you sure you want to exit without saving your draft?</string>
+    <string name="save_dialog_confirm_exit">Exit</string>
+    <string name="save_dialog_return">Return</string>
+
+    <!-- DeleteDialog Strings -->
+    <string name="delete_dialog_title">Delete Guide Draft</string>
+    <string name="delete_dialog_message">Confirm deletion of draft. This action cannot be undone.</string>
+
+    <!-- PublishDialog Strings -->
+    <string name="publish_dialog_title">Publish Guide</string>
+    <string name="publish_dialog_message">Confirm publishing of Guide in current state.</string>
+
+    <!-- Connectivity Strings -->
+    <string name="connectivity_error_no_network">No network connection.</string>
+    
+    <!-- Dummy text for testing purposes -->
+    <string name="list_guide_title_text">Four Mile Trail</string>
+
+    <string name="list_guide_distance_text">9.6 miles</string>
+    <string name="list_guide_rating_text">4.8\u2605</string>
+    <string name="list_guide_reviews_text">(45)</string>
+    <string name="list_guide_difficulty_text">Moderate</string>
+
+    <string name="list_section_text">The Four Mile Trail (actually 4.8 miles) is one of Yosemite Valley’s most strenuous trails. It climbs up to Glacier Point – an ascent of nearly 3300-ft in just under five miles. After the grueling uphill slog, hikers are rewarded with unparalleled views of Half Dome and the rest of Yosemite Valley. Glacier Point can also be reached by car or shuttle, but the view feels much more rewarding when you walk. We hiked this on a rainy Saturday in late September. Though summer is over, there were still plenty of people out and about. You can’t expect much solitude on this trail, but you can look forward to a great workout and some good people watching!</string>
+    <string name="list_section_image_caption_text">Getting ready to hike! Saturday morning in Curry Village.</string>
+
+    <string name="list_guide_details_elevation_text">3226 ft</string>
+
+    <string name="list_author_text">Christa</string>
+    <string name="list_author_score_text">1200 pts</string>
+    <string name="list_author_description_text">We (Christa and Rob) are from Northern California and we like to hike.  We’ve shared our photos and experiences so that others may find new parks, trails or places to visit.</string>
+
+    <string name="list_area_text">Yosemite National Park</string>
+    <string name="list_area_state_text">California</string>
+
+    <string name="list_rating_comment_text">This is a test comment to see how a real comment would be displayed. We are making it long to see what it looks like as multiple lines.</string>
 </resources>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.SectionViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/guide_details_section_margin"
+        android:layout_marginBottom="@dimen/guide_details_section_margin"
+        android:background="?android:colorBackground">
+
+        <ImageView
+            android:id="@+id/list_section_tp"
+            android:layout_width="@dimen/list_section_icon_size"
+            android:layout_height="@dimen/list_section_icon_size"
+            android:padding="@dimen/list_section_icon_padding"
+            android:layout_gravity="center_vertical"
+            android:onTouch="@{vm::onReorderTouch}"
+            android:contentDescription="@string/content_description_reorder_section"
+            android:src="@drawable/ic_reorder"/>
+
+        <EditText
+            android:id="@+id/list_section_text_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scrollHorizontally="false"
+            android:hint="@string/list_section_text_hint"
+            android:lineSpacingExtra="@dimen/block_text_line_spacing"
+            android:inputType="textAutoCorrect|textCapSentences|textMultiLine"
+            android:text="@={vm.content}"
+            android:nextFocusRight="@+id/list_section_del"
+            app:imeAction="@{vm.imeAction}"
+            style="@style/TextAppearance.AppCompat.Body1"/>
+
+        <ImageView
+            android:id="@+id/list_section_del"
+            android:layout_width="@dimen/list_section_icon_size"
+            android:layout_height="@dimen/list_section_icon_size"
+            android:padding="@dimen/list_section_icon_padding"
+            android:layout_gravity="center_vertical"
+            android:onClick="@{vm::onDeleteClick}"
+            android:src="@drawable/ic_delete"
+            android:focusable="true"
+            android:contentDescription="@string/content_description_delete_section"
+            android:background="?attr/selectableItemBackground"/>
+
+    </LinearLayout>
+
+
+
+</layout>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.GuideViewModel" />
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/guide_details_cl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/guide_details_abl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.SubtitleCollapsingToolbarLayout
+                android:id="@+id/guide_details_ct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@{vm.trailName}"
+                app:subtitle="@{vm.areaName}"
+                app:expandedTitleTextAppearance="@style/ExpandedToolbarTitleTextAppearance"
+                app:collapsedTitleTextAppearance="@style/CollapsedToolbarTitleTextAppearance"
+                app:expandedSubtitleTextAppearance="@style/ExpandedToolbarSubtitleTextAppearance"
+                app:collapsedSubtitleTextAppearance="@style/CollapsedToolbarSubtitleTextAppearance"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:contentScrim="@color/colorPrimary">
+
+                <ImageView
+                    android:id="@+id/guide_details_iv"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/guide_details_image_height"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@{vm.contentDescription}"
+                    app:image="@{vm.image}"
+                    app:layout_collapseMode="parallax"
+                    tools:src="@drawable/placeholder_guide_image"/>
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/guide_details_tb"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:popupTheme="@style/AppTheme.PopupOverlay"
+                    app:layout_collapseMode="pin" />
+            </android.support.design.widget.SubtitleCollapsingToolbarLayout>
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/guide_details_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:descendantFocusability="afterDescendants"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</layout>

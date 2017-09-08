@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.SearchViewModel" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:descendantFocusability="beforeDescendants"
+        android:nextFocusDown="@+id/search_cv">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/search_map_cv"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:focusable="false"
+            android:descendantFocusability="beforeDescendants"
+            android:nextFocusUp="@+id/search_iv"
+            android:nextFocusDown="@+id/search_results_rv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/search_results_rv"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <project.sherpa.ui.views.SmartMapView
+                android:id="@+id/search_mv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:nextFocusUp="@+id/search_tv"
+                android:nextFocusDown="@+id/search_results_rv"
+                app:mapbox_uiCompassGravity="bottom|end"/>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/search_cv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/search_widget_horizontal_margin"
+            android:layout_marginStart="@dimen/search_widget_horizontal_margin"
+            android:layout_marginRight="@dimen/search_widget_horizontal_margin"
+            android:layout_marginEnd="@dimen/search_widget_horizontal_margin"
+            android:layout_marginTop="@dimen/search_widget_vertical_margin"
+            android:layout_marginBottom="@dimen/search_widget_vertical_margin"
+            android:alpha="@dimen/search_widget_deactivated_alpha"
+            android:descendantFocusability="afterDescendants"
+            app:cardBackgroundColor="@android:color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="@id/search_map_cv"
+            app:layout_constraintEnd_toEndOf="@id/search_map_cv"
+            app:searchIv="@{searchIv}"
+            app:closeIv="@{searchCloseIv}"
+            app:searchTv="@{searchTv}"
+            app:hasFocus="@{vm.hasFocus}">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/search_widget_height">
+
+                <ImageView
+                    android:id="@+id/search_iv"
+                    android:layout_width="@dimen/search_widget_icon_size"
+                    android:layout_height="@dimen/search_widget_icon_size"
+                    android:layout_marginLeft="@dimen/search_widget_icon_horizontal_margin"
+                    android:layout_marginStart="@dimen/search_widget_icon_horizontal_margin"
+                    android:src="@drawable/places_ic_search"
+                    android:focusable="true"
+                    android:layout_gravity="center_vertical|start"/>
+
+                <ImageView
+                    android:id="@+id/search_close_iv"
+                    android:layout_width="@dimen/search_widget_icon_size"
+                    android:layout_height="@dimen/search_widget_icon_size"
+                    android:layout_marginLeft="@dimen/search_widget_icon_horizontal_margin"
+                    android:layout_marginStart="@dimen/search_widget_icon_horizontal_margin"
+                    android:src="@drawable/ic_close"
+                    android:layout_gravity="center_vertical|start"
+                    android:tint="@color/grey_400"
+                    android:alpha="@dimen/hidden_alpha"
+                    android:onClick="@{vm::onClickClear}"
+                    />
+
+                <EditText
+                    android:id="@+id/search_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/search_widget_text_horizontal_margin"
+                    android:layout_marginStart="@dimen/search_widget_text_horizontal_margin"
+                    android:hint="@string/search_label"
+                    android:textSize="@dimen/search_widget_text_size"
+                    android:fontFamily="sans-serif"
+                    android:textColorHint="@color/grey_400"
+                    android:text="@={vm.query}"
+                    android:inputType="textAutoCorrect"
+                    android:imeOptions="actionSearch|flagNoExtractUi"
+                    android:onFocusChange="@{vm::onFocusChanged}"
+                    android:gravity="start"
+                    android:nextFocusUp="@id/search_close_iv"
+                    android:nextFocusDown="@+id/search_places_rv"
+                    app:backgroundTint="@android:color/transparent"/>
+
+            </FrameLayout>
+
+            <View
+                android:id="@+id/search_divider_v"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/list_item_separater_height"
+                android:layout_marginTop="@dimen/search_widget_height"
+                android:background="@color/grey_400"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/search_places_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/search_widget_height"
+                android:nextFocusDown="@+id/search_results_rv"
+                app:adapter="@{vm.adapter}"
+                app:activity="@{vm.activity}"/>
+
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:id="@+id/search_instruction_tv"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/search_instruction_height"
+            android:gravity="center"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            app:layout_constraintStart_toStartOf="@id/search_results_rv"
+            app:layout_constraintEnd_toEndOf="@id/search_results_rv"
+            app:layout_constraintTop_toTopOf="@+id/search_results_rv"
+            android:text="@string/search_instruction_search"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/search_results_rv"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:nextFocusUp="@id/search_tv"
+            app:layout_constraintStart_toEndOf="@id/search_map_cv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+
+</layout>

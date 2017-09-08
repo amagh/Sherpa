@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.AttributionViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_separater_height"
+            android:layout_marginLeft="@dimen/list_search_horizontal_padding"
+            android:layout_marginStart="@dimen/list_search_horizontal_padding"
+            android:background="@color/grey_400"/>
+
+        <ProgressBar
+            android:id="@+id/list_attribution_pb"
+            android:layout_width="@dimen/google_attribution_progressbar_size"
+            android:layout_height="@dimen/google_attribution_progressbar_size"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/search_widget_icon_horizontal_margin"
+            android:layout_marginStart="@dimen/search_widget_icon_horizontal_margin"
+            android:visibility="@{vm.progressVisibility}"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/list_search_horizontal_padding"
+            android:layout_marginStart="@dimen/list_search_horizontal_padding"
+            android:layout_marginTop="@dimen/list_search_vertical_padding"
+            android:layout_marginBottom="@dimen/list_search_vertical_padding"
+            android:visibility="@{vm.attributionVisibility}"
+            android:src="@drawable/powered_by_google_light" />
+
+    </FrameLayout>
+
+</layout>

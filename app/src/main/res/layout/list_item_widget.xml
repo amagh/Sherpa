@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/list_widget_rl"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/list_widget_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        tools:text="@string/list_guide_title_text"/>
+
+    <TextView
+        android:id="@+id/list_widget_rating_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/list_widget_tv"
+        android:layout_marginTop="4dp"
+        tools:text="@string/list_guide_rating_text"/>
+
+    <TextView
+        android:id="@+id/list_widget_review_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/list_widget_tv"
+        android:layout_toRightOf="@id/list_widget_rating_tv"
+        android:layout_toEndOf="@id/list_widget_rating_tv"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="@dimen/text_horizontal_margin"
+        android:layout_marginStart="@dimen/text_horizontal_margin"
+        tools:text="@string/list_guide_reviews_text"/>
+
+    <TextView
+        android:id="@+id/list_widget_distance_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/list_widget_tv"
+        android:layout_marginTop="4dp"
+        tools:text="@string/list_guide_distance_text" />
+
+    <TextView
+        android:id="@+id/list_widget_author_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/list_widget_rating_tv"
+        tools:text="@string/list_author_text"/>
+
+    <TextView
+        android:id="@+id/list_widget_difficulty_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/list_widget_rating_tv"
+        tools:text="@string/difficulty_moderate"/>
+
+</RelativeLayout>

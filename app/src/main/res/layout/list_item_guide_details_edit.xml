@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.GuideViewModel" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/guide_details_section_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:focusable="true">
+
+        <android.support.constraint.Guideline
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/guideline"
+            app:layout_constraintGuide_percent=".5"
+            android:orientation="vertical"/>
+
+        <ImageView
+            android:id="@+id/list_guide_difficulty_circle_1"
+            android:layout_width="@dimen/guide_details_difficulty_circle_size"
+            android:layout_height="@dimen/guide_details_difficulty_circle_size"
+            android:src="@drawable/ic_circle_stroke"
+            android:layout_marginLeft="@dimen/guide_details_difficulty_circle_margin"
+            android:layout_marginStart="@dimen/guide_details_difficulty_circle_margin"
+            android:contentDescription="@string/difficulty_easy"
+            android:onClick="@{vm::onClickDifficultyCircle}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/list_guide_difficulty_circle_2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:difficultyRating="@{vm.difficultyRating}"
+            app:circle2="@{listGuideDifficultyCircle2}"
+            app:circle3="@{listGuideDifficultyCircle3}"
+            app:circle4="@{listGuideDifficultyCircle4}"
+            app:circle5="@{listGuideDifficultyCircle5}"
+            tools:src="@drawable/ic_circle"/>
+
+        <ImageView
+            android:id="@+id/list_guide_difficulty_circle_2"
+            android:layout_width="@dimen/guide_details_difficulty_circle_size"
+            android:layout_height="@dimen/guide_details_difficulty_circle_size"
+            android:src="@drawable/ic_circle_stroke"
+            android:contentDescription="@string/difficulty_moderate"
+            android:onClick="@{vm::onClickDifficultyCircle}"
+            app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintEnd_toStartOf="@+id/list_guide_difficulty_circle_3"
+            app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            tools:src="@drawable/ic_circle"/>
+
+        <ImageView
+            android:id="@+id/list_guide_difficulty_circle_3"
+            android:layout_width="@dimen/guide_details_difficulty_circle_size"
+            android:layout_height="@dimen/guide_details_difficulty_circle_size"
+            android:src="@drawable/ic_circle_stroke"
+            android:contentDescription="@string/difficulty_hard"
+            android:onClick="@{vm::onClickDifficultyCircle}"
+            app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_2"
+            app:layout_constraintEnd_toStartOf="@+id/list_guide_difficulty_circle_4"
+            app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <ImageView
+            android:id="@+id/list_guide_difficulty_circle_4"
+            android:layout_width="@dimen/guide_details_difficulty_circle_size"
+            android:layout_height="@dimen/guide_details_difficulty_circle_size"
+            android:src="@drawable/ic_circle_stroke"
+            android:contentDescription="@string/difficulty_expert"
+            android:onClick="@{vm::onClickDifficultyCircle}"
+            app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_3"
+            app:layout_constraintEnd_toStartOf="@+id/list_guide_difficulty_circle_5"
+            app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <ImageView
+            android:id="@+id/list_guide_difficulty_circle_5"
+            android:layout_width="@dimen/guide_details_difficulty_circle_size"
+            android:layout_height="@dimen/guide_details_difficulty_circle_size"
+            android:src="@drawable/ic_circle_stroke"
+            android:layout_marginRight="@dimen/guide_details_difficulty_circle_margin"
+            android:layout_marginEnd="@dimen/guide_details_difficulty_circle_margin"
+            android:contentDescription="@string/difficulty_extreme"
+            android:onClick="@{vm::onClickDifficultyCircle}"
+            app:layout_constraintStart_toEndOf="@id/list_guide_difficulty_circle_4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <TextView
+            android:id="@+id/list_guide_difficulty_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/text_vertical_margin"
+            android:text="@{vm.difficulty}"
+            app:layout_constraintTop_toBottomOf="@id/list_guide_difficulty_circle_1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            tools:text="@string/difficulty_moderate"
+            />
+
+        <project.sherpa.ui.views.SmartMapView
+            android:id="@+id/list_guide_details_map"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/list_guide_details_map_height"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            app:activity="@{vm.activity}"
+            app:gpx="@{vm.gpx}"
+            app:viewModel="@{vm.viewModel}"
+            app:trackUserPosition="@{vm.trackUserPosition}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/list_guide_difficulty_tv"
+            app:mapbox_uiZoomGestures="false"
+            app:mapbox_uiScrollGestures="false"
+            app:mapbox_uiRotateGestures="false"
+            app:mapbox_uiTiltGestures="false"
+            app:mapbox_uiDoubleTapGestures="false"/>
+
+        <ImageView
+            android:id="@+id/guide_details_map_error_iv"
+            android:layout_width="@dimen/create_guide_hero_icon_size"
+            android:layout_height="@dimen/create_guide_hero_icon_size"
+            android:src="@drawable/ic_error_outline"
+            android:visibility="gone"
+            app:gpxErrorTv="@{guideDetailsMapErrorTv}"
+            app:showGpxError="@{vm.showGpxError}"
+            app:layout_constraintStart_toStartOf="@id/list_guide_details_map"
+            app:layout_constraintEnd_toEndOf="@id/list_guide_details_map"
+            app:layout_constraintTop_toTopOf="@id/list_guide_details_map"
+            app:layout_constraintBottom_toBottomOf="@id/list_guide_details_map"/>
+
+        <TextView
+            android:id="@+id/guide_details_map_error_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create_guide_gpx_missing_error_text"
+            android:textColor="@android:color/white"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guide_details_map_error_iv"/>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/list_guide_details_elevation_lc"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/list_guide_details_graph_height"
+            android:layout_marginTop="@dimen/guide_details_internal_vertical_margin"
+            android:visibility="@{vm.elevationVisibility}"
+            app:gpx="@{vm.gpx}"
+            app:context="@{vm.context}"
+            app:layout_constraintStart_toStartOf="@+id/list_guide_details_map"
+            app:layout_constraintEnd_toEndOf="@+id/list_guide_details_map"
+            app:layout_constraintTop_toBottomOf="@+id/list_guide_details_map"/>
+
+        <TextView
+            android:id="@+id/list_guide_details_distance_label_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/text_vertical_margin"
+            android:text="@string/list_guide_details_distance_label"
+            style="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintTop_toBottomOf="@id/list_guide_details_elevation_lc"
+            app:layout_constraintStart_toStartOf="@id/list_guide_details_map"
+            />
+
+        <TextView
+            android:id="@+id/list_guide_details_distance_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/text_horizontal_margin"
+            android:layout_marginStart="@dimen/text_horizontal_margin"
+            android:text="@{vm.distance}"
+            style="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintBaseline_toBaselineOf="@id/list_guide_details_distance_label_tv"
+            app:layout_constraintStart_toEndOf="@id/list_guide_details_distance_label_tv"
+            tools:text="@string/list_guide_distance_text"/>
+
+        <TextView
+            android:id="@+id/list_guide_details_elevation_label_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/list_guide_details_elevation_label"
+            android:visibility="@{vm.elevationVisibility}"
+            style="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintBaseline_toBaselineOf="@id/list_guide_details_distance_label_tv"
+            app:layout_constraintStart_toStartOf="@id/guideline" />
+
+        <TextView
+            android:id="@+id/list_guide_details_elevation_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/text_horizontal_margin"
+            android:layout_marginStart="@dimen/text_horizontal_margin"
+            android:text="@{vm.elevation}"
+            android:visibility="@{vm.elevationVisibility}"
+            style="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintBaseline_toBaselineOf="@id/list_guide_details_distance_label_tv"
+            app:layout_constraintStart_toEndOf="@id/list_guide_details_elevation_label_tv"
+            tools:text="@string/list_guide_details_elevation_text"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>
