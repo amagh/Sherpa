@@ -291,7 +291,7 @@ public class AreaAdapter extends HideableAdapter<AreaAdapter.AreaViewHolder> {
                         break;
                 }
 
-                ((ListItemGoogleAttributionBinding) mBinding).setVm(vm);;
+                ((ListItemGoogleAttributionBinding) mBinding).setVm(vm);
             } else {
 
                 // Handle layout for any item in mSortedList

@@ -205,7 +205,7 @@ public class FirebaseDatabaseTest {
 
         BaseModel[] models = mDatabase.searchForRecords(AREA, "Grand", 5);
 
-        Set<String> expectedNames = new HashSet();
+        Set<String> expectedNames = new HashSet<>();
         expectedNames.add("Grand Canyon");
         expectedNames.add("Grand Teton");
 

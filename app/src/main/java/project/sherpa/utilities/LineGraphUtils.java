@@ -1,6 +1,7 @@
 package project.sherpa.utilities;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
@@ -82,7 +83,7 @@ public class LineGraphUtils {
                 dataSet.setDrawCircles(false);
 
                 // Set the color of the line
-                dataSet.setColor(context.getResources().getColor(R.color.green_700));
+                dataSet.setColor(ContextCompat.getColor(context, R.color.green_700));
 
                 // Set width of line
                 dataSet.setLineWidth(2);

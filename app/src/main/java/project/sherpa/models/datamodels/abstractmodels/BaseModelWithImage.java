@@ -18,16 +18,6 @@ public abstract class BaseModelWithImage extends BaseModel {
     protected Uri imageUri;
     public boolean hasImage;
 
-
-    /**
-     * Sets the Uri for the object's corresponding image file
-     *
-     * @param imageUri  Uri describing the location of an image file
-     */
-//    public void setImageUri(Uri imageUri) {
-//        this.imageUri = imageUri;
-//    }
-
     /**
      * Sets the Uri for the Object's image from a File that describes the location of an image file
      *

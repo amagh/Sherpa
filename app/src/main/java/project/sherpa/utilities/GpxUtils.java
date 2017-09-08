@@ -161,7 +161,6 @@ public class GpxUtils {
      * MapboxMap. Also creates a Marker to be used to indicate the start of a trail.
      *
      * @param gpxFile    A File corresponding to a GPX file that contains coordinates for a guide
-     * @return A PolylineOptions that can be used to plot the trail of a guide
      */
     public static void getMapboxOptions(@NonNull final File gpxFile, final MapboxOptionsListener listener) {
         new Thread(new Runnable() {

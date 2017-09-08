@@ -50,7 +50,6 @@ import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.ui.activities.AccountActivity;
 import project.sherpa.ui.activities.SelectAreaTrailActivity;
-import project.sherpa.ui.activities.ConnectivityActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.activities.MainActivity;
 import project.sherpa.ui.activities.OpenDraftActivity;

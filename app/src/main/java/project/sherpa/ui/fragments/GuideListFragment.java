@@ -46,8 +46,6 @@ public class GuideListFragment extends ConnectivityFragment {
     private Author mAuthor;
     private List<Guide> mGuideList;
 
-    private Snackbar mSnackbar;
-
     public GuideListFragment() {}
 
     @Override

@@ -923,7 +923,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                 this,
                 getString(R.string.draft_saved),
                 Toast.LENGTH_LONG)
-                .show();;
+                .show();
 
         mSaved = true;
     }

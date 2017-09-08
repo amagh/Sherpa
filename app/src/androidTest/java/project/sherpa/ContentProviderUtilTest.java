@@ -20,9 +20,7 @@ import project.sherpa.models.datamodels.Section;
 import project.sherpa.models.datamodels.Trail;
 import project.sherpa.utilities.ContentProviderUtils;
 
-import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**

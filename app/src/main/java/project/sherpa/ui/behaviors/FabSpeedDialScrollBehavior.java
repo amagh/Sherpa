@@ -1,8 +1,6 @@
 package project.sherpa.ui.behaviors;
 
-import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
-import android.util.AttributeSet;
 import android.view.View;
 
 import io.github.yavski.fabspeeddial.FabSpeedDial;
@@ -15,10 +13,6 @@ import io.github.yavski.fabspeeddial.FabSpeedDialBehaviour;
 public class FabSpeedDialScrollBehavior extends FabSpeedDialBehaviour {
 
     public FabSpeedDialScrollBehavior() {
-    }
-
-    public FabSpeedDialScrollBehavior(Context context, AttributeSet attrs) {
-        super(context, attrs);
     }
 
     @Override

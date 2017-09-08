@@ -149,11 +149,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
      * Switches the layout used for the Author BaseModel between one for display or one for editing.
      */
     public void switchAuthorLayout() {
-        if (mIsInEditMode) {
-            mIsInEditMode = false;
-        } else {
-            mIsInEditMode = true;
-        }
+        mIsInEditMode = !mIsInEditMode;
 
         notifyItemChanged(0);
     }

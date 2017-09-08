@@ -184,15 +184,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     }
 
     /**
-     * Sets the Uri describing a GPX file
-     *
-     * @param gpxUri    Uri corresponding to the location of a GPX file.
-     */
-//    public void setGpxUri(Uri gpxUri) {
-//        this.gpxUri = gpxUri;
-//    }
-
-    /**
      * Converts a File to a Uri to be saved as a reference to the actual GPX File so that it may be
      * accessed later
      *
@@ -250,55 +241,10 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         this.favorite = favorite;
     }
 
-    /**
-     * Converts the Map of raters into an Array of Ratings to be used to populate the Guide's
-     * ratings
-     *
-     * @return An Array describing the people who have rated this guide, their rating, and their
-     * comments
-     */
-    @Exclude
-    public Rating[] getRatings() {
-
-        // Validate raters
-        if (raters != null) {
-
-            // Create a List to hold the Ratings to be returned
-            List<Rating> ratingList = new ArrayList<>();
-
-            // Iterate through the Map and convert each entry to a Rating
-            for (String authorId : raters.keySet()) {
-
-                Rating rating = raters.get(authorId);
-
-                // Add the authorId to the Rating
-                rating.setAuthorId(authorId);
-
-                // Add the Rating to the List
-                ratingList.add(rating);
-            }
-
-            Collections.sort(ratingList, new Comparator<Rating>() {
-                @Override
-                public int compare(Rating rating, Rating t1) {
-                    return rating.getDate() < t1.getDate()
-                            ? -1
-                            : rating.getDate() > t1.getDate()
-                            ? 1
-                            : 0;
-                }
-            });
-
-            return ratingList.toArray(new Rating[ratingList.size()]);
-        } else {
-            return null;
-        }
-    }
 
     //********************************************************************************************//
     //***************************** Parcelable Related Methods ***********************************//
     //********************************************************************************************//
-
 
     @Override
     public int describeContents() {

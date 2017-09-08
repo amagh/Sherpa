@@ -526,8 +526,4 @@ public class SearchFragment extends MapboxFragment {
         }
     }
 
-    @Override
-    public void onDisconnected() {
-        super.onDisconnected();
-    }
 }

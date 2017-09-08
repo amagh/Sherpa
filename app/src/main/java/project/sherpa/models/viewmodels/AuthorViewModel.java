@@ -48,7 +48,6 @@ public class AuthorViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Author mAuthor;
     private WeakReference<AppCompatActivity> mActivity;
-    private boolean mEditMode;
     private int mEditVisibility = View.INVISIBLE;
     private boolean mAccepted = false;
 

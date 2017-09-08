@@ -15,9 +15,7 @@ import project.sherpa.R;
  * Created by Alvin on 7/24/2017.
  */
 
-public class MapboxActivity extends ConnectivityActivity {
-    // ** Member Variables ** //
-    MapView mMapView;
+public abstract class MapboxActivity extends ConnectivityActivity {
     Set<MapView> mMapSet;
     Bundle mSavedInstanceState;
 
@@ -114,7 +112,6 @@ public class MapboxActivity extends ConnectivityActivity {
 
         mMapSet.add(mapView);
 
-        mMapView = mapView;
     }
 
     public Bundle getSavedInstanceState() {

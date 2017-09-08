@@ -39,11 +39,6 @@ public class AreaViewModel extends BaseObservable {
         return mArea.location;
     }
 
-    @Bindable
-    public int getLatLngVisibility() {
-        return mLatLngVisibility;
-    }
-
     public void onClickGeolocation(View view) {
         LatLng latLng = new LatLng(mArea.latitude, mArea.longitude);
         mViewModel.changeMapCamera(latLng);

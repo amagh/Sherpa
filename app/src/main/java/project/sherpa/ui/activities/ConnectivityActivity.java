@@ -20,7 +20,7 @@ import java.util.Set;
  * Created by Alvin on 8/9/2017.
  */
 
-public class ConnectivityActivity extends AppCompatActivity {
+public abstract class ConnectivityActivity extends AppCompatActivity {
     // ** Constants ** //
     private static final int PERMISSION_REQUEST_ACCESS_NETWORK_STATE = 5614;
 

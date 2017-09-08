@@ -552,7 +552,7 @@ public class DoubleSearchViewModel extends BaseObservable implements GoogleApiCl
         new AdditiveAnimator().setDuration(150)
                 .target(fab)
                 .scale(scale)
-                .start();;
+                .start();
     }
 
     /**

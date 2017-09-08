@@ -48,7 +48,7 @@ public class AddTrailDialog extends DialogFragment {
                 }
 
                 return false;
-            };
+            }
         });
 
         // Set the layout for the Dialog. Set the title for the Dialog.

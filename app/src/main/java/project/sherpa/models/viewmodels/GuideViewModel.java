@@ -308,11 +308,6 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @Bindable
-    public Bundle getSavedInstanceState() {
-        return mSavedInstanceState;
-    }
-
-    @Bindable
     public MapboxFragment getFragment() {
         return mFragment.get();
     }

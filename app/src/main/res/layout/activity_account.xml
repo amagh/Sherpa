@@ -115,6 +115,7 @@
             style="?android:attr/borderlessButtonStyle"/>
 
         <FrameLayout
+            android:id="@+id/switch_ui_fl"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimaryDark"
