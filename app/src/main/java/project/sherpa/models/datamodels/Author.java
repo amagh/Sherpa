@@ -124,6 +124,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(firebaseId);
         parcel.writeString(name);
+        parcel.writeString(username);
         parcel.writeString(description);
         parcel.writeInt(score);
 
@@ -147,10 +148,11 @@ public class Author extends BaseModelWithImage implements Parcelable {
     };
 
     private Author(Parcel parcel) {
-        firebaseId = parcel.readString();
-        name = parcel.readString();
+        firebaseId  = parcel.readString();
+        name        = parcel.readString();
+        username    = parcel.readString();
         description = parcel.readString();
-        score = parcel.readInt();
+        score       = parcel.readInt();
 
         if (parcel.readInt() == 1) {
             setDraft(true);
