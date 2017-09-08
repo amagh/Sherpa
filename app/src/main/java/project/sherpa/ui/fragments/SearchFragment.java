@@ -62,6 +62,11 @@ import static project.sherpa.utilities.FirebaseProviderUtils.GPX_PATH;
 
 public class SearchFragment extends MapboxFragment {
 
+    // ** Constants ** //
+    private static final String LATITUDE_KEY    = "location";
+    private static final String LONGITUDE_KEY   = "longitude";
+    private static final String RADIUS_KEY      = "radius";
+
     // ** Member Variables ** //
     private FragmentSearchBinding mBinding;
     private MapboxMap mMapboxMap;
@@ -88,22 +93,7 @@ public class SearchFragment extends MapboxFragment {
 
         // Check to see if there are any guides to be loaded
         if (savedInstanceState != null) {
-
-            // Get a List of the FirebaseIds of guides to restore
-            List<String> guideIdList = savedInstanceState.getStringArrayList(GUIDE_KEY);
-
-            if (guideIdList != null && guideIdList.size() > 0) {
-
-                // Hide the search instructions
-                if (mBinding.searchInstructionTv.getVisibility() == View.VISIBLE) {
-                    mBinding.searchInstructionTv.setVisibility(View.GONE);
-                }
-
-                // Retrieve the Guide
-                for (String guideId : guideIdList) {
-                    getGuide(guideId);
-                }
-            }
+            restoreSavedInstanceState(savedInstanceState);
         }
 
         return mBinding.getRoot();
@@ -124,6 +114,47 @@ public class SearchFragment extends MapboxFragment {
         }
 
         outState.putStringArrayList(GUIDE_KEY, guideIdList);
+        outState.putDouble(LATITUDE_KEY, mGeoQuery.getCenter().latitude);
+        outState.putDouble(LONGITUDE_KEY, mGeoQuery.getCenter().longitude);
+        outState.putDouble(RADIUS_KEY, mGeoQuery.getRadius());
+    }
+
+    /**
+     * Restores the Guides and Polylines that were showing to the user prior to the state change
+     *
+     * @param savedInstanceState    SavedInstanceState Bundle from onCreate()
+     */
+    private void restoreSavedInstanceState(Bundle savedInstanceState) {
+
+        // Get a List of the FirebaseIds of guides to restore
+        List<String> guideIdList = savedInstanceState.getStringArrayList(GUIDE_KEY);
+
+        if (guideIdList != null && guideIdList.size() > 0) {
+
+            // Hide the search instructions
+            if (mBinding.searchInstructionTv.getVisibility() == View.VISIBLE) {
+                mBinding.searchInstructionTv.setVisibility(View.GONE);
+            }
+
+            // Retrieve the Guide
+            for (String guideId : guideIdList) {
+                getGuide(guideId);
+            }
+        }
+
+        double latitude     = savedInstanceState.getDouble(LATITUDE_KEY);
+        double longitude    = savedInstanceState.getDouble(LONGITUDE_KEY);
+        final double radius = savedInstanceState.getDouble(RADIUS_KEY);
+
+        // If the search radius was greater than 0, then there was a prior query for GeoFire
+        if (radius != 0) {
+
+            // Trigger the GeoFire Query so that the keys are properly registered as "entered" and
+            // can be properly removed when the user moves the camera
+            final GeoLocation target = new GeoLocation(latitude, longitude);
+
+            queryGeoFire(target, radius);
+        }
     }
 
     /**
@@ -151,6 +182,7 @@ public class SearchFragment extends MapboxFragment {
 
         // Get a reference of the MapboxMap to manipulate camera position and add Polylines
         mBinding.searchMv.getMapAsync(new OnMapReadyCallback() {
+
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
@@ -360,6 +392,9 @@ public class SearchFragment extends MapboxFragment {
      * @param gpxFile   GPX File containing coordinates representing a trail
      */
     private void addPolylineOptionsToMap(final Guide guide, File gpxFile) {
+
+        // Check to see if the Polyline has already been added to the MapboxMap
+        if (mGuidePolylineMap.get(guide.firebaseId) != null) return;
 
         // Generate the MapboxOptions that will contain the Polyline
         GpxUtils.getMapboxOptions(gpxFile, new GpxUtils.MapboxOptionsListener() {
