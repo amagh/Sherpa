@@ -342,7 +342,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
 
                     // Start GuideDetailsActivity for mGuide
                     Intent intent = new Intent(this, GuideDetailsActivity.class);
-                    intent.putExtra(GUIDE_KEY, mGuide);
+                    intent.putExtra(GUIDE_KEY, mGuide.firebaseId);
 
                     startActivity(intent);
 
