@@ -78,6 +78,18 @@ public abstract class ConnectivityActivity extends AppCompatActivity {
     }
 
     /**
+     * Removes a Callback from the Set of Callbacks to trigger on network change
+     *
+     * @param callback    Callback to be removed
+     */
+    public void removeConnectivityCallback(ConnectivityCallback callback) {
+
+        if (mCallbackSet != null) {
+            mCallbackSet.remove(callback);
+        }
+    }
+
+    /**
      * Checks whether the device is currently connected to an active network
      *
      * @return True if connected. False if not connected.

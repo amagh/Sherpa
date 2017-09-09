@@ -29,6 +29,16 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+
+        // Remove the Callback
+        if (getActivity() instanceof ConnectivityActivity) {
+            ((ConnectivityActivity) getActivity()).removeConnectivityCallback(this);
+        }
+    }
+
+    @Override
     public void onConnected() {
 
         // Re-connect to Firebase
