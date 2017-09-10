@@ -146,6 +146,8 @@
     <!-- Publish Activity Strings -->
     <string name="publish_title_text">Publishing Guide. Please wait…</string>
     <string name="publish_progress_text">Uploading file %1$d of %2$d</string>
+    <string name="publish_error_no_network">"No network connection. Try to publish when you have a network connection"</string>
+    <string name="publish_error_failed">Upload Failed. Please try again later.</string>
 
     <!-- Open Draft Activity Strings -->
     <string name="draft_empty_text">No saved drafts.</string>
