@@ -50,6 +50,7 @@
     <string name="invalid_password_length_error">Password must be at least 8 characters.</string>
     <string name="invalid_username_length_error">Username must be at least 4 characters</string>
     <string name="invalid_username_char_error">Username may only contain letters, numbers, and underscores</string>
+    <string name="invalid_username_taken">Username already exists. Please change your username and try again.</string>
     <string name="authentication_error">Authentication failed. Please try again.</string>
 
     <!-- Formatting for guide list item -->
