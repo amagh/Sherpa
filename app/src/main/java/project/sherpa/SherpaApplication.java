@@ -1,5 +1,6 @@
 package project.sherpa;
 
+import android.support.multidex.BuildConfig;
 import android.support.multidex.MultiDexApplication;
 
 import timber.log.Timber;
@@ -12,6 +13,8 @@ public class SherpaApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        Timber.plant(new Timber.DebugTree());
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
     }
 }
