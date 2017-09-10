@@ -120,7 +120,7 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
     @Override
     public void onDisconnected() {
         Toast.makeText(this,
-                "No network connection. Try to publish when you have a network connection",
+                getString(R.string.publish_error_no_network),
                 Toast.LENGTH_LONG)
                 .show();
 
@@ -281,7 +281,7 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
 
                         // Inform the user that it did not complete and will allow them
                         // to try again
-                        Toast.makeText(PublishActivity.this, "Upload failed! Please try again.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(PublishActivity.this, getString(R.string.publish_error_failed), Toast.LENGTH_LONG).show();
                     }
                 });
     }
