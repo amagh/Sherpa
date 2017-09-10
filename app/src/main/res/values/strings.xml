@@ -144,6 +144,7 @@
     <string name="add_trail_warn_add_text">Please add a trail name before continuing.</string>
     <string name="add_trail_item_text">Can\'t find the trail you\'re looking for?</string>
     <string name="content_description_see_location">See location on map</string>
+    <string name="content_description_confirm_selection">Confirm selection</string>
 
     <!-- Publish Activity Strings -->
     <string name="publish_title_text">Publishing Guide. Please wait…</string>
