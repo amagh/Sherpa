@@ -259,7 +259,7 @@ public class AccountViewModel extends BaseObservable {
                         progressVisibility = View.GONE;
                         notifyPropertyChanged(BR.progressVisibility);
 
-                        Toast.makeText(mContext, "Username already exists. Please change your username and try again.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.invalid_username_taken), Toast.LENGTH_LONG).show();
                     } else {
                         // Attempt to create a new account
                         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
