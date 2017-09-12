@@ -8,6 +8,9 @@
         <variable
             name="vm"
             type="project.sherpa.models.viewmodels.GuideViewModel" />
+        <variable
+            name="ad"
+            type="project.sherpa.ads.viewmodels.AdViewModel" />
     </data>
 
     <android.support.design.widget.CoordinatorLayout
@@ -66,23 +69,21 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/guide_details_av"
-                android:descendantFocusability="afterDescendants"
-                />
+                android:descendantFocusability="afterDescendants" />
 
             <com.google.android.gms.ads.AdView
                 android:id="@+id/guide_details_av"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                app:adRequest="@{ad.adRequest}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/guide_details_rv"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:adSize="BANNER"
-                app:adUnitId="ca-app-pub-3940256099942544/6300978111"/>
+                app:adUnitId="ca-app-pub-9368220731151233/8472162563" />
 
         </android.support.constraint.ConstraintLayout>
-
-
 
     </android.support.design.widget.CoordinatorLayout>
 
