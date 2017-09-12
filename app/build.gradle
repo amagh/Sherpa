@@ -48,6 +48,7 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     compile "com.google.android.gms:play-services-places:${playServicesVersion}"
+    compile "com.google.android.gms:play-services-ads:${playServicesVersion}"
 
     compile "com.google.firebase:firebase-storage:${playServicesVersion}"
     compile "com.google.firebase:firebase-database:${playServicesVersion}"
