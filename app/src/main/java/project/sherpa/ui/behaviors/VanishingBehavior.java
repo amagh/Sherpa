@@ -14,6 +14,9 @@ import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 
 public class VanishingBehavior extends CoordinatorLayout.Behavior<View> {
 
+    public VanishingBehavior() {
+    }
+
     public VanishingBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
