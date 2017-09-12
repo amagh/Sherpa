@@ -222,7 +222,7 @@ public class SaveUtils {
             FileOutputStream outStream = new FileOutputStream(imageFile);
 
             // Compress and write to the FOS
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outStream);
             outStream.flush();
             outStream.close();
 
