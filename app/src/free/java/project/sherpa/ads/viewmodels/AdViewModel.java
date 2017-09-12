@@ -31,7 +31,9 @@ public class AdViewModel extends BaseObservable {
 
         // Check to see if the AdRequest has been initialized
         if (mAdRequest == null) {
-            mAdRequest = new AdRequest.Builder().build();
+            mAdRequest = new AdRequest.Builder()
+                    .addTestDevice("27119592306BEB8549C4E1E8E97D926F")
+                    .build();
         }
 
         return mAdRequest;
