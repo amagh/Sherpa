@@ -67,7 +67,6 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/user_backdrop_separator_height"
             android:background="@color/grey_400"
-            app:layout_behavior=".ui.behaviors.VanishingBehavior"
             app:layout_anchor="@+id/user_ab"
             app:layout_anchorGravity="bottom" />
 
@@ -79,7 +78,6 @@
             android:src="@drawable/ic_account_circle"
             android:contentDescription="@string/content_description_author_image"
             android:onClick="@{vm::onClickProfileImage}"
-            app:layout_behavior=".ui.behaviors.VanishingBehavior"
             app:layout_anchor="@+id/user_ab"
             app:layout_anchorGravity="bottom|center_horizontal"
             app:authorImage="@{vm.authorImage}"
