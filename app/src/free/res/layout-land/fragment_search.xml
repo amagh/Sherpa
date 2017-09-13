@@ -19,28 +19,18 @@
         android:descendantFocusability="beforeDescendants"
         android:nextFocusDown="@+id/search_cv">
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/search_map_cv"
+        <project.sherpa.ui.views.SmartMapView
+            android:id="@+id/search_mv"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:focusable="false"
-            android:descendantFocusability="beforeDescendants"
-            android:nextFocusUp="@+id/search_iv"
+            android:nextFocusUp="@+id/search_tv"
             android:nextFocusDown="@+id/search_results_rv"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/search_results_rv"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:mapbox_uiCompassGravity="bottom|end"/>
 
-            <project.sherpa.ui.views.SmartMapView
-                android:id="@+id/search_mv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:nextFocusUp="@+id/search_tv"
-                android:nextFocusDown="@+id/search_results_rv"
-                app:mapbox_uiCompassGravity="bottom|end"/>
-
-        </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
             android:id="@+id/search_cv"
@@ -56,8 +46,8 @@
             android:descendantFocusability="afterDescendants"
             app:cardBackgroundColor="@android:color/white"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="@id/search_map_cv"
-            app:layout_constraintEnd_toEndOf="@id/search_map_cv"
+            app:layout_constraintStart_toStartOf="@id/search_mv"
+            app:layout_constraintEnd_toEndOf="@id/search_mv"
             app:searchIv="@{searchIv}"
             app:closeIv="@{searchCloseIv}"
             app:searchTv="@{searchTv}"
@@ -149,28 +139,22 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:nextFocusUp="@id/search_tv"
-            app:layout_constraintStart_toEndOf="@+id/search_map_cv"
+            app:layout_constraintStart_toEndOf="@+id/search_mv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/search_map_ad_cv"/>
+            app:layout_constraintBottom_toTopOf="@+id/search_av"/>
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/search_map_ad_cv"
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/search_av"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/search_results_rv"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:cardBackgroundColor="@android:color/transparent">
-
-            <com.google.android.gms.ads.AdView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:adRequest="@{ad.adRequest}"
-                app:adSize="BANNER"
-                app:adUnitId="ca-app-pub-9368220731151233/6806414021"/>
-        </android.support.v7.widget.CardView>
+            app:adRequest="@{ad.adRequest}"
+            app:adSize="BANNER"
+            app:adUnitId="ca-app-pub-9368220731151233/6806414021"/>
 
     </android.support.constraint.ConstraintLayout>
 
