@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="project.sherpa">
+    package="project.sherpa" >
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".SherpaApplication"
@@ -13,63 +13,71 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_places_api_key"/>
+            android:value="@string/google_places_api_key" />
 
         <activity
             android:name=".ui.activities.MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.CreateGuideActivity">
+        <activity android:name=".ui.activities.CreateGuideActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity"/>
+                android:value=".ui.activities.MainActivity" />
         </activity>
         <activity
             android:name=".ui.activities.AccountActivity"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity"/>
+                android:value=".ui.activities.MainActivity" />
         </activity>
-        <activity android:name=".ui.activities.UserActivity">
+        <activity android:name=".ui.activities.UserActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity"/>
+                android:value=".ui.activities.MainActivity" />
         </activity>
-
-        <activity android:name=".ui.activities.GuideDetailsActivity">
+        <activity android:name=".ui.activities.GuideDetailsActivity" >
         </activity>
-        <activity android:name=".ui.activities.SelectAreaTrailActivity">
+        <activity android:name=".ui.activities.SelectAreaTrailActivity" >
         </activity>
         <activity
             android:name=".ui.activities.PublishActivity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog">
+            android:theme="@style/Theme.AppCompat.Light.Dialog" >
         </activity>
-        <activity android:name=".ui.activities.OpenDraftActivity">
+        <activity android:name=".ui.activities.OpenDraftActivity" >
         </activity>
 
-        <receiver android:name=".widgets.FavoritesWidget">
+        <receiver android:name=".widgets.FavoritesWidget" >
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/favorites_widget_info"/>
+                android:resource="@xml/favorites_widget_info" />
         </receiver>
 
-        <service android:name=".widgets.FavoritesWidgetService"
-                 android:permission="android.permission.BIND_REMOTEVIEWS" />
-
+        <service
+            android:name=".widgets.FavoritesWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
         <service android:name=".widgets.FavoritesWidgetUpdateService" />
+
+        <activity
+            android:name="prefs.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".ui.activities.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="project.sherpa.ui.activities.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
