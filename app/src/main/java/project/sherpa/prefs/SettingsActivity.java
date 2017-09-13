@@ -1,4 +1,4 @@
-package prefs;
+package project.sherpa.prefs;
 
 import android.annotation.TargetApi;
 import android.content.Context;

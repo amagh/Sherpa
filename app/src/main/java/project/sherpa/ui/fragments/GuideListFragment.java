@@ -3,7 +3,6 @@ package project.sherpa.ui.fragments;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,9 +24,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import prefs.SettingsActivity;
+import project.sherpa.prefs.SettingsActivity;
 import project.sherpa.R;
-import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.data.GuideDatabase;
 import project.sherpa.databinding.FragmentGuideListBinding;
 import project.sherpa.models.datamodels.Author;

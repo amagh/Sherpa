@@ -3,7 +3,7 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="prefs.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="project.sherpa.prefs.SettingsActivity$GeneralPreferenceFragment"
         android:title="@string/pref_header_general" />
 
 </preference-headers>

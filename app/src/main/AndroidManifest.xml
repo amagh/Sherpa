@@ -71,7 +71,7 @@
         <service android:name=".widgets.FavoritesWidgetUpdateService" />
 
         <activity
-            android:name="prefs.SettingsActivity"
+            android:name="project.sherpa.prefs.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".ui.activities.MainActivity" >
             <meta-data
