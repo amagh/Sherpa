@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -40,6 +41,7 @@ import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.MapUtils;
 import project.sherpa.utilities.OfflineGuideManager;
+import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
@@ -159,6 +161,17 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
                 return true;
 
             case R.id.menu_save:
+
+                if (ContentProviderUtils.containsCachedGuide(getActivity())) {
+                    Toast.makeText(
+                            getActivity(),
+                            getString(R.string.toast_free_cached_limit),
+                            Toast.LENGTH_LONG)
+                            .show();
+
+                    return true;
+                }
+
                 if (!ContentProviderUtils.isGuideCachedInDatabase(getActivity(), mGuide)) {
                     saveGuide();
                     animateCacheIcon();

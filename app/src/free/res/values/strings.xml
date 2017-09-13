@@ -1,3 +1,6 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Sherpa Free</string>
+
+    <!-- GuideDetailsActivity Strings -->
+    <string name="toast_free_cached_limit">Free version only allows one cached guide at a time. Please purchase the app to cache more guides!</string>
 </resources>
