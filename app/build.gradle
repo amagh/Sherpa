@@ -64,8 +64,8 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-storage:0.6.0'
     compile 'com.firebase:geofire-android:2.1.1'
 
-    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:5.1.0@aar'){
-        transitive=true
+    compile('com.mapbox.mapboxsdk:mapbox-android-sdk:5.1.0@aar') {
+        transitive = true
     }
 
     compile 'io.ticofab.androidgpxparser:parser:1.0.0'
