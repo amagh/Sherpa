@@ -64,8 +64,8 @@ public class LineGraphUtils {
                 // floor instead of round() because fractions of a label can't be shown
                 int numLabels;
 
-                while ((numLabels = (int) Math.floor(totalDistance / interval)) > 6) {
-                    // Double the interval until there are less than 6 labels in the graph
+                while ((numLabels = (int) Math.floor(totalDistance / interval)) > 5) {
+                    // Double the interval until there are less than 5 labels in the graph
                     // 2.5 mi > 5.0 mi > 10 mi > 20 mi etc
                     interval *= 2;
                 }
