@@ -46,10 +46,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@android:color/transparent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/search_cv">
+            app:layout_constraintBottom_toBottomOf="@id/search_map_cv">
 
             <com.google.android.gms.ads.AdView
                 android:id="@+id/search_map_av"
@@ -74,7 +73,7 @@
             android:alpha="@dimen/search_widget_deactivated_alpha"
             android:descendantFocusability="afterDescendants"
             app:cardBackgroundColor="@android:color/white"
-            app:layout_constraintTop_toBottomOf="@id/search_map_ad_cv"
+            app:layout_constraintTop_toTopOf="@id/search_map_cv"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:searchIv="@{searchIv}"
