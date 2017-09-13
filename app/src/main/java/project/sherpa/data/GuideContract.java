@@ -8,6 +8,10 @@ import net.simonvt.schematic.annotation.References;
 
 import project.sherpa.models.datamodels.Guide;
 
+import project.sherpa.models.datamodels.Chat;
+import project.sherpa.models.datamodels.Message;
+import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+
 /**
  * Defines the tables and columns to be created for the database
  */
@@ -105,5 +109,33 @@ public class GuideContract {
         @DataType(DataType.Type.TEXT) @NotNull String LOCATION                      = "location";
 
         @DataType(DataType.Type.INTEGER) String DRAFT                               = "draft";
+    }
+
+    public interface MessageEntry {
+        @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement
+        String _ID          = "_id";
+        @DataType(DataType.Type.TEXT) @NotNull
+        String FIREBASE_ID  = BaseModel.FIREBASE_ID;
+        @DataType(DataType.Type.TEXT)
+        @References(table = GuideDatabase.AUTHORS, column = AuthorEntry.FIREBASE_ID)
+        String AUTHOR_ID    = Message.AUTHOR_ID;
+        @DataType(DataType.Type.TEXT) @NotNull
+        String MESSAGE      = Message.MESSAGE;
+        @DataType(DataType.Type.TEXT) @NotNull
+        String CHAT_ID      = Message.CHAT_ID;
+        @DataType(DataType.Type.REAL) @NotNull
+        String DATE         = Message.DATE;
+    }
+
+    public interface ChatEntry {
+        @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement
+        String _ID              = "_id";
+        @DataType(DataType.Type.TEXT) @NotNull
+        String FIREBASE_ID      = BaseModel.FIREBASE_ID;
+        @DataType(DataType.Type.TEXT)
+        @References(table = GuideDatabase.AUTHORS, column = AuthorEntry.FIREBASE_ID)
+        String MEMBER_ID        = Chat.MEMBER_ID;
+        @DataType(DataType.Type.INTEGER)
+        String MESSAGE_COUNT    = Chat.MESSAGE_COUNT;
     }
 }
