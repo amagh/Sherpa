@@ -47,6 +47,7 @@ import project.sherpa.utilities.ColorGenerator;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FormattingUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import project.sherpa.utilities.GeneralUtils;
 import project.sherpa.utilities.SaveUtils;
 import project.sherpa.widgets.FavoritesWidgetUpdateService;
 
@@ -157,15 +158,29 @@ public class GuideViewModel extends BaseObservable {
 
     @Bindable
     public String getDistance() {
+
+        int unitResource = R.string.list_guide_format_distance_imperial;
+
+        if (GeneralUtils.isUnitPreferenceMetric(mContext)) {
+            unitResource = R.string.list_guide_format_distance_metric;
+        }
+
         return mContext.getString(
-                R.string.list_guide_format_distance_imperial,
+                unitResource,
                 FormattingUtils.convertDistance(mContext, mGuide.distance));
     }
 
     @Bindable
     public String getElevation() {
+
+        int unitResource = R.string.list_guide_format_elevation_imperial;
+
+        if (GeneralUtils.isUnitPreferenceMetric(mContext)) {
+            unitResource = R.string.list_guide_format_elevation_metric;
+        }
+
         return mContext.getString(
-                R.string.list_guide_format_elevation_imperial,
+                unitResource,
                 FormattingUtils.convertElevation(mContext, mGuide.elevation));
     }
 
