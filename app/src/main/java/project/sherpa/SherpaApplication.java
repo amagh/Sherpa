@@ -1,6 +1,5 @@
 package project.sherpa;
 
-import android.support.multidex.BuildConfig;
 import android.support.multidex.MultiDexApplication;
 
 import timber.log.Timber;
