@@ -89,6 +89,7 @@
     <string name="error_tile_count_exceeded">Reached max tile count. Please remove some offline maps before attempting to save again.</string>
     <string name="mapbox_deleted">Mapbox tiles successfully deleted.</string>
     <string name="mapbox_downloaded">Map downloaded!</string>
+    <string name="toast_free_cached_limit">Free version only allows one cached guide at a time. Please purchase the app to cache more guides!</string>
 
     <!-- Guide Details Map Strings -->
     <string name="content_description_back_button">Return to guide details.</string>
