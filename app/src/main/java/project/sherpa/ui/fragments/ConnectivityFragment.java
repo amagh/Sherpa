@@ -1,12 +1,17 @@
 package project.sherpa.ui.fragments;
 
+import android.databinding.ViewDataBinding;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import project.sherpa.R;
+import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.ui.activities.ConnectivityActivity;
 
 /**
@@ -71,6 +76,34 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
                     mSnackbar.dismiss();
                 }
             });
+        }
+    }
+
+    /**
+     * Loads the ViewModel to serve ads
+     */
+    void loadAdViewModel(ViewDataBinding binding) {
+
+        // Check if the ViewDataBinding contains a method for setting the AdViewModel. This method
+        // should only exist in the free version of the app.
+        Method setAdMethod = null;
+
+        try {
+            setAdMethod = binding.getClass().getMethod("setAd", AdViewModel.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        // If the binding contains the method, invoke it to set the AdViewModel and load the
+        // AdRequest
+        if (setAdMethod != null) {
+            try {
+                setAdMethod.invoke(binding, new AdViewModel(getActivity()));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
