@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import project.sherpa.BuildConfig;
 import project.sherpa.R;
 import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.data.GuideContract;
@@ -158,7 +159,8 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
 
             case R.id.menu_save:
 
-                if (ContentProviderUtils.containsCachedGuide(getActivity())) {
+                // In free version, only allow a single cached guide at a time
+                if (BuildConfig.FLAVOR.equals("free") && ContentProviderUtils.containsCachedGuide(getActivity())) {
                     Toast.makeText(
                             getActivity(),
                             getString(R.string.toast_free_cached_limit),
