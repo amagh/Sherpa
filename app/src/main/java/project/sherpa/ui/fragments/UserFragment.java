@@ -40,6 +40,7 @@ import java.util.Map;
 import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.sherpa.R;
+import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideDatabase;
 import project.sherpa.databinding.FragmentUserBinding;
@@ -190,6 +191,9 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                 }
             }
         }
+
+        // Load Ads
+        loadAdViewModel(mBinding);
 
         // Load the logged in user so that the favorites can be synced
         loadUserForFavorites();

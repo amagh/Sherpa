@@ -97,17 +97,10 @@ public class SearchFragment extends MapboxFragment {
             restoreSavedInstanceState(savedInstanceState);
         }
 
-        loadAdViewModel();
+        // Load ads if applicable
+        loadAdViewModel(mBinding);
 
         return mBinding.getRoot();
-    }
-
-    /**
-     * Loads the ViewModel to serve ads
-     */
-    private void loadAdViewModel() {
-        AdViewModel vm = new AdViewModel(getActivity());
-        mBinding.setAd(vm);
     }
 
     @Override

@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import project.sherpa.R;
+import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.data.GuideDatabase;
 import project.sherpa.databinding.FragmentGuideListBinding;
 import project.sherpa.models.datamodels.Author;
@@ -67,11 +68,9 @@ public class GuideListFragment extends ConnectivityFragment {
             // Load the Guide associated with each guideId from cache
             loadDataFromCache(guideIdList);
         }
-//
-//        // Check to see if the device is connected to a network
-//        if (getActivity() instanceof ConnectivityActivity) {
-//            ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
-//        }
+
+        // Load ads if applicable
+        loadAdViewModel(mBinding);
 
         return mBinding.getRoot();
     }

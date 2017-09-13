@@ -83,17 +83,13 @@ public class GuideDetailsMapFragment extends MapboxFragment {
 
         mBinding.setHandler(new GuideDetailsMapViewModel((GuideDetailsActivity) getActivity()));
 
-        loadAdViewModel();
+        // Load ads if applicable
+        loadAdViewModel(mBinding);
 
         // Request permission to track user on map
         ((GuideDetailsActivity) getActivity()).requestLocationPermission();
 
         return mBinding.getRoot();
-    }
-
-    private void loadAdViewModel() {
-        AdViewModel vm = new AdViewModel(getActivity());
-        mBinding.setAd(vm);
     }
 
     /**
