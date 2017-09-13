@@ -6,6 +6,7 @@ import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import project.sherpa.R;
+import project.sherpa.utilities.GeneralUtils;
 
 
 /**
@@ -25,6 +26,10 @@ public class ElevationAxisFormatter implements IAxisValueFormatter {
     public String getFormattedValue(float value, AxisBase axis) {
 
         // Return the formatted elevation
-        return mContext.getString(R.string.list_guide_format_elevation_imperial, value);
+        if (GeneralUtils.isUnitPreferenceMetric(mContext)) {
+            return mContext.getString(R.string.list_guide_format_elevation_metric, value);
+        } else {
+            return mContext.getString(R.string.list_guide_format_elevation_imperial, value);
+        }
     }
 }

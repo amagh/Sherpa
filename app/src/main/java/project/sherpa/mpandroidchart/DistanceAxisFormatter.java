@@ -6,6 +6,7 @@ import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import project.sherpa.R;
+import project.sherpa.utilities.GeneralUtils;
 
 /**
  * Created by Alvin on 7/25/2017.
@@ -26,6 +27,10 @@ public class DistanceAxisFormatter implements IAxisValueFormatter {
     public String getFormattedValue(float value, AxisBase axis) {
 
         // Return the formatted String to be used as the axis labels
-        return mContext.getString(R.string.list_guide_format_distance_chart_imperial, value);
+        if (GeneralUtils.isUnitPreferenceMetric(mContext)) {
+            return mContext.getString(R.string.list_guide_format_distance_chart_metric, value);
+        } else {
+            return mContext.getString(R.string.list_guide_format_distance_chart_imperial, value);
+        }
     }
 }
