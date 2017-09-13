@@ -16,7 +16,7 @@ import net.simonvt.schematic.annotation.TableEndpoint;
         database = GuideDatabase.class)
 public class GuideProvider {
     // ** Constants ** //
-    public static final String AUTHORITY = "project.sherpa.data";
+    public static final String AUTHORITY = "project.sherpa.paid.data";
     static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
     /**

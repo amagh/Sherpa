@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.GuideViewModel" />
+
+        <variable
+            name="handler"
+            type="project.sherpa.models.viewmodels.GuideDetailsMapViewModel" />
+
+        <variable
+            name="ad"
+            type="project.sherpa.ads.viewmodels.AdViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <project.sherpa.ui.views.SmartMapView
+            android:id="@+id/guide_details_mv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:activity="@{vm.activity}"
+            app:gpx="@{vm.gpx}"
+            app:viewModel="@{vm.viewModel}"
+            app:trackUserPosition="@{vm.trackUserPosition}"
+            app:fragment="@{vm.fragment}"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.gms.ads.AdView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:adRequest="@{ad.adRequest}"
+                app:adSize="BANNER"
+                app:adUnitId="ca-app-pub-9368220731151233/6941311245"/>
+
+            <ImageView
+                android:id="@+id/guide_details_map_back_iv"
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="?attr/actionBarSize"
+                android:padding="@dimen/back_icon_padding"
+                android:src="@drawable/ic_arrow_back"
+                android:contentDescription="@string/content_description_back_button"
+                android:onClick="@{handler::onClickBack}"/>
+
+        </LinearLayout>
+
+
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/guide_details_map_track_user_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:onClick="@{vm::onClickTrack}"
+            app:contentPadding="@dimen/map_icon_padding">
+
+            <ImageView
+                android:layout_width="@dimen/map_icon_size"
+                android:layout_height="@dimen/map_icon_size"
+                android:src="@drawable/ic_gps_fixed"
+                android:contentDescription="@string/content_description_my_location_button"
+                android:tint="@color/grey_700"/>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/guide_details_map_navigate_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="@dimen/nav_icon_bottom_margin"
+            android:onClick="@{vm::onClickNavigate}"
+            app:contentPadding="@dimen/map_icon_padding">
+
+            <ImageView
+                android:layout_width="@dimen/map_icon_size"
+                android:layout_height="@dimen/map_icon_size"
+                android:src="@drawable/ic_directions"
+                android:contentDescription="@string/content_description_trail_head_button"
+                android:tint="@color/grey_700"/>
+        </android.support.v7.widget.CardView>
+
+    </FrameLayout>
+
+
+
+</layout>

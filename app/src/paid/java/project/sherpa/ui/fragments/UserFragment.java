@@ -56,6 +56,7 @@ import project.sherpa.ui.activities.OpenDraftActivity;
 import project.sherpa.ui.adapters.AuthorDetailsAdapter;
 import project.sherpa.ui.adapters.GuideAdapter;
 import project.sherpa.ui.behaviors.FabSpeedDialScrollBehavior;
+import project.sherpa.ui.behaviors.VanishingBehavior;
 import project.sherpa.ui.dialogs.ProgressDialog;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
@@ -122,6 +123,8 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), new Author()));
         mBinding.fabDial.setMenuListener(this);
         mBinding.fabDial.getChildAt(0).setContentDescription(getString(R.string.content_description_create_fab));
+
+        setLayoutBehaviors();
 
         initRecyclerView();
 
@@ -194,6 +197,14 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         setHasOptionsMenu(true);
 
         return mBinding.getRoot();
+    }
+
+    private void setLayoutBehaviors() {
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mBinding.userAuthorIv.getLayoutParams();
+        params.setBehavior(new VanishingBehavior());
+
+        CoordinatorLayout.LayoutParams params2 = (CoordinatorLayout.LayoutParams) mBinding.userSeparatorV.getLayoutParams();
+        params2.setBehavior(new VanishingBehavior());
     }
 
     @Override
