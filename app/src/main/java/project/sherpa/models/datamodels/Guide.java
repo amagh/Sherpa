@@ -7,6 +7,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.ServerValue;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     public int difficulty;
     public String area;
     private boolean favorite;
+    private boolean addDate;
     public Map<String, Rating> raters;
 
     private Uri gpxUri;
@@ -239,6 +241,27 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     @Exclude
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
+    }
+
+    public Object getDateAdded() {
+        if (addDate) {
+            return ServerValue.TIMESTAMP;
+        } else {
+            return dateAdded;
+        }
+    }
+
+    @Exclude
+    public long getDate() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(long dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    public void addDate() {
+        this.addDate = true;
     }
 
 
