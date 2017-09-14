@@ -44,7 +44,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     private static final String DISTANCE        = "distance";
     private static final String DIFFICULTY      = "difficulty";
     private static final String AREA            = "area";
-    private static final String RATERS          = "raters";
 
     // ** Member Variables ** //
     private String title;
@@ -63,7 +62,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     public String area;
     private boolean favorite;
     private boolean addDate;
-    public Map<String, Rating> raters;
 
     private Uri gpxUri;
 
@@ -186,7 +184,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         map.put(DIFFICULTY, difficulty);
         map.put(AREA, area);
         map.put(HAS_IMAGE, hasImage);
-        map.put(RATERS, raters);
 
         return map;
     }
@@ -331,18 +328,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         } else {
             parcel.writeInt(0);
         }
-
-        if (raters != null) {
-            parcel.writeInt(raters.size());
-
-            for (String authorId : raters.keySet()) {
-                parcel.writeString(authorId);
-                parcel.writeString(raters.get(authorId).getAuthorName());
-                parcel.writeInt(raters.get(authorId).getRating());
-                parcel.writeString(raters.get(authorId).getComment());
-                parcel.writeLong(raters.get(authorId).getDate());
-            }
-        }
     }
 
     public static final Parcelable.Creator<Guide> CREATOR = new Parcelable.Creator<Guide>() {
@@ -390,24 +375,6 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
         if (parcel.readInt() == 1) {
             setFavorite(true);
-        }
-
-        int ratings;
-        if ((ratings = parcel.readInt()) != 0) {
-            raters = new HashMap<>();
-
-            for (int i = 0; i < ratings; i++) {
-                String authorId = parcel.readString();
-
-                Rating rating = new Rating();
-
-                rating.setAuthorName(parcel.readString());
-                rating.setRating(parcel.readInt());
-                rating.setComment(parcel.readString());
-                rating.setDateAdded(parcel.readLong());
-
-                raters.put(authorId, rating);
-            }
         }
     }
 }
