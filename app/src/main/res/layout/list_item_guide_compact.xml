@@ -52,6 +52,7 @@
             android:layout_marginRight="@dimen/list_guide_compact_internal_margin"
             android:layout_marginEnd="@dimen/list_guide_compact_internal_margin"
             android:maxLines="1"
+            android:text="@{vm.title}"
             style="@style/TextAppearance.AppCompat.Body1"
             app:layout_constraintStart_toEndOf="@id/list_guide_iv"
             app:layout_constraintEnd_toStartOf="@id/list_guide_track_color_iv"

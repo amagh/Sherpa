@@ -142,6 +142,11 @@ public class GuideViewModel extends BaseObservable {
     }
 
     @Bindable
+    public String getTitle() {
+        return mGuide.getTitle();
+    }
+
+    @Bindable
     public String getTrailName() {
         return mGuide.trailName;
     }
