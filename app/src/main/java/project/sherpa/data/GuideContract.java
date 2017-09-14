@@ -6,6 +6,8 @@ import net.simonvt.schematic.annotation.NotNull;
 import net.simonvt.schematic.annotation.PrimaryKey;
 import net.simonvt.schematic.annotation.References;
 
+import project.sherpa.models.datamodels.Guide;
+
 /**
  * Defines the tables and columns to be created for the database
  */
@@ -16,6 +18,9 @@ public class GuideContract {
     public interface GuideEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
         @DataType(DataType.Type.TEXT) String FIREBASE_ID                            = "firebaseId";
+
+        @DataType(DataType.Type.TEXT)
+        String TITLE = Guide.TITLE;
 
         @DataType(DataType.Type.TEXT)
         @References(table = GuideDatabase.TRAILS, column = TrailEntry.FIREBASE_ID)
