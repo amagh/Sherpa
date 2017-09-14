@@ -182,6 +182,7 @@ public class PublishActivity extends MapboxActivity implements ConnectivityActiv
             mGuide.authorId = mAuthor.firebaseId;
             mGuide.authorName = mAuthor.name;
             mGuide.area = mArea.name;
+            mGuide.addDate();
 
             addChildUpdate(mGuide, childUpdates);
 
