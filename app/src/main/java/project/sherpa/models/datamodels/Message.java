@@ -16,12 +16,14 @@ public class Message extends BaseModel {
 
     // ** Constants ** //
     public static final String AUTHOR_ID    = "authorId";
+    public static final String AUTHOR_NAME  = "authorName";
     public static final String MESSAGE      = "message";
     public static final String CHAT_ID      = "chatId";
     public static final String DATE         = "date";
 
     // ** Member Variables ** //
     private String authorId;
+    private String authorName;
     private String message;
     private String chatId;
     private double date;
@@ -32,6 +34,7 @@ public class Message extends BaseModel {
         Map<String, Object> map = new HashMap<>();
 
         map.put(AUTHOR_ID, authorId);
+        map.put(AUTHOR_NAME, authorName);
         map.put(MESSAGE, message);
         map.put(CHAT_ID, chatId);
         map.put(DATE, date);
@@ -50,6 +53,7 @@ public class Message extends BaseModel {
         // Get indices for the columns
         int idxFirebaseId   = cursor.getColumnIndex(GuideContract.MessageEntry.FIREBASE_ID);
         int idxAuthorId     = cursor.getColumnIndex(GuideContract.MessageEntry.AUTHOR_ID);
+        int idxAuthorName   = cursor.getColumnIndex(GuideContract.AuthorEntry.NAME);
         int idxMessage      = cursor.getColumnIndex(GuideContract.MessageEntry.MESSAGE);
         int idxChatId       = cursor.getColumnIndex(GuideContract.MessageEntry.CHAT_ID);
         int idxDate         = cursor.getColumnIndex(GuideContract.MessageEntry.DATE);
@@ -57,6 +61,7 @@ public class Message extends BaseModel {
         // Get the data from the Cursor
         String firebaseId   = cursor.getString(idxFirebaseId);
         String authorId     = cursor.getString(idxAuthorId);
+        String authorName   = cursor.getString(idxAuthorName);
         String message      = cursor.getString(idxMessage);
         String chatId       = cursor.getString(idxChatId);
         double date         = cursor.getDouble(idxDate);
@@ -66,6 +71,7 @@ public class Message extends BaseModel {
 
         messageObj.firebaseId   = firebaseId;
         messageObj.authorId     = authorId;
+        messageObj.authorName   = authorName;
         messageObj.message      = message;
         messageObj.chatId       = chatId;
         messageObj.date         = date;
@@ -82,6 +88,10 @@ public class Message extends BaseModel {
         return authorId;
     }
 
+    public String getAuthorName() {
+        return authorName;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -96,6 +106,10 @@ public class Message extends BaseModel {
 
     public void setAuthorId(String authorId) {
         this.authorId = authorId;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
     }
 
     public void setMessage(String message) {
