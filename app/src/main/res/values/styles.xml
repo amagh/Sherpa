@@ -8,11 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="ExpandedToolbarTitleTextAppearance" parent="TextAppearance.AppCompat.Headline">
+    <style name="ExpandedToolbarTitleTextAppearance" parent="TextAppearance.AppCompat.Title">
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="CollapsedToolbarTitleTextAppearance" parent="TextAppearance.AppCompat.Title">
+    <style name="CollapsedToolbarTitleTextAppearance" parent="TextAppearance.AppCompat.Subhead">
         <item name="android:textColor">@android:color/white</item>
     </style>
 
