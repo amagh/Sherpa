@@ -1,9 +1,13 @@
 package project.sherpa.models.datamodels;
 
+import android.database.Cursor;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import project.sherpa.data.GuideContract;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 
 /**
@@ -36,6 +40,45 @@ public class Chat extends BaseModel {
         map.put(LAST_MESSAGE, lastMessage);
 
         return map;
+    }
+
+    /**
+     * Creates a Chat data model from a Cursor describing a Chat
+     *
+     * @param cursor    Cursor describing a Chat
+     * @return Chat with the details from the Cursor
+     */
+    public Chat createChatFromCursor(Cursor cursor) {
+
+        // Get column indices
+        int idxFirebaseId       = cursor.getColumnIndex(GuideContract.ChatEntry.FIREBASE_ID);
+        int idxMemberId         = cursor.getColumnIndex(GuideContract.ChatEntry.MEMBER_ID);
+        int idxMessageCount     = cursor.getColumnIndex(GuideContract.ChatEntry.MESSAGE_COUNT);
+        int idxLastMessageId    = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE_ID);
+        int idxLastMessage      = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE);
+
+        // Get the value from the Cursor
+        String firebaseId       = cursor.getString(idxFirebaseId);
+        int messageCount        = cursor.getInt(idxMessageCount);
+        String lastMessageId    = cursor.getString(idxLastMessageId);
+        String lastMessage      = cursor.getString(idxLastMessage);
+
+        // Iterate through each value in the Cursor and add the memberId to the members List
+        List<String> members    = new ArrayList<>();
+        do {
+            members.add(cursor.getString(idxMemberId));
+        } while (cursor.moveToNext());
+
+        // Create and populate a new Chat
+        Chat chat = new Chat();
+
+        chat.firebaseId     = firebaseId;
+        chat.messageCount   = messageCount;
+        chat.lastMessageId  = lastMessageId;
+        chat.lastMessage    = lastMessage;
+        chat.members        = members;
+
+        return chat;
     }
 
     //********************************************************************************************//
