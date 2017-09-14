@@ -169,7 +169,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         map.put(TRAIL_NAME, trailName);
         map.put(AUTHOR_ID, authorId);
         map.put(AUTHOR_NAME, authorName);
-        map.put(DATE_ADDED, dateAdded);
+        map.put(DATE_ADDED, getDateAdded());
         map.put(RATING, rating);
         map.put(REVIEWS, reviews);
         map.put(LATITUDE, latitude);
