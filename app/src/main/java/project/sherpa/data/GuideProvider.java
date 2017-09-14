@@ -7,6 +7,8 @@ import net.simonvt.schematic.annotation.ContentUri;
 import net.simonvt.schematic.annotation.InexactContentUri;
 import net.simonvt.schematic.annotation.TableEndpoint;
 
+import project.sherpa.BuildConfig;
+
 /**
  * ContentProvider framework to be used by Schematic to generate the ContentProvider
  */
@@ -16,7 +18,7 @@ import net.simonvt.schematic.annotation.TableEndpoint;
         database = GuideDatabase.class)
 public class GuideProvider {
     // ** Constants ** //
-    public static final String AUTHORITY = "project.sherpa.data";
+    public static final String AUTHORITY = "project.sherpa." + BuildConfig.FLAVOR + ".data";
     static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
     /**

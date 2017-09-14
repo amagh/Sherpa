@@ -12,7 +12,9 @@
     <!-- User preferences -->
     <string name="pref_units_key">units</string>
     <string name="pref_units_imperial">imperial</string>
+    <string name="pref_units_metric">metric</string>
     <string name="pref_units_default">@string/pref_units_imperial</string>
+    <string name="pref_units_title">Units</string>
 
     <!-- Strings for guide details -->
     <string name="list_guide_details_distance_label">Total distance:</string>
@@ -57,6 +59,9 @@
     <string name="list_guide_format_distance_imperial">%,.2f miles</string>
     <string name="list_guide_format_distance_chart_imperial">%,.1f mi</string>
     <string name="list_guide_format_elevation_imperial">%,.0f ft</string>
+    <string name="list_guide_format_distance_metric">%,.2f km</string>
+    <string name="list_guide_format_distance_chart_metric">%,.1f km</string>
+    <string name="list_guide_format_elevation_metric">%,.0f m</string>
     <string name="list_guide_format_rating">%1.1f\u2605</string>
     <string name="list_guide_format_rating_zero">0\u2605</string>
     <string name="list_guide_format_reviews">(%d)</string>
@@ -89,6 +94,7 @@
     <string name="error_tile_count_exceeded">Reached max tile count. Please remove some offline maps before attempting to save again.</string>
     <string name="mapbox_deleted">Mapbox tiles successfully deleted.</string>
     <string name="mapbox_downloaded">Map downloaded!</string>
+    <string name="toast_free_cached_limit">Free version only allows one cached guide at a time. Please purchase the app to cache more guides!</string>
 
     <!-- Guide Details Map Strings -->
     <string name="content_description_back_button">Return to guide details.</string>
@@ -219,4 +225,21 @@
     <string name="list_area_state_text">California</string>
 
     <string name="list_rating_comment_text">This is a test comment to see how a real comment would be displayed. We are making it long to see what it looks like as multiple lines.</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Preference strings -->
+    <string name="pref_menu_title">Settings</string>
+    <string name="pref_header_general">General</string>
+
+    <string-array name="pref_units_list_titles">
+        <item>Imperial</item>
+        <item>Metric</item>
+    </string-array>
+    <string-array name="pref_units_list_values">
+        <item>@string/pref_units_imperial</item>
+        <item>@string/pref_units_metric</item>
+    </string-array>
+
 </resources>

@@ -439,6 +439,32 @@ public class ContentProviderUtils {
     }
 
     /**
+     * Checks whether the offline database already contains a cached guide. This method will be
+     * used to limit the number of cached guides in the free version.
+     *
+     * @param context    Interface to global Context
+     * @return True if the database already contains a cached guide. False otherwise.
+     */
+    public static boolean containsCachedGuide(Context context) {
+        Cursor cursor = context.getContentResolver().query(
+                GuideProvider.Guides.CONTENT_URI,
+                null,
+                GuideContract.GuideEntry.IMAGE_URI + " IS NOT NULL AND " + GuideContract.GuideEntry.DRAFT + " IS NULL",
+                null,
+                null);
+
+        if (cursor != null) {
+            try {
+                return cursor.getCount() > 0;
+            } finally {
+                cursor.close();
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Creates a ContentValues for a Guide data model
      *
      * @param guide    Guide to create ContentValues for

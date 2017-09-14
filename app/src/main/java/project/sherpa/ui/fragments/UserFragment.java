@@ -40,6 +40,7 @@ import java.util.Map;
 import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.sherpa.R;
+import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideDatabase;
 import project.sherpa.databinding.FragmentUserBinding;
@@ -56,6 +57,7 @@ import project.sherpa.ui.activities.OpenDraftActivity;
 import project.sherpa.ui.adapters.AuthorDetailsAdapter;
 import project.sherpa.ui.adapters.GuideAdapter;
 import project.sherpa.ui.behaviors.FabSpeedDialScrollBehavior;
+import project.sherpa.ui.behaviors.VanishingBehavior;
 import project.sherpa.ui.dialogs.ProgressDialog;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
@@ -123,6 +125,8 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         mBinding.fabDial.setMenuListener(this);
         mBinding.fabDial.getChildAt(0).setContentDescription(getString(R.string.content_description_create_fab));
 
+        setLayoutBehaviors();
+
         initRecyclerView();
 
         if (savedInstanceState != null) {
@@ -188,12 +192,23 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
             }
         }
 
+        // Load Ads
+        loadAdViewModel(mBinding);
+
         // Load the logged in user so that the favorites can be synced
         loadUserForFavorites();
 
         setHasOptionsMenu(true);
 
         return mBinding.getRoot();
+    }
+
+    private void setLayoutBehaviors() {
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mBinding.userAuthorIv.getLayoutParams();
+        params.setBehavior(new VanishingBehavior());
+
+        CoordinatorLayout.LayoutParams params2 = (CoordinatorLayout.LayoutParams) mBinding.userSeparatorV.getLayoutParams();
+        params2.setBehavior(new VanishingBehavior());
     }
 
     @Override

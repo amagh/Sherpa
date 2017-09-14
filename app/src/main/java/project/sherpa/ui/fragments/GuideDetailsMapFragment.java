@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import project.sherpa.R;
+import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.databinding.FragmentGuideDetailsMapBinding;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
@@ -81,6 +82,9 @@ public class GuideDetailsMapFragment extends MapboxFragment {
         }
 
         mBinding.setHandler(new GuideDetailsMapViewModel((GuideDetailsActivity) getActivity()));
+
+        // Load ads if applicable
+        loadAdViewModel(mBinding);
 
         // Request permission to track user on map
         ((GuideDetailsActivity) getActivity()).requestLocationPermission();

@@ -3,7 +3,9 @@ package project.sherpa.utilities;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -172,5 +174,22 @@ public class GeneralUtils {
         ActivityCompat.requestPermissions(activity,
                 permissions,
                 requestCode);
+    }
+
+    /**
+     * Checks the users unit preferences and returns a boolean value for whether that preference is
+     * for metric units
+     *
+     * @param context    Interface to global Context
+     * @return True if user prefers metric. False otherwise.
+     */
+    public static boolean isUnitPreferenceMetric(Context context) {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return prefs.getString(
+                context.getString(R.string.pref_units_key),
+                context.getString(R.string.pref_units_default))
+                .equals(context.getString(R.string.pref_units_metric));
     }
 }

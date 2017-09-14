@@ -15,7 +15,10 @@ import android.view.ViewGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -23,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import project.sherpa.R;
+import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideProvider;
 import project.sherpa.databinding.FragmentFavoritesBinding;
@@ -34,6 +38,7 @@ import project.sherpa.ui.activities.MainActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
@@ -82,11 +87,16 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
             }
         }
 
+        // Load ads if applicable
+        loadAdViewModel(mBinding);
+
         // Begin listening for network status changes
         ((MainActivity) getActivity()).addConnectivityCallback(this);
 
         return mBinding.getRoot();
     }
+
+
 
     /**
      * Initializes the elements required for the RecyclerView

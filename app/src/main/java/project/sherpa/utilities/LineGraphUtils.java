@@ -1,6 +1,8 @@
 package project.sherpa.utilities;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -23,8 +25,9 @@ import project.sherpa.mpandroidchart.ElevationAxisFormatter;
 
 public class LineGraphUtils {
     // ** Constants ** //
-    private static final double METERS_PER_MILE = 1609.34;
-    private static final double METERS_PER_FEET = 0.3048;
+    private static final double METERS_PER_MILE         = 1609.34;
+    private static final double METERS_PER_FEET         = 0.3048;
+    private static final double METERS_PER_KILOMETER    = 1000;
 
     public static void addElevationDataToLineChart(File gpxFile, final LineChart lineChart, final Context context) {
 
@@ -36,24 +39,33 @@ public class LineGraphUtils {
                     return;
                 }
 
+                double distanceConversion   = GeneralUtils.isUnitPreferenceMetric(context)
+                        ? METERS_PER_KILOMETER
+                        : METERS_PER_MILE;
+                double heightConversion     = GeneralUtils.isUnitPreferenceMetric(context)
+                        ? 1
+                        : METERS_PER_FEET;
+
                 for (Entry entry : elevationData) {
                     // Convert to imperial
-                    entry.setX((float) (entry.getX() / METERS_PER_MILE));
-                    entry.setY((float) (entry.getY() / METERS_PER_FEET));
+                    entry.setX((float) (entry.getX() / distanceConversion));
+                    entry.setY((float) (entry.getY() / heightConversion));
                 }
 
                 float totalDistance = elevationData.get(elevationData.size() - 1).getX();
 
                 // Set the number of labels to display on the chart based on the total distance of
                 // the trail
-                float interval = 2.5f;      // 2.5 mi interval as minimum
+                float interval = GeneralUtils.isUnitPreferenceMetric(context)
+                        ? 5.0f      // 5.0 km interval as minimum
+                        : 2.5f;     // 2.5 mi interval as minimum
 
                 // Calculate how many labels there would be if the interval were 2.5 miles. Use
                 // floor instead of round() because fractions of a label can't be shown
                 int numLabels;
 
-                while ((numLabels = (int) Math.floor(totalDistance / interval)) > 6) {
-                    // Double the interval until there are less than 6 labels in the graph
+                while ((numLabels = (int) Math.floor(totalDistance / interval)) > 5) {
+                    // Double the interval until there are less than 5 labels in the graph
                     // 2.5 mi > 5.0 mi > 10 mi > 20 mi etc
                     interval *= 2;
                 }
@@ -98,10 +110,14 @@ public class LineGraphUtils {
                 lineChart.getXAxis().setSpecificLabelPositions(labels);
 
                 // Set up the Y-Axes
+                float granularity = GeneralUtils.isUnitPreferenceMetric(context)
+                        ? 250f
+                        : 500f;
+
                 lineChart.getAxisRight().setValueFormatter(new ElevationAxisFormatter(context));
-                lineChart.getAxisRight().setGranularity(500f);
+                lineChart.getAxisRight().setGranularity(granularity);
                 lineChart.getAxisLeft().setValueFormatter(new ElevationAxisFormatter(context));
-                lineChart.getAxisLeft().setGranularity(500f);
+                lineChart.getAxisLeft().setGranularity(granularity);
 
                 // Remove the description label from the chart
                 Description description = new Description();

@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import project.sherpa.R;
+import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.databinding.FragmentSearchBinding;
 import project.sherpa.firebasestorage.StorageProvider;
 import project.sherpa.models.datamodels.Guide;
@@ -95,6 +96,9 @@ public class SearchFragment extends MapboxFragment {
         if (savedInstanceState != null) {
             restoreSavedInstanceState(savedInstanceState);
         }
+
+        // Load ads if applicable
+        loadAdViewModel(mBinding);
 
         return mBinding.getRoot();
     }

@@ -18,11 +18,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import project.sherpa.BuildConfig;
 import project.sherpa.R;
+import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideProvider;
 import project.sherpa.databinding.FragmentGuideDetailsBinding;
@@ -39,6 +42,7 @@ import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.MapUtils;
 import project.sherpa.utilities.OfflineGuideManager;
+import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
@@ -115,6 +119,9 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
             mBinding.setVm(new GuideViewModel(getActivity(), mGuide));
         }
 
+        // Load ads if applicable
+        loadAdViewModel(mBinding);
+
         // Show the menu
         setHasOptionsMenu(true);
 
@@ -151,6 +158,18 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
                 return true;
 
             case R.id.menu_save:
+
+                // In free version, only allow a single cached guide at a time
+                if (BuildConfig.FLAVOR.equals("free") && ContentProviderUtils.containsCachedGuide(getActivity())) {
+                    Toast.makeText(
+                            getActivity(),
+                            getString(R.string.toast_free_cached_limit),
+                            Toast.LENGTH_LONG)
+                            .show();
+
+                    return true;
+                }
+
                 if (!ContentProviderUtils.isGuideCachedInDatabase(getActivity(), mGuide)) {
                     saveGuide();
                     animateCacheIcon();

@@ -56,6 +56,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
         // Index the columns of the Cursor
         int idxFirebaseId       = cursor.getColumnIndex(GuideContract.AuthorEntry.FIREBASE_ID);
         int idxName             = cursor.getColumnIndex(GuideContract.AuthorEntry.NAME);
+        int idxUsername         = cursor.getColumnIndex(GuideContract.AuthorEntry.USERNAME);
         int idxDescription      = cursor.getColumnIndex(GuideContract.AuthorEntry.DESCRIPTION);
         int idxScore            = cursor.getColumnIndex(GuideContract.AuthorEntry.SCORE);
         int idxImageUri         = cursor.getColumnIndex(GuideContract.AuthorEntry.IMAGE_URI);
@@ -63,6 +64,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
         // Retrieve the values from the Cursor
         String firebaseId       = cursor.getString(idxFirebaseId);
         String name             = cursor.getString(idxName);
+        String username         = cursor.getString(idxUsername);
         String description      = cursor.getString(idxDescription);
         int score               = cursor.getInt(idxScore);
         String imageUriString   = cursor.getString(idxImageUri);
@@ -71,6 +73,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
         Author author           = new Author();
         author.firebaseId       = firebaseId;
         author.name             = name;
+        author.username         = username;
         author.description      = description;
         author.score            = score;
 

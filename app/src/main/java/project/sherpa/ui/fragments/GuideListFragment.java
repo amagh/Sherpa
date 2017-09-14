@@ -1,10 +1,13 @@
 package project.sherpa.ui.fragments;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -21,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import project.sherpa.prefs.SettingsActivity;
 import project.sherpa.R;
 import project.sherpa.data.GuideDatabase;
 import project.sherpa.databinding.FragmentGuideListBinding;
@@ -67,13 +71,30 @@ public class GuideListFragment extends ConnectivityFragment {
             // Load the Guide associated with each guideId from cache
             loadDataFromCache(guideIdList);
         }
-//
-//        // Check to see if the device is connected to a network
-//        if (getActivity() instanceof ConnectivityActivity) {
-//            ((ConnectivityActivity) getActivity()).setConnectivityCallback(this);
-//        }
+
+        // Load ads if applicable
+        loadAdViewModel(mBinding);
+
+        setHasOptionsMenu(true);
 
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_general, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_prefs:
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
+                return true;
+        }
+
+        return false;
     }
 
     @Override
