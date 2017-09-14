@@ -29,7 +29,7 @@ import project.sherpa.utilities.GpxUtils;
 
 public class Guide extends BaseModelWithImage implements Parcelable {
     // ** Constants ** //
-    public static final String TITLE            = "guideTitle";
+    public static final String TITLE            = "title";
     private static final String TRAIL_ID        = "trailId";
     private static final String TRAIL_NAME      = "trailName";
     private static final String AUTHOR_ID       = "authorId";
