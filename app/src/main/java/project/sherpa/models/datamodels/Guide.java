@@ -29,6 +29,7 @@ import project.sherpa.utilities.GpxUtils;
 
 public class Guide extends BaseModelWithImage implements Parcelable {
     // ** Constants ** //
+    public static final String TITLE      = "guideTitle";
     private static final String TRAIL_ID        = "trailId";
     private static final String TRAIL_NAME      = "trailName";
     private static final String AUTHOR_ID       = "authorId";
@@ -46,6 +47,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     private static final String RATERS          = "raters";
 
     // ** Member Variables ** //
+    private String title;
     public String trailId;
     public String trailName;
     public String authorId;
@@ -92,6 +94,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
         // Get the index of every column from the Cursor
         int idxFirebaseId       = cursor.getColumnIndex(GuideContract.GuideEntry.FIREBASE_ID);
+        int idxGuideTitle       = cursor.getColumnIndex(GuideContract.GuideEntry.TITLE);
         int idxTrailId          = cursor.getColumnIndex(GuideContract.GuideEntry.TRAIL_ID);
         int idxTrailName        = cursor.getColumnIndex(GuideContract.GuideEntry.TRAIL_NAME);
         int idxAuthorId         = cursor.getColumnIndex(GuideContract.GuideEntry.AUTHOR_ID);
@@ -112,6 +115,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
         // Get the values from the Cursor
         String firebaseId       = cursor.getString(idxFirebaseId);
+        String title            = cursor.getString(idxGuideTitle);
         String trailId          = cursor.getString(idxTrailId);
         String trailName        = cursor.getString(idxTrailName);
         String authorId         = cursor.getString(idxAuthorId);
@@ -133,6 +137,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         // Create a new Guide using the values from the Cursor
         Guide guide             = new Guide();
         guide.firebaseId        = firebaseId;
+        guide.title             = title;
         guide.trailId           = trailId;
         guide.trailName         = trailName;
         guide.authorId          = authorId;
@@ -165,6 +170,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
+        map.put(TITLE, title);
         map.put(TRAIL_ID, trailId);
         map.put(TRAIL_NAME, trailName);
         map.put(AUTHOR_ID, authorId);
