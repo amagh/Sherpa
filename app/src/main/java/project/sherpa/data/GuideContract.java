@@ -138,5 +138,9 @@ public class GuideContract {
         String MEMBER_ID        = Chat.MEMBER_ID;
         @DataType(DataType.Type.INTEGER)
         String MESSAGE_COUNT    = Chat.MESSAGE_COUNT;
+        @DataType(DataType.Type.TEXT)
+        String LAST_MESSAGE_ID  = Chat.LAST_MESSAGE_ID;
+        @DataType(DataType.Type.TEXT)
+        String LAST_MESSAGE     = Chat.LAST_MESSAGE;
     }
 }
