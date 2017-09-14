@@ -24,6 +24,8 @@
                 android:id="@+id/guide_details_ct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:descendantFocusability="beforeDescendants"
                 app:title="@{vm.title}"
                 app:subtitle="@{vm.trailName}"
                 app:expandedTitleTextAppearance="@style/ExpandedToolbarTitleTextAppearance"
@@ -43,6 +45,24 @@
                     android:onClick="@{vm::onClickHeroImage}"
                     app:image="@{vm.image}"
                     app:layout_collapseMode="parallax"/>
+
+                <EditText
+                    android:id="@+id/guide_details_edit_title_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginLeft="28dp"
+                    android:layout_marginStart="28dp"
+                    android:layout_marginBottom="28dp"
+                    android:layout_marginRight="28dp"
+                    android:layout_marginEnd="28dp"
+                    android:textColor="@android:color/transparent"
+                    android:text="@={vm.title}"
+                    android:inputType="textAutoCorrect|textCapWords"
+                    android:imeOptions="actionDone"
+                    app:backgroundTint="@android:color/transparent"
+                    tools:text="The Quintessential Hike"
+                    style="@style/TextAppearance.AppCompat.Title"/>
                 
                 <ImageView
                     android:id="@+id/guide_details_icon_iv"

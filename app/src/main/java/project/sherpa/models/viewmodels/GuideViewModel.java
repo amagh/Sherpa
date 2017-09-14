@@ -9,8 +9,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.SubtitleCollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -143,7 +145,16 @@ public class GuideViewModel extends BaseObservable {
 
     @Bindable
     public String getTitle() {
-        return mGuide.getTitle();
+
+        return mGuide.getTitle() != null && !mGuide.getTitle().isEmpty()
+                ? mGuide.getTitle()
+                : "";
+    }
+
+    public void setTitle(String title) {
+        mGuide.setTitle(title);
+
+        notifyPropertyChanged(BR.title);
     }
 
     @Bindable
