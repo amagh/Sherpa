@@ -26,7 +26,7 @@ public class Message extends BaseModel {
     private String authorName;
     private String message;
     private String chatId;
-    private double date;
+    private long date;
 
     @Override
     public Map<String, Object> toMap() {
@@ -64,7 +64,7 @@ public class Message extends BaseModel {
         String authorName   = cursor.getString(idxAuthorName);
         String message      = cursor.getString(idxMessage);
         String chatId       = cursor.getString(idxChatId);
-        double date         = cursor.getDouble(idxDate);
+        long date           = cursor.getLong(idxDate);
 
         // Create a new Message with the information
         Message messageObj = new Message();
@@ -100,7 +100,7 @@ public class Message extends BaseModel {
         return chatId;
     }
 
-    public double getDate() {
+    public long getDate() {
         return date;
     }
 
@@ -120,7 +120,7 @@ public class Message extends BaseModel {
         this.chatId = chatId;
     }
 
-    public void setDate(double date) {
+    public void setDate(long date) {
         this.date = date;
     }
 }
