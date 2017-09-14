@@ -106,10 +106,14 @@
     <string name="menu_save_draft_title">Save Draft</string>
     <string name="menu_delete_draft">Delete Draft</string>
 
+    <string name="guide_title_hint">Add a Guide Title</string>
+
     <string name="create_guide_image_missing_error_text">Please add an image</string>
     <string name="create_guide_gpx_missing_error_text">Please add a GPX file</string>
     <string name="create_guide_no_sections_error">Please add some content to your guide before publishing</string>
     <string name="create_guide_difficulty_missing_error_text">Please select a difficulty for the trail before publishing</string>
+    <string name="toast_create_guide_empty_guide_title">Please enter a title for your guide</string>
+    <string name="toast_create_guide_invalid_guide_title">Invalid guide title. Title can only contain letters, numbers, and spaces</string>
 
     <string name="draft_saved">Draft Saved!</string>
     <string name="draft_deleted">Draft Deleted!</string>

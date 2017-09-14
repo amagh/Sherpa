@@ -53,6 +53,7 @@ import project.sherpa.ui.dialogs.SaveDialog;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.GeneralUtils;
+import timber.log.Timber;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
@@ -729,6 +730,29 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
     private boolean validateGuide() {
 
         boolean valid = true;
+
+        // Trim the guide title
+        if (mGuide.getTitle() != null) mGuide.setTitle(mGuide.getTitle().trim());
+
+        // Check to ensure guide title is not empty and contains only letters and numbers
+        if (mGuide.getTitle() == null || mGuide.getTitle().isEmpty()) {
+            Toast.makeText(
+                    this,
+                    getString(R.string.toast_create_guide_empty_guide_title),
+                    Toast.LENGTH_LONG)
+                    .show();
+
+            valid = false;
+
+        } else if (!mGuide.getTitle().matches("[A-Za-z0-9 ]+")) {
+            Toast.makeText(
+                    this,
+                    getString(R.string.toast_create_guide_invalid_guide_title),
+                    Toast.LENGTH_LONG)
+                    .show();
+
+            valid = false;
+        }
 
         if (mGuide.difficulty == 0) {
             Toast.makeText(
