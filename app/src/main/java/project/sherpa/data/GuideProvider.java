@@ -9,6 +9,7 @@ import net.simonvt.schematic.annotation.TableEndpoint;
 
 import project.sherpa.BuildConfig;
 import project.sherpa.data.GuideContract.*;
+import project.sherpa.models.datamodels.Message;
 
 /**
  * ContentProvider framework to be used by Schematic to generate the ContentProvider
@@ -208,13 +209,16 @@ public class GuideProvider {
                 type = "vnd.android.cursor.dir/messages",
                 whereColumn = GuideDatabase.MESSAGES + "." + MessageEntry.CHAT_ID,
                 pathSegment = 2,
-                join = "JOIN " + GuideDatabase.MESSAGES + " ON " +
-                        GuideDatabase.MESSAGES  + "." + MessageEntry.CHAT_ID    + " = " +
-                        GuideDatabase.CHATS     + "." + ChatEntry.FIREBASE_ID)
-        public static Uri forChat(String firebaseId) {
+                join = "JOIN "                  + GuideDatabase.CHATS           + " ON "    +
+                        GuideDatabase.MESSAGES  + "." + MessageEntry.CHAT_ID    + " = "     +
+                        GuideDatabase.CHATS     + "." + ChatEntry.FIREBASE_ID   + " "       +
+                        "JOIN "                 + GuideDatabase.AUTHORS         + " ON "    +
+                        GuideDatabase.MESSAGES  + "." + Message.AUTHOR_ID       + " = "     +
+                        GuideDatabase.AUTHORS   + "." + AuthorEntry.FIREBASE_ID)
+        public static Uri forChat(String chatId) {
             return CONTENT_URI.buildUpon()
                     .appendPath(Path.CHATS)
-                    .appendPath(firebaseId)
+                    .appendPath(chatId)
                     .build();
         }
     }
@@ -229,5 +233,20 @@ public class GuideProvider {
                 path = Path.CHATS,
                 type = "vnd.android.cursor.dir/chats")
         public static final Uri CONTENT_URI = buildUri(Path.CHATS);
+
+        @InexactContentUri(
+                path = Path.CHATS + "/*",
+                name = "CHATS_BY_ID",
+                type = "vnd.android.cursor.dir/chats",
+                whereColumn = GuideDatabase.CHATS + "." + ChatEntry.FIREBASE_ID,
+                pathSegment = 1,
+                join = "JOIN "                  + GuideDatabase.AUTHORS         + " ON "    +
+                        GuideDatabase.CHATS     + "." + ChatEntry.MEMBER_ID     + " = "     +
+                        GuideDatabase.AUTHORS   + "." + AuthorEntry.FIREBASE_ID)
+        public static Uri byId(String firebaseId) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(firebaseId)
+                    .build();
+        }
     }
 }
