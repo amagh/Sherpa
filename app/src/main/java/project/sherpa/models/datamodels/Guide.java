@@ -29,7 +29,7 @@ import project.sherpa.utilities.GpxUtils;
 
 public class Guide extends BaseModelWithImage implements Parcelable {
     // ** Constants ** //
-    public static final String TITLE      = "guideTitle";
+    public static final String TITLE            = "guideTitle";
     private static final String TRAIL_ID        = "trailId";
     private static final String TRAIL_NAME      = "trailName";
     private static final String AUTHOR_ID       = "authorId";
@@ -239,6 +239,10 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         return gpxFile;
     }
 
+    //********************************************************************************************//
+    //*********************************** Getters & Setters **************************************//
+    //********************************************************************************************//
+
     @Exclude
     public boolean isFavorite() {
         return favorite;
@@ -270,6 +274,13 @@ public class Guide extends BaseModelWithImage implements Parcelable {
         this.addDate = true;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     //********************************************************************************************//
     //***************************** Parcelable Related Methods ***********************************//
