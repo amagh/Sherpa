@@ -50,7 +50,7 @@ public class Guide extends BaseModelWithImage implements Parcelable {
     public String trailName;
     public String authorId;
     public String authorName;
-    public long dateAdded;
+    private long dateAdded;
     public double rating;
     public int reviews;
     public double latitude;
