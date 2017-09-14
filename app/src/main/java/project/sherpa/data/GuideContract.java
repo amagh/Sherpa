@@ -122,6 +122,7 @@ public class GuideContract {
         @DataType(DataType.Type.TEXT) @NotNull
         String MESSAGE      = Message.MESSAGE;
         @DataType(DataType.Type.TEXT) @NotNull
+        @References(table = GuideDatabase.CHATS, column = ChatEntry.FIREBASE_ID)
         String CHAT_ID      = Message.CHAT_ID;
         @DataType(DataType.Type.REAL) @NotNull
         String DATE         = Message.DATE;
