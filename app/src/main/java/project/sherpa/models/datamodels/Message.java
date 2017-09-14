@@ -39,20 +39,29 @@ public class Message extends BaseModel {
         return map;
     }
 
+    /**
+     * Generates a Message data object from a Cursor describing a Message
+     *
+     * @param cursor    Cursor describing a Message
+     * @return Message data object with contents from the Cursor
+     */
     public static Message createMessageFromCursor(Cursor cursor) {
 
+        // Get indices for the columns
         int idxFirebaseId   = cursor.getColumnIndex(GuideContract.MessageEntry.FIREBASE_ID);
         int idxAuthorId     = cursor.getColumnIndex(GuideContract.MessageEntry.AUTHOR_ID);
         int idxMessage      = cursor.getColumnIndex(GuideContract.MessageEntry.MESSAGE);
         int idxChatId       = cursor.getColumnIndex(GuideContract.MessageEntry.CHAT_ID);
         int idxDate         = cursor.getColumnIndex(GuideContract.MessageEntry.DATE);
 
+        // Get the data from the Cursor
         String firebaseId   = cursor.getString(idxFirebaseId);
         String authorId     = cursor.getString(idxAuthorId);
         String message      = cursor.getString(idxMessage);
         String chatId       = cursor.getString(idxChatId);
         double date         = cursor.getDouble(idxDate);
 
+        // Create a new Message with the information
         Message messageObj = new Message();
 
         messageObj.firebaseId   = firebaseId;
