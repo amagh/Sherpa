@@ -105,6 +105,9 @@
     <dimen name="message_outer_horizontal_margin">8dp</dimen>
     <dimen name="message_horizontal_padding">8dp</dimen>
     <dimen name="message_vertical_padding">6dp</dimen>
+    <dimen name="message_default_top_padding">8dp</dimen>
+    <dimen name="message_contracted_top_padding">2dp</dimen>
+    <dimen name="message_container_horizontal_padding">44dp</dimen>
 
     <dimen name="chat_bubble_corner_radius">8dp</dimen>
 

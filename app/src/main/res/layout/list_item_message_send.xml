@@ -16,27 +16,34 @@
         android:layout_height="wrap_content"
         tools:paddingTop="8dp">
 
-        <TextView
-            android:id="@+id/message_tv"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/message_container_ll"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/message_horizontal_padding"
-            android:paddingStart="@dimen/message_horizontal_padding"
-            android:paddingRight="@dimen/message_horizontal_padding"
-            android:paddingEnd="@dimen/message_horizontal_padding"
-            android:paddingTop="@dimen/message_vertical_padding"
-            android:paddingBottom="@dimen/message_vertical_padding"
-            android:background="@drawable/chat_bubble_self"
             android:layout_marginRight="@dimen/message_outer_horizontal_margin"
             android:layout_marginEnd="@dimen/message_outer_horizontal_margin"
-            android:textColor="@android:color/white"
-            android:text="@{vm.message}"
-            style="@style/TextAppearance.AppCompat.Caption"
+            android:paddingLeft="44dp"
+            android:paddingStart="44dp"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:maxWidth="300dp"
-            tools:text="@string/list_message_text"/>
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/message_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/message_horizontal_padding"
+                android:paddingStart="@dimen/message_horizontal_padding"
+                android:paddingRight="@dimen/message_horizontal_padding"
+                android:paddingEnd="@dimen/message_horizontal_padding"
+                android:paddingTop="@dimen/message_vertical_padding"
+                android:paddingBottom="@dimen/message_vertical_padding"
+                android:background="@drawable/chat_bubble_self"
+                android:textColor="@android:color/white"
+                android:text="@{vm.message}"
+                style="@style/TextAppearance.AppCompat.Caption"
+                tools:text="@string/list_message_text"/>
+        </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 </layout>
