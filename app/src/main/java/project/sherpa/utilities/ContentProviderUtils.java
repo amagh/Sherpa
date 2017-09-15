@@ -17,7 +17,9 @@ import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideProvider;
 import project.sherpa.models.datamodels.Area;
 import project.sherpa.models.datamodels.Author;
+import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.Guide;
+import project.sherpa.models.datamodels.Message;
 import project.sherpa.models.datamodels.Section;
 import project.sherpa.models.datamodels.Trail;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
@@ -67,6 +69,29 @@ public class ContentProviderUtils {
         context.getContentResolver().bulkInsert(
                 GuideProvider.Sections.CONTENT_URI,
                 sectionValues);
+    }
+
+    /**
+     * Bulk inserts an Array of Messages into the database
+     *
+     * @param context     Interface to global Context
+     * @param messages    Array of Messages to be inserted into the database
+     */
+    public static void bulkInsertMessages(Context context, Message... messages) {
+
+        // Init Array of ContentValues to be bulk inserted
+        ContentValues[] messageValues = new ContentValues[messages.length];
+
+        // Create ContentValues for each Message to be inserted
+        for (int i = 0; i < messages.length; i++) {
+            Message message = messages[i];
+            messageValues[i] = getValuesForMessage(message);
+        }
+
+        // Bulk insert
+        context.getContentResolver().bulkInsert(
+                GuideProvider.Messages.CONTENT_URI,
+                messageValues);
     }
 
     /**
@@ -610,6 +635,54 @@ public class ContentProviderUtils {
 
 
         return values;
+    }
+
+    /**
+     * Creates a Content Values for a Message data model
+     *
+     * @param message    Message to be Converted to ContentValues
+     * @return ContentValues describing a Message
+     */
+    private static ContentValues getValuesForMessage(Message message) {
+        ContentValues values = new ContentValues();
+
+        values.put(GuideContract.MessageEntry.FIREBASE_ID,      message.firebaseId);
+        values.put(GuideContract.MessageEntry.CHAT_ID,          message.getChatId());
+        values.put(GuideContract.MessageEntry.AUTHOR_ID,        message.getAuthorId());
+        values.put(GuideContract.MessageEntry.DATE,             (long) message.getDate());
+        values.put(GuideContract.MessageEntry.MESSAGE,          message.getMessage());
+
+        return values;
+    }
+
+    /**
+     * Converts a Chat to an Array of ContentValues and bulk inserts them into the database. a
+     * ContentValues is created for each member of the chat.
+     *
+     * @param context    Interface to global Context
+     * @param chat Chat to be inserted into the database
+     */
+    private static void insertChat(Context context, Chat chat) {
+
+        // Init the Array of ContentValues to be inserted
+        ContentValues[] chatValues = new ContentValues[chat.getMembers().size()];
+
+        // Create a ContentValues for each member of the chat
+        for (int i = 0; i < chatValues.length; i++) {
+            chatValues[i] = new ContentValues();
+            ContentValues values = chatValues[i];
+
+            values.put(GuideContract.ChatEntry.FIREBASE_ID,     chat.firebaseId);
+            values.put(GuideContract.ChatEntry.MEMBER_ID,       chat.getMembers().get(i));
+            values.put(GuideContract.ChatEntry.LAST_MESSAGE_ID, chat.getLastMessageId());
+            values.put(GuideContract.ChatEntry.LAST_MESSAGE,    chat.getLastMessage());
+            values.put(GuideContract.ChatEntry.MESSAGE_COUNT,   chat.getMessageCount());
+        }
+
+        // Bulk insert
+        context.getContentResolver().bulkInsert(
+                GuideProvider.Chats.CONTENT_URI,
+                chatValues);
     }
 
     /**
