@@ -5,7 +5,11 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.net.Uri;
+import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
@@ -20,8 +24,11 @@ import com.google.firebase.storage.StorageReference;
 import de.hdodenhof.circleimageview.CircleImageView;
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Message;
+import project.sherpa.ui.fragments.MessageFragment;
 import project.sherpa.utilities.DimensionUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
+
+import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_MESSAGES;
 
 /**
  * Created by Alvin on 9/14/2017.
@@ -30,11 +37,11 @@ import project.sherpa.utilities.FirebaseProviderUtils;
 public class MessageViewModel extends BaseObservable {
 
     // ** Member Variables ** //
-    private Activity mActivity;
+    private AppCompatActivity mActivity;
     private Message mMessage;
     private boolean mSameAuthor;
 
-    public MessageViewModel(Activity activity, Message message, boolean sameAuthor) {
+    public MessageViewModel(AppCompatActivity activity, Message message, boolean sameAuthor) {
         mActivity = activity;
         mMessage = message;
         mSameAuthor = sameAuthor;
@@ -44,6 +51,11 @@ public class MessageViewModel extends BaseObservable {
     public String getMessage() {
         return mMessage.getMessage();
     }
+
+    public void setMessage(String message) {
+        mMessage.setMessage(message);
+    }
+
 
     @Bindable
     public String getAuthorName() {
@@ -96,5 +108,20 @@ public class MessageViewModel extends BaseObservable {
 
         // Convert dips to pixels
         return DimensionUtils.convertDpToPixel(mActivity, dp);
+    }
+
+    public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_SEND) {
+
+            // When the user presses the IME option to send, the Message is sent
+            MessageFragment fragment = (MessageFragment) mActivity.getSupportFragmentManager()
+                    .findFragmentByTag(FRAG_TAG_MESSAGES);
+
+            fragment.sendMessage();
+
+            return true;
+        }
+
+        return false;
     }
 }
