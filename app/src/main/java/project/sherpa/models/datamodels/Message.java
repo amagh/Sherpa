@@ -2,6 +2,8 @@ package project.sherpa.models.datamodels;
 
 import android.database.Cursor;
 
+import com.google.firebase.database.ServerValue;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,6 +81,14 @@ public class Message extends BaseModel {
         return messageObj;
     }
 
+    public int compare(Message otherMessage) {
+        return this.date < otherMessage.date
+                ? -1
+                : this.date > otherMessage.date
+                ? 1
+                : 0;
+    }
+
     //********************************************************************************************//
     //*********************************** Getters & Setters **************************************//
     //********************************************************************************************//
@@ -100,8 +110,10 @@ public class Message extends BaseModel {
         return chatId;
     }
 
-    public long getDate() {
-        return date;
+    public Object getDate() {
+        return date > 0
+                ? date
+                : ServerValue.TIMESTAMP;
     }
 
     public void setAuthorId(String authorId) {
