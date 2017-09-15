@@ -3,6 +3,7 @@ package project.sherpa.ui.adapters;
 import android.app.Activity;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.util.SortedListAdapterCallback;
@@ -152,7 +153,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             boolean sameAuthor = prevMessage != null
                     && prevMessage.getAuthorId().equals(message.getAuthorId());
 
-            MessageViewModel vm = new MessageViewModel(mActivity, message, sameAuthor);
+            MessageViewModel vm = new MessageViewModel((AppCompatActivity) mActivity, message, sameAuthor);
 
             // Bind the data
             if (mBinding instanceof ListItemMessageSendBinding) {
