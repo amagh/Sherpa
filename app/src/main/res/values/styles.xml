@@ -64,4 +64,20 @@
         <item name="android:layout_marginStart">@dimen/list_search_nav_left_margin</item>
         <item name="android:tint">@color/colorPrimaryLight</item>
     </style>
+
+    <style name="MessageTextStyle" parent="TextAppearance.AppCompat.Body1">
+
+
+    </style>
+
+    <style name="MessageChatBubbleText" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">@dimen/message_horizontal_padding</item>
+        <item name="android:paddingStart">@dimen/message_horizontal_padding</item>
+        <item name="android:paddingRight">@dimen/message_horizontal_padding</item>
+        <item name="android:paddingEnd">@dimen/message_horizontal_padding</item>
+        <item name="android:paddingTop">@dimen/message_vertical_padding</item>
+        <item name="android:paddingBottom">@dimen/message_vertical_padding</item>
+    </style>
 </resources>

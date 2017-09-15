@@ -34,10 +34,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
-            android:textSize="10sp"
             android:layout_marginLeft="@dimen/message_horizontal_padding"
             android:layout_marginStart="@dimen/message_horizontal_padding"
             android:text="@{vm.authorName}"
+            style="@style/TextAppearance.AppCompat.Caption"
             app:layout_constraintTop_toBottomOf="@+id/message_container_ll"
             app:layout_constraintStart_toStartOf="@id/message_container_ll"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -58,18 +58,10 @@
 
             <TextView
                 android:id="@+id/message_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/message_horizontal_padding"
-                android:paddingStart="@dimen/message_horizontal_padding"
-                android:paddingRight="@dimen/message_horizontal_padding"
-                android:paddingEnd="@dimen/message_horizontal_padding"
-                android:paddingTop="@dimen/message_vertical_padding"
-                android:paddingBottom="@dimen/message_vertical_padding"
                 android:background="@drawable/chat_bubble_other"
                 android:textColor="@android:color/black"
                 android:text="@{vm.message}"
-                style="@style/TextAppearance.AppCompat.Caption"
+                style="@style/MessageChatBubbleText"
                 tools:text="@string/list_message_text"/>
         </LinearLayout>
 
