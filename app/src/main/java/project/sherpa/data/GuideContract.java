@@ -1,10 +1,12 @@
 package project.sherpa.data;
 
 import net.simonvt.schematic.annotation.AutoIncrement;
+import net.simonvt.schematic.annotation.ConflictResolutionType;
 import net.simonvt.schematic.annotation.DataType;
 import net.simonvt.schematic.annotation.NotNull;
 import net.simonvt.schematic.annotation.PrimaryKey;
 import net.simonvt.schematic.annotation.References;
+import net.simonvt.schematic.annotation.UniqueConstraint;
 
 import project.sherpa.models.datamodels.Guide;
 
@@ -128,6 +130,9 @@ public class GuideContract {
         String DATE         = Message.DATE;
     }
 
+    @UniqueConstraint(
+            columns = {ChatEntry.FIREBASE_ID, ChatEntry.MEMBER_ID},
+            onConflict = ConflictResolutionType.REPLACE)
     public interface ChatEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement
         String _ID              = "_id";
