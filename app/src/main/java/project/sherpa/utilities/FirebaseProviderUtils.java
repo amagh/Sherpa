@@ -734,6 +734,59 @@ public class FirebaseProviderUtils {
     }
 
     /**
+     * Retrieves the Chats that the user is involved in from Firebase Database
+     *
+     * @param listener    Listener to return results to the observer
+     */
+    public static void getChatsForFirebaseUser(final FirebaseListener listener) {
+
+        // Get the logged in FirebaseUser
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) return;
+
+        // Get the Author associated with the FirebaseUser
+        Author author = (Author) DataCache.getInstance().get(user.getUid());
+
+        if (author == null) {
+            getAuthorForFirebaseUser(new FirebaseListener() {
+                @Override
+                public void onModelReady(BaseModel model) {
+
+                    // Cache the Author and re-run this function
+                    DataCache.getInstance().store(model);
+
+                    getChatsForFirebaseUser(listener);
+                }
+            });
+        } else {
+
+            // Get each Chat that the User is a part of
+            for (String chatId : author.getChats()) {
+                final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference()
+                        .child(GuideDatabase.CHATS)
+                        .child(chatId);
+
+                chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Chat chat = dataSnapshot.getValue(Chat.class);
+
+                        if (chat != null) listener.onModelReady(chat);
+
+                        chatRef.removeEventListener(this);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        chatRef.removeEventListener(this);
+                    }
+                });
+            }
+        }
+    }
+
+    /**
      * Queries Firebase for Areas that match the query
      *
      * @param query       The query to filter the Firebase Database for
