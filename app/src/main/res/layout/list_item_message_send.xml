@@ -22,8 +22,8 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/message_outer_horizontal_margin"
             android:layout_marginEnd="@dimen/message_outer_horizontal_margin"
-            android:paddingLeft="44dp"
-            android:paddingStart="44dp"
+            android:paddingLeft="@dimen/message_container_horizontal_padding"
+            android:paddingStart="@dimen/message_container_horizontal_padding"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
