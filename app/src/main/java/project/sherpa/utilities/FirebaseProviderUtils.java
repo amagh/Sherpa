@@ -32,6 +32,8 @@ import project.sherpa.files.ImageFile;
 import project.sherpa.files.abstractfiles.BaseFile;
 import project.sherpa.models.datamodels.Area;
 import project.sherpa.models.datamodels.Author;
+import project.sherpa.models.datamodels.Chat;
+import project.sherpa.models.datamodels.Message;
 import project.sherpa.models.datamodels.Rating;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.datamodels.Guide;
@@ -42,7 +44,9 @@ import timber.log.Timber;
 import static junit.framework.Assert.assertNotNull;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AREA;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.CHAT;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.MESSAGE;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.RATING;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.SECTION;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.TRAIL;
@@ -60,14 +64,16 @@ public class FirebaseProviderUtils {
     public static final String BACKDROP_SUFFIX = "_bd";
     public static final String GEOFIRE_PATH = "geofire";
 
-    @IntDef({GUIDE, TRAIL, AUTHOR, SECTION, AREA, RATING})
+    @IntDef({GUIDE, TRAIL, AUTHOR, SECTION, AREA, RATING, CHAT, MESSAGE})
     public @interface FirebaseType {
-        int GUIDE = 0;
-        int TRAIL = 1;
-        int AUTHOR = 2;
-        int SECTION = 3;
-        int AREA = 4;
-        int RATING = 5;
+        int GUIDE       = 0;
+        int TRAIL       = 1;
+        int AUTHOR      = 2;
+        int SECTION     = 3;
+        int AREA        = 4;
+        int RATING      = 5;
+        int CHAT        = 6;
+        int MESSAGE     = 7;
     }
 
     public static final String RATING_DIRECTORY = "ratings";
@@ -95,6 +101,12 @@ public class FirebaseProviderUtils {
             case AREA:
                 return GuideDatabase.AREAS;
 
+            case CHAT:
+                return GuideDatabase.CHATS;
+
+            case MESSAGE:
+                return GuideDatabase.MESSAGES;
+
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
         }
     }
@@ -118,6 +130,10 @@ public class FirebaseProviderUtils {
             return GuideDatabase.SECTIONS;
         } else if (model instanceof Area) {
             return GuideDatabase.AREAS;
+        } else if (model instanceof Chat) {
+            return GuideDatabase.CHATS;
+        } else if (model instanceof Message) {
+            return GuideDatabase.MESSAGES;
         } else {
             throw new UnsupportedOperationException("Unknown model:" + model.getClass());
         }
@@ -171,6 +187,14 @@ public class FirebaseProviderUtils {
                 models = new Rating[modelList.size()];
                 break;
 
+            case CHAT:
+                models = new Chat[modelList.size()];
+                break;
+
+            case MESSAGE:
+                models = new Message[modelList.size()];
+                break;
+
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
         }
 
@@ -211,6 +235,14 @@ public class FirebaseProviderUtils {
 
             case RATING:
                 model = dataSnapshot.getValue(Rating.class);
+                break;
+
+            case CHAT:
+                model = dataSnapshot.getValue(Chat.class);
+                break;
+
+            case MESSAGE:
+                model = dataSnapshot.getValue(Message.class);
                 break;
 
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
