@@ -22,6 +22,7 @@ public class Message extends BaseModel {
     public static final String MESSAGE      = "message";
     public static final String CHAT_ID      = "chatId";
     public static final String DATE         = "date";
+    public static final String STATUS       = "status";
 
     // ** Member Variables ** //
     private String authorId;
@@ -29,6 +30,7 @@ public class Message extends BaseModel {
     private String message;
     private String chatId;
     private long date;
+    private int status;
 
     @Override
     public Map<String, Object> toMap() {
@@ -59,6 +61,7 @@ public class Message extends BaseModel {
         int idxMessage      = cursor.getColumnIndex(GuideContract.MessageEntry.MESSAGE);
         int idxChatId       = cursor.getColumnIndex(GuideContract.MessageEntry.CHAT_ID);
         int idxDate         = cursor.getColumnIndex(GuideContract.MessageEntry.DATE);
+        int idxStatus       = cursor.getColumnIndex(GuideContract.MessageEntry.STATUS);
 
         // Get the data from the Cursor
         String firebaseId   = cursor.getString(idxFirebaseId);
@@ -67,6 +70,7 @@ public class Message extends BaseModel {
         String message      = cursor.getString(idxMessage);
         String chatId       = cursor.getString(idxChatId);
         long date           = cursor.getLong(idxDate);
+        int status          = cursor.getInt(idxStatus);
 
         // Create a new Message with the information
         Message messageObj = new Message();
@@ -77,6 +81,7 @@ public class Message extends BaseModel {
         messageObj.message      = message;
         messageObj.chatId       = chatId;
         messageObj.date         = date;
+        messageObj.status       = status;
 
         return messageObj;
     }
@@ -116,6 +121,10 @@ public class Message extends BaseModel {
                 : ServerValue.TIMESTAMP;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
     public void setAuthorId(String authorId) {
         this.authorId = authorId;
     }
@@ -134,5 +143,9 @@ public class Message extends BaseModel {
 
     public void setDate(long date) {
         this.date = date;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

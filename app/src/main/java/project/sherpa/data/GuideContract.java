@@ -113,6 +113,9 @@ public class GuideContract {
         @DataType(DataType.Type.INTEGER) String DRAFT                               = "draft";
     }
 
+    @UniqueConstraint(
+            columns = GuideContract.MessageEntry.FIREBASE_ID,
+            onConflict = ConflictResolutionType.REPLACE)
     public interface MessageEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement
         String _ID          = "_id";
@@ -128,6 +131,8 @@ public class GuideContract {
         String CHAT_ID      = Message.CHAT_ID;
         @DataType(DataType.Type.REAL) @NotNull
         String DATE         = Message.DATE;
+        @DataType(DataType.Type.INTEGER)
+        String STATUS       = Message.STATUS;
     }
 
     @UniqueConstraint(
