@@ -131,8 +131,6 @@ public class GuideContract {
         String CHAT_ID      = Message.CHAT_ID;
         @DataType(DataType.Type.REAL) @NotNull
         String DATE         = Message.DATE;
-        @DataType(DataType.Type.INTEGER)
-        String STATUS       = Message.STATUS;
     }
 
     @UniqueConstraint(
@@ -140,19 +138,21 @@ public class GuideContract {
             onConflict = ConflictResolutionType.REPLACE)
     public interface ChatEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement
-        String _ID              = "_id";
+        String _ID                  = "_id";
         @DataType(DataType.Type.TEXT) @NotNull
-        String FIREBASE_ID      = BaseModel.FIREBASE_ID;
+        String FIREBASE_ID          = BaseModel.FIREBASE_ID;
         @DataType(DataType.Type.TEXT)
         @References(table = GuideDatabase.AUTHORS, column = AuthorEntry.FIREBASE_ID)
-        String MEMBER_ID        = Chat.MEMBER_ID;
+        String MEMBER_ID            = Chat.MEMBER_ID;
         @DataType(DataType.Type.INTEGER)
-        String MESSAGE_COUNT    = Chat.MESSAGE_COUNT;
+        String MESSAGE_COUNT        = Chat.MESSAGE_COUNT;
         @DataType(DataType.Type.TEXT)
-        String LAST_AUTHOR_ID   = Chat.LAST_AUTHOR_ID;
+        String LAST_AUTHOR_ID       = Chat.LAST_AUTHOR_ID;
         @DataType(DataType.Type.TEXT)
-        String LAST_MESSAGE_ID  = Chat.LAST_MESSAGE_ID;
+        String LAST_MESSAGE_ID      = Chat.LAST_MESSAGE_ID;
         @DataType(DataType.Type.TEXT)
-        String LAST_MESSAGE     = Chat.LAST_MESSAGE;
+        String LAST_MESSAGE         = Chat.LAST_MESSAGE;
+        @DataType(DataType.Type.REAL)
+        String LAST_MESSAGE_DATE    = Chat.LAST_MESSAGE_DATE;
     }
 }

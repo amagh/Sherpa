@@ -2,6 +2,8 @@ package project.sherpa.models.datamodels;
 
 import android.database.Cursor;
 
+import com.github.mikephil.charting.renderer.scatter.ChevronUpShapeRenderer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,12 +19,14 @@ import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 public class Chat extends BaseModel {
 
     // ** Constants ** //
-    public static final String MEMBERS          = "members";
-    public static final String MESSAGE_COUNT    = "messageCount";
-    public static final String LAST_AUTHOR_ID   = "lastAuthorId";
-    public static final String LAST_MESSAGE_ID  = "lastMessageId";
-    public static final String LAST_MESSAGE     = "lastMessage";
-    public static final String MEMBER_ID        = "memberId";
+    public static final String MEMBERS              = "members";
+    public static final String MESSAGE_COUNT        = "messageCount";
+    public static final String LAST_AUTHOR_ID       = "lastAuthorId";
+    public static final String LAST_MESSAGE_ID      = "lastMessageId";
+    public static final String LAST_MESSAGE         = "lastMessage";
+    public static final String LAST_MESSAGE_DATE    = "lastMessageDate";
+    public static final String MEMBER_ID            = "memberId";
+
 
     // ** Member Variables ** //
     private List<String> members;
@@ -30,17 +34,19 @@ public class Chat extends BaseModel {
     private String lastAuthorId;
     private String lastMessageId;
     private String lastMessage;
+    private long lastMessageDate;
 
     @Override
     public Map<String, Object> toMap() {
 
         Map<String, Object> map = new HashMap<>();
 
-        map.put(MEMBERS, members);
-        map.put(MESSAGE_COUNT, messageCount);
-        map.put(LAST_AUTHOR_ID, lastAuthorId);
-        map.put(LAST_MESSAGE_ID, lastMessageId);
-        map.put(LAST_MESSAGE, lastMessage);
+        map.put(MEMBERS,            members);
+        map.put(MESSAGE_COUNT,      messageCount);
+        map.put(LAST_AUTHOR_ID,     lastAuthorId);
+        map.put(LAST_MESSAGE_ID,    lastMessageId);
+        map.put(LAST_MESSAGE,       lastMessage);
+        map.put(LAST_MESSAGE_DATE,  lastMessageDate);
 
         return map;
     }
@@ -60,6 +66,7 @@ public class Chat extends BaseModel {
         int idxLastAuthorId     = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_AUTHOR_ID);
         int idxLastMessageId    = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE_ID);
         int idxLastMessage      = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE);
+        int idxLastMessageDate  = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE_DATE);
 
         // Get the value from the Cursor
         String firebaseId       = cursor.getString(idxFirebaseId);
@@ -67,6 +74,7 @@ public class Chat extends BaseModel {
         String lastAuthorId     = cursor.getString(idxLastAuthorId);
         String lastMessageId    = cursor.getString(idxLastMessageId);
         String lastMessage      = cursor.getString(idxLastMessage);
+        long lastMessageDate    = cursor.getLong(idxLastMessageDate);
 
         // Iterate through each value in the Cursor and add the memberId to the members List
         List<String> members    = new ArrayList<>();
@@ -77,14 +85,24 @@ public class Chat extends BaseModel {
         // Create and populate a new Chat
         Chat chat = new Chat();
 
-        chat.firebaseId     = firebaseId;
-        chat.messageCount   = messageCount;
-        chat.lastAuthorId   = lastAuthorId;
-        chat.lastMessageId  = lastMessageId;
-        chat.lastMessage    = lastMessage;
-        chat.members        = members;
+        chat.firebaseId         = firebaseId;
+        chat.messageCount       = messageCount;
+        chat.lastAuthorId       = lastAuthorId;
+        chat.lastMessageId      = lastMessageId;
+        chat.lastMessage        = lastMessage;
+        chat.lastMessageDate    = lastMessageDate;
+        chat.members            = members;
 
         return chat;
+    }
+
+    public int compare(Chat otherChat) {
+
+        return lastMessageDate < otherChat.lastMessageDate
+                ? -1
+                : lastMessageDate > otherChat.lastMessageDate
+                ? 1
+                : 0;
     }
 
     //********************************************************************************************//
