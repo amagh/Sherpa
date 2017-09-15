@@ -26,6 +26,7 @@ public class Constants {
         public static final String FRAG_TAG_ACCOUNT         = "account_frag";
         public static final String FRAG_TAG_FAVORITE        = "favorite_frag";
         public static final String FRAG_TAG_SAVED_GUIDES    = "saved_guides_frag";
+        public static final String FRAG_TAG_MESSAGES        = "message_tag";
     }
 
     public static class IntentKeys {
@@ -37,5 +38,7 @@ public class Constants {
         public static final String GUIDE_KEY    = "guide";
         public static final String TRAIL_KEY    = "trail";
         public static final String SECTION_KEY  = "section";
+        public static final String CHAT_KEY     = "chat";
+
     }
 }
