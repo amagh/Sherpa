@@ -19,6 +19,7 @@ public class Chat extends BaseModel {
     // ** Constants ** //
     public static final String MEMBERS          = "members";
     public static final String MESSAGE_COUNT    = "messageCount";
+    public static final String LAST_AUTHOR_ID   = "lastAuthorId";
     public static final String LAST_MESSAGE_ID  = "lastMessageId";
     public static final String LAST_MESSAGE     = "lastMessage";
     public static final String MEMBER_ID        = "memberId";
@@ -26,6 +27,7 @@ public class Chat extends BaseModel {
     // ** Member Variables ** //
     private List<String> members;
     private int messageCount;
+    private String lastAuthorId;
     private String lastMessageId;
     private String lastMessage;
 
@@ -36,6 +38,7 @@ public class Chat extends BaseModel {
 
         map.put(MEMBERS, members);
         map.put(MESSAGE_COUNT, messageCount);
+        map.put(LAST_AUTHOR_ID, lastAuthorId);
         map.put(LAST_MESSAGE_ID, lastMessageId);
         map.put(LAST_MESSAGE, lastMessage);
 
@@ -54,12 +57,14 @@ public class Chat extends BaseModel {
         int idxFirebaseId       = cursor.getColumnIndex(GuideContract.ChatEntry.FIREBASE_ID);
         int idxMemberId         = cursor.getColumnIndex(GuideContract.ChatEntry.MEMBER_ID);
         int idxMessageCount     = cursor.getColumnIndex(GuideContract.ChatEntry.MESSAGE_COUNT);
+        int idxLastAuthorId     = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_AUTHOR_ID);
         int idxLastMessageId    = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE_ID);
         int idxLastMessage      = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE);
 
         // Get the value from the Cursor
         String firebaseId       = cursor.getString(idxFirebaseId);
         int messageCount        = cursor.getInt(idxMessageCount);
+        String lastAuthorId     = cursor.getString(idxLastAuthorId);
         String lastMessageId    = cursor.getString(idxLastMessageId);
         String lastMessage      = cursor.getString(idxLastMessage);
 
@@ -74,6 +79,7 @@ public class Chat extends BaseModel {
 
         chat.firebaseId     = firebaseId;
         chat.messageCount   = messageCount;
+        chat.lastAuthorId   = lastAuthorId;
         chat.lastMessageId  = lastMessageId;
         chat.lastMessage    = lastMessage;
         chat.members        = members;
@@ -94,6 +100,10 @@ public class Chat extends BaseModel {
         return messageCount;
     }
 
+    public String getLastAuthorId() {
+        return lastAuthorId;
+    }
+
     public String getLastMessageId() {
         return lastMessageId;
     }
@@ -108,6 +118,10 @@ public class Chat extends BaseModel {
 
     public void setMessageCount(int messageCount) {
         this.messageCount = messageCount;
+    }
+
+    public void setLastAuthorId(String lastAuthorId) {
+        this.lastAuthorId = lastAuthorId;
     }
 
     public void setLastMessageId(String lastMessageId) {
