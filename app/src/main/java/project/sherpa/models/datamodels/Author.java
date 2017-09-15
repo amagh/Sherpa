@@ -7,6 +7,7 @@ import android.os.Parcelable;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import project.sherpa.data.GuideContract;
@@ -26,6 +27,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
     private static final String HAS_IMAGE               = "hasImage";
     private static final String SCORE                   = "score";
     private static final String FAVORITES               = "favorites";
+    public static final String CHATS                    = "chats";
 
     // ** Member Variables ** //
     public String name;
@@ -33,6 +35,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
     public String description;
     public int score;
     public Map<String, String> favorites;
+    private List<String> chats;
 
     public Author() {}
 
@@ -89,14 +92,15 @@ public class Author extends BaseModelWithImage implements Parcelable {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(NAME, name);
-        map.put(USERNAME, username);
-        map.put(LOWER_CASE_USERNAME, username.toLowerCase());
-        map.put(DESCRIPTION, description);
-        map.put(LOWER_CASE_NAME, name.toLowerCase());
-        map.put(HAS_IMAGE, hasImage);
-        map.put(SCORE, score);
-        map.put(FAVORITES, favorites);
+        map.put(NAME,                   name);
+        map.put(USERNAME,               username);
+        map.put(LOWER_CASE_USERNAME,    username.toLowerCase());
+        map.put(DESCRIPTION,            description);
+        map.put(LOWER_CASE_NAME,        name.toLowerCase());
+        map.put(HAS_IMAGE,              hasImage);
+        map.put(SCORE,                  score);
+        map.put(FAVORITES,              favorites);
+        map.put(CHATS,                  chats);
 
         return map;
     }
@@ -109,11 +113,19 @@ public class Author extends BaseModelWithImage implements Parcelable {
         return username;
     }
 
+    public List<String> getChats() {
+        return chats;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
 
-    //********************************************************************************************//
+    public void setChats(List<String> chats) {
+        this.chats = chats;
+    }
+
+//********************************************************************************************//
     //***************************** Parcelable Related Methods ***********************************//
     //********************************************************************************************//
 
