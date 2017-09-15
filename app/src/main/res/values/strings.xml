@@ -208,8 +208,11 @@
     <!-- Connectivity Strings -->
     <string name="connectivity_error_no_network">No network connection.</string>
 
-    <!-- Messagning Strings -->
+    <!-- Messaging Strings -->
     <string name="message_hint_text">Type a message</string>
+
+    <!-- Chat Strings -->
+    <string name="chat_last_message_text">%1$s: %2$s</string>
     
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
