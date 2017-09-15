@@ -705,6 +705,8 @@ public class ContentProviderUtils {
             return getValuesForSection((Section) model);
         } else if (model instanceof Area) {
             return getValuesForArea((Area) model);
+        } else if (model instanceof Message) {
+            return getValuesForMessage((Message) model);
         }
 
         return null;
@@ -729,6 +731,8 @@ public class ContentProviderUtils {
             return GuideProvider.Sections.CONTENT_URI;
         } else if (model instanceof Area) {
             return GuideProvider.Areas.CONTENT_URI;
+        } else if (model instanceof Message) {
+            return GuideProvider.Messages.CONTENT_URI;
         }
 
         return null;
