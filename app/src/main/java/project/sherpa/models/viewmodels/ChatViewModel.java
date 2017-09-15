@@ -26,6 +26,11 @@ public class ChatViewModel extends BaseObservable {
     private AppCompatActivity mActivity;
     private Chat mChat;
 
+    public ChatViewModel(AppCompatActivity appCompatActivity, Chat chat) {
+        mActivity = appCompatActivity;
+        mChat = chat;
+    }
+
     @Bindable
     public String getMembers() {
         StringBuilder builder = new StringBuilder();
