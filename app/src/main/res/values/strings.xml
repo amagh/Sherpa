@@ -207,6 +207,9 @@
 
     <!-- Connectivity Strings -->
     <string name="connectivity_error_no_network">No network connection.</string>
+
+    <!-- Messagning Strings -->
+    <string name="message_hint_text">Type a message</string>
     
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
@@ -231,7 +234,7 @@
     <string name="list_rating_comment_text">This is a test comment to see how a real comment would be displayed. We are making it long to see what it looks like as multiple lines.</string>
     <string name="title_activity_settings">Settings</string>
 
-    <string name="list_message_text">This is the test text just to see how it looks. Let's see how it looks if we make it two lines.</string>
+    <string name="list_message_text">This is the test text just to see how it looks. Let\'s see how it looks if we make it two lines.</string>
 
     <!-- Strings related to Settings -->
 
