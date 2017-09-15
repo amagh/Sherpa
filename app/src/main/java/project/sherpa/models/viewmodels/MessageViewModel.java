@@ -11,6 +11,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -75,5 +77,24 @@ public class MessageViewModel extends BaseObservable {
                 }
             }
         });
+    }
+
+    @Bindable
+    public float getTopPadding() {
+
+        // Get the number of dips to use for the top padding of the parent layout depending on
+        // whether the previous message has the same author
+        TypedValue dpValue = new TypedValue();
+
+        int floatRes = mSameAuthor
+                ? R.dimen.message_contracted_top_padding
+                : R.dimen.message_default_top_padding;
+
+        mActivity.getResources().getValue(floatRes, dpValue, true);
+
+        float dp = dpValue.getFloat();
+
+        // Convert dips to pixels
+        return DimensionUtils.convertDpToPixel(mActivity, dp);
     }
 }
