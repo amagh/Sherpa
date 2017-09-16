@@ -5,6 +5,7 @@ import android.net.Uri;
 import net.simonvt.schematic.annotation.ContentProvider;
 import net.simonvt.schematic.annotation.ContentUri;
 import net.simonvt.schematic.annotation.InexactContentUri;
+import net.simonvt.schematic.annotation.NotificationUri;
 import net.simonvt.schematic.annotation.TableEndpoint;
 
 import project.sherpa.BuildConfig;
@@ -201,6 +202,7 @@ public class GuideProvider {
         @ContentUri(
                 path = Path.MESSAGES,
                 type = "vnd.android.cursor.dir/messages")
+        @NotificationUri(paths = {Path.MESSAGES + "/" + Path.CHATS + "/*"})
         public static final Uri CONTENT_URI = buildUri(Path.MESSAGES);
 
         @InexactContentUri(
@@ -209,10 +211,7 @@ public class GuideProvider {
                 type = "vnd.android.cursor.dir/messages",
                 whereColumn = GuideDatabase.MESSAGES + "." + MessageEntry.CHAT_ID,
                 pathSegment = 2,
-                join = "JOIN "                  + GuideDatabase.CHATS           + " ON "    +
-                        GuideDatabase.MESSAGES  + "." + MessageEntry.CHAT_ID    + " = "     +
-                        GuideDatabase.CHATS     + "." + ChatEntry.FIREBASE_ID   + " "       +
-                        "JOIN "                 + GuideDatabase.AUTHORS         + " ON "    +
+                join = "JOIN "                  + GuideDatabase.AUTHORS         + " ON "    +
                         GuideDatabase.MESSAGES  + "." + Message.AUTHOR_ID       + " = "     +
                         GuideDatabase.AUTHORS   + "." + AuthorEntry.FIREBASE_ID)
         public static Uri forChat(String chatId) {
