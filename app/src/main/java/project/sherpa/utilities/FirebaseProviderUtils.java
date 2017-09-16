@@ -793,6 +793,48 @@ public class FirebaseProviderUtils {
     }
 
     /**
+     * Either inserts a new data model to Firebase or updates an existing value
+     *
+     * @param model       BaseModel to be inserted/updated
+     * @param listener    Listener to inform of successful operation
+     */
+    public static void insertOrUpdateModel(BaseModel model, @Nullable OnSuccessListener listener) {
+
+        String directory = null;
+
+        // Operation depends on whether the model already has a FirebaseId
+        if (model.firebaseId == null) {
+
+            // Retrieve a FirebaseId for the model and insert it into the Firebase Database
+            directory = getDirectoryFromModel(model);
+
+            if (model instanceof Section) {
+                directory += "/" + ((Section) model).guideId;
+            } else if (model instanceof Message) {
+                directory += "/" + ((Message) model).getChatId();
+            }
+
+            model.firebaseId = FirebaseDatabase.getInstance().getReference()
+                    .child(directory)
+                    .push()
+                    .getKey();
+        }
+
+        // Run an update on the values
+        Map<String, Object> childUpdates = new HashMap<>();
+
+        // Set the directory if it is null and append the FirebaseId
+        if (directory == null) directory = getDirectoryFromModel(model);
+        directory += "/" + model.firebaseId;
+
+        childUpdates.put(directory, model.toMap());
+
+        FirebaseDatabase.getInstance().getReference()
+                .updateChildren(childUpdates)
+                .addOnSuccessListener(listener);
+    }
+
+    /**
      * Queries Firebase for Areas that match the query
      *
      * @param query       The query to filter the Firebase Database for
