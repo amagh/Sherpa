@@ -762,6 +762,12 @@ public class FirebaseProviderUtils {
         } else {
 
             // Get each Chat that the User is a part of
+            if (author.getChats() == null) {
+                listener.onModelReady(null);
+
+                return;
+            }
+
             for (String chatId : author.getChats()) {
                 final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference()
                         .child(GuideDatabase.CHATS)
@@ -770,7 +776,7 @@ public class FirebaseProviderUtils {
                 chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Chat chat = dataSnapshot.getValue(Chat.class);
+                        Chat chat = (Chat) getModelFromSnapshot(CHAT, dataSnapshot);
 
                         if (chat != null) listener.onModelReady(chat);
 
