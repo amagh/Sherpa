@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import project.sherpa.data.GuideContract;
+import project.sherpa.data.GuideDatabase;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 
 /**
@@ -23,6 +24,26 @@ public class Message extends BaseModel {
     public static final String CHAT_ID      = "chatId";
     public static final String DATE         = "date";
     public static final String STATUS       = "status";
+
+    public static final String[] PROJECTION = {
+            GuideDatabase.MESSAGES  + "." + FIREBASE_ID,
+            AUTHOR_ID,
+            GuideDatabase.AUTHORS   + "." + GuideContract.AuthorEntry.NAME,
+            MESSAGE,
+            CHAT_ID,
+            DATE,
+            STATUS
+    };
+
+    public interface ProjectionIndex {
+        int FIREBASE_ID = 0;
+        int AUTHOR_ID   = 1;
+        int AUTHOR_NAME = 2;
+        int MESSAGE     = 3;
+        int CHAT_ID     = 4;
+        int DATE        = 5;
+        int STATUS      = 6;
+    }
 
     // ** Member Variables ** //
     private String authorId;
@@ -41,7 +62,7 @@ public class Message extends BaseModel {
         map.put(AUTHOR_NAME, authorName);
         map.put(MESSAGE, message);
         map.put(CHAT_ID, chatId);
-        map.put(DATE, date);
+        map.put(DATE, getDate());
 
         return map;
     }
@@ -54,23 +75,14 @@ public class Message extends BaseModel {
      */
     public static Message createMessageFromCursor(Cursor cursor) {
 
-        // Get indices for the columns
-        int idxFirebaseId   = cursor.getColumnIndex(GuideContract.MessageEntry.FIREBASE_ID);
-        int idxAuthorId     = cursor.getColumnIndex(GuideContract.MessageEntry.AUTHOR_ID);
-        int idxAuthorName   = cursor.getColumnIndex(GuideContract.AuthorEntry.NAME);
-        int idxMessage      = cursor.getColumnIndex(GuideContract.MessageEntry.MESSAGE);
-        int idxChatId       = cursor.getColumnIndex(GuideContract.MessageEntry.CHAT_ID);
-        int idxDate         = cursor.getColumnIndex(GuideContract.MessageEntry.DATE);
-        int idxStatus       = cursor.getColumnIndex(GuideContract.MessageEntry.STATUS);
-
         // Get the data from the Cursor
-        String firebaseId   = cursor.getString(idxFirebaseId);
-        String authorId     = cursor.getString(idxAuthorId);
-        String authorName   = cursor.getString(idxAuthorName);
-        String message      = cursor.getString(idxMessage);
-        String chatId       = cursor.getString(idxChatId);
-        long date           = cursor.getLong(idxDate);
-        int status          = cursor.getInt(idxStatus);
+        String firebaseId   = cursor.getString(ProjectionIndex.FIREBASE_ID);
+        String authorId     = cursor.getString(ProjectionIndex.AUTHOR_ID);
+        String authorName   = cursor.getString(ProjectionIndex.AUTHOR_NAME);
+        String message      = cursor.getString(ProjectionIndex.MESSAGE);
+        String chatId       = cursor.getString(ProjectionIndex.CHAT_ID);
+        long date           = cursor.getLong(ProjectionIndex.DATE);
+        int status          = cursor.getInt(ProjectionIndex.STATUS);
 
         // Create a new Message with the information
         Message messageObj = new Message();
