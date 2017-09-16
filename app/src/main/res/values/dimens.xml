@@ -113,9 +113,10 @@
     <dimen name="messaging_text_horizontal_padding">12dp</dimen>
     <dimen name="messaging_outline_vertical_margin">4dp</dimen>
     <dimen name="messaging_separator_bottom_margin">9dp</dimen>
-    <dimen name="messaging_add_guide_image_size">48dp</dimen>
+    <dimen name="messaging_icon_size">48dp</dimen>
     <dimen name="messaging_add_guide_image_left_margin">8dp</dimen>
-    <dimen name="messaging_add_guide_image_padding">12dp</dimen>
+    <dimen name="messaging_icon_padding">12dp</dimen>
+    <dimen name="messaging_cancel_icon_size">16dp</dimen>
 
     <dimen name="chat_bubble_corner_radius">8dp</dimen>
     <dimen name="messaging_bubble_corner_radius">16dp</dimen>

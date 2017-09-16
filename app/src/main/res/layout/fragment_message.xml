@@ -1,17 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
             name="vm"
             type="project.sherpa.models.viewmodels.MessageViewModel"/>
+
+        <variable
+            name="chat"
+            type="project.sherpa.models.viewmodels.ChatViewModel"/>
     </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/message_tb"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center_vertical"
+            android:visibility="@{chat.addMemberVisibility}"
+            app:layout_constraintStart_toStartOf="@id/message_tb"
+            app:layout_constraintEnd_toEndOf="@id/message_tb"
+            app:layout_constraintTop_toTopOf="@id/message_tb"
+            app:layout_constraintBottom_toBottomOf="@id/message_tb"
+            android:background="@color/colorPrimary"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/message_cancel_add_iv"
+                android:layout_width="@dimen/messaging_icon_size"
+                android:layout_height="@dimen/messaging_icon_size"
+                android:padding="@dimen/messaging_cancel_icon_size"
+                android:src="@drawable/ic_close"/>
+
+            <EditText
+                android:id="@+id/message_add_people_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Type a user's username"
+                android:textColor="@android:color/white"
+                android:textColorHint="@android:color/white"
+                android:text="@={chat.addUsername}"
+                style="@style/TextAppearance.AppCompat.Body1"
+                app:backgroundTint="@android:color/transparent"/>
+
+            <ImageView
+                android:id="@+id/message_add_people_iv"
+                android:layout_width="@dimen/messaging_icon_size"
+                android:layout_height="@dimen/messaging_icon_size"
+                android:padding="@dimen/messaging_icon_padding"
+                android:src="@drawable/ic_add_circle"
+                android:tint="@android:color/white"
+                android:onClick="@{chat::onClickAddUser}"/>
+
+        </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/message_rv"
@@ -19,7 +75,7 @@
             android:layout_height="0dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/message_tb"
             app:layout_constraintBottom_toTopOf="@+id/message_chat_separator_v"/>
 
         <EditText
@@ -35,6 +91,7 @@
             android:paddingStart="@dimen/messaging_text_horizontal_padding"
             android:paddingRight="@dimen/messaging_text_horizontal_padding"
             android:paddingEnd="@dimen/messaging_text_horizontal_padding"
+            android:inputType="textAutoCorrect|textCapSentences"
             android:imeOptions="actionSend"
             android:text="@={vm.message}"
             android:onEditorAction="@{vm::onEditorAction}"
@@ -68,11 +125,11 @@
 
         <ImageView
             android:id="@+id/message_add_guide_iv"
-            android:layout_width="@dimen/messaging_add_guide_image_size"
-            android:layout_height="@dimen/messaging_add_guide_image_size"
+            android:layout_width="@dimen/messaging_icon_size"
+            android:layout_height="@dimen/messaging_icon_size"
             android:layout_marginLeft="@dimen/messaging_add_guide_image_left_margin"
             android:layout_marginStart="@dimen/messaging_add_guide_image_left_margin"
-            android:padding="@dimen/messaging_add_guide_image_padding"
+            android:padding="@dimen/messaging_icon_padding"
             android:src="@drawable/ic_add_circle"
             android:background="?attr/selectableItemBackground"
             app:layout_constraintStart_toStartOf="parent"
