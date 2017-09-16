@@ -138,7 +138,7 @@ public class Chat extends BaseModel {
         ContentProviderUtils.insertChat(context, this);
 
         if (newChat) {
-            FirebaseProviderUtils.insertModel(this);
+            FirebaseProviderUtils.insertOrUpdateModel(this, null);
         } else {
             addMemberToFirebase(authorId);
         }
