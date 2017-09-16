@@ -1,5 +1,6 @@
 package project.sherpa.models.viewmodels;
 
+import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -29,6 +30,7 @@ import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Author;
+import project.sherpa.ui.activities.ChatActivity;
 import project.sherpa.ui.fragments.UserFragment;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.GeneralUtils;
@@ -237,6 +239,15 @@ public class AuthorViewModel extends BaseObservable {
         fab.setVisibility(fabVisibility);
     }
 
+    @Bindable
+    public int getMessageVisibility() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        return user != null
+                ? View.VISIBLE
+                : View.GONE;
+    }
+
     public void onClickEdit(View view) {
 
         // Switch the layout between edit and display
@@ -278,6 +289,30 @@ public class AuthorViewModel extends BaseObservable {
                 getFragment(),
                 REQUEST_CODE_PROFILE_PIC,
                 FilePickerConst.FILE_TYPE_MEDIA);
+    }
+
+    /**
+     * Click response for the messaging button in the UserFragment
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickMessage(View view) {
+
+        // Check to see if the user clicked the messaging icon on their own profile or anothers
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (mAuthor.firebaseId.equals(user.getUid())) {
+
+            // Open the MessageActivity
+            Intent intent = new Intent(mActivity.get(), ChatActivity.class);
+            mActivity.get().startActivity(intent);
+        } else {
+            Toast.makeText(
+                    mActivity.get(),
+                    "Test",
+                    Toast.LENGTH_SHORT)
+                    .show();
+        }
     }
 
     /**

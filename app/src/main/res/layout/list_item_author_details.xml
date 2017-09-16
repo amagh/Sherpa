@@ -21,19 +21,36 @@
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:descendantFocusability="afterDescendants">
 
-        <ImageView
-            android:layout_width="@dimen/user_edit_icon_size"
-            android:layout_height="@dimen/user_edit_icon_size"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:padding="@dimen/user_edit_icon_padding"
-            android:layout_gravity="end"
-            android:src="@drawable/ic_create"
-            android:tint="@color/grey_400"
-            android:contentDescription="@string/content_description_edit_profile_button"
-            android:onClick="@{vm::onClickEdit}"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground"
-            app:editVisibility="@{vm.editVisibility}"/>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin">
+
+            <ImageView
+                android:layout_width="@dimen/user_edit_icon_size"
+                android:layout_height="@dimen/user_edit_icon_size"
+                android:padding="@dimen/user_edit_icon_padding"
+                android:layout_gravity="end"
+                android:src="@drawable/ic_create"
+                android:tint="@color/grey_400"
+                android:contentDescription="@string/content_description_edit_profile_button"
+                android:onClick="@{vm::onClickEdit}"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                app:editVisibility="@{vm.editVisibility}"/>
+
+            <ImageView
+                android:layout_width="@dimen/user_edit_icon_size"
+                android:layout_height="@dimen/user_edit_icon_size"
+                android:padding="@dimen/user_edit_icon_padding"
+                android:src="@drawable/ic_account_circle"
+                android:tint="@color/grey_400"
+                android:onClick="@{vm::onClickMessage}"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                android:visibility="@{vm.messageVisibility}"/>
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/list_author_name_tv"
