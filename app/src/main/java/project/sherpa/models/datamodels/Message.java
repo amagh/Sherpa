@@ -62,7 +62,7 @@ public class Message extends BaseModel {
         map.put(AUTHOR_NAME, authorName);
         map.put(MESSAGE, message);
         map.put(CHAT_ID, chatId);
-        map.put(DATE, getDate());
+        map.put(DATE, date != 0 ? date : ServerValue.TIMESTAMP);
 
         return map;
     }
@@ -127,10 +127,8 @@ public class Message extends BaseModel {
         return chatId;
     }
 
-    public Object getDate() {
-        return date > 0
-                ? date
-                : ServerValue.TIMESTAMP;
+    public long getDate() {
+        return date;
     }
 
     public int getStatus() {
