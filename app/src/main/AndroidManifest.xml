@@ -79,6 +79,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="project.sherpa.ui.activities.MainActivity" />
         </activity>
+
+        <activity android:name=".ui.activities.ChatActivity"/>
+        <activity android:name=".ui.activities.MessageActivity"/>
     </application>
 
 </manifest>
