@@ -649,7 +649,9 @@ public class ContentProviderUtils {
         values.put(GuideContract.MessageEntry.FIREBASE_ID,      message.firebaseId);
         values.put(GuideContract.MessageEntry.CHAT_ID,          message.getChatId());
         values.put(GuideContract.MessageEntry.AUTHOR_ID,        message.getAuthorId());
-        values.put(GuideContract.MessageEntry.DATE,             (long) message.getDate());
+        values.put(GuideContract.MessageEntry.DATE,             message.getDate() instanceof Map
+                                                                        ? System.currentTimeMillis()
+                                                                        : (long) message.getDate());
         values.put(GuideContract.MessageEntry.MESSAGE,          message.getMessage());
 
         return values;
@@ -662,7 +664,7 @@ public class ContentProviderUtils {
      * @param context    Interface to global Context
      * @param chat Chat to be inserted into the database
      */
-    private static void insertChat(Context context, Chat chat) {
+    public static void insertChat(Context context, Chat chat) {
 
         // Init the Array of ContentValues to be inserted
         ContentValues[] chatValues = new ContentValues[chat.getMembers().size()];
