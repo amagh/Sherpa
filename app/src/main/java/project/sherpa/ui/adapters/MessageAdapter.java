@@ -81,7 +81,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     @Override
     public void onBindViewHolder(MessageViewHolder holder, int position) {
-        if (position <= mSortedList.size()) holder.bind(position);
+        if (holder.getItemViewType() != SPACER_VIEW_TYPE) holder.bind(position);
     }
 
     @Override
@@ -94,14 +94,17 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public int getItemViewType(int position) {
 
-        Message message = mSortedList.get(position);
-
         if (position == mSortedList.size()) {
             return SPACER_VIEW_TYPE;
-        } else if (mUser != null && message.getAuthorId().equals(mUser.getUid())) {
-            return SEND_MESSAGE_VIEW_TYPE;
         } else {
-            return RECEIVE_MESSAGE_VIEW_TYPE;
+
+            Message message = mSortedList.get(position);
+
+            if (mUser != null && message.getAuthorId().equals(mUser.getUid())) {
+                return SEND_MESSAGE_VIEW_TYPE;
+            } else {
+                return RECEIVE_MESSAGE_VIEW_TYPE;
+            }
         }
     }
 
@@ -122,10 +125,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         mSortedList.addAll(messageList);
     }
 
+    /**
+     * Adds a Message to be displayed by the Adapter if it does not already exist in the Adapter
+     *
+     * @param message    Message to be added
+     */
     public void addMessage(Message message) {
 
         // Add the item if the SortedList does not already contain it
-        if (mSortedList.indexOf(message) != SortedList.INVALID_POSITION) {
+        boolean newItem = true;
+
+        // Iterate through the SortedList and check to ensure that an item with the same FirebaseId
+        // doesn't already exist in the List
+        for (int i = 0; i < mSortedList.size(); i++) {
+            Message oldMessage = mSortedList.get(i);
+            if (oldMessage.firebaseId.equals(message.firebaseId)) {
+                newItem = false;
+                break;
+            }
+        }
+
+        if (newItem) {
             mSortedList.add(message);
         }
     }
