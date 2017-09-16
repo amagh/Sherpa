@@ -1,8 +1,14 @@
 package project.sherpa.models.datamodels;
 
+import android.content.Context;
 import android.database.Cursor;
 
 import com.github.mikephil.charting.renderer.scatter.ChevronUpShapeRenderer;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 import project.sherpa.data.GuideContract;
+import project.sherpa.data.GuideDatabase;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.utilities.ContentProviderUtils;
+import project.sherpa.utilities.FirebaseProviderUtils;
 
 /**
  * Created by Alvin on 9/13/2017.
@@ -108,6 +117,65 @@ public class Chat extends BaseModel {
                 : lastMessageDate > otherChat.lastMessageDate
                 ? 1
                 : 0;
+    }
+
+    /**
+     * Adds a member to the Chat and updates the Chat in the local database and Firebase Database
+     *
+     * @param context     Interface to global Context
+     * @param authorId    FirebaseId of the author to add to the chat
+     */
+    public void addMember(Context context, String authorId) {
+        boolean newChat = false;
+
+        if (members == null) {
+            newChat = true;
+            members = new ArrayList<>();
+        }
+
+        members.add(authorId);
+
+        ContentProviderUtils.insertChat(context, this);
+
+        if (newChat) {
+            FirebaseProviderUtils.insertModel(this);
+        } else {
+            addMemberToFirebase(authorId);
+        }
+    }
+
+    /**
+     * Updates the Firebase entry for the Chat by adding a member.
+     *
+     * @param authorId    FirebaseId of the Author to be added to the Chat
+     */
+    private void addMemberToFirebase(final String authorId) {
+        FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.CHATS)
+                .child(firebaseId)
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Chat chat = mutableData.getValue(Chat.class);
+
+                        // Check to ensure that the FirebaseDatabase returns a valid item
+                        if (chat == null) {
+                            addMemberToFirebase(authorId);
+                            return Transaction.abort();
+                        }
+
+                        // Modify the Chat
+                        chat.getMembers().add(authorId);
+                        mutableData.setValue(chat);
+
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+                    }
+                });
     }
 
     //********************************************************************************************//
