@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,7 +27,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import project.sherpa.R;
@@ -36,6 +39,8 @@ import project.sherpa.databinding.FragmentMessageBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.Message;
+import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.models.viewmodels.ChatViewModel;
 import project.sherpa.models.viewmodels.MessageViewModel;
 import project.sherpa.ui.adapters.MessageAdapter;
 import project.sherpa.utilities.ContentProviderUtils;
@@ -44,6 +49,7 @@ import project.sherpa.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.CHAT;
 
 /**
  * Created by Alvin on 9/14/2017.
@@ -62,13 +68,15 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     private Message mMessage;
     private Author mAuthor;
 
+    private ChatViewModel mChatViewModel;
+
     private DatabaseReference mChatReference;
     private ValueEventListener mMessageListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
 
             if (dataSnapshot.exists()) {
-                Chat chat = dataSnapshot.getValue(Chat.class);
+                Chat chat = (Chat) FirebaseProviderUtils.getModelFromSnapshot(CHAT, dataSnapshot);
 
                 if (chat != null && chat.getMessageCount() > mChat.getMessageCount()) {
 
@@ -76,9 +84,13 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                     updateMessages(chat.getMessageCount() - mChat.getMessageCount());
                 }
 
+
                 // Re-reference the member field to the new Chat and cache it
                 mChat = chat;
                 DataCache.getInstance().store(mChat);
+
+                // Update the database entry for the Chat
+                ContentProviderUtils.insertChat(getActivity(), mChat);
             }
         }
 
@@ -131,8 +143,19 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                 setMessageBinding();
             }
 
+            // Download all the Users involved in the chat to the database
+            downloadUsersForChat(mChat);
+
             // Start the Loader and pass in the Bundle
             getActivity().getSupportLoaderManager().initLoader(MESSAGE_LOADER, args, this);
+        }
+
+        // Bind the Views related to the Chat
+        setChatBinding();
+
+        // If the device user is the only member of the chat, then set up the
+        if (mChat.getMembers().size() == 1) {
+            mChatViewModel.setAddMember(true);
         }
 
         return mBinding.getRoot();
@@ -144,7 +167,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         // Get the Uri for the messages corresponding to a chatId
         Uri chatMessagesUri = args.getParcelable(CHAT_KEY);
 
-        return new CursorLoader(getActivity(), chatMessagesUri, null, null, null, null);
+        return new CursorLoader(getActivity(), chatMessagesUri, Message.PROJECTION, null, null, null);
     }
 
     @Override
@@ -208,9 +231,12 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
     /**
      * Retrieves new messages from FirebaseDatabase for the
-     * @param numMessages
+     *
+     * @param numMessages    The number of messages to be downloaded from Firebase Database
      */
     private void updateMessages(int numMessages) {
+
+        // Query Firebase for new messages
         Query query = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.MESSAGES)
                 .orderByChild(Message.CHAT_ID)
@@ -222,13 +248,15 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 if (dataSnapshot.exists()) {
+
+                    // Get the new messages from Firebase
                     Message[] messages = (Message[]) FirebaseProviderUtils.getModelsFromSnapshot(
                             FirebaseProviderUtils.FirebaseType.MESSAGE,
                             dataSnapshot);
 
+                    // Insert the Message into the local database
                     ContentProviderUtils.bulkInsertMessages(getActivity(), messages);
                 }
-
             }
 
             @Override
@@ -236,6 +264,17 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
             }
         });
+    }
+
+    /**
+     * Sets up the Views related to the Chat
+     */
+    private void setChatBinding() {
+        if (mChatViewModel == null) {
+            mChatViewModel = new ChatViewModel((AppCompatActivity) getActivity(), mChat);
+        }
+
+        mBinding.setChat(mChatViewModel);
     }
 
     /**
@@ -261,7 +300,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     public void sendMessage() {
 
         // Generate a FirebaseId for the Message
-        String firebaseId = FirebaseDatabase.getInstance().getReference()
+        mMessage.firebaseId = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.MESSAGES)
                 .push()
                 .getKey();
@@ -270,7 +309,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         Map<String, Object> childUpdates = new HashMap<>();
 
         // Add the Message's value to the Map
-        childUpdates.put(firebaseId, mMessage.toMap());
+        childUpdates.put(GuideDatabase.MESSAGES + "/" + mMessage.firebaseId, mMessage.toMap());
 
         // Add the Message to Firebase Database
         FirebaseDatabase.getInstance().getReference()
@@ -278,7 +317,24 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+
+                        // Add the message to the local database
                         updateChatMessageCount(mMessage);
+
+                        mMessage.setStatus(0);
+                        ContentProviderUtils.insertModel(getActivity(), mMessage);
+
+                        setMessageBinding();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        Timber.e("Failed to send message: " + e.getMessage());
+
+                        mMessage.setStatus(1);
+                        ContentProviderUtils.insertModel(getActivity(), mMessage);
 
                         setMessageBinding();
                     }
@@ -293,6 +349,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
      * @param message    Message to be used the last message details of the Chat
      */
     public void updateChatMessageCount(final Message message) {
+
         FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.CHATS)
                 .child(mChat.firebaseId)
@@ -314,6 +371,8 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                             chat.setLastMessage(message.getMessage());
                             chat.setLastMessageId(message.firebaseId);
                             chat.setMessageCount(chat.getMessageCount() + 1);
+
+                            mutableData.setValue(chat.toMap());
                         }
 
                         return Transaction.success(mutableData);
@@ -326,5 +385,30 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                         }
                     }
                 });
+    }
+
+    /**
+     * Downloads the profile of all Authors in the chat
+     *
+     * @param chat    The Chat containing members
+     */
+    private void downloadUsersForChat(Chat chat) {
+
+        // Iterate through each member and download their profile from Firebase
+        for (String authorId : chat.getMembers()) {
+            FirebaseProviderUtils.getModel(
+                    FirebaseProviderUtils.FirebaseType.AUTHOR,
+                    authorId,
+                    new FirebaseProviderUtils.FirebaseListener() {
+                        @Override
+                        public void onModelReady(BaseModel model) {
+                            if (model != null) {
+                                ContentProviderUtils.insertModel(getActivity(), model);
+                            }
+                        }
+                    }
+            );
+        }
+
     }
 }
