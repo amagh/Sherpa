@@ -451,6 +451,9 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
 
         mAuthor = author;
 
+        DataCache.getInstance().store(mAuthor);
+        ContentProviderUtils.insertModel(getActivity(), mAuthor);
+
         // Add the Author to the Adapter so their info can be displayed
         mAdapter.addModel(mAuthor);
         mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
