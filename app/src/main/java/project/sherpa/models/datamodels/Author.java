@@ -6,12 +6,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import project.sherpa.data.GuideContract;
 import project.sherpa.models.datamodels.abstractmodels.BaseModelWithImage;
+import project.sherpa.utilities.ContentProviderUtils;
+import project.sherpa.utilities.FirebaseProviderUtils;
 
 /**
  * Created by Alvin on 7/17/2017.
@@ -103,6 +106,20 @@ public class Author extends BaseModelWithImage implements Parcelable {
         map.put(CHATS,                  chats);
 
         return map;
+    }
+
+    /**
+     * Adds a Chat to the User's Firebase Profile
+     * @param chatId
+     */
+    public void addChat(String chatId) {
+        if (chats == null) {
+            chats = new ArrayList<>();
+        }
+
+        chats.add(chatId);
+
+        FirebaseProviderUtils.insertOrUpdateModel(this, null);
     }
 
     //********************************************************************************************//
