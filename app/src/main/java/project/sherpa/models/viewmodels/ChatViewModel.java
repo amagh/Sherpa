@@ -1,20 +1,36 @@
 package project.sherpa.models.viewmodels;
 
+import android.database.Cursor;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import project.sherpa.BR;
 import project.sherpa.R;
+import project.sherpa.data.GuideContract;
+import project.sherpa.data.GuideProvider;
+import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
+import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.utilities.ContentProviderUtils;
+import project.sherpa.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 9/15/2017.
@@ -25,6 +41,8 @@ public class ChatViewModel extends BaseObservable {
     // ** Member Variables ** //
     private AppCompatActivity mActivity;
     private Chat mChat;
+    private String mAddUsername;
+    private boolean mAddMember;
 
     public ChatViewModel(AppCompatActivity appCompatActivity, Chat chat) {
         mActivity = appCompatActivity;
@@ -36,6 +54,22 @@ public class ChatViewModel extends BaseObservable {
         StringBuilder builder = new StringBuilder();
 
         for (String member : mChat.getMembers()) {
+
+            Cursor cursor = mActivity.getContentResolver().query(
+                    GuideProvider.Authors.CONTENT_URI,
+                    null,
+                    GuideContract.AuthorEntry.FIREBASE_ID + " = ?",
+                    new String[]{member},
+                    null);
+
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    member = Author.createAuthorFromCursor(cursor).name;
+                }
+
+                cursor.close();
+            }
+
             if (builder.length() == 0) {
                 builder.append(member);
             } else {
@@ -55,6 +89,13 @@ public class ChatViewModel extends BaseObservable {
                 mChat.getLastMessage());
     }
 
+    @Bindable
+    public StorageReference getAuthorImage() {
+        return FirebaseStorage.getInstance().getReference()
+                .child(FirebaseProviderUtils.IMAGE_PATH)
+                .child(mChat.getLastAuthorId() + FirebaseProviderUtils.JPEG_EXT);
+    }
+
     @BindingAdapter("authorImage")
     public static void loadAuthorImage(final CircleImageView imageView, final StorageReference authorImage) {
 
@@ -72,6 +113,66 @@ public class ChatViewModel extends BaseObservable {
                             .signature(new StringSignature(storageMetadata.getMd5Hash()))
                             .error(R.drawable.ic_account_circle)
                             .into(imageView);
+                }
+            }
+        });
+    }
+
+    @Bindable
+    public boolean getAddMember() {
+        return mAddMember;
+    }
+
+    public void setAddMember(boolean addMember) {
+        mAddMember = addMember;
+
+        notifyPropertyChanged(BR.addMember);
+        notifyPropertyChanged(BR.addMemberVisibility);
+    }
+
+    @Bindable
+    public int getAddMemberVisibility() {
+
+        return getAddMember() || mChat.getMembers().size() < 1
+                ? View.VISIBLE
+                : View.GONE;
+    }
+
+    @Bindable
+    public String getAddUsername() {
+        return mAddUsername;
+    }
+
+    public void setAddUsername(String username) {
+        mAddUsername = username;
+    }
+
+    public void onClickAddUser(View view) {
+
+        FirebaseProviderUtils.queryForUsername(mAddUsername, new FirebaseProviderUtils.FirebaseListener() {
+            @Override
+            public void onModelReady(BaseModel model) {
+                Author author = (Author) model;
+
+                if (author != null) {
+                    ContentProviderUtils.insertModel(mActivity, author);
+                    mChat.getMembers().add(author.firebaseId);
+
+                    if (author.getChats() == null) {
+                        author.setChats(new ArrayList<String>());
+                    }
+
+                    author.getChats().add(mChat.firebaseId);
+
+                    FirebaseProviderUtils.updateUser(author);
+
+                    setAddMember(false);
+                } else {
+                    Toast.makeText(
+                            mActivity,
+                            "User does not exist",
+                            Toast.LENGTH_SHORT)
+                            .show();
                 }
             }
         });
