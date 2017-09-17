@@ -24,6 +24,7 @@
             android:layout_marginLeft="@dimen/message_author_margin"
             android:layout_marginStart="@dimen/message_author_margin"
             android:layout_marginTop="@dimen/message_author_margin"
+            android:visibility="@{vm.authorImageVisibility}"
             app:authorImage="@{vm.authorImage}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/message_container_ll"

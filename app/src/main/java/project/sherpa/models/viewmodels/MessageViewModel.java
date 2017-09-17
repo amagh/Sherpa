@@ -116,6 +116,19 @@ public class MessageViewModel extends BaseObservable {
     }
 
     @Bindable
+    public int getAuthorImageVisibility() {
+        if (mNextMessage != null) {
+            if (mNextMessage.getAuthorId().equals(mMessage.getAuthorId())) {
+                return View.INVISIBLE;
+            } else {
+                return View.VISIBLE;
+            }
+        } else {
+            return View.VISIBLE;
+        }
+    }
+
+    @Bindable
     public int getTopMargin() {
 
         // Get the number of dips to use for the top padding of the parent layout depending on
