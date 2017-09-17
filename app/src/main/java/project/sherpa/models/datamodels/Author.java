@@ -119,7 +119,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
 
         chats.add(chatId);
 
-        FirebaseProviderUtils.insertOrUpdateModel(this, null);
+        FirebaseProviderUtils.insertOrUpdateModel(this);
     }
 
     //********************************************************************************************//
