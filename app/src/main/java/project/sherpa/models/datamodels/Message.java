@@ -1,7 +1,9 @@
 package project.sherpa.models.datamodels;
 
+import android.content.Context;
 import android.database.Cursor;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ServerValue;
 
 import java.util.HashMap;
@@ -10,6 +12,8 @@ import java.util.Map;
 import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideDatabase;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.utilities.ContentProviderUtils;
+import project.sherpa.utilities.FirebaseProviderUtils;
 
 /**
  * Created by Alvin on 9/13/2017.
@@ -104,6 +108,12 @@ public class Message extends BaseModel {
                 : this.date > otherMessage.date
                 ? 1
                 : 0;
+    }
+
+    public Task<Void> send(Context context) {
+
+        ContentProviderUtils.insertModel(context, this);
+        return FirebaseProviderUtils.insertOrUpdateModel(this);
     }
 
     //********************************************************************************************//
