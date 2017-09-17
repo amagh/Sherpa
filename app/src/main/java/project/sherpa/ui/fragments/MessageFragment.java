@@ -22,15 +22,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import project.sherpa.R;
 import project.sherpa.data.GuideDatabase;
@@ -81,7 +74,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                 if (chat != null && chat.getMessageCount() > mChat.getMessageCount()) {
 
                     // Retrieve the number of new messages that the current chat does not contain
-                    updateMessages(chat.getMessageCount() - mChat.getMessageCount());
+                    getMessages(chat.getMessageCount() - mChat.getMessageCount());
                 }
 
 
@@ -234,7 +227,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
      *
      * @param numMessages    The number of messages to be downloaded from Firebase Database
      */
-    private void updateMessages(int numMessages) {
+    private void getMessages(int numMessages) {
 
         // Query Firebase for new messages
         Query query = FirebaseDatabase.getInstance().getReference()
@@ -299,27 +292,13 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
      */
     public void sendMessage() {
 
-        // Generate a FirebaseId for the Message
-        mMessage.firebaseId = FirebaseDatabase.getInstance().getReference()
-                .child(GuideDatabase.MESSAGES)
-                .push()
-                .getKey();
-
-        // Generate the Map that will be pushed to Firebase Database
-        Map<String, Object> childUpdates = new HashMap<>();
-
-        // Add the Message's value to the Map
-        childUpdates.put(GuideDatabase.MESSAGES + "/" + mMessage.firebaseId, mMessage.toMap());
-
-        // Add the Message to Firebase Database
-        FirebaseDatabase.getInstance().getReference()
-                .updateChildren(childUpdates)
+        mMessage.send(getActivity())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
 
                         // Add the message to the local database
-                        updateChatMessageCount(mMessage);
+                        mChat.updateChatWithNewMessage(mMessage);
 
                         mMessage.setStatus(0);
                         ContentProviderUtils.insertModel(getActivity(), mMessage);
@@ -337,52 +316,6 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                         ContentProviderUtils.insertModel(getActivity(), mMessage);
 
                         setMessageBinding();
-                    }
-                });
-    }
-
-    /**
-     * Updates the message count for the Chat by adding one to it using a Transaction to ensure
-     * that if multiple messages are sent by different Users, the message count is still updated
-     * correctly
-     *
-     * @param message    Message to be used the last message details of the Chat
-     */
-    public void updateChatMessageCount(final Message message) {
-
-        FirebaseDatabase.getInstance().getReference()
-                .child(GuideDatabase.CHATS)
-                .child(mChat.firebaseId)
-                .runTransaction(new Transaction.Handler() {
-                    @Override
-                    public Transaction.Result doTransaction(MutableData mutableData) {
-
-                        Chat chat = mutableData.getValue(Chat.class);
-                        if (chat == null) {
-
-                            // Re-run the Transaction
-                            updateChatMessageCount(message);
-
-                            // Abort the current Transaction
-                            return Transaction.abort();
-                        } else {
-
-                            // Update the Chat values
-                            chat.setLastMessage(message.getMessage());
-                            chat.setLastMessageId(message.firebaseId);
-                            chat.setMessageCount(chat.getMessageCount() + 1);
-
-                            mutableData.setValue(chat.toMap());
-                        }
-
-                        return Transaction.success(mutableData);
-                    }
-
-                    @Override
-                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                        if (databaseError != null) {
-                            Timber.e("Error updating Chat message count: " + databaseError.getMessage());
-                        }
                     }
                 });
     }
