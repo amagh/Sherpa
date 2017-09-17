@@ -147,6 +147,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         if (newItem) {
             mSortedList.add(message);
+            notifyItemChanged(mSortedList.size() - 2);
         }
     }
 
