@@ -3,11 +3,11 @@ package project.sherpa.models.datamodels;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.github.mikephil.charting.renderer.scatter.ChevronUpShapeRenderer;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.Transaction;
 
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ import project.sherpa.data.GuideDatabase;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 9/13/2017.
@@ -46,6 +47,8 @@ public class Chat extends BaseModel {
     private String lastMessageId;
     private String lastMessage;
     private long lastMessageDate;
+
+    private boolean updateTime;
 
     @Override
     public Map<String, Object> toMap() {
@@ -120,6 +123,14 @@ public class Chat extends BaseModel {
     }
 
     /**
+     * Sets whether the Chat should use the server time when the {@link #getLastMessageDate()} is
+     * called
+     */
+    private void updateTimeWithServerValue(boolean update) {
+        updateTime = update;
+    }
+
+    /**
      * Adds a member to the Chat and updates the Chat in the local database and Firebase Database
      *
      * @param context     Interface to global Context
@@ -138,7 +149,7 @@ public class Chat extends BaseModel {
         ContentProviderUtils.insertChat(context, this);
 
         if (newChat) {
-            FirebaseProviderUtils.insertOrUpdateModel(this, null);
+            FirebaseProviderUtils.insertOrUpdateModel(this);
         } else {
             addMemberToFirebase(authorId);
         }
@@ -178,6 +189,50 @@ public class Chat extends BaseModel {
                 });
     }
 
+    /**
+     * Updates the Chat's message count and last message info on Firebase
+     *
+     * @param message    Message details to be set as the last message details for the Chat
+     */
+    public void updateChatWithNewMessage(final Message message) {
+        FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.CHATS)
+                .child(firebaseId)
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+
+                        Chat chat = mutableData.getValue(Chat.class);
+                        if (chat == null) {
+
+                            // Re-run the Transaction
+                            updateChatWithNewMessage(message);
+
+                            // Abort the current Transaction
+                            return Transaction.abort();
+                        } else {
+
+                            // Update the Chat values
+                            chat.setLastMessage(message.getMessage());
+                            chat.setLastMessageId(message.firebaseId);
+                            updateTimeWithServerValue(true);
+                            chat.setMessageCount(chat.getMessageCount() + 1);
+
+                            mutableData.setValue(chat.toMap());
+                        }
+
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                        if (databaseError != null) {
+                            Timber.e("Error updating Chat message count: " + databaseError.getMessage());
+                        }
+                    }
+                });
+    }
+
     //********************************************************************************************//
     //*********************************** Getters & Setters **************************************//
     //********************************************************************************************//
@@ -207,8 +262,10 @@ public class Chat extends BaseModel {
         return lastMessage;
     }
 
-    public long getLastMessageDate() {
-        return lastMessageDate;
+    public Object getLastMessageDate() {
+        return updateTime
+                ? ServerValue.TIMESTAMP
+                : lastMessageDate;
     }
 
     public void setMembers(List<String> members) {
