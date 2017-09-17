@@ -649,9 +649,9 @@ public class ContentProviderUtils {
         values.put(GuideContract.MessageEntry.FIREBASE_ID,      message.firebaseId);
         values.put(GuideContract.MessageEntry.CHAT_ID,          message.getChatId());
         values.put(GuideContract.MessageEntry.AUTHOR_ID,        message.getAuthorId());
-        values.put(GuideContract.MessageEntry.DATE,             message.getDate() instanceof Map
+        values.put(GuideContract.MessageEntry.DATE,             message.getDate() == 0
                                                                         ? System.currentTimeMillis()
-                                                                        : (long) message.getDate());
+                                                                        : message.getDate());
         values.put(GuideContract.MessageEntry.MESSAGE,          message.getMessage());
 
         return values;
