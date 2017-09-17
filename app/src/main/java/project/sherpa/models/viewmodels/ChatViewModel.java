@@ -4,10 +4,8 @@ import android.database.Cursor;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
-import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -18,8 +16,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.ArrayList;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import project.sherpa.BR;
 import project.sherpa.R;
@@ -28,9 +24,7 @@ import project.sherpa.data.GuideProvider;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
-import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
-import timber.log.Timber;
 
 /**
  * Created by Alvin on 9/15/2017.
@@ -147,33 +141,39 @@ public class ChatViewModel extends BaseObservable {
         mAddUsername = username;
     }
 
+    /**
+     * Click response for the button for adding new Users to the Chat
+     *
+     * @param view    View that was clicked
+     */
     public void onClickAddUser(View view) {
 
+        // Query Firebase to see if the user exists
         FirebaseProviderUtils.queryForUsername(mAddUsername, new FirebaseProviderUtils.FirebaseListener() {
             @Override
             public void onModelReady(BaseModel model) {
+
                 Author author = (Author) model;
 
-                if (author != null) {
-                    ContentProviderUtils.insertModel(mActivity, author);
-                    mChat.getMembers().add(author.firebaseId);
+                if (author == null) {
 
-                    if (author.getChats() == null) {
-                        author.setChats(new ArrayList<String>());
-                    }
-
-                    author.getChats().add(mChat.firebaseId);
-
-                    FirebaseProviderUtils.updateUser(author);
-
-                    setAddMember(false);
-                } else {
+                    // Inform the User that the selected User does not exist
                     Toast.makeText(
                             mActivity,
                             "User does not exist",
                             Toast.LENGTH_SHORT)
                             .show();
+
+                    return;
                 }
+
+                // Add the user to the Chat
+                mChat.addMember(mActivity, author.firebaseId);
+
+                // Add the Chat to the User's profile an update the local and Firebase Database
+                author.addChat(mChat.firebaseId);
+
+                setAddMember(false);
             }
         });
     }
