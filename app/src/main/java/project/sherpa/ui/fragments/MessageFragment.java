@@ -232,8 +232,8 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         // Query Firebase for new messages
         Query query = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.MESSAGES)
-                .orderByChild(Message.CHAT_ID)
-                .equalTo(mChat.firebaseId)
+                .child(mChat.firebaseId)
+                .orderByChild(Message.DATE)
                 .limitToLast(numMessages);
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
