@@ -136,9 +136,6 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                 setMessageBinding();
             }
 
-            // Download all the Users involved in the chat to the database
-            downloadUsersForChat(mChat);
-
             // Start the Loader and pass in the Bundle
             getActivity().getSupportLoaderManager().initLoader(MESSAGE_LOADER, args, this);
         }
