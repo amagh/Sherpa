@@ -798,12 +798,8 @@ public class FirebaseProviderUtils {
      * Either inserts a new data model to Firebase or updates an existing value
      *
      * @param model              BaseModel to be inserted/updated
-     * @param successListener    Listener to inform of successful operation
-     * @param failureListener    Listener to inform of failed operation
      */
-    public static void insertOrUpdateModel(BaseModel model,
-                                           @Nullable OnSuccessListener<Void> successListener,
-                                           @Nullable OnFailureListener failureListener) {
+    public static Task<Void> insertOrUpdateModel(BaseModel model) {
 
         String directory = null;
 
@@ -835,12 +831,8 @@ public class FirebaseProviderUtils {
         childUpdates.put(directory, model.toMap());
 
         // Initialize the task
-        Task<Void> updateTask = FirebaseDatabase.getInstance().getReference()
+        return FirebaseDatabase.getInstance().getReference()
                 .updateChildren(childUpdates);
-
-        // Add listeners if applicable
-        if (successListener != null) updateTask.addOnSuccessListener(successListener);
-        if (failureListener != null) updateTask.addOnFailureListener(failureListener);
     }
 
     /**
