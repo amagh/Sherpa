@@ -293,6 +293,9 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
      */
     public void sendMessage() {
 
+        // Check to ensure there is a message to send
+        if (mMessage.getMessage() == null || mMessage.getMessage().isEmpty()) return;
+
         mMessage.send(getActivity())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
