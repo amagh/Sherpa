@@ -111,9 +111,11 @@ public class Message extends BaseModel {
     }
 
     public Task<Void> send(Context context) {
-
-        ContentProviderUtils.insertModel(context, this);
-        return FirebaseProviderUtils.insertOrUpdateModel(this);
+        try {
+            return FirebaseProviderUtils.insertOrUpdateModel(this);
+        } finally {
+            ContentProviderUtils.insertModel(context, this);
+        }
     }
 
     //********************************************************************************************//
