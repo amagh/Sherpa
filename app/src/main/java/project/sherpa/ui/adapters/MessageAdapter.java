@@ -169,11 +169,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     ? mSortedList.get(position - 1)
                     : null;
 
-            // Check if the messages have the same Author
-            boolean sameAuthor = prevMessage != null
-                    && prevMessage.getAuthorId().equals(message.getAuthorId());
+            Message nextMessage = position < mSortedList.size() - 1
+                    ? mSortedList.get(position + 1)
+                    : null;
 
-            MessageViewModel vm = new MessageViewModel((AppCompatActivity) mActivity, message, sameAuthor);
+            MessageViewModel vm = new MessageViewModel((AppCompatActivity) mActivity, message, prevMessage);
+            vm.setNextMessage(nextMessage);
 
             // Bind the data
             if (mBinding instanceof ListItemMessageSendBinding) {

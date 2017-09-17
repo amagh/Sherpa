@@ -44,12 +44,17 @@ public class MessageViewModel extends BaseObservable {
     // ** Member Variables ** //
     private AppCompatActivity mActivity;
     private Message mMessage;
-    private boolean mSameAuthor;
+    private Message mPrevMessage;
+    private Message mNextMessage;
 
-    public MessageViewModel(AppCompatActivity activity, Message message, boolean sameAuthor) {
+    public MessageViewModel(AppCompatActivity activity, Message message, Message prevMessage) {
         mActivity = activity;
         mMessage = message;
-        mSameAuthor = sameAuthor;
+        mPrevMessage = prevMessage;
+    }
+
+    public void setNextMessage(Message nextMessage) {
+        mNextMessage = nextMessage;
     }
 
     @Bindable
@@ -89,11 +94,25 @@ public class MessageViewModel extends BaseObservable {
                             .using(new FirebaseImageLoader())
                             .load(authorImage)
                             .signature(new StringSignature(storageMetadata.getMd5Hash()))
+                            .placeholder(R.drawable.ic_account_circle)
                             .error(R.drawable.ic_account_circle)
                             .into(imageView);
                 }
             }
         });
+    }
+
+    @Bindable
+    public int getAuthorVisibility() {
+        if (mNextMessage != null) {
+            if (mNextMessage.getAuthorId().equals(mMessage.getAuthorId())) {
+                return View.GONE;
+            } else {
+                return View.VISIBLE;
+            }
+        } else {
+            return View.VISIBLE;
+        }
     }
 
     @Bindable
@@ -103,7 +122,7 @@ public class MessageViewModel extends BaseObservable {
         // whether the previous message has the same author
         TypedValue dpValue = new TypedValue();
 
-        int floatRes = mSameAuthor
+        int floatRes = mPrevMessage == null || mPrevMessage.getAuthorId().equals(mMessage.getAuthorId())
                 ? R.dimen.message_contracted_top_padding
                 : R.dimen.message_default_top_padding;
 

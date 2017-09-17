@@ -280,7 +280,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         mMessage.setChatId(mChat.firebaseId);
 
         // Set the message to the ViewModel
-        MessageViewModel vm = new MessageViewModel((AppCompatActivity) getActivity(), mMessage, false);
+        MessageViewModel vm = new MessageViewModel((AppCompatActivity) getActivity(), mMessage, null);
         mBinding.setVm(vm);
     }
 
