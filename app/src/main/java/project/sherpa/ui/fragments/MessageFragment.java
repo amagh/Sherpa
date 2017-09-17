@@ -192,7 +192,11 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     private void initRecyclerView() {
         mAdapter = new MessageAdapter(getActivity());
         mBinding.messageRv.setAdapter(mAdapter);
-        mBinding.messageRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        // Init the LayoutManager in reverse order
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setStackFromEnd(true);
+        mBinding.messageRv.setLayoutManager(layoutManager);
     }
 
     /**
