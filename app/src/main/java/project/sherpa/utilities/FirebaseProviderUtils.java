@@ -6,7 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.firebase.geofire.GeoFire;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -795,10 +797,13 @@ public class FirebaseProviderUtils {
     /**
      * Either inserts a new data model to Firebase or updates an existing value
      *
-     * @param model       BaseModel to be inserted/updated
-     * @param listener    Listener to inform of successful operation
+     * @param model              BaseModel to be inserted/updated
+     * @param successListener    Listener to inform of successful operation
+     * @param failureListener    Listener to inform of failed operation
      */
-    public static void insertOrUpdateModel(BaseModel model, @Nullable OnSuccessListener listener) {
+    public static void insertOrUpdateModel(BaseModel model,
+                                           @Nullable OnSuccessListener<Void> successListener,
+                                           @Nullable OnFailureListener failureListener) {
 
         String directory = null;
 
@@ -829,9 +834,13 @@ public class FirebaseProviderUtils {
 
         childUpdates.put(directory, model.toMap());
 
-        FirebaseDatabase.getInstance().getReference()
-                .updateChildren(childUpdates)
-                .addOnSuccessListener(listener);
+        // Initialize the task
+        Task<Void> updateTask = FirebaseDatabase.getInstance().getReference()
+                .updateChildren(childUpdates);
+
+        // Add listeners if applicable
+        if (successListener != null) updateTask.addOnSuccessListener(successListener);
+        if (failureListener != null) updateTask.addOnFailureListener(failureListener);
     }
 
     /**
