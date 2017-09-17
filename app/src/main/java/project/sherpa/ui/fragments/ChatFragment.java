@@ -3,6 +3,7 @@ package project.sherpa.ui.fragments;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
@@ -11,8 +12,17 @@ import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import project.sherpa.R;
+import project.sherpa.data.GuideDatabase;
 import project.sherpa.databinding.FragmentChatBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
@@ -36,6 +46,9 @@ public class ChatFragment extends ConnectivityFragment {
     private FragmentChatBinding mBinding;
     private Author mAuthor;
     private ChatAdapter mAdapter;
+
+    private List<Pair<DatabaseReference, ValueEventListener>> mReferenceListenerPairList;
+    private List<String> mAuthorIdList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -79,34 +92,111 @@ public class ChatFragment extends ConnectivityFragment {
         mBinding.chatRv.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mReferenceListenerPairList != null) {
+            for (Pair<DatabaseReference, ValueEventListener> pair : mReferenceListenerPairList) {
+                pair.first.removeEventListener(pair.second);
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (mReferenceListenerPairList != null) {
+            for (Pair<DatabaseReference, ValueEventListener> pair : mReferenceListenerPairList) {
+                pair.first.addValueEventListener(pair.second);
+            }
+        }
+    }
+
     /**
      * Loads all the chats that the user is involved in
      */
     private void loadChats() {
 
-        FirebaseProviderUtils.getChatsForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
-            @Override
-            public void onModelReady(BaseModel model) {
+        // Start a ValueEventListener for each Chat the user is involved in
+        for (String chatId : mAuthor.getChats()) {
 
-                if (model == null) {
+            final DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                    .child(GuideDatabase.CHATS)
+                    .child(chatId);
 
-                    // User is not involved in any chats. Start a new Chat
-                    addNewChat();
-                    return;
-                }
+            ValueEventListener listener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Chat chat = (Chat) FirebaseProviderUtils.getModelFromSnapshot(
+                                    FirebaseProviderUtils.FirebaseType.CHAT,
+                                    dataSnapshot);
 
-                // Load each chat into the DataCache and local database
-                Chat chat = (Chat) model;
-                DataCache.getInstance().store(chat);
-                ContentProviderUtils.insertChat(getActivity(), chat);
+                            // Retrieve the members from each Chat
+                            if (chat.getMembers().size() > 1) {
+                                getChatMembers(chat);
+                                DataCache.getInstance().store(chat);
+                                ContentProviderUtils.insertChat(getActivity(), chat);
+                            } else {
+                                // Remove any Chats that do not have any members
+                                reference.removeValue();
+                                reference.removeEventListener(this);
+                            }
+                        }
 
-                if (chat.getMembers().size() > 0) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    // Add the Chat to be displayed by the Adapter
-                    mAdapter.addChat(chat);
-                }
-            }
-        });
+                        }
+                    };
+
+                    reference.addValueEventListener(listener);
+
+            // Init the List
+            if (mReferenceListenerPairList == null) mReferenceListenerPairList = new ArrayList<>();
+
+            // Add both to the List so the ValueEventListener can be added and removed in
+            // onStart/onPause
+            mReferenceListenerPairList.add(new Pair<>(reference, listener));
+        }
+    }
+
+    /**
+     * Retrieves the members involved in a chat from Firebase
+     *
+     * @param chat    Chat whose members are to be retrieved
+     */
+    private void getChatMembers(final Chat chat) {
+
+        // Iterate through the member list and retrieve each member
+        for (String authorId : chat.getMembers()) {
+
+            // Skip any members that have already been retrieved
+            if (mAuthorIdList.contains(authorId)) continue;
+
+            // Add the member to the List so that they aren't downloaded again
+            mAuthorIdList.add(authorId);
+
+            FirebaseProviderUtils.getModel(
+                    FirebaseProviderUtils.FirebaseType.AUTHOR,
+                    authorId,
+                    new FirebaseProviderUtils.FirebaseListener() {
+                        @Override
+                        public void onModelReady(BaseModel model) {
+
+                            // Add the Author to the DataCache and the local database
+                            Author author = (Author) model;
+
+                            DataCache.getInstance().store(author);
+                            ContentProviderUtils.insertModel(getActivity(), author);
+
+                            // Add the Chat to the Adapter
+                            mAdapter.addChat(chat);
+                        }
+                    }
+            );
+        }
     }
 
     /**
