@@ -137,7 +137,7 @@ public class ChatFragment extends ConnectivityFragment {
                             if (chat.getMembers().size() > 1) {
                                 getChatMembers(chat);
                                 DataCache.getInstance().store(chat);
-                                ContentProviderUtils.insertChat(getActivity(), chat);
+
                             } else {
                                 // Remove any Chats that do not have any members
                                 reference.removeValue();
@@ -150,8 +150,6 @@ public class ChatFragment extends ConnectivityFragment {
 
                         }
                     };
-
-                    reference.addValueEventListener(listener);
 
             // Init the List
             if (mReferenceListenerPairList == null) mReferenceListenerPairList = new ArrayList<>();
