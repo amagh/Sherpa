@@ -14,7 +14,8 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:paddingTop="8dp">
+        app:topMargin="@{vm.topMargin}"
+        tools:layout_marginTop="8dp">
 
         <LinearLayout
             android:id="@+id/message_container_ll"

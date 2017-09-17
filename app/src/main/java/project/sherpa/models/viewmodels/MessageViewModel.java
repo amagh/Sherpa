@@ -5,10 +5,14 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.net.Uri;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -27,6 +31,7 @@ import project.sherpa.models.datamodels.Message;
 import project.sherpa.ui.fragments.MessageFragment;
 import project.sherpa.utilities.DimensionUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_MESSAGES;
 
@@ -92,7 +97,7 @@ public class MessageViewModel extends BaseObservable {
     }
 
     @Bindable
-    public float getTopPadding() {
+    public int getTopMargin() {
 
         // Get the number of dips to use for the top padding of the parent layout depending on
         // whether the previous message has the same author
@@ -107,7 +112,14 @@ public class MessageViewModel extends BaseObservable {
         float dp = dpValue.getFloat();
 
         // Convert dips to pixels
-        return DimensionUtils.convertDpToPixel(mActivity, dp);
+        return (int) DimensionUtils.convertDpToPixel(mActivity, dp);
+    }
+
+    @BindingAdapter("topMargin")
+    public static void setTopMargin(ConstraintLayout layout, int topMargin) {
+
+        // Set the top margin for the layout
+        ((RecyclerView.LayoutParams) layout.getLayoutParams()).topMargin = topMargin;
     }
 
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {

@@ -14,8 +14,8 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@{vm.topPadding}"
-        tools:paddingTop="8dp">
+        app:topMargin="@{vm.topMargin}"
+        tools:layout_marginTop="8dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/message_author_iv"
