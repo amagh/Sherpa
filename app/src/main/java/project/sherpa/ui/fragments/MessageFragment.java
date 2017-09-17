@@ -129,6 +129,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
             String chatId = GuideProvider.getIdFromUri((Uri) args.getParcelable(CHAT_KEY));
 
             mChat = (Chat) DataCache.getInstance().get(chatId);
+            getNewMessagesSinceLastChat();
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
@@ -230,6 +231,9 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
      */
     private void getMessages(int numMessages) {
 
+        // Check to ensure there are messages to retrieve before retrieving them
+        if (numMessages <= 0) return;
+
         // Query Firebase for new messages
         Query query = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.MESSAGES)
@@ -258,6 +262,32 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
             }
         });
+    }
+
+    /**
+     * Loads any new messages that have been added since the user last checked their chat
+     */
+    private void getNewMessagesSinceLastChat() {
+
+        // Query the local database to see how many messages the last Chat accounted for
+        Cursor cursor = getActivity().getContentResolver().query(
+                GuideProvider.Chats.byId(mChat.firebaseId),
+                null,
+                null,
+                null,
+                null);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                Chat chat = Chat.createChatFromCursor(cursor);
+
+                // Load the difference in number of messages between the updated chat and last
+                // checked chat
+                getMessages(mChat.getMessageCount() - chat.getMessageCount());
+            }
+
+            cursor.close();
+        }
     }
 
     /**

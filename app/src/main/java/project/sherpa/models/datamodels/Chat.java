@@ -71,7 +71,7 @@ public class Chat extends BaseModel {
      * @param cursor    Cursor describing a Chat
      * @return Chat with the details from the Cursor
      */
-    public Chat createChatFromCursor(Cursor cursor) {
+    public static Chat createChatFromCursor(Cursor cursor) {
 
         // Get column indices
         int idxFirebaseId       = cursor.getColumnIndex(GuideContract.ChatEntry.FIREBASE_ID);
