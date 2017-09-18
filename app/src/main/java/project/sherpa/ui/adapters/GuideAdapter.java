@@ -232,7 +232,8 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
                 GuideViewModel vm = new GuideViewModel(mBinding.getRoot().getContext(), guide);
                 vm.setAuthor(mAuthor);
 
-                ((ListItemGuideBinding) mBinding).setVm(vm);
+                ((ListItemGuideBinding) mBinding).top.setVm(vm);
+                ((ListItemGuideBinding) mBinding).bottom.setVm(vm);
             } else {
                 if (guide.firebaseId.equals(mHighlighted)) {
                     // If Guide's track is highlighted, then set the color swatch appropriately

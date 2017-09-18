@@ -1,60 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/list_guide_author_iv"
-        android:layout_width="@dimen/list_guide_author_pic_size"
-        android:layout_height="@dimen/list_guide_author_pic_size"
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.GuideViewModel"/>
+    </data>
 
-        app:authorImage="@{vm.authorImage}"
-        app:layout_constraintStart_toStartOf="@id/list_guide_title_tv"
-        app:layout_constraintTop_toBottomOf="@id/list_guide_iv"
-        tools:src="@drawable/placeholder_profile_image"/>
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/list_guide_author_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/text_horizontal_margin"
-        android:layout_marginStart="@dimen/text_horizontal_margin"
-        android:text="@{vm.author}"
-        style="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintStart_toEndOf="@id/list_guide_author_iv"
-        app:layout_constraintTop_toTopOf="@id/list_guide_author_iv"
-        app:layout_constraintBottom_toBottomOf="@id/list_guide_author_iv"
-        tools:text="@string/list_author_text"/>
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/list_guide_author_iv"
+            android:layout_width="@dimen/list_guide_author_pic_size"
+            android:layout_height="@dimen/list_guide_author_pic_size"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            app:authorImage="@{vm.authorImage}"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:src="@drawable/placeholder_profile_image"/>
 
-    <ImageView
-        android:id="@+id/list_guide_favorite_btn"
-        android:layout_width="@dimen/list_guide_favorite_size"
-        android:layout_height="@dimen/list_guide_favorite_size"
-        android:padding="@dimen/list_guide_favorite_padding"
-        android:layout_marginRight="@dimen/list_guide_favorite_end_margin"
-        android:layout_marginEnd="@dimen/list_guide_favorite_end_margin"
-        android:contentDescription="@string/content_description_favorite_button"
-        android:onClick="@{vm::onClickFavorite}"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/list_guide_author_iv"
-        app:layout_constraintBottom_toBottomOf="@id/list_guide_author_iv"
-        android:src="@drawable/ic_star"/>
+        <TextView
+            android:id="@+id/list_guide_author_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/text_horizontal_margin"
+            android:layout_marginStart="@dimen/text_horizontal_margin"
+            android:text="@{vm.author}"
+            style="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintStart_toEndOf="@id/list_guide_author_iv"
+            app:layout_constraintTop_toTopOf="@id/list_guide_author_iv"
+            app:layout_constraintBottom_toBottomOf="@id/list_guide_author_iv"
+            tools:text="@string/list_author_text"/>
 
-    <ImageView
-        android:id="@+id/list_guide_favorite_star"
-        android:layout_width="@dimen/list_guide_favorite_size"
-        android:layout_height="@dimen/list_guide_favorite_size"
-        android:padding="@dimen/list_guide_favorite_padding"
-        android:layout_marginRight="@dimen/list_guide_favorite_end_margin"
-        android:layout_marginEnd="@dimen/list_guide_favorite_end_margin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/list_guide_author_iv"
-        app:layout_constraintBottom_toBottomOf="@id/list_guide_author_iv"
-        app:favorite="@{vm.favorite}"
-        android:src="@drawable/ic_star_yellow"/>
+        <ImageView
+            android:id="@+id/list_guide_favorite_btn"
+            android:layout_width="@dimen/list_guide_favorite_size"
+            android:layout_height="@dimen/list_guide_favorite_size"
+            android:padding="@dimen/list_guide_favorite_padding"
+            android:layout_marginRight="@dimen/list_guide_favorite_end_margin"
+            android:layout_marginEnd="@dimen/list_guide_favorite_end_margin"
+            android:contentDescription="@string/content_description_favorite_button"
+            android:onClick="@{vm::onClickFavorite}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/list_guide_author_iv"
+            app:layout_constraintBottom_toBottomOf="@id/list_guide_author_iv"
+            android:src="@drawable/ic_star"/>
 
+        <ImageView
+            android:id="@+id/list_guide_favorite_star"
+            android:layout_width="@dimen/list_guide_favorite_size"
+            android:layout_height="@dimen/list_guide_favorite_size"
+            android:padding="@dimen/list_guide_favorite_padding"
+            android:layout_marginRight="@dimen/list_guide_favorite_end_margin"
+            android:layout_marginEnd="@dimen/list_guide_favorite_end_margin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/list_guide_author_iv"
+            app:layout_constraintBottom_toBottomOf="@id/list_guide_author_iv"
+            app:favorite="@{vm.favorite}"
+            android:src="@drawable/ic_star_yellow"/>
 
-</android.support.constraint.ConstraintLayout>
+    </android.support.constraint.ConstraintLayout>
+</layout>

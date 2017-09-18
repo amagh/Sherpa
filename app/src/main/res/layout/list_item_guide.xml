@@ -2,12 +2,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-        <variable
-            name="vm"
-            type="project.sherpa.models.viewmodels.GuideViewModel" />
-    </data>
-
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,14 +22,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <include layout="@layout/layout_guide_item_top"/>
+            <include
+                android:id="@+id/top"
+                layout="@layout/layout_guide_item_top"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/card_vertical_padding">
 
-                <include layout="@layout/layout_guide_item_bottom"/>
+                <include
+                    android:id="@+id/bottom"
+                    layout="@layout/layout_guide_item_bottom"/>
 
             </FrameLayout>
 
