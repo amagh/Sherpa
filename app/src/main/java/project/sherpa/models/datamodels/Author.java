@@ -1,9 +1,14 @@
 package project.sherpa.models.datamodels;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,7 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 import project.sherpa.data.GuideContract;
+import project.sherpa.data.GuideDatabase;
 import project.sherpa.models.datamodels.abstractmodels.BaseModelWithImage;
+import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
 
 /**
@@ -109,16 +116,53 @@ public class Author extends BaseModelWithImage implements Parcelable {
 
     /**
      * Adds a Chat to the User's Firebase Profile
-     * @param chatId
+     *
+     * @param context    Interface to global Context
+     * @param chatId     FirebaseId of the Chat to be added to this Author's list of Chats
      */
-    public void addChat(String chatId) {
+    public void addChat(Context context, String chatId) {
         if (chats == null) {
             chats = new ArrayList<>();
         }
 
+        // Add the Chat
         if (!chats.contains(chatId)) {
+
             chats.add(chatId);
+
+            // Update Firebase Database
             FirebaseProviderUtils.insertOrUpdateModel(this);
+
+            // Update the local database if modifying logged in User
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null && user.getUid().equals(firebaseId)) {
+                ContentProviderUtils.insertModel(context, this);
+            }
+        }
+    }
+
+    /**
+     * Removes a Chat from this Author's list of Chats
+     *
+     * @param context    Interface to global Context
+     * @param chatId     FirebaseId of the Chat to be removed
+     */
+    public void removeChat(Context context, String chatId) {
+        if (chats == null) return;
+
+        // Remove the Chat
+        if (chats.contains(chatId)) {
+
+            chats.remove(chatId);
+
+            // Update Firebase Database
+            FirebaseProviderUtils.insertOrUpdateModel(this);
+
+            // Update the local database if modifying logged in User
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null && user.getUid().equals(firebaseId)) {
+                ContentProviderUtils.insertModel(context, this);
+            }
         }
     }
 
