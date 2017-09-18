@@ -138,7 +138,7 @@ public class ChatViewModel extends BaseObservable {
             if (currentUser.getUsername().toLowerCase().equals(mAddUsername.toLowerCase().trim())) {
                 Toast.makeText(
                         mActivity,
-                        "Can't add yourself to the chat",
+                        mActivity.getString(R.string.toast_error_add_self),
                         Toast.LENGTH_SHORT)
                         .show();
 
@@ -158,7 +158,7 @@ public class ChatViewModel extends BaseObservable {
                     // Inform the User that the selected User does not exist
                     Toast.makeText(
                             mActivity,
-                            "User does not exist",
+                            mActivity.getString(R.string.toast_error_user_does_not_exist),
                             Toast.LENGTH_SHORT)
                             .show();
 

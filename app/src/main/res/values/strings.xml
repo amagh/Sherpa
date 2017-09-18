@@ -213,6 +213,8 @@
 
     <!-- Chat Strings -->
     <string name="chat_last_message_text">%1$s: %2$s</string>
+    <string name="toast_error_add_self">Cannot add yourself to the chat</string>
+    <string name="toast_error_user_does_not_exist">User does not exist</string>
     
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
