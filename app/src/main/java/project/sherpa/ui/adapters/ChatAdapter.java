@@ -73,7 +73,31 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
      * @param chat
      */
     public void addChat(Chat chat) {
-        mSortedList.add(chat);
+
+        boolean newChat = true;
+        for (int i = 0; i < mSortedList.size(); i++) {
+
+            Chat oldChat = mSortedList.get(i);
+
+            if (oldChat.firebaseId.equals(chat.firebaseId)) {
+
+                newChat = false;
+
+                oldChat.setMembers(chat.getMembers());
+                oldChat.setMemberCode(chat.getMemberCode());
+                oldChat.setLastMessageDate((long) chat.getLastMessageDate());
+                oldChat.setLastMessage(chat.getLastMessage());
+                oldChat.setMessageCount(chat.getMessageCount());
+                oldChat.setLastAuthorId(chat.getLastAuthorId());
+                oldChat.setLastAuthorName(chat.getLastAuthorName());
+
+                notifyDataSetChanged();
+            }
+        }
+
+        if (newChat) {
+            mSortedList.add(chat);
+        }
     }
 
     class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
