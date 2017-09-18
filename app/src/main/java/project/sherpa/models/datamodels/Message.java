@@ -61,8 +61,8 @@ public class Message extends BaseModel {
 
     @IntDef({NONE, GUIDE_TYPE})
     public @interface AttachmentType {
-        int NONE        = -1;
-        int GUIDE_TYPE  = 0;
+        int NONE        = 0;
+        int GUIDE_TYPE  = 1;
     }
 
     // ** Member Variables ** //
@@ -71,7 +71,7 @@ public class Message extends BaseModel {
     private String message;
     private String attachment;
     @Message.AttachmentType
-    private int attachmentType = NONE;
+    private int attachmentType;
     private String chatId;
     private long date;
     private int status;
