@@ -11,12 +11,17 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.Transaction;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideDatabase;
+import project.sherpa.data.GuideProvider;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
@@ -231,6 +236,75 @@ public class Chat extends BaseModel {
                         }
                     }
                 });
+    }
+
+    /**
+     * Checks if there is another Chat with the same members
+     *
+     * @param context          Interface to global Context
+     * @param chatAuthorIds    List of Members in the new Chat to be created
+     * @return FirebaseId of the Chat that has the same members. Null if there are no duplicates.
+     */
+    public static Chat checkDuplicateChats(Context context, List<String> chatAuthorIds) {
+
+        // Sort the List alphabetically
+        Collections.sort(chatAuthorIds, new Comparator<String>() {
+            @Override
+            public int compare(String s, String t1) {
+                return s.compareTo(t1);
+            }
+        });
+
+        // Query the database for the FirebaseIds of all Chats in the database
+        Cursor cursor = context.getContentResolver().query(
+                GuideProvider.Chats.CONTENT_URI, null, null, null, null);
+
+        // Iterate through each ChatId and check to see if any of them contain the same members
+        if (cursor != null && cursor.moveToFirst()) {
+            Set<Chat> chatSet = createChatsFromCursor(context, cursor);
+            cursor.close();
+
+            for (Chat chat : chatSet) {
+                if (chat.getMembers().equals(chatAuthorIds)) {
+                    return chat;
+                }
+            }
+        }
+
+        if (cursor != null) cursor.close();
+
+        return null;
+    }
+
+    /**
+     * Creates a Set of Chats from a Cursor pointing to the Chat table
+     *
+     * @param context   Interface to global Context
+     * @param cursor    Cursor pointing to Chat table
+     * @return A Set of all Chats contained in the Chat table
+     */
+    private static Set<Chat> createChatsFromCursor(Context context, Cursor cursor) {
+
+        Set<Chat> chatSet = new HashSet<>();
+
+        do {
+
+            // Create a Chat for each Chat described by the Cursor and add it to the Set
+            String chatId = cursor.getString(1);
+
+            Cursor chatCursor = context.getContentResolver().query(
+                    GuideProvider.Chats.byId(chatId), null, null, null,
+                    GuideContract.ChatEntry.MEMBER_ID + " ASC");
+
+            if (chatCursor != null && chatCursor.moveToFirst()) {
+                chatSet.add(Chat.createChatFromCursor(chatCursor));
+            }
+
+            if (chatCursor != null) chatCursor.close();
+
+        } while (cursor.moveToNext());
+
+        return chatSet;
     }
 
     //********************************************************************************************//
