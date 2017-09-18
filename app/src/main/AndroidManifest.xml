@@ -82,6 +82,7 @@
 
         <activity android:name=".ui.activities.ChatActivity"/>
         <activity android:name=".ui.activities.MessageActivity"/>
+        <activity android:name=".ui.activities.AttachActivity"/>
     </application>
 
 </manifest>
