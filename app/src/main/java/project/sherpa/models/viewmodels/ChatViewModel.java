@@ -3,29 +3,18 @@ package project.sherpa.models.viewmodels;
 import android.database.Cursor;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.databinding.BindingAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.signature.StringSignature;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import project.sherpa.BR;
 import project.sherpa.R;
 import project.sherpa.data.GuideContract;
@@ -102,28 +91,6 @@ public class ChatViewModel extends BaseObservable {
         return FirebaseStorage.getInstance().getReference()
                 .child(FirebaseProviderUtils.IMAGE_PATH)
                 .child(mChat.getLastAuthorId() + FirebaseProviderUtils.JPEG_EXT);
-    }
-
-    @BindingAdapter("authorImage")
-    public static void loadAuthorImage(final CircleImageView imageView, final StorageReference authorImage) {
-
-        if (authorImage == null) return;
-
-        // Load the author's image from Firebase Storage
-        authorImage.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-            @Override
-            public void onSuccess(StorageMetadata storageMetadata) {
-                // Load from Firebase Storage
-                if (imageView.getContext() != null) {
-                    Glide.with(imageView.getContext())
-                            .using(new FirebaseImageLoader())
-                            .load(authorImage)
-                            .signature(new StringSignature(storageMetadata.getMd5Hash()))
-                            .error(R.drawable.ic_account_circle)
-                            .into(imageView);
-                }
-            }
-        });
     }
 
     @Bindable
