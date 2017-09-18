@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,10 +16,7 @@ import android.view.ViewGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -26,19 +24,18 @@ import java.util.List;
 import java.util.Map;
 
 import project.sherpa.R;
-import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideProvider;
 import project.sherpa.databinding.FragmentFavoritesBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.ui.activities.AttachActivity;
+import project.sherpa.ui.activities.ConnectivityActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
-import project.sherpa.ui.activities.MainActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
-import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
@@ -64,8 +61,8 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
         // Inflate the View using DataBindingUtils
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_favorites, container, false);
 
-        ((MainActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.title_favorites));
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.title_favorites));
 
         // Initialize the RecyclerView
         initRecyclerView();
@@ -91,7 +88,7 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
         loadAdViewModel(mBinding);
 
         // Begin listening for network status changes
-        ((MainActivity) getActivity()).addConnectivityCallback(this);
+        ((ConnectivityActivity) getActivity()).addConnectivityCallback(this);
 
         return mBinding.getRoot();
     }
@@ -111,11 +108,21 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
             @Override
             public void onGuideClicked(Guide guide) {
 
-                // Open the GuideDetailsActivity
-                Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
-                intent.putExtra(GUIDE_KEY, guide.firebaseId);
+                DataCache.getInstance().store(guide);
 
-                startActivity(intent);
+                if (getActivity() instanceof AttachActivity) {
+                    // Return the result
+                    Intent intent = new Intent();
+                    intent.putExtra(GUIDE_KEY, guide.firebaseId);
+
+                    ((AttachActivity) getActivity()).finishWithAttachment(intent);
+                } else {
+                    // Open the GuideDetailsActivity
+                    Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
+                    intent.putExtra(GUIDE_KEY, guide.firebaseId);
+
+                    startActivity(intent);
+                }
             }
 
             @Override
