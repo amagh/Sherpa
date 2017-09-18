@@ -36,6 +36,7 @@ import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.ui.fragments.MessageFragment;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_MESSAGES;
 
@@ -210,11 +211,18 @@ public class ChatViewModel extends BaseObservable {
                             mChat.addMember(mActivity, author.firebaseId);
 
                             // Add the Chat to the User's profile an update the local and Firebase Database
-                            author.addChat(mChat.firebaseId);
+                            author.addChat(mActivity, mChat.firebaseId);
 
                             setAddMember(false);
                         } else {
                             Chat chat = (Chat) model;
+
+                            MessageFragment fragment = (MessageFragment) mActivity.getSupportFragmentManager()
+                                    .findFragmentByTag(FRAG_TAG_MESSAGES);
+
+                            fragment.setChat(chat);
+
+                            Timber.d("Found duplicate Chat: " + chat.firebaseId);
                         }
                     }
                 });
