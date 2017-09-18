@@ -229,7 +229,13 @@ public class ChatFragment extends ConnectivityFragment {
         for (String authorId : chat.getMembers()) {
 
             // Skip any members that have already been retrieved
-            if (mAuthorIdList.contains(authorId)) continue;
+            if (mAuthorIdList.contains(authorId)) {
+
+                // Add the Chat to the Adapter
+                mAdapter.addChat(chat);
+
+                continue;
+            }
 
             // Add the member to the List so that they aren't downloaded again
             mAuthorIdList.add(authorId);
