@@ -121,21 +121,25 @@ public class GuideContract {
             onConflict = ConflictResolutionType.REPLACE)
     public interface MessageEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement
-        String _ID          = "_id";
+        String _ID              = "_id";
         @DataType(DataType.Type.TEXT) @NotNull
-        String FIREBASE_ID  = BaseModel.FIREBASE_ID;
+        String FIREBASE_ID      = BaseModel.FIREBASE_ID;
         @DataType(DataType.Type.TEXT)
         @References(table = GuideDatabase.AUTHORS, column = AuthorEntry.FIREBASE_ID)
-        String AUTHOR_ID    = Message.AUTHOR_ID;
+        String AUTHOR_ID        = Message.AUTHOR_ID;
         @DataType(DataType.Type.TEXT) @NotNull
-        String MESSAGE      = Message.MESSAGE;
+        String MESSAGE          = Message.MESSAGE;
+        @DataType(DataType.Type.TEXT)
+        String ATTACHMENT       = Message.ATTACHMENT;
+        @DataType(DataType.Type.TEXT)
+        String ATTACHMENT_TYPE  = Message.ATTACHMENT_TYPE;
         @DataType(DataType.Type.TEXT) @NotNull
         @References(table = GuideDatabase.CHATS, column = ChatEntry.FIREBASE_ID)
-        String CHAT_ID      = Message.CHAT_ID;
+        String CHAT_ID          = Message.CHAT_ID;
         @DataType(DataType.Type.REAL) @NotNull
-        String DATE         = Message.DATE;
+        String DATE             = Message.DATE;
         @DataType(DataType.Type.INTEGER)
-        String STATUS       = Message.STATUS;
+        String STATUS           = Message.STATUS;
     }
 
     @UniqueConstraint(

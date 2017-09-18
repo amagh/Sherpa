@@ -2,6 +2,7 @@ package project.sherpa.models.datamodels;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.IntDef;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ServerValue;
@@ -15,6 +16,9 @@ import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
 
+import static project.sherpa.models.datamodels.Message.AttachmentType.GUIDE_TYPE;
+import static project.sherpa.models.datamodels.Message.AttachmentType.NONE;
+
 /**
  * Created by Alvin on 9/13/2017.
  */
@@ -22,37 +26,52 @@ import project.sherpa.utilities.FirebaseProviderUtils;
 public class Message extends BaseModel {
 
     // ** Constants ** //
-    public static final String AUTHOR_ID    = "authorId";
-    public static final String AUTHOR_NAME  = "authorName";
-    public static final String MESSAGE      = "message";
-    public static final String CHAT_ID      = "chatId";
-    public static final String DATE         = "date";
-    public static final String STATUS       = "status";
+    public static final String AUTHOR_ID        = "authorId";
+    public static final String AUTHOR_NAME      = "authorName";
+    public static final String MESSAGE          = "message";
+    public static final String ATTACHMENT       = "attachment";
+    public static final String ATTACHMENT_TYPE  = "attachmentType";
+    public static final String CHAT_ID          = "chatId";
+    public static final String DATE             = "date";
+    public static final String STATUS           = "status";
 
     public static final String[] PROJECTION = {
             GuideDatabase.MESSAGES  + "." + FIREBASE_ID,
             AUTHOR_ID,
             GuideDatabase.AUTHORS   + "." + GuideContract.AuthorEntry.NAME,
             MESSAGE,
+            ATTACHMENT,
+            ATTACHMENT_TYPE,
             CHAT_ID,
             DATE,
             STATUS
     };
 
     public interface ProjectionIndex {
-        int FIREBASE_ID = 0;
-        int AUTHOR_ID   = 1;
-        int AUTHOR_NAME = 2;
-        int MESSAGE     = 3;
-        int CHAT_ID     = 4;
-        int DATE        = 5;
-        int STATUS      = 6;
+        int FIREBASE_ID     = 0;
+        int AUTHOR_ID       = 1;
+        int AUTHOR_NAME     = 2;
+        int MESSAGE         = 3;
+        int ATTACHMENT      = 4;
+        int ATTACHMENT_TYPE = 5;
+        int CHAT_ID         = 6;
+        int DATE            = 7;
+        int STATUS          = 8;
+    }
+
+    @IntDef({NONE, GUIDE_TYPE})
+    public @interface AttachmentType {
+        int NONE        = -1;
+        int GUIDE_TYPE  = 0;
     }
 
     // ** Member Variables ** //
     private String authorId;
     private String authorName;
     private String message;
+    private String attachment;
+    @Message.AttachmentType
+    private int attachmentType = NONE;
     private String chatId;
     private long date;
     private int status;
@@ -62,11 +81,13 @@ public class Message extends BaseModel {
 
         Map<String, Object> map = new HashMap<>();
 
-        map.put(AUTHOR_ID, authorId);
-        map.put(AUTHOR_NAME, authorName);
-        map.put(MESSAGE, message);
-        map.put(CHAT_ID, chatId);
-        map.put(DATE, date != 0 ? date : ServerValue.TIMESTAMP);
+        map.put(AUTHOR_ID,          authorId);
+        map.put(AUTHOR_NAME,        authorName);
+        map.put(MESSAGE,            message);
+        map.put(ATTACHMENT,         attachment);
+        map.put(ATTACHMENT_TYPE,    attachmentType);
+        map.put(CHAT_ID,            chatId);
+        map.put(DATE,               date != 0 ? date : ServerValue.TIMESTAMP);
 
         return map;
     }
@@ -84,6 +105,9 @@ public class Message extends BaseModel {
         String authorId     = cursor.getString(ProjectionIndex.AUTHOR_ID);
         String authorName   = cursor.getString(ProjectionIndex.AUTHOR_NAME);
         String message      = cursor.getString(ProjectionIndex.MESSAGE);
+        String attachment   = cursor.getString(ProjectionIndex.ATTACHMENT);
+        @AttachmentType
+        int attachmentType  = cursor.getInt(ProjectionIndex.ATTACHMENT_TYPE);
         String chatId       = cursor.getString(ProjectionIndex.CHAT_ID);
         long date           = cursor.getLong(ProjectionIndex.DATE);
         int status          = cursor.getInt(ProjectionIndex.STATUS);
@@ -91,13 +115,15 @@ public class Message extends BaseModel {
         // Create a new Message with the information
         Message messageObj = new Message();
 
-        messageObj.firebaseId   = firebaseId;
-        messageObj.authorId     = authorId;
-        messageObj.authorName   = authorName;
-        messageObj.message      = message;
-        messageObj.chatId       = chatId;
-        messageObj.date         = date;
-        messageObj.status       = status;
+        messageObj.firebaseId       = firebaseId;
+        messageObj.authorId         = authorId;
+        messageObj.authorName       = authorName;
+        messageObj.message          = message;
+        messageObj.attachment       = attachment;
+        messageObj.attachmentType   = attachmentType;
+        messageObj.chatId           = chatId;
+        messageObj.date             = date;
+        messageObj.status           = status;
 
         return messageObj;
     }
@@ -109,6 +135,12 @@ public class Message extends BaseModel {
                 ? 1
                 : 0;
     }
+
+    public void attachGuide(String guideId) {
+        this.attachment     = guideId;
+        this.attachmentType = GUIDE_TYPE;
+    }
+
 
     public Task<Void> send(Context context) {
         try {
@@ -135,6 +167,15 @@ public class Message extends BaseModel {
         return message;
     }
 
+    public String getAttachment() {
+        return attachment;
+    }
+
+    @AttachmentType
+    public int getAttachmentType() {
+        return attachmentType;
+    }
+
     public String getChatId() {
         return chatId;
     }
@@ -157,6 +198,14 @@ public class Message extends BaseModel {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public void setAttachment(String attachment) {
+        this.attachment = attachment;
+    }
+
+    public void setAttachmentType(@AttachmentType int attachmentType) {
+        this.attachmentType = attachmentType;
     }
 
     public void setChatId(String chatId) {
