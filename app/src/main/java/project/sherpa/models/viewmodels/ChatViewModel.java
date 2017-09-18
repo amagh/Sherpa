@@ -12,9 +12,18 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import project.sherpa.BR;
@@ -24,7 +33,11 @@ import project.sherpa.data.GuideProvider;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.ui.fragments.MessageFragment;
+import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
+
+import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_MESSAGES;
 
 /**
  * Created by Alvin on 9/15/2017.
@@ -148,6 +161,23 @@ public class ChatViewModel extends BaseObservable {
      */
     public void onClickAddUser(View view) {
 
+        // Check to ensure the user is not adding themselves to the Chat
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null) {
+            Author currentUser = (Author) DataCache.getInstance().get(user.getUid());
+
+            if (currentUser.getUsername().toLowerCase().equals(mAddUsername.toLowerCase().trim())) {
+                Toast.makeText(
+                        mActivity,
+                        "Can't add yourself to the chat",
+                        Toast.LENGTH_SHORT)
+                        .show();
+
+                return;
+            }
+        }
+
         // Query Firebase to see if the user exists
         FirebaseProviderUtils.queryForUsername(mAddUsername, new FirebaseProviderUtils.FirebaseListener() {
             @Override
@@ -167,14 +197,24 @@ public class ChatViewModel extends BaseObservable {
                     return;
                 }
 
-                // Add the user to the Chat
-                mChat.addMember(mActivity, author.firebaseId);
+                // Get the Chat's list of Authors and check if any other Chats would have the same
+                // members if the Author was added to it
+                List<String> chatAuthorIds = new ArrayList<>(mChat.getMembers());
+                chatAuthorIds.add(author.firebaseId);
 
-                // Add the Chat to the User's profile an update the local and Firebase Database
-                author.addChat(mChat.firebaseId);
+                if (Chat.checkDuplicateChats(mActivity, chatAuthorIds) == null) {
 
-                setAddMember(false);
+                    // Add the member to the chat
+                    mChat.addMember(mActivity, author.firebaseId);
+
+                    // Add the Chat to the User's profile an update the local and Firebase Database
+                    author.addChat(mChat.firebaseId);
+
+                    setAddMember(false);
+                }
+
             }
         });
     }
+
 }
