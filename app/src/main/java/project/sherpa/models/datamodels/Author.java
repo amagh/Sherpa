@@ -13,7 +13,6 @@ import java.util.Map;
 
 import project.sherpa.data.GuideContract;
 import project.sherpa.models.datamodels.abstractmodels.BaseModelWithImage;
-import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
 
 /**
@@ -117,9 +116,10 @@ public class Author extends BaseModelWithImage implements Parcelable {
             chats = new ArrayList<>();
         }
 
-        chats.add(chatId);
-
-        FirebaseProviderUtils.insertOrUpdateModel(this);
+        if (!chats.contains(chatId)) {
+            chats.add(chatId);
+            FirebaseProviderUtils.insertOrUpdateModel(this);
+        }
     }
 
     //********************************************************************************************//
