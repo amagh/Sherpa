@@ -127,7 +127,7 @@ public class GuideContract {
         @DataType(DataType.Type.TEXT)
         @References(table = GuideDatabase.AUTHORS, column = AuthorEntry.FIREBASE_ID)
         String AUTHOR_ID        = Message.AUTHOR_ID;
-        @DataType(DataType.Type.TEXT) @NotNull
+        @DataType(DataType.Type.TEXT)
         String MESSAGE          = Message.MESSAGE;
         @DataType(DataType.Type.TEXT)
         String ATTACHMENT       = Message.ATTACHMENT;
