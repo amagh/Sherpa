@@ -7,8 +7,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +44,7 @@ public class Chat extends BaseModel {
     public static final String LAST_MESSAGE         = "lastMessage";
     public static final String LAST_MESSAGE_DATE    = "lastMessageDate";
     public static final String MEMBER_ID            = "memberId";
+    public static final String MEMBER_CODE          = "memberCode";
 
 
     // ** Member Variables ** //
@@ -52,6 +55,7 @@ public class Chat extends BaseModel {
     private String lastMessageId;
     private String lastMessage;
     private long lastMessageDate;
+    private String memberCode;
 
     private boolean updateTime;
 
@@ -66,6 +70,7 @@ public class Chat extends BaseModel {
         map.put(LAST_MESSAGE_ID,    lastMessageId);
         map.put(LAST_MESSAGE,       lastMessage);
         map.put(LAST_MESSAGE_DATE,  lastMessageDate);
+        map.put(MEMBER_CODE,        buildMemberCode());
 
         return map;
     }
@@ -79,7 +84,7 @@ public class Chat extends BaseModel {
     public static Chat createChatFromCursor(Cursor cursor) {
 
         // Get column indices
-        int idxFirebaseId       = cursor.getColumnIndex(GuideContract.ChatEntry.FIREBASE_ID);
+        int idxFirebaseId       = 1;
         int idxMemberId         = cursor.getColumnIndex(GuideContract.ChatEntry.MEMBER_ID);
         int idxMessageCount     = cursor.getColumnIndex(GuideContract.ChatEntry.MESSAGE_COUNT);
         int idxLastAuthorId     = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_AUTHOR_ID);
@@ -114,6 +119,7 @@ public class Chat extends BaseModel {
         chat.lastMessage        = lastMessage;
         chat.lastMessageDate    = lastMessageDate;
         chat.members            = members;
+        chat.memberCode         = buildMemberCode(members);
 
         return chat;
     }
@@ -194,6 +200,10 @@ public class Chat extends BaseModel {
                 });
     }
 
+    private String buildMemberCode() {
+        return buildMemberCode(members);
+    }
+
     /**
      * Updates the Chat's message count and last message info on Firebase
      *
@@ -239,72 +249,75 @@ public class Chat extends BaseModel {
     }
 
     /**
-     * Checks if there is another Chat with the same members
+     * Generates the memberCode from the List of members of a Chat. The code is simply a String of
+     * all the members in alphabetical order. This can be used to easily check if a group with the
+     * same members already exists.
      *
-     * @param context          Interface to global Context
-     * @param chatAuthorIds    List of Members in the new Chat to be created
-     * @return FirebaseId of the Chat that has the same members. Null if there are no duplicates.
+     * @param memberList    List of members to generate the member code for
+     * @return Member code consisting of a String of all the members in alphabetical order
      */
-    public static Chat checkDuplicateChats(Context context, List<String> chatAuthorIds) {
+    public static String buildMemberCode(List<String> memberList) {
 
-        // Sort the List alphabetically
-        Collections.sort(chatAuthorIds, new Comparator<String>() {
+        // Sort the List into alphabetical order
+        Collections.sort(memberList, new Comparator<String>() {
             @Override
             public int compare(String s, String t1) {
                 return s.compareTo(t1);
             }
         });
 
-        // Query the database for the FirebaseIds of all Chats in the database
-        Cursor cursor = context.getContentResolver().query(
-                GuideProvider.Chats.CONTENT_URI, null, null, null, null);
-
-        // Iterate through each ChatId and check to see if any of them contain the same members
-        if (cursor != null && cursor.moveToFirst()) {
-            Set<Chat> chatSet = createChatsFromCursor(context, cursor);
-            cursor.close();
-
-            for (Chat chat : chatSet) {
-                if (chat.getMembers().equals(chatAuthorIds)) {
-                    return chat;
-                }
-            }
+        // Build the memberCode
+        StringBuilder builder = new StringBuilder();
+        for (String authorId : memberList) {
+            builder.append(authorId);
         }
 
-        if (cursor != null) cursor.close();
-
-        return null;
+        return builder.toString();
     }
 
     /**
-     * Creates a Set of Chats from a Cursor pointing to the Chat table
+     * Checks the FirebaseDatabase to see if there are any chats with the same members as the List
+     * of members in the signature
      *
-     * @param context   Interface to global Context
-     * @param cursor    Cursor pointing to Chat table
-     * @return A Set of all Chats contained in the Chat table
+     * @param chatMemberList    List of members to check against the FirebaseDatabase
+     * @param listener          Returns the Chat that has the sasme members from Firebase
      */
-    private static Set<Chat> createChatsFromCursor(Context context, Cursor cursor) {
+    public static void checkDuplicateChats(
+            List<String> chatMemberList,
+            final FirebaseProviderUtils.FirebaseListener listener) {
 
-        Set<Chat> chatSet = new HashSet<>();
+        // Generate the memberCode that will be used to check against the FirebaseDatabse to check
+        // if there is another Chat with the same members
+        String memberCode = buildMemberCode(chatMemberList);
 
-        do {
+        // Query Firebase to see if there are any duplicate Chats
+        final Query chatQuery = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.CHATS)
+                .orderByChild(Chat.MEMBER_CODE)
+                .equalTo(memberCode);
 
-            // Create a Chat for each Chat described by the Cursor and add it to the Set
-            String chatId = cursor.getString(1);
+        chatQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-            Cursor chatCursor = context.getContentResolver().query(
-                    GuideProvider.Chats.byId(chatId), null, null, null,
-                    GuideContract.ChatEntry.MEMBER_ID + " ASC");
+                if (dataSnapshot.exists()) {
+                    Chat[] chats = (Chat[]) FirebaseProviderUtils.getModelsFromSnapshot(
+                            FirebaseProviderUtils.FirebaseType.CHAT,
+                            dataSnapshot);
 
-            if (chatCursor != null && chatCursor.moveToFirst()) {
-                chatSet.add(Chat.createChatFromCursor(chatCursor));
+                    listener.onModelReady(chats[0]);
+                } else {
+                    listener.onModelReady(null);
+                }
+
+                chatQuery.removeEventListener(this);
             }
 
-            if (chatCursor != null) chatCursor.close();
-
-        } while (cursor.moveToNext());
-
-        return chatSet;
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                chatQuery.removeEventListener(this);
+            }
+        });
     }
 
     //********************************************************************************************//
@@ -342,6 +355,10 @@ public class Chat extends BaseModel {
                 : lastMessageDate;
     }
 
+    public String getMemberCode() {
+        return memberCode;
+    }
+
     public void setMembers(List<String> members) {
         this.members = members;
     }
@@ -368,5 +385,9 @@ public class Chat extends BaseModel {
 
     public void setLastMessageDate(long lastMessageDate) {
         this.lastMessageDate = lastMessageDate;
+    }
+
+    public void setMemberCode(String memberCode) {
+        this.memberCode = memberCode;
     }
 }
