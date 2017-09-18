@@ -633,7 +633,6 @@ public class ContentProviderUtils {
             values.put(GuideContract.AreaEntry.DRAFT,           1);
         }
 
-
         return values;
     }
 
@@ -653,6 +652,8 @@ public class ContentProviderUtils {
                                                                         ? System.currentTimeMillis()
                                                                         : message.getDate());
         values.put(GuideContract.MessageEntry.MESSAGE,          message.getMessage());
+        values.put(GuideContract.MessageEntry.ATTACHMENT,       message.getAttachment());
+        values.put(GuideContract.MessageEntry.ATTACHMENT_TYPE,  message.getAttachmentType());
 
         return values;
     }
