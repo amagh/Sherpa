@@ -24,7 +24,9 @@
         app:topMargin="@{vm.topMargin}"
         tools:layout_marginTop="8dp">
 
-        <include layout="@layout/layout_guide_item_top"/>
+        <include
+            android:id="@+id/message_guide"
+            layout="@layout/layout_guide_item_top"/>
 
     </FrameLayout>
 

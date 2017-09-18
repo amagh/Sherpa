@@ -61,7 +61,9 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/message_author_tv">
 
-            <include layout="@layout/layout_guide_item_top"/>
+            <include
+                android:id="@+id/message_guide"
+                layout="@layout/layout_guide_item_top"/>
 
         </FrameLayout>
 

@@ -13,15 +13,22 @@ import android.view.ViewGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import project.sherpa.R;
 import project.sherpa.databinding.ListItemMessageReceiveBinding;
 import project.sherpa.databinding.ListItemMessageReceiveGuideBinding;
 import project.sherpa.databinding.ListItemMessageSendBinding;
 import project.sherpa.databinding.ListItemMessageSendGuideBinding;
+import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.Message;
+import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.models.viewmodels.GuideViewModel;
 import project.sherpa.models.viewmodels.MessageViewModel;
+import project.sherpa.utilities.DataCache;
+import project.sherpa.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
 import static project.sherpa.models.datamodels.Message.AttachmentType.GUIDE_TYPE;
@@ -62,6 +69,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         }
     };
     private SortedList<Message> mSortedList = new SortedList<>(Message.class, mCallback);
+    private Map<String, Guide> mGuideAttachmentMap = new HashMap<>();
 
     public MessageAdapter(Activity activity) {
         mActivity = activity;
@@ -178,6 +186,46 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         }
     }
 
+    /**
+     * Loads a Guide to be displayed as an attachment to a message
+     *
+     * @param position    Position of the message to get the Guide for
+     */
+    private boolean loadGuide(int position) {
+        final Message message = mSortedList.get(position);
+
+        if (message.getAttachmentType() ==  GUIDE_TYPE) {
+            String guideId = message.getAttachment();
+
+            // See if the Guide has been cached
+            Guide cachedGuide = (Guide) DataCache.getInstance().get(guideId);
+            if (cachedGuide != null) {
+
+                // Put the cached Guide into the Map and notify
+                mGuideAttachmentMap.put(cachedGuide.firebaseId, cachedGuide);
+                return true;
+            }
+
+            // Load Guide from Firebase if not cached
+            FirebaseProviderUtils.getModel(
+                    FirebaseProviderUtils.FirebaseType.GUIDE,
+                    guideId,
+                    new FirebaseProviderUtils.FirebaseListener() {
+                        @Override
+                        public void onModelReady(BaseModel model) {
+
+                            // Put the Guide in the Map and notify
+                            Guide guide = (Guide) model;
+                            mGuideAttachmentMap.put(guide.firebaseId, guide);
+                            notifyItemChanged(mSortedList.indexOf(message));
+                        }
+                    }
+            );
+        }
+
+        return false;
+    }
+
     class MessageViewHolder extends RecyclerView.ViewHolder {
 
         // ** Member Variables ** //
@@ -210,9 +258,47 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             } else if (mBinding instanceof ListItemMessageReceiveBinding) {
                 ((ListItemMessageReceiveBinding) mBinding).setVm(vm);
             } else if (mBinding instanceof ListItemMessageSendGuideBinding) {
+
+                // Bind the Guide data
+                bindGuideViewModel(message);
+
                 ((ListItemMessageSendGuideBinding) mBinding).setVm(vm);
+
             } else if (mBinding instanceof ListItemMessageReceiveGuideBinding) {
+
+                // Bind the Guide data
+                bindGuideViewModel(message);
+
                 ((ListItemMessageReceiveGuideBinding) mBinding).setVm(vm);
+            }
+        }
+
+        /**
+         * Binds the attached GuideViewModel for a Message to the ViewDataBinding
+         *
+         * @param message    Message to load the Guide for
+         */
+        private void bindGuideViewModel(Message message) {
+
+            // Load the Guide that is supposed to be attached
+            Guide guide = mGuideAttachmentMap.get(message.getAttachment());
+
+            if (guide == null) {
+
+                // Guide not loaded yet. Load it
+                if (loadGuide(mSortedList.indexOf(message))) {
+                    bindGuideViewModel(message);
+                }
+            } else {
+
+                // Bind the GuideViewModel to the ViewDataBinding
+                GuideViewModel gvm = new GuideViewModel(mActivity, guide);
+
+                if (mBinding instanceof ListItemMessageSendGuideBinding) {
+                    ((ListItemMessageSendGuideBinding) mBinding).messageGuide.setVm(gvm);
+                } else {
+                    ((ListItemMessageReceiveGuideBinding) mBinding).messageGuide.setVm(gvm);
+                }
             }
         }
     }
