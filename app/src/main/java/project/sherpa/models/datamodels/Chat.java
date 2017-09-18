@@ -67,6 +67,7 @@ public class Chat extends BaseModel {
         map.put(MEMBERS,            members);
         map.put(MESSAGE_COUNT,      messageCount);
         map.put(LAST_AUTHOR_ID,     lastAuthorId);
+        map.put(LAST_AUTHOR_NAME,   lastAuthorName);
         map.put(LAST_MESSAGE_ID,    lastMessageId);
         map.put(LAST_MESSAGE,       lastMessage);
         map.put(LAST_MESSAGE_DATE,  lastMessageDate);
@@ -231,7 +232,9 @@ public class Chat extends BaseModel {
                             // Update the Chat values
                             chat.setLastMessage(message.getMessage());
                             chat.setLastMessageId(message.firebaseId);
-                            updateTimeWithServerValue(true);
+                            chat.setLastAuthorId(message.getAuthorId());
+                            chat.setLastAuthorName(message.getAuthorName());
+                            chat.updateTimeWithServerValue(true);
                             chat.setMessageCount(chat.getMessageCount() + 1);
 
                             mutableData.setValue(chat.toMap());
