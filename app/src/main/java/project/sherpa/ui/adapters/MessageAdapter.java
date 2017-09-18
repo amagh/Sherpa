@@ -17,10 +17,15 @@ import java.util.List;
 
 import project.sherpa.R;
 import project.sherpa.databinding.ListItemMessageReceiveBinding;
+import project.sherpa.databinding.ListItemMessageReceiveGuideBinding;
 import project.sherpa.databinding.ListItemMessageSendBinding;
+import project.sherpa.databinding.ListItemMessageSendGuideBinding;
 import project.sherpa.models.datamodels.Message;
 import project.sherpa.models.viewmodels.MessageViewModel;
 import timber.log.Timber;
+
+import static project.sherpa.models.datamodels.Message.AttachmentType.GUIDE_TYPE;
+import static project.sherpa.models.datamodels.Message.AttachmentType.NONE;
 
 /**
  * Created by Alvin on 9/14/2017.
@@ -29,9 +34,11 @@ import timber.log.Timber;
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
     // ** Constants ** //
-    private static final int SEND_MESSAGE_VIEW_TYPE     = 0;
-    private static final int RECEIVE_MESSAGE_VIEW_TYPE  = 1;
-    private static final int SPACER_VIEW_TYPE           = 2;
+    private static final int SEND_MESSAGE_VIEW_TYPE             = 0;
+    private static final int RECEIVE_MESSAGE_VIEW_TYPE          = 1;
+    private static final int SEND_MESSAGE_GUIDE_VIEW_TYPE       = 2;
+    private static final int RECEIVE_MESSAGE_GUIDE_VIEW_TYPE    = 3;
+    private static final int SPACER_VIEW_TYPE                   = 4;
 
     // ** Member Variables ** //
     private Activity mActivity;
@@ -67,11 +74,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         int layoutId = 0;
 
         switch (viewType) {
-            case SEND_MESSAGE_VIEW_TYPE:    layoutId = R.layout.list_item_message_send;
+            case SEND_MESSAGE_VIEW_TYPE:            layoutId = R.layout.list_item_message_send;
                 break;
-            case RECEIVE_MESSAGE_VIEW_TYPE: layoutId = R.layout.list_item_message_receive;
+            case RECEIVE_MESSAGE_VIEW_TYPE:         layoutId = R.layout.list_item_message_receive;
                 break;
-            case SPACER_VIEW_TYPE:          layoutId = R.layout.list_item_message_bottom_spacer;
+            case SEND_MESSAGE_GUIDE_VIEW_TYPE:      layoutId = R.layout.list_item_message_send_guide;
+                break;
+            case RECEIVE_MESSAGE_GUIDE_VIEW_TYPE:   layoutId = R.layout.list_item_message_receive_guide;
+                break;
+            case SPACER_VIEW_TYPE:                  layoutId = R.layout.list_item_message_bottom_spacer;
                 break;
         }
 
@@ -95,18 +106,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public int getItemViewType(int position) {
 
-        if (position == mSortedList.size()) {
-            return SPACER_VIEW_TYPE;
-        } else {
+        if (position == mSortedList.size()) return SPACER_VIEW_TYPE;
 
-            Message message = mSortedList.get(position);
+        // Get the ViewType based on the Message's attachments and author
+        Message message = mSortedList.get(position);
+        switch (message.getAttachmentType()) {
+            case NONE:
+                if (mUser != null && message.getAuthorId().equals(mUser.getUid())) {
+                    return SEND_MESSAGE_VIEW_TYPE;
+                } else {
+                    return RECEIVE_MESSAGE_VIEW_TYPE;
+                }
 
-            if (mUser != null && message.getAuthorId().equals(mUser.getUid())) {
-                return SEND_MESSAGE_VIEW_TYPE;
-            } else {
-                return RECEIVE_MESSAGE_VIEW_TYPE;
-            }
+            case GUIDE_TYPE:
+                if (mUser != null && message.getAuthorId().equals(mUser.getUid())) {
+                    return SEND_MESSAGE_GUIDE_VIEW_TYPE;
+                } else {
+                    return RECEIVE_MESSAGE_GUIDE_VIEW_TYPE;
+                }
         }
+
+        return super.getItemViewType(position);
     }
 
     public void setMessageList(List<Message> messageList) {
@@ -153,7 +173,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         }
 
         if (newItem) {
-            Timber.d("Adding message: " + message.getMessage() + " | ID: " + message.firebaseId);
             mSortedList.add(message);
             notifyItemChanged(mSortedList.size() - 2);
         }
@@ -190,6 +209,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 ((ListItemMessageSendBinding) mBinding).setVm(vm);
             } else if (mBinding instanceof ListItemMessageReceiveBinding) {
                 ((ListItemMessageReceiveBinding) mBinding).setVm(vm);
+            } else if (mBinding instanceof ListItemMessageSendGuideBinding) {
+                ((ListItemMessageSendGuideBinding) mBinding).setVm(vm);
+            } else if (mBinding instanceof ListItemMessageReceiveGuideBinding) {
+                ((ListItemMessageReceiveGuideBinding) mBinding).setVm(vm);
             }
         }
     }
