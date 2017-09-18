@@ -280,9 +280,16 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                 // Load the difference in number of messages between the updated chat and last
                 // checked chat
                 getMessages(mChat.getMessageCount() - chat.getMessageCount());
+            } else {
+
+                // New chat - get all messages
+                getMessages(mChat.getMessageCount());
             }
 
             cursor.close();
+        } else {
+            // New chat - get all messages
+            getMessages(mChat.getMessageCount());
         }
     }
 
