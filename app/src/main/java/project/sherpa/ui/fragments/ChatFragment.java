@@ -1,6 +1,7 @@
 package project.sherpa.ui.fragments;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.util.Pair;
@@ -19,10 +20,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import project.sherpa.R;
+import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideDatabase;
+import project.sherpa.data.GuideProvider;
 import project.sherpa.databinding.FragmentChatBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
@@ -85,7 +90,7 @@ public class ChatFragment extends ConnectivityFragment {
             public void onClick(Chat clickedItem) {
 
                 // Start the MessageActivity for the clicked Chat
-                startMessageActivity(clickedItem.firebaseId);
+                startMessageActivity(clickedItem);
             }
         });
         mBinding.chatRv.setAdapter(mAdapter);
@@ -119,6 +124,15 @@ public class ChatFragment extends ConnectivityFragment {
      */
     private void loadChats() {
 
+        // Remove any Chats from the database that don't exist on the Firebase Database
+        checkAndRemoveDeletedChats();
+
+        // Start a new chat if there are no chats
+        if (mAuthor.getChats() == null || mAuthor.getChats().size() == 0) {
+            addNewChat();
+            return;
+        }
+
         // Start a ValueEventListener for each Chat the user is involved in
         for (String chatId : mAuthor.getChats()) {
 
@@ -133,6 +147,8 @@ public class ChatFragment extends ConnectivityFragment {
                                     FirebaseProviderUtils.FirebaseType.CHAT,
                                     dataSnapshot);
 
+                            if (chat == null) return;
+
                             // Retrieve the members from each Chat
                             if (chat.getMembers().size() > 1) {
                                 getChatMembers(chat);
@@ -142,6 +158,8 @@ public class ChatFragment extends ConnectivityFragment {
                                 // Remove any Chats that do not have any members
                                 reference.removeValue();
                                 reference.removeEventListener(this);
+
+                                mAuthor.removeChat(getActivity(), chat.firebaseId);
                             }
                         }
 
@@ -157,6 +175,46 @@ public class ChatFragment extends ConnectivityFragment {
             // Add both to the List so the ValueEventListener can be added and removed in
             // onStart/onPause
             mReferenceListenerPairList.add(new Pair<>(reference, listener));
+        }
+    }
+
+    /**
+     * Checks the Firebase Database list of Chats for the User against the local database and
+     * removes any Chats from the local database that do not exist on the Firebase Database
+     */
+    private void checkAndRemoveDeletedChats() {
+
+        // Query the local database to get all ChatIds that exist in the local database
+        Cursor cursor = getActivity().getContentResolver().query(
+                GuideProvider.Chats.CONTENT_URI, null, null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            Set<String> databaseChatSet = new HashSet<>();
+
+            do {
+                databaseChatSet.add(cursor.getString(1));
+            } while (cursor.moveToNext());
+
+            cursor.close();
+
+            // Remove any ChatIds from the database Set that also exist in the Firebase Database
+            if (mAuthor.getChats() != null && mAuthor.getChats().size() > 0) {
+                for (String chatId : mAuthor.getChats()) {
+                    databaseChatSet.remove(chatId);
+                }
+            }
+
+            // Delete any Chats remaining in the Set
+            if (databaseChatSet.size() > 0) {
+                for (String chatId : databaseChatSet) {
+                    getActivity().getContentResolver().delete(
+                            GuideProvider.Chats.CONTENT_URI,
+                            GuideContract.ChatEntry.FIREBASE_ID + " = ?",
+                            new String[] {chatId});
+
+                    mAuthor.removeChat(getActivity(), chatId);
+                }
+            }
         }
     }
 
@@ -207,22 +265,24 @@ public class ChatFragment extends ConnectivityFragment {
         chat.addMember(getActivity(), mAuthor.firebaseId);
 
         // Add the chat to the User and update it in Firebase
-        mAuthor.addChat(chat.firebaseId);
-
-        DataCache.getInstance().store(chat);
+        mAuthor.addChat(getActivity(), chat.firebaseId);
 
         // Start the MessageActivity for the Chat
-        startMessageActivity(chat.firebaseId);
+        startMessageActivity(chat);
     }
 
     /**
      * Starts the MessageActivity for a specific Chat
      *
-     * @param chatId    FirebaseId of the Chat to be initiated
+     * @param chat    Chat to be initiated
      */
-    private void startMessageActivity(String chatId) {
+    private void startMessageActivity(Chat chat) {
         Intent intent = new Intent(getActivity(), MessageActivity.class);
-        intent.putExtra(CHAT_KEY, chatId);
+        intent.putExtra(CHAT_KEY, chat.firebaseId);
+
+        // Store the Chat and Author
+        DataCache.getInstance().store(chat);
+        DataCache.getInstance().store(mAuthor);
 
         startActivity(intent);
     }
