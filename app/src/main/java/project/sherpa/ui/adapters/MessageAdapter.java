@@ -20,6 +20,7 @@ import project.sherpa.databinding.ListItemMessageReceiveBinding;
 import project.sherpa.databinding.ListItemMessageSendBinding;
 import project.sherpa.models.datamodels.Message;
 import project.sherpa.models.viewmodels.MessageViewModel;
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 9/14/2017.
@@ -145,11 +146,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             Message oldMessage = mSortedList.get(i);
             if (oldMessage.firebaseId.equals(message.firebaseId)) {
                 newItem = false;
+                oldMessage.setDate(message.getDate());
+                notifyItemChanged(i);
                 break;
             }
         }
 
         if (newItem) {
+            Timber.d("Adding message: " + message.getMessage() + " | ID: " + message.firebaseId);
             mSortedList.add(message);
             notifyItemChanged(mSortedList.size() - 2);
         }
