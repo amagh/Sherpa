@@ -183,7 +183,7 @@ public class ChatViewModel extends BaseObservable {
             @Override
             public void onModelReady(BaseModel model) {
 
-                Author author = (Author) model;
+                final Author author = (Author) model;
 
                 if (author == null) {
 
@@ -202,17 +202,22 @@ public class ChatViewModel extends BaseObservable {
                 List<String> chatAuthorIds = new ArrayList<>(mChat.getMembers());
                 chatAuthorIds.add(author.firebaseId);
 
-                if (Chat.checkDuplicateChats(mActivity, chatAuthorIds) == null) {
+                Chat.checkDuplicateChats(chatAuthorIds, new FirebaseProviderUtils.FirebaseListener() {
+                    @Override
+                    public void onModelReady(BaseModel model) {
+                        if (model == null) {
+                            // Add the member to the chat
+                            mChat.addMember(mActivity, author.firebaseId);
 
-                    // Add the member to the chat
-                    mChat.addMember(mActivity, author.firebaseId);
+                            // Add the Chat to the User's profile an update the local and Firebase Database
+                            author.addChat(mChat.firebaseId);
 
-                    // Add the Chat to the User's profile an update the local and Firebase Database
-                    author.addChat(mChat.firebaseId);
-
-                    setAddMember(false);
-                }
-
+                            setAddMember(false);
+                        } else {
+                            Chat chat = (Chat) model;
+                        }
+                    }
+                });
             }
         });
     }
