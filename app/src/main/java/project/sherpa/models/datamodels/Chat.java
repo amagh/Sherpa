@@ -188,6 +188,7 @@ public class Chat extends BaseModel {
 
                         // Modify the Chat
                         chat.getMembers().add(authorId);
+                        chat.setMemberCode(buildMemberCode(chat.getMembers()));
                         mutableData.setValue(chat);
 
                         return Transaction.success(mutableData);
