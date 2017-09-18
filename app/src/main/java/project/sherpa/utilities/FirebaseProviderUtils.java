@@ -251,7 +251,7 @@ public class FirebaseProviderUtils {
         }
 
         // Set the model's firebaseId
-        assertNotNull(model);
+        if (model == null) return null;
         model.firebaseId = dataSnapshot.getKey();
 
         return model;
