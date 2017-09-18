@@ -222,7 +222,8 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
                     vm.setAuthor(mUser);
                 }
 
-                ((ListItemGuideBinding) mBinding).setVm(vm);
+                ((ListItemGuideBinding) mBinding).top.setVm(vm);
+                ((ListItemGuideBinding) mBinding).bottom.setVm(vm);
             }
         }
     }
