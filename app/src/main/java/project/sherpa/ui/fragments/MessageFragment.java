@@ -128,21 +128,17 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
             // Retrieve the FirebaseId of the Chat to retrieve messages for
             String chatId = GuideProvider.getIdFromUri((Uri) args.getParcelable(CHAT_KEY));
 
-            mChat = (Chat) DataCache.getInstance().get(chatId);
-            getNewMessagesSinceLastChat();
+            // Set the Chat for the Fragment
+            Chat chat = (Chat) DataCache.getInstance().get(chatId);
+            setChat(chat);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
                 mAuthor = (Author) DataCache.getInstance().get(user.getUid());
-                setMessageBinding();
             }
 
-            // Start the Loader and pass in the Bundle
-            getActivity().getSupportLoaderManager().initLoader(MESSAGE_LOADER, args, this);
+            setMessageBinding();
         }
-
-        // Bind the Views related to the Chat
-        setChatBinding();
 
         // If the device user is the only member of the chat, then set up the
         if (mChat.getMembers().size() == 1) {
@@ -288,6 +284,27 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
             cursor.close();
         }
+    }
+
+    /**
+     * Sets the Chat to be used for this Fragment to retrieve messages for
+     *
+     * @param chat    The Chat to be set
+     */
+    public void setChat(Chat chat) {
+
+        mAdapter.clear();
+
+        // Start the Loader and pass in the Bundle
+        Bundle args = new Bundle();
+        args.putParcelable(CHAT_KEY, GuideProvider.Messages.forChat(chat.firebaseId));
+
+        // Load messages from the database
+        getActivity().getSupportLoaderManager().restartLoader(MESSAGE_LOADER, args, this);
+
+        mChat = chat;
+        getNewMessagesSinceLastChat();
+        setChatBinding();
     }
 
     /**
