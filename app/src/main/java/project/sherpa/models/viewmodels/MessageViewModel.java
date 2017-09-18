@@ -1,20 +1,17 @@
 package project.sherpa.models.viewmodels;
 
-import android.app.Activity;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
-import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -22,8 +19,6 @@ import com.bumptech.glide.signature.StringSignature;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -34,7 +29,6 @@ import project.sherpa.models.datamodels.Message;
 import project.sherpa.ui.fragments.MessageFragment;
 import project.sherpa.utilities.DimensionUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
-import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_MESSAGES;
 
@@ -157,10 +151,24 @@ public class MessageViewModel extends BaseObservable {
     }
 
     @BindingAdapter("topMargin")
-    public static void setTopMargin(ConstraintLayout layout, int topMargin) {
+    public static void setTopMargin(ViewGroup layout, int topMargin) {
 
         // Set the top margin for the layout
         ((RecyclerView.LayoutParams) layout.getLayoutParams()).topMargin = topMargin;
+    }
+
+    /**
+     * Click response for attach button
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickAttach(View view) {
+
+        // Start the Activity for selecting a Guide to attach to the chat
+        MessageFragment fragment = (MessageFragment) mActivity.getSupportFragmentManager()
+                .findFragmentByTag(FRAG_TAG_MESSAGES);
+
+        fragment.startActivityToAttachGuide();
     }
 
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {

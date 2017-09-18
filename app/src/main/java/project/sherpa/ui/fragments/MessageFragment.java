@@ -1,5 +1,6 @@
 package project.sherpa.ui.fragments;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
@@ -35,13 +36,19 @@ import project.sherpa.models.datamodels.Message;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.ChatViewModel;
 import project.sherpa.models.viewmodels.MessageViewModel;
+import project.sherpa.ui.activities.AttachActivity;
 import project.sherpa.ui.adapters.MessageAdapter;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
+import static android.app.Activity.RESULT_OK;
+import static project.sherpa.models.datamodels.Message.ATTACHMENT_TYPE;
+import static project.sherpa.models.datamodels.Message.AttachmentType.GUIDE_TYPE;
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
+import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
+import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_ATTACH_GUIDE;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.CHAT;
 
 /**
@@ -184,6 +191,25 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         super.onPause();
 
         removeMessageListener();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        switch (requestCode) {
+            case REQUEST_CODE_ATTACH_GUIDE:
+                if (resultCode == RESULT_OK) {
+
+                    // Get the selected guide for attachment
+                    String guideId = data.getStringExtra(GUIDE_KEY);
+                    if (guideId == null) return;
+
+                    // Attach the Guide and send the message
+                    attachGuideToMessage(guideId);
+                }
+
+                break;
+        }
     }
 
     private void initRecyclerView() {
@@ -343,12 +369,32 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     }
 
     /**
+     * Starts the AttachActivity to allow for the user to select a Guide to attach to the message
+     */
+    public void startActivityToAttachGuide() {
+        Intent intent = new Intent(getActivity(), AttachActivity.class);
+        intent.putExtra(ATTACHMENT_TYPE, GUIDE_TYPE);
+
+        startActivityForResult(intent, REQUEST_CODE_ATTACH_GUIDE);
+    }
+
+    /**
+     * Attaches a Guide to a message and sends it
+     * @param guideId
+     */
+    public void attachGuideToMessage(String guideId) {
+        mMessage.attachGuide(guideId);
+        sendMessage();
+    }
+
+    /**
      * Uploads the message the User composed to Firebase Database
      */
     public void sendMessage() {
 
         // Check to ensure there is a message to send
-        if (mMessage.getMessage() == null || mMessage.getMessage().isEmpty()) return;
+        if (mMessage.getAttachment() == null
+                && (mMessage.getMessage() == null || mMessage.getMessage().isEmpty())) return;
 
         mMessage.send(getActivity())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {

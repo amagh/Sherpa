@@ -97,7 +97,7 @@
             android:onEditorAction="@{vm::onEditorAction}"
             style="@style/TextAppearance.AppCompat.Body1"
             app:backgroundTint="@android:color/transparent"
-            app:layout_constraintStart_toEndOf="@+id/message_add_guide_iv"
+            app:layout_constraintStart_toEndOf="@+id/message_attach_iv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -108,7 +108,7 @@
             android:layout_marginTop="@dimen/messaging_outline_vertical_margin"
             android:layout_marginBottom="@dimen/messaging_outline_vertical_margin"
             android:background="@drawable/messaging_bubble"
-            app:layout_constraintStart_toEndOf="@+id/message_add_guide_iv"
+            app:layout_constraintStart_toEndOf="@+id/message_attach_iv"
             app:layout_constraintEnd_toEndOf="@id/message_tv"
             app:layout_constraintTop_toTopOf="@id/message_tv"
             app:layout_constraintBottom_toBottomOf="@id/message_tv"/>
@@ -124,7 +124,7 @@
             android:background="@color/grey_400"/>
 
         <ImageView
-            android:id="@+id/message_add_guide_iv"
+            android:id="@+id/message_attach_iv"
             android:layout_width="@dimen/messaging_icon_size"
             android:layout_height="@dimen/messaging_icon_size"
             android:layout_marginLeft="@dimen/messaging_add_guide_image_left_margin"
@@ -132,6 +132,7 @@
             android:padding="@dimen/messaging_icon_padding"
             android:src="@drawable/ic_add_circle"
             android:background="?attr/selectableItemBackground"
+            android:onClick="@{vm::onClickAttach}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
