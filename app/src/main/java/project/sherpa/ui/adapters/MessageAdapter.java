@@ -125,6 +125,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         mSortedList.addAll(messageList);
     }
 
+    public void clear() {
+        mSortedList.clear();
+    }
+
     /**
      * Adds a Message to be displayed by the Adapter if it does not already exist in the Adapter
      *
