@@ -118,6 +118,9 @@
     <dimen name="messaging_icon_padding">12dp</dimen>
     <dimen name="messaging_cancel_icon_size">16dp</dimen>
 
+    <dimen name="messaging_guide_padding">12dp</dimen>
+    <dimen name="messaging_guide_send_horizontal_margin">78dp</dimen>
+
     <dimen name="chat_bubble_corner_radius">8dp</dimen>
     <dimen name="messaging_bubble_corner_radius">16dp</dimen>
 
