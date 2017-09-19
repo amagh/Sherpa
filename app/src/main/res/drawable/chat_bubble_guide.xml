@@ -5,6 +5,10 @@
 
     <solid android:color="@android:color/white"/>
 
+    <stroke
+        android:color="@color/grey_400"
+        android:width="@dimen/list_item_separator_height"/>
+
     <corners android:radius="@dimen/chat_bubble_corner_radius"/>
 
 </shape>
