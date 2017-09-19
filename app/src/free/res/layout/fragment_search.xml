@@ -133,7 +133,7 @@
             <View
                 android:id="@+id/search_divider_v"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/list_item_separater_height"
+                android:layout_height="@dimen/list_item_separator_height"
                 android:layout_marginTop="@dimen/search_widget_height"
                 android:background="@color/grey_400"/>
 

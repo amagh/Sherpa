@@ -118,7 +118,7 @@
         <View
             android:id="@+id/message_chat_separator_v"
             android:layout_width="0dp"
-            android:layout_height="@dimen/list_item_separater_height"
+            android:layout_height="@dimen/list_item_separator_height"
             android:layout_marginBottom="@dimen/messaging_separator_bottom_margin"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
