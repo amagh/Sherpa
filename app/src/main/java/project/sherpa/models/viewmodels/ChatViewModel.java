@@ -78,7 +78,7 @@ public class ChatViewModel extends BaseObservable {
             if (builder.length() > 0) {
 
                 // Add comma separator
-                builder.append(",");
+                builder.append(", ");
             }
 
             builder.append(member);
@@ -89,10 +89,17 @@ public class ChatViewModel extends BaseObservable {
 
     @Bindable
     public String getLastMessage() {
+
+        // Set the text to display as the last message as "Attachment" if the last message contained
+        // an attachment.
+        String message = mChat.getLastMessage() == null || mChat.getLastMessage().isEmpty()
+                ? mActivity.getString(R.string.chat_attachment_text)
+                : mChat.getLastMessage();
+
         return mActivity.getString(
                 R.string.chat_last_message_text,
                 mChat.getLastAuthorName(),
-                mChat.getLastMessage());
+                message);
     }
 
     @Bindable

@@ -213,6 +213,7 @@
 
     <!-- Chat Strings -->
     <string name="chat_last_message_text">%1$s: %2$s</string>
+    <string name="chat_attachment_text">Attachment</string>
     <string name="toast_error_add_self">Cannot add yourself to the chat</string>
     <string name="toast_error_user_does_not_exist">User does not exist</string>
     
