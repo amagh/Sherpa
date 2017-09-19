@@ -35,12 +35,15 @@ import project.sherpa.data.GuideProvider;
 import project.sherpa.databinding.FragmentMessageBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
+import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.Message;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.ChatViewModel;
 import project.sherpa.models.viewmodels.MessageViewModel;
 import project.sherpa.ui.activities.AttachActivity;
+import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.adapters.MessageAdapter;
+import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
@@ -237,7 +240,14 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     }
 
     private void initRecyclerView() {
-        mAdapter = new MessageAdapter(getActivity());
+        mAdapter = new MessageAdapter(getActivity(), new ClickHandler<Guide>() {
+            @Override
+            public void onClick(Guide guide) {
+
+                // Start the Activity to show the Guide details for the clicked Guide
+                startGuideDetailsActivity(guide);
+            }
+        });
         mBinding.messageRv.setAdapter(mAdapter);
 
         // Init the LayoutManager in reverse order
@@ -407,6 +417,20 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         intent.putExtra(ATTACHMENT_TYPE, GUIDE_TYPE);
 
         startActivityForResult(intent, REQUEST_CODE_ATTACH_GUIDE);
+    }
+
+    /**
+     * Start Activity to show guide details for clicking an attachment guide
+     *
+     * @param guide    Guide in the attachment that was clicked
+     */
+    private void startGuideDetailsActivity(Guide guide) {
+        Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
+        intent.putExtra(GUIDE_KEY, guide.firebaseId);
+
+        DataCache.getInstance().store(guide);
+
+        startActivity(intent);
     }
 
     /**

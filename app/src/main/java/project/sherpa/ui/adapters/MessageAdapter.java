@@ -8,6 +8,7 @@ import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +28,7 @@ import project.sherpa.models.datamodels.Message;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.GuideViewModel;
 import project.sherpa.models.viewmodels.MessageViewModel;
+import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
@@ -50,6 +52,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     // ** Member Variables ** //
     private Activity mActivity;
     private FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+    private ClickHandler<Guide> mClickHandler;
     private SortedListAdapterCallback<Message> mCallback = new SortedListAdapterCallback<Message>(this) {
         @Override
         public int compare(Message o1, Message o2) {
@@ -71,8 +74,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private SortedList<Message> mSortedList = new SortedList<>(Message.class, mCallback);
     private Map<String, Guide> mGuideAttachmentMap = new HashMap<>();
 
-    public MessageAdapter(Activity activity) {
+    public MessageAdapter(Activity activity, ClickHandler<Guide> clickHandler) {
         mActivity = activity;
+        mClickHandler = clickHandler;
     }
 
     @Override
@@ -226,7 +230,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         return false;
     }
 
-    class MessageViewHolder extends RecyclerView.ViewHolder {
+    class MessageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // ** Member Variables ** //
         ViewDataBinding mBinding;
@@ -235,6 +239,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             super(binding.getRoot());
 
             mBinding = binding;
+
+            if (mBinding instanceof ListItemMessageSendGuideBinding ||
+                    mBinding instanceof  ListItemMessageReceiveGuideBinding) {
+                mBinding.getRoot().setOnClickListener(this);
+            }
         }
 
         void bind(int position) {
@@ -300,6 +309,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     ((ListItemMessageReceiveGuideBinding) mBinding).messageGuide.setVm(gvm);
                 }
             }
+        }
+
+        @Override
+        public void onClick(View view) {
+
+            // Get the Messages associated with the clicked position
+            int position = getAdapterPosition();
+            Message message = mSortedList.get(position);
+
+            // Get the guide associated with the clicked message
+            Guide guide = mGuideAttachmentMap.get(message.getAttachment());
+            mClickHandler.onClick(guide);
         }
     }
 }
