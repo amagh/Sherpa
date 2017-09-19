@@ -226,12 +226,17 @@ public class ChatFragment extends ConnectivityFragment {
                 }
             }
 
-            // Delete any Chats remaining in the Set
+            // Delete any Chats remaining in the Set and Messages associated with it
             if (databaseChatSet.size() > 0) {
                 for (String chatId : databaseChatSet) {
                     getActivity().getContentResolver().delete(
                             GuideProvider.Chats.CONTENT_URI,
                             GuideContract.ChatEntry.FIREBASE_ID + " = ?",
+                            new String[] {chatId});
+
+                    getActivity().getContentResolver().delete(
+                            GuideProvider.Messages.CONTENT_URI,
+                            GuideContract.MessageEntry.CHAT_ID + " = ?",
                             new String[] {chatId});
 
                     mAuthor.removeChat(getActivity(), chatId);
