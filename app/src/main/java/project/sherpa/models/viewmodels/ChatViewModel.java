@@ -213,4 +213,20 @@ public class ChatViewModel extends BaseObservable {
         });
     }
 
+    /**
+     * Click response for the cancel icon when add a user to the chat
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickCancel(View view) {
+
+        if (mAddUsername == null || mAddUsername.isEmpty()) {
+            // Hide the view for adding a user
+            setAddMember(false);
+        } else {
+            // Clear the entered text
+            setAddUsername(null);
+            notifyPropertyChanged(BR.addUsername);
+        }
+    }
 }

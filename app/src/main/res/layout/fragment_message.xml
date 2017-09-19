@@ -45,14 +45,15 @@
                 android:layout_width="@dimen/messaging_icon_size"
                 android:layout_height="@dimen/messaging_icon_size"
                 android:padding="@dimen/messaging_cancel_icon_size"
-                android:src="@drawable/ic_close"/>
+                android:src="@drawable/ic_close"
+                android:onClick="@{chat::onClickCancel}"/>
 
             <EditText
                 android:id="@+id/message_add_people_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Type a user's username"
+                android:hint="@string/chat_add_member_hint"
                 android:textColor="@android:color/white"
                 android:textColorHint="@android:color/white"
                 android:text="@={chat.addUsername}"
