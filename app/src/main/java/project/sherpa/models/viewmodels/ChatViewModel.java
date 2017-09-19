@@ -48,9 +48,17 @@ public class ChatViewModel extends BaseObservable {
 
     @Bindable
     public String getMembers() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         StringBuilder builder = new StringBuilder();
 
+        // Add the name of each user in the chat
         for (String member : mChat.getMembers()) {
+
+            // Do not display the user's own name
+            if (user!= null && user.getUid().equals(member)) {
+                continue;
+            }
 
             Cursor cursor = mActivity.getContentResolver().query(
                     GuideProvider.Authors.CONTENT_URI,
@@ -67,12 +75,13 @@ public class ChatViewModel extends BaseObservable {
                 cursor.close();
             }
 
-            if (builder.length() == 0) {
-                builder.append(member);
-            } else {
-                builder.append(", ");
-                builder.append(member);
+            if (builder.length() > 0) {
+
+                // Add comma separator
+                builder.append(",");
             }
+
+            builder.append(member);
         }
 
         return builder.toString();
