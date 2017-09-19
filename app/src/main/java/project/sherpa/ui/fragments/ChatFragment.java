@@ -52,7 +52,8 @@ public class ChatFragment extends ConnectivityFragment {
     private Author mAuthor;
     private ChatAdapter mAdapter;
 
-    private List<Pair<DatabaseReference, ValueEventListener>> mReferenceListenerPairList;
+    private Set<Pair<DatabaseReference, ValueEventListener>> mReferenceListenerPairSet = new HashSet<>();
+    private Set<String> mChatSet = new HashSet<>();
     private List<String> mAuthorIdList = new ArrayList<>();
 
     @Override
@@ -62,8 +63,6 @@ public class ChatFragment extends ConnectivityFragment {
         loadCurrentUser();
 
         initRecyclerView();
-
-        loadChats();
 
         return mBinding.getRoot();
     }
@@ -77,7 +76,27 @@ public class ChatFragment extends ConnectivityFragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         assert user != null;
 
-        mAuthor = (Author) DataCache.getInstance().get(user.getUid());
+        DatabaseReference authorRef = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.AUTHORS)
+                .child(user.getUid());
+
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mAuthor = (Author) FirebaseProviderUtils.getModelFromSnapshot(
+                        FirebaseProviderUtils.FirebaseType.AUTHOR,
+                        dataSnapshot);
+
+                loadChats();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        mReferenceListenerPairSet.add(new Pair<>(authorRef, listener));
     }
 
     /**
@@ -101,8 +120,8 @@ public class ChatFragment extends ConnectivityFragment {
     public void onPause() {
         super.onPause();
 
-        if (mReferenceListenerPairList != null) {
-            for (Pair<DatabaseReference, ValueEventListener> pair : mReferenceListenerPairList) {
+        if (mReferenceListenerPairSet != null) {
+            for (Pair<DatabaseReference, ValueEventListener> pair : mReferenceListenerPairSet) {
                 pair.first.removeEventListener(pair.second);
             }
         }
@@ -112,8 +131,8 @@ public class ChatFragment extends ConnectivityFragment {
     public void onResume() {
         super.onResume();
 
-        if (mReferenceListenerPairList != null) {
-            for (Pair<DatabaseReference, ValueEventListener> pair : mReferenceListenerPairList) {
+        if (mReferenceListenerPairSet != null) {
+            for (Pair<DatabaseReference, ValueEventListener> pair : mReferenceListenerPairSet) {
                 pair.first.addValueEventListener(pair.second);
             }
         }
@@ -129,12 +148,15 @@ public class ChatFragment extends ConnectivityFragment {
 
         // Start a new chat if there are no chats
         if (mAuthor.getChats() == null || mAuthor.getChats().size() == 0) {
-            addNewChat();
+//            addNewChat();
             return;
         }
 
         // Start a ValueEventListener for each Chat the user is involved in
         for (String chatId : mAuthor.getChats()) {
+
+            // Do not add another Listener for items that already have a Listener attached to them
+            if (mChatSet.contains(chatId)) return;
 
             final DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                     .child(GuideDatabase.CHATS)
@@ -169,12 +191,12 @@ public class ChatFragment extends ConnectivityFragment {
                         }
                     };
 
-            // Init the List
-            if (mReferenceListenerPairList == null) mReferenceListenerPairList = new ArrayList<>();
+            reference.addValueEventListener(listener);
 
-            // Add both to the List so the ValueEventListener can be added and removed in
+            // Add both to the Set so the ValueEventListener can be added and removed in
             // onStart/onPause
-            mReferenceListenerPairList.add(new Pair<>(reference, listener));
+            mReferenceListenerPairSet.add(new Pair<>(reference, listener));
+            mChatSet.add(chatId);
         }
     }
 
