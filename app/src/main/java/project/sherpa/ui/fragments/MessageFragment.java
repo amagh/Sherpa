@@ -12,6 +12,9 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -126,6 +129,10 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_message, container, false);
 
+
+
+        setHasOptionsMenu(true);
+
         initRecyclerView();
 
         // Retrieve the Bundle containing the Uri
@@ -153,6 +160,23 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         }
 
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_message, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.menu_add_user:
+                mChatViewModel.setAddMember(true);
+                return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -338,6 +362,8 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         mChat = chat;
         getNewMessagesSinceLastChat();
         setChatBinding();
+
+        setActionBar();
     }
 
     /**
@@ -349,6 +375,11 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         }
 
         mBinding.setChat(mChatViewModel);
+    }
+
+    private void setActionBar() {
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mBinding.messageTb);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(mChatViewModel.getMembers());
     }
 
     /**
