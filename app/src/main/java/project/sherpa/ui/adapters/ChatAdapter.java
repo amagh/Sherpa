@@ -100,6 +100,31 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         }
     }
 
+    /**
+     * Removes a Chat from the Adapter
+     *
+     * @param chatId    FirebaseId of the Chat to be removed
+     */
+    public void removeChat(String chatId) {
+
+        // Iterate through the List of Chats and remove the Chat that matches the ChatId
+        for (int i = 0; i < mSortedList.size(); i++) {
+            Chat chat = mSortedList.get(i);
+            if (chat.firebaseId.equals(chatId)) {
+                mSortedList.removeItemAt(i);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Clears the Adapter
+     */
+    public void clear() {
+        mSortedList.clear();
+        notifyDataSetChanged();
+    }
+
     class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // ** Member Variables ** //

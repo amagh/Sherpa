@@ -20,8 +20,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import project.sherpa.R;
@@ -52,7 +54,8 @@ public class ChatFragment extends ConnectivityFragment {
     private Author mAuthor;
     private ChatAdapter mAdapter;
 
-    private Set<Pair<DatabaseReference, ValueEventListener>> mReferenceListenerPairSet = new HashSet<>();
+    private Pair<DatabaseReference, ValueEventListener> mAuthorReferenceListenerPair;
+    private Map<String, ChatValueEventListener> mEventListenerMap = new HashMap<>();
     private Set<String> mChatSet = new HashSet<>();
     private List<String> mAuthorIdList = new ArrayList<>();
 
@@ -76,16 +79,43 @@ public class ChatFragment extends ConnectivityFragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         assert user != null;
 
-        DatabaseReference authorRef = FirebaseDatabase.getInstance().getReference()
+        final DatabaseReference authorRef = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.AUTHORS)
                 .child(user.getUid());
 
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                mAuthor = (Author) FirebaseProviderUtils.getModelFromSnapshot(
+
+                Author author = (Author) FirebaseProviderUtils.getModelFromSnapshot(
                         FirebaseProviderUtils.FirebaseType.AUTHOR,
                         dataSnapshot);
+
+                if (author.getChats() == null) {
+
+                    // Stop and remove all ChatValueEventListeners
+                    for (ChatValueEventListener listener : mEventListenerMap.values()) {
+                        listener.stop();
+                    }
+
+                    mEventListenerMap.clear();
+                    mAdapter.clear();
+                }
+
+                // Remove any Chats that are no longer in the User's list of Chats
+                if (mAuthor != null && mAuthor.getChats() != null && author.getChats() != null) {
+
+                    // Check the new list of Chats against the List of Chats that the Author
+                    // previously had and remove any Chats that aren't in the new List
+                    for (String chatId : mAuthor.getChats()) {
+                        if (!author.getChats().contains(chatId)) {
+                            mAdapter.removeChat(chatId);
+                            mEventListenerMap.remove(chatId);
+                        }
+                    }
+                }
+
+                mAuthor = author;
 
                 loadChats();
             }
@@ -96,7 +126,7 @@ public class ChatFragment extends ConnectivityFragment {
             }
         };
 
-        mReferenceListenerPairSet.add(new Pair<>(authorRef, listener));
+        mAuthorReferenceListenerPair  = new Pair<>(authorRef, listener);
     }
 
     /**
@@ -120,9 +150,13 @@ public class ChatFragment extends ConnectivityFragment {
     public void onPause() {
         super.onPause();
 
-        if (mReferenceListenerPairSet != null) {
-            for (Pair<DatabaseReference, ValueEventListener> pair : mReferenceListenerPairSet) {
-                pair.first.removeEventListener(pair.second);
+        if (mAuthorReferenceListenerPair != null) {
+            mAuthorReferenceListenerPair.first.removeEventListener(mAuthorReferenceListenerPair.second);
+        }
+
+        if (mEventListenerMap != null) {
+            for (ChatValueEventListener listener : mEventListenerMap.values()) {
+                listener.stop();
             }
         }
     }
@@ -131,9 +165,13 @@ public class ChatFragment extends ConnectivityFragment {
     public void onResume() {
         super.onResume();
 
-        if (mReferenceListenerPairSet != null) {
-            for (Pair<DatabaseReference, ValueEventListener> pair : mReferenceListenerPairSet) {
-                pair.first.addValueEventListener(pair.second);
+        if (mAuthorReferenceListenerPair != null) {
+            mAuthorReferenceListenerPair.first.addValueEventListener(mAuthorReferenceListenerPair.second);
+        }
+
+        if (mEventListenerMap != null) {
+            for (ChatValueEventListener listener : mEventListenerMap.values()) {
+                listener.start();
             }
         }
     }
@@ -146,11 +184,7 @@ public class ChatFragment extends ConnectivityFragment {
         // Remove any Chats from the database that don't exist on the Firebase Database
         checkAndRemoveDeletedChats();
 
-        // Start a new chat if there are no chats
-        if (mAuthor.getChats() == null || mAuthor.getChats().size() == 0) {
-//            addNewChat();
-            return;
-        }
+        if (mAuthor.getChats() == null) return;
 
         // Start a ValueEventListener for each Chat the user is involved in
         for (String chatId : mAuthor.getChats()) {
@@ -158,44 +192,12 @@ public class ChatFragment extends ConnectivityFragment {
             // Do not add another Listener for items that already have a Listener attached to them
             if (mChatSet.contains(chatId)) return;
 
-            final DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                    .child(GuideDatabase.CHATS)
-                    .child(chatId);
-
-            ValueEventListener listener = new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Chat chat = (Chat) FirebaseProviderUtils.getModelFromSnapshot(
-                                    FirebaseProviderUtils.FirebaseType.CHAT,
-                                    dataSnapshot);
-
-                            if (chat == null) return;
-
-                            // Retrieve the members from each Chat
-                            if (chat.getMembers().size() > 1) {
-                                getChatMembers(chat);
-                                DataCache.getInstance().store(chat);
-
-                            } else {
-                                // Remove any Chats that do not have any members
-                                reference.removeValue();
-                                reference.removeEventListener(this);
-
-                                mAuthor.removeChat(getActivity(), chat.firebaseId);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    };
-
-            reference.addValueEventListener(listener);
+            ChatValueEventListener listener = new ChatValueEventListener(chatId);
+            listener.start();
 
             // Add both to the Set so the ValueEventListener can be added and removed in
             // onStart/onPause
-            mReferenceListenerPairSet.add(new Pair<>(reference, listener));
+            mEventListenerMap.put(chatId, listener);
             mChatSet.add(chatId);
         }
     }
@@ -318,5 +320,57 @@ public class ChatFragment extends ConnectivityFragment {
         DataCache.getInstance().store(mAuthor);
 
         startActivity(intent);
+    }
+
+    private class ChatValueEventListener implements ValueEventListener {
+
+        // ** Member Variables ** //
+        private String chatId;
+        private DatabaseReference reference;
+
+        ChatValueEventListener(String chatId) {
+            this.chatId = chatId;
+
+            reference = FirebaseDatabase.getInstance().getReference()
+                    .child(GuideDatabase.CHATS)
+                    .child(chatId);
+        }
+
+        String getChatId() {
+            return this.chatId;
+        }
+
+        void start() {
+            reference.addValueEventListener(this);
+        }
+
+        void stop() {
+            reference.removeEventListener(this);
+        }
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            Chat chat = (Chat) FirebaseProviderUtils.getModelFromSnapshot(
+                    FirebaseProviderUtils.FirebaseType.CHAT,
+                    dataSnapshot);
+
+            // Retrieve the members from each Chat
+            if (chat.getMembers().size() > 1 && chat.getLastMessageId() != null) {
+                getChatMembers(chat);
+                DataCache.getInstance().store(chat);
+
+            } else {
+                // Remove any Chats that do not have any members or any messages
+                reference.removeValue();
+                reference.removeEventListener(this);
+
+                mAuthor.removeChat(getActivity(), chat.firebaseId);
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
     }
 }
