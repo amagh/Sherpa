@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.SearchUserViewModel"/>
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/list_search_user_iv"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/list_author_icon_padding"
+            android:src="@drawable/ic_account_circle"
+            app:authorImage="@{vm.authorImage}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/list_search_user_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{vm.name}"
+            app:author="@{vm.author}"
+            app:layout_constraintStart_toEndOf="@id/list_search_user_iv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/list_search_user_username_tv"
+            app:layout_constraintVertical_chainStyle="packed"
+            style="@style/TextAppearance.AppCompat.Body1"
+            tools:text="@string/list_author_text"/>
+
+        <TextView
+            android:id="@+id/list_search_user_username_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{vm.query}"
+            app:layout_constraintStart_toEndOf="@id/list_search_user_iv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/list_search_user_tv"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            style="@style/TextAppearance.AppCompat.Caption"
+            tools:text="@string/list_author_username_text"/>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>
