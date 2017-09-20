@@ -43,7 +43,7 @@ public class Chat extends BaseModel {
     public static final String LAST_MESSAGE_DATE    = "lastMessageDate";
     public static final String MEMBER_ID            = "memberId";
     public static final String MEMBER_CODE          = "memberCode";
-
+    public static final String IS_GROUP             = "isGroup";
 
     // ** Member Variables ** //
     private List<String> activeMembers;
@@ -55,6 +55,7 @@ public class Chat extends BaseModel {
     private String lastMessage;
     private long lastMessageDate;
     private String memberCode;
+    private boolean isGroup;
 
     private boolean updateTime;
 
@@ -72,6 +73,7 @@ public class Chat extends BaseModel {
         map.put(LAST_MESSAGE,       lastMessage);
         map.put(LAST_MESSAGE_DATE,  lastMessageDate);
         map.put(MEMBER_CODE,        buildMemberCode());
+        map.put(IS_GROUP,           isGroup);
 
         return map;
     }
@@ -412,6 +414,10 @@ public class Chat extends BaseModel {
         return memberCode;
     }
 
+    public boolean isGroup() {
+        return isGroup;
+    }
+
     public void setActiveMembers(List<String> activeMembers) {
         this.activeMembers = activeMembers;
     }
@@ -446,5 +452,9 @@ public class Chat extends BaseModel {
 
     public void setMemberCode(String memberCode) {
         this.memberCode = memberCode;
+    }
+
+    public void setIsGroup(boolean isGroup) {
+        this.isGroup = isGroup;
     }
 }
