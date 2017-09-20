@@ -6,6 +6,7 @@ import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -54,6 +55,7 @@ public class AuthorViewModel extends BaseObservable {
     private WeakReference<AppCompatActivity> mActivity;
     private int mEditVisibility = View.INVISIBLE;
     private boolean mAccepted = false;
+    private boolean mSelected = false;
 
     public AuthorViewModel(@NonNull AppCompatActivity activity, @NonNull Author author) {
         mAuthor = author;
@@ -80,6 +82,11 @@ public class AuthorViewModel extends BaseObservable {
     @Bindable
     public String getName() {
         return mAuthor.name;
+    }
+
+    @Bindable
+    public String getUsername() {
+        return mAuthor.getUsername();
     }
 
     @Bindable
@@ -254,6 +261,28 @@ public class AuthorViewModel extends BaseObservable {
         return user != null
                 ? View.VISIBLE
                 : View.GONE;
+    }
+
+    @Bindable
+    public boolean getSelected() {
+        return mSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        mSelected = selected;
+
+        notifyPropertyChanged(BR.selected);
+    }
+
+    @BindingAdapter({"imageView", "authorImage", "selected"})
+    public static void setSelectedBackground(ConstraintLayout layout, ImageView imageView, Uri authorImage, boolean selected) {
+        layout.setSelected(selected);
+
+        if (selected) {
+            imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.chat_selected_user));
+        } else {
+            loadImage(imageView, authorImage);
+        }
     }
 
     public void onClickEdit(View view) {
