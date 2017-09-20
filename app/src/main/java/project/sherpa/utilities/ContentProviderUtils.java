@@ -668,7 +668,7 @@ public class ContentProviderUtils {
     public static void insertChat(Context context, Chat chat) {
 
         // Init the Array of ContentValues to be inserted
-        ContentValues[] chatValues = new ContentValues[chat.getMembers().size()];
+        ContentValues[] chatValues = new ContentValues[chat.getActiveMembers().size()];
 
         // Create a ContentValues for each member of the chat
         for (int i = 0; i < chatValues.length; i++) {
@@ -676,7 +676,7 @@ public class ContentProviderUtils {
             ContentValues values = chatValues[i];
 
             values.put(GuideContract.ChatEntry.FIREBASE_ID,     chat.firebaseId);
-            values.put(GuideContract.ChatEntry.MEMBER_ID,       chat.getMembers().get(i));
+            values.put(GuideContract.ChatEntry.MEMBER_ID,       chat.getActiveMembers().get(i));
             values.put(GuideContract.ChatEntry.LAST_MESSAGE_ID, chat.getLastMessageId());
             values.put(GuideContract.ChatEntry.LAST_MESSAGE,    chat.getLastMessage());
             values.put(GuideContract.ChatEntry.MESSAGE_COUNT,   chat.getMessageCount());

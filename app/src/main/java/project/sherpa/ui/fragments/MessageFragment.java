@@ -157,7 +157,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         }
 
         // If the device user is the only member of the chat, then set up the
-        if (mChat.getMembers().size() == 1) {
+        if (mChat.getActiveMembers().size() == 1) {
             mChatViewModel.setAddMember(true);
         }
 
@@ -168,7 +168,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_message, menu);
 
-        if (mChat.getMembers().size() < 3) menu.getItem(1).setVisible(false);
+        if (mChat.getActiveMembers().size() < 3) menu.getItem(1).setVisible(false);
     }
 
     @Override
@@ -501,7 +501,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     private void downloadUsersForChat(Chat chat) {
 
         // Iterate through each member and download their profile from Firebase
-        for (String authorId : chat.getMembers()) {
+        for (String authorId : chat.getActiveMembers()) {
             FirebaseProviderUtils.getModel(
                     FirebaseProviderUtils.FirebaseType.AUTHOR,
                     authorId,

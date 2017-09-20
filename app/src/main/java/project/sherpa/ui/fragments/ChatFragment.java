@@ -255,7 +255,7 @@ public class ChatFragment extends ConnectivityFragment {
     private void getChatMembers(final Chat chat) {
 
         // Iterate through the member list and retrieve each member
-        for (String authorId : chat.getMembers()) {
+        for (String authorId : chat.getActiveMembers()) {
 
             // Skip any members that have already been retrieved
             if (mAuthorIdList.contains(authorId)) {
@@ -354,8 +354,16 @@ public class ChatFragment extends ConnectivityFragment {
                     FirebaseProviderUtils.FirebaseType.CHAT,
                     dataSnapshot);
 
+            if (chat == null) {
+                reference.removeEventListener(this);
+                mAuthor.removeChat(getActivity(), this.chatId);
+
+                mEventListenerMap.remove(this.chatId);
+                return;
+            }
+
             // Retrieve the members from each Chat
-            if (chat.getMembers().size() > 1 && chat.getLastMessageId() != null) {
+            if (chat.getActiveMembers().size() > 1 && chat.getLastMessageId() != null) {
                 getChatMembers(chat);
                 DataCache.getInstance().store(chat);
 
@@ -363,8 +371,9 @@ public class ChatFragment extends ConnectivityFragment {
                 // Remove any Chats that do not have any members or any messages
                 reference.removeValue();
                 reference.removeEventListener(this);
-
                 mAuthor.removeChat(getActivity(), chat.firebaseId);
+
+                mEventListenerMap.remove(this.chatId);
             }
         }
 

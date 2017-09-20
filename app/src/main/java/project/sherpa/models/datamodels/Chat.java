@@ -16,14 +16,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideDatabase;
-import project.sherpa.data.GuideProvider;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
@@ -36,7 +33,8 @@ import timber.log.Timber;
 public class Chat extends BaseModel {
 
     // ** Constants ** //
-    public static final String MEMBERS              = "members";
+    public static final String ACTIVE_MEMBERS       = "members";
+    public static final String ALL_MEMBERS          = "allMembers";
     public static final String MESSAGE_COUNT        = "messageCount";
     public static final String LAST_AUTHOR_ID       = "lastAuthorId";
     public static final String LAST_AUTHOR_NAME     = "lastAuthorName";
@@ -48,7 +46,8 @@ public class Chat extends BaseModel {
 
 
     // ** Member Variables ** //
-    private List<String> members;
+    private List<String> activeMembers;
+    private List<String> allMembers;
     private int messageCount;
     private String lastAuthorId;
     private String lastAuthorName;
@@ -64,7 +63,8 @@ public class Chat extends BaseModel {
 
         Map<String, Object> map = new HashMap<>();
 
-        map.put(MEMBERS,            members);
+        map.put(ACTIVE_MEMBERS,     activeMembers);
+        map.put(ALL_MEMBERS,        allMembers);
         map.put(MESSAGE_COUNT,      messageCount);
         map.put(LAST_AUTHOR_ID,     lastAuthorId);
         map.put(LAST_AUTHOR_NAME,   lastAuthorName);
@@ -85,28 +85,28 @@ public class Chat extends BaseModel {
     public static Chat createChatFromCursor(Cursor cursor) {
 
         // Get column indices
-        int idxFirebaseId       = 1;
-        int idxMemberId         = cursor.getColumnIndex(GuideContract.ChatEntry.MEMBER_ID);
-        int idxMessageCount     = cursor.getColumnIndex(GuideContract.ChatEntry.MESSAGE_COUNT);
-        int idxLastAuthorId     = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_AUTHOR_ID);
-        int idxLastAuthorName   = cursor.getColumnIndex(GuideContract.AuthorEntry.NAME);
-        int idxLastMessageId    = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE_ID);
-        int idxLastMessage      = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE);
-        int idxLastMessageDate  = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE_DATE);
+        int idxFirebaseId           = 1;
+        int idxMemberId             = cursor.getColumnIndex(GuideContract.ChatEntry.MEMBER_ID);
+        int idxMessageCount         = cursor.getColumnIndex(GuideContract.ChatEntry.MESSAGE_COUNT);
+        int idxLastAuthorId         = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_AUTHOR_ID);
+        int idxLastAuthorName       = cursor.getColumnIndex(GuideContract.AuthorEntry.NAME);
+        int idxLastMessageId        = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE_ID);
+        int idxLastMessage          = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE);
+        int idxLastMessageDate      = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE_DATE);
 
         // Get the value from the Cursor
-        String firebaseId       = cursor.getString(idxFirebaseId);
-        int messageCount        = cursor.getInt(idxMessageCount);
-        String lastAuthorId     = cursor.getString(idxLastAuthorId);
-        String lastAuthorName   = cursor.getString(idxLastAuthorName);
-        String lastMessageId    = cursor.getString(idxLastMessageId);
-        String lastMessage      = cursor.getString(idxLastMessage);
-        long lastMessageDate    = cursor.getLong(idxLastMessageDate);
+        String firebaseId           = cursor.getString(idxFirebaseId);
+        int messageCount            = cursor.getInt(idxMessageCount);
+        String lastAuthorId         = cursor.getString(idxLastAuthorId);
+        String lastAuthorName       = cursor.getString(idxLastAuthorName);
+        String lastMessageId        = cursor.getString(idxLastMessageId);
+        String lastMessage          = cursor.getString(idxLastMessage);
+        long lastMessageDate        = cursor.getLong(idxLastMessageDate);
 
         // Iterate through each value in the Cursor and add the memberId to the members List
-        List<String> members    = new ArrayList<>();
+        List<String> activeMembers  = new ArrayList<>();
         do {
-            members.add(cursor.getString(idxMemberId));
+            activeMembers.add(cursor.getString(idxMemberId));
         } while (cursor.moveToNext());
 
         // Create and populate a new Chat
@@ -119,8 +119,8 @@ public class Chat extends BaseModel {
         chat.lastMessageId      = lastMessageId;
         chat.lastMessage        = lastMessage;
         chat.lastMessageDate    = lastMessageDate;
-        chat.members            = members;
-        chat.memberCode         = buildMemberCode(members);
+        chat.activeMembers      = activeMembers;
+        chat.memberCode         = buildMemberCode(activeMembers);
 
         return chat;
     }
@@ -151,12 +151,14 @@ public class Chat extends BaseModel {
     public void addMember(Context context, String authorId) {
         boolean newChat = false;
 
-        if (members == null) {
+        if (activeMembers == null) {
             newChat = true;
-            members = new ArrayList<>();
+            activeMembers = new ArrayList<>();
         }
 
-        members.add(authorId);
+        if (!activeMembers.contains(authorId)) {
+            activeMembers.add(authorId);
+        }
 
         if (newChat) {
             FirebaseProviderUtils.insertOrUpdateModel(this);
@@ -188,8 +190,51 @@ public class Chat extends BaseModel {
                         }
 
                         // Modify the Chat
-                        chat.getMembers().add(authorId);
-                        chat.setMemberCode(buildMemberCode(chat.getMembers()));
+                        if (!chat.getActiveMembers().contains(authorId)) {
+                            chat.getActiveMembers().add(authorId);
+                        }
+
+                        chat.setMemberCode(buildMemberCode(chat.getActiveMembers()));
+                        mutableData.setValue(chat);
+
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+                    }
+                });
+    }
+
+    /**
+     * Removes a member from the Chat
+     *
+     * @param authorId    FirebaseId of the user to be removed
+     */
+    public void removeMember(String authorId) {
+        activeMembers.remove(authorId);
+        removeMemberFromFirebase(authorId);
+    }
+
+    private void removeMemberFromFirebase(final String authorId) {
+        FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.CHATS)
+                .child(firebaseId)
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Chat chat = mutableData.getValue(Chat.class);
+
+                        // Check to ensure that the FirebaseDatabase returns a valid item
+                        if (chat == null) {
+                            removeMemberFromFirebase(authorId);
+                            return Transaction.abort();
+                        }
+
+                        // Modify the Chat
+                        chat.getActiveMembers().remove(authorId);
+                        chat.setMemberCode(buildMemberCode(chat.getActiveMembers()));
                         mutableData.setValue(chat);
 
                         return Transaction.success(mutableData);
@@ -203,7 +248,7 @@ public class Chat extends BaseModel {
     }
 
     private String buildMemberCode() {
-        return buildMemberCode(members);
+        return buildMemberCode(activeMembers);
     }
 
     /**
@@ -329,8 +374,12 @@ public class Chat extends BaseModel {
     //********************************************************************************************//
 
 
-    public List<String> getMembers() {
-        return members;
+    public List<String> getActiveMembers() {
+        return activeMembers;
+    }
+
+    public List<String> getAllMembers() {
+        return allMembers;
     }
 
     public int getMessageCount() {
@@ -363,8 +412,12 @@ public class Chat extends BaseModel {
         return memberCode;
     }
 
-    public void setMembers(List<String> members) {
-        this.members = members;
+    public void setActiveMembers(List<String> activeMembers) {
+        this.activeMembers = activeMembers;
+    }
+
+    public void setAllMembers(List<String> allMembers) {
+        this.allMembers = allMembers;
     }
 
     public void setMessageCount(int messageCount) {

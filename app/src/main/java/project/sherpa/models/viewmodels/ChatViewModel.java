@@ -53,7 +53,7 @@ public class ChatViewModel extends BaseObservable {
         StringBuilder builder = new StringBuilder();
 
         // Add the name of each user in the chat
-        for (String member : mChat.getMembers()) {
+        for (String member : mChat.getActiveMembers()) {
 
             // Do not display the user's own name
             if (user!= null && user.getUid().equals(member)) {
@@ -124,7 +124,7 @@ public class ChatViewModel extends BaseObservable {
     @Bindable
     public int getAddMemberVisibility() {
 
-        return getAddMember() || mChat.getMembers().size() < 1
+        return getAddMember() || mChat.getActiveMembers().size() < 1
                 ? View.VISIBLE
                 : View.GONE;
     }
@@ -183,7 +183,7 @@ public class ChatViewModel extends BaseObservable {
 
                 // Get the Chat's list of Authors and check if any other Chats would have the same
                 // members if the Author was added to it
-                List<String> chatAuthorIds = new ArrayList<>(mChat.getMembers());
+                List<String> chatAuthorIds = new ArrayList<>(mChat.getActiveMembers());
                 chatAuthorIds.add(author.firebaseId);
 
                 Chat.checkDuplicateChats(chatAuthorIds, new FirebaseProviderUtils.FirebaseListener() {
