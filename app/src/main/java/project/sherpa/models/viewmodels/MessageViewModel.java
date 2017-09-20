@@ -1,5 +1,6 @@
 package project.sherpa.models.viewmodels;
 
+import android.app.Activity;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -86,7 +87,7 @@ public class MessageViewModel extends BaseObservable {
             @Override
             public void onSuccess(StorageMetadata storageMetadata) {
                 // Load from Firebase Storage
-                if (imageView.getContext() != null) {
+                if (imageView.getContext() != null && !((Activity) imageView.getContext()).isFinishing()) {
                     Glide.with(imageView.getContext())
                             .using(new FirebaseImageLoader())
                             .load(authorImage)
