@@ -196,9 +196,15 @@ public class ChatViewModel extends BaseObservable {
                             // Add the Chat to the User's profile an update the local and Firebase Database
                             author.addChat(mActivity, mChat.firebaseId);
 
-                            setAddMember(false);
                         } else {
                             Chat chat = (Chat) model;
+
+                            if (!author.getChats().contains(mChat.firebaseId)) {
+
+                                // Add the chat to the member if it is not in the Author's list of
+                                // Chats
+                                author.addChat(mActivity, mChat.firebaseId);
+                            }
 
                             MessageFragment fragment = (MessageFragment) mActivity.getSupportFragmentManager()
                                     .findFragmentByTag(FRAG_TAG_MESSAGES);
@@ -207,6 +213,8 @@ public class ChatViewModel extends BaseObservable {
 
                             Timber.d("Found duplicate Chat: " + chat.firebaseId);
                         }
+
+                        setAddMember(false);
                     }
                 });
             }
