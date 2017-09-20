@@ -13,7 +13,10 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground">
+        android:background="?attr/selectableItemBackground"
+        app:imageView="@{listAuthorIv}"
+        app:authorImage="@{vm.authorImage}"
+        app:selected="@{vm.selected}">
 
         <ImageView
             android:id="@+id/list_author_iv"
@@ -33,9 +36,23 @@
             app:layout_constraintStart_toEndOf="@id/list_author_iv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/list_author_username_tv"
+            app:layout_constraintVertical_chainStyle="packed"
             style="@style/TextAppearance.AppCompat.Body1"
             tools:text="@string/list_author_text"/>
+
+        <TextView
+            android:id="@+id/list_author_username_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{vm.username}"
+            app:layout_constraintStart_toStartOf="@id/list_author_tv"
+            app:layout_constraintEnd_toEndOf="@id/list_author_tv"
+            app:layout_constraintTop_toBottomOf="@id/list_author_tv"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            style="@style/TextAppearance.AppCompat.Caption"
+            tools:text="@string/list_author_username_text"/>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

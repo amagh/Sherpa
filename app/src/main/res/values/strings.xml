@@ -52,7 +52,7 @@
     <string name="invalid_password_length_error">Password must be at least 8 characters.</string>
     <string name="invalid_username_length_error">Username must be at least 4 characters</string>
     <string name="invalid_username_char_error">Username may only contain letters, numbers, and underscores</string>
-    <string name="invalid_username_taken">Username already exists. Please change your username and try again.</string>
+    <string name="invalid_username_taken">Username already exists. Please change your query and try again.</string>
     <string name="authentication_error">Authentication failed. Please try again.</string>
 
     <!-- Formatting for guide list item -->
@@ -216,7 +216,7 @@
     <!-- Chat Strings -->
     <string name="chat_last_message_text">%1$s: %2$s</string>
     <string name="chat_attachment_text">Attachment</string>
-    <string name="chat_add_member_hint">Type a user\'s username</string>
+    <string name="chat_add_member_hint">Type a user\'s query</string>
     <string name="toast_error_add_self">Cannot add yourself to the chat</string>
     <string name="toast_error_user_does_not_exist">User does not exist</string>
     
@@ -234,6 +234,7 @@
     <string name="list_guide_details_elevation_text">3226 ft</string>
 
     <string name="list_author_text">Christa</string>
+    <string name="list_author_username_text">christa78</string>
     <string name="list_author_score_text">1200 pts</string>
     <string name="list_author_description_text">We (Christa and Rob) are from Northern California and we like to hike.  We’ve shared our photos and experiences so that others may find new parks, trails or places to visit.</string>
 
