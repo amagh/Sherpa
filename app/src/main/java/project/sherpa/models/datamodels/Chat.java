@@ -33,7 +33,7 @@ import timber.log.Timber;
 public class Chat extends BaseModel {
 
     // ** Constants ** //
-    public static final String ACTIVE_MEMBERS       = "members";
+    public static final String ACTIVE_MEMBERS       = "activeMembers";
     public static final String ALL_MEMBERS          = "allMembers";
     public static final String MESSAGE_COUNT        = "messageCount";
     public static final String LAST_AUTHOR_ID       = "lastAuthorId";
@@ -57,8 +57,6 @@ public class Chat extends BaseModel {
     private String memberCode;
     private boolean isGroup;
 
-    private boolean updateTime;
-
     @Override
     public Map<String, Object> toMap() {
 
@@ -71,7 +69,7 @@ public class Chat extends BaseModel {
         map.put(LAST_AUTHOR_NAME,   lastAuthorName);
         map.put(LAST_MESSAGE_ID,    lastMessageId);
         map.put(LAST_MESSAGE,       lastMessage);
-        map.put(LAST_MESSAGE_DATE,  lastMessageDate);
+        map.put(LAST_MESSAGE_DATE,  ServerValue.TIMESTAMP);
         map.put(MEMBER_CODE,        buildMemberCode());
         map.put(IS_GROUP,           isGroup);
 
@@ -137,14 +135,6 @@ public class Chat extends BaseModel {
     }
 
     /**
-     * Sets whether the Chat should use the server time when the {@link #getLastMessageDate()} is
-     * called
-     */
-    private void updateTimeWithServerValue(boolean update) {
-        updateTime = update;
-    }
-
-    /**
      * Adds a member to the Chat and updates the Chat in the local database and Firebase Database
      *
      * @param context     Interface to global Context
@@ -160,6 +150,14 @@ public class Chat extends BaseModel {
 
         if (!activeMembers.contains(authorId)) {
             activeMembers.add(authorId);
+        }
+
+        if (allMembers == null) {
+            allMembers = new ArrayList<>();
+        }
+
+        if (!allMembers.contains(authorId)) {
+            allMembers.add(authorId);
         }
 
         if (newChat) {
@@ -281,7 +279,6 @@ public class Chat extends BaseModel {
                             chat.setLastMessageId(message.firebaseId);
                             chat.setLastAuthorId(message.getAuthorId());
                             chat.setLastAuthorName(message.getAuthorName());
-                            chat.updateTimeWithServerValue(true);
                             chat.setMessageCount(chat.getMessageCount() + 1);
 
                             mutableData.setValue(chat.toMap());
@@ -404,10 +401,8 @@ public class Chat extends BaseModel {
         return lastMessage;
     }
 
-    public Object getLastMessageDate() {
-        return updateTime
-                ? ServerValue.TIMESTAMP
-                : lastMessageDate;
+    public long getLastMessageDate() {
+        return lastMessageDate;
     }
 
     public String getMemberCode() {

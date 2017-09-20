@@ -85,7 +85,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
                 oldChat.setActiveMembers(chat.getActiveMembers());
                 oldChat.setMemberCode(chat.getMemberCode());
-                oldChat.setLastMessageDate((long) chat.getLastMessageDate());
+                oldChat.setLastMessageDate(chat.getLastMessageDate());
                 oldChat.setLastMessage(chat.getLastMessage());
                 oldChat.setMessageCount(chat.getMessageCount());
                 oldChat.setLastAuthorId(chat.getLastAuthorId());
