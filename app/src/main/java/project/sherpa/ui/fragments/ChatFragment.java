@@ -255,7 +255,7 @@ public class ChatFragment extends ConnectivityFragment {
     private void getChatMembers(final Chat chat) {
 
         // Iterate through the member list and retrieve each member
-        for (String authorId : chat.getActiveMembers()) {
+        for (String authorId : chat.getAllMembers()) {
 
             // Skip any members that have already been retrieved
             if (mAuthorIdList.contains(authorId)) {
