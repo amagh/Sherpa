@@ -8,4 +8,8 @@
         android:icon="@drawable/menu_icon_add_person"
         app:showAsAction="always"/>
 
+    <item
+        android:id="@+id/menu_leave_chat"
+        android:title="@string/menu_leave_chat"
+        app:showAsAction="never" />
 </menu>

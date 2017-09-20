@@ -211,6 +211,7 @@
     <!-- Messaging Strings -->
     <string name="message_hint_text">Type a message</string>
     <string name="menu_add_user">Add user to chat</string>
+    <string name="menu_leave_chat">Leave chat</string>
 
     <!-- Chat Strings -->
     <string name="chat_last_message_text">%1$s: %2$s</string>

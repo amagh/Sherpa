@@ -42,6 +42,7 @@ import project.sherpa.models.viewmodels.ChatViewModel;
 import project.sherpa.models.viewmodels.MessageViewModel;
 import project.sherpa.ui.activities.AttachActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
+import project.sherpa.ui.activities.MessageActivity;
 import project.sherpa.ui.adapters.MessageAdapter;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.utilities.ContentProviderUtils;
@@ -132,8 +133,6 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_message, container, false);
 
-
-
         setHasOptionsMenu(true);
 
         initRecyclerView();
@@ -145,14 +144,14 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
             // Retrieve the FirebaseId of the Chat to retrieve messages for
             String chatId = GuideProvider.getIdFromUri((Uri) args.getParcelable(CHAT_KEY));
 
-            // Set the Chat for the Fragment
-            Chat chat = (Chat) DataCache.getInstance().get(chatId);
-            setChat(chat);
-
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
                 mAuthor = (Author) DataCache.getInstance().get(user.getUid());
             }
+
+            // Set the Chat for the Fragment
+            Chat chat = (Chat) DataCache.getInstance().get(chatId);
+            setChat(chat);
 
             setMessageBinding();
         }
@@ -168,6 +167,8 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_message, menu);
+
+        if (mChat.getMembers().size() < 3) menu.getItem(1).setVisible(false);
     }
 
     @Override
@@ -176,6 +177,15 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         switch (item.getItemId()) {
             case R.id.menu_add_user:
                 mChatViewModel.setAddMember(true);
+                return true;
+
+            case R.id.menu_leave_chat:
+                mAuthor.removeChat(getActivity(), mChat.firebaseId);
+
+                if (getActivity() instanceof MessageActivity) {
+                    getActivity().finish();
+                }
+
                 return true;
         }
 
@@ -360,7 +370,11 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
      */
     public void setChat(Chat chat) {
 
+        getActivity().invalidateOptionsMenu();
         mAdapter.clear();
+
+        // Add the Chat to the Author if it's not included in it
+        mAuthor.addChat(getActivity(), chat.firebaseId);
 
         // Start the Loader and pass in the Bundle
         Bundle args = new Bundle();
