@@ -149,7 +149,7 @@ public class NewChatActivity extends ConnectivityActivity {
                     chat.generateFirebaseId();
                     chat.setActiveMembers(selected);
                     chat.setAllMembers(selected);
-                    chat.setIsGroup(selected.size() > 2);
+                    chat.setGroup(selected.size() > 2);
                 } else {
 
                     // Get a reference to the duplicate Chat

@@ -43,7 +43,7 @@ public class Chat extends BaseModel {
     public static final String LAST_MESSAGE_DATE    = "lastMessageDate";
     public static final String MEMBER_ID            = "memberId";
     public static final String MEMBER_CODE          = "memberCode";
-    public static final String IS_GROUP             = "isGroup";
+    public static final String GROUP                = "group";
 
     // ** Member Variables ** //
     private List<String> activeMembers;
@@ -55,7 +55,7 @@ public class Chat extends BaseModel {
     private String lastMessage;
     private long lastMessageDate;
     private String memberCode;
-    private boolean isGroup;
+    private boolean group;
 
     @Override
     public Map<String, Object> toMap() {
@@ -71,7 +71,7 @@ public class Chat extends BaseModel {
         map.put(LAST_MESSAGE,       lastMessage);
         map.put(LAST_MESSAGE_DATE,  ServerValue.TIMESTAMP);
         map.put(MEMBER_CODE,        buildMemberCode());
-        map.put(IS_GROUP,           isGroup);
+        map.put(GROUP,              group);
 
         return map;
     }
@@ -281,12 +281,16 @@ public class Chat extends BaseModel {
                             return Transaction.abort();
                         } else {
 
+                            Timber.d("Pre-modification Chat Values: " + chat.toMap().toString());
+
                             // Update the Chat values
                             chat.setLastMessage(message.getMessage());
                             chat.setLastMessageId(message.firebaseId);
                             chat.setLastAuthorId(message.getAuthorId());
                             chat.setLastAuthorName(message.getAuthorName());
                             chat.setMessageCount(chat.getMessageCount() + 1);
+
+                            Timber.d("Post-modification Chat Values: " + chat.toMap().toString());
 
                             mutableData.setValue(chat.toMap());
                         }
@@ -436,8 +440,8 @@ public class Chat extends BaseModel {
         return memberCode;
     }
 
-    public boolean isGroup() {
-        return isGroup;
+    public boolean getGroup() {
+        return group;
     }
 
     public void setActiveMembers(List<String> activeMembers) {
@@ -476,7 +480,7 @@ public class Chat extends BaseModel {
         this.memberCode = memberCode;
     }
 
-    public void setIsGroup(boolean isGroup) {
-        this.isGroup = isGroup;
+    public void setGroup(boolean group) {
+        this.group = group;
     }
 }
