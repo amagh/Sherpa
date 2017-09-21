@@ -58,7 +58,6 @@ public class ChatFragment extends ConnectivityFragment {
 
     private Pair<DatabaseReference, ValueEventListener> mAuthorReferenceListenerPair;
     private Map<String, ChatValueEventListener> mEventListenerMap = new HashMap<>();
-    private Set<String> mChatSet = new HashSet<>();
     private List<String> mAuthorIdList = new ArrayList<>();
 
     @Override
@@ -192,7 +191,7 @@ public class ChatFragment extends ConnectivityFragment {
         for (String chatId : mAuthor.getChats()) {
 
             // Do not add another Listener for items that already have a Listener attached to them
-            if (mChatSet.contains(chatId)) return;
+            if (mEventListenerMap.keySet().contains(chatId)) return;
 
             ChatValueEventListener listener = new ChatValueEventListener(chatId);
             listener.start();
@@ -200,7 +199,6 @@ public class ChatFragment extends ConnectivityFragment {
             // Add both to the Set so the ValueEventListener can be added and removed in
             // onStart/onPause
             mEventListenerMap.put(chatId, listener);
-            mChatSet.add(chatId);
         }
     }
 
@@ -333,10 +331,6 @@ public class ChatFragment extends ConnectivityFragment {
             reference = FirebaseDatabase.getInstance().getReference()
                     .child(GuideDatabase.CHATS)
                     .child(chatId);
-        }
-
-        String getChatId() {
-            return this.chatId;
         }
 
         // Begins listening for changes in this Chat
