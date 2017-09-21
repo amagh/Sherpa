@@ -92,6 +92,10 @@ public class AuthorViewModel extends BaseObservable {
     @Bindable
     public Uri getAuthorImage() {
 
+        if (mSelected) {
+            return null;
+        }
+
         // Check whether the Author has a Uri for an offline ImageUri
         if (mAuthor.getImageUri() != null) {
 
@@ -109,7 +113,12 @@ public class AuthorViewModel extends BaseObservable {
     @BindingAdapter("authorImage")
     public static void loadImage(final ImageView imageView, final Uri authorImage) {
 
-        if (authorImage == null) return;
+        if (authorImage == null) {
+            imageView.setImageDrawable(
+                    ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_account_circle));
+
+            return;
+        }
 
         // Check whether to load image from File or from Firebase Storage
         if (authorImage.getScheme().matches("gs")) {

@@ -10,6 +10,7 @@ import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -100,9 +101,17 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
      * @param author    Author to be added
      */
     public void addAuthor(Author author) {
-        if (mSortedList.indexOf(author) == SortedList.INVALID_POSITION) {
-            mSortedList.add(author);
+
+        // Check to ensure the Author isn't already in the List
+        for (int i = 0; i < mSortedList.size(); i++) {
+            Author listAuthor = mSortedList.get(i);
+
+            if (author.firebaseId.equals(listAuthor.firebaseId)) {
+                return;
+            }
         }
+
+        mSortedList.add(author);
     }
 
     /**
@@ -177,8 +186,19 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
                 setSelected(author, selected);
             } else {
                 SearchUserViewModel vm = ((ListItemSearchUserBinding) mBinding).getVm();
-                vm.getAuthor();
-                vm.reset();
+                Author author = vm.getAuthor();
+
+                if (author != null) {
+                    addAuthor(author);
+                    setSelected(author, true);
+                    vm.reset();
+                } else {
+                    Toast.makeText(
+                            view.getContext(),
+                            "Username not found.",
+                            Toast.LENGTH_SHORT)
+                            .show();
+                }
             }
         }
     }
