@@ -37,7 +37,6 @@ public class NewChatActivity extends ConnectivityActivity {
 
     // ** Member Variables ** //
     private Author mAuthor;
-    private Chat mChat;
 
     private ActivityNewChatBinding mBinding;
     private SearchUserViewModel mViewModel;
@@ -56,7 +55,6 @@ public class NewChatActivity extends ConnectivityActivity {
         String authorId = getIntent().getStringExtra(AUTHOR_KEY);
 
         mAuthor = (Author) DataCache.getInstance().get(authorId);
-        mChat = new Chat();
 
         setupViewModel();
         initRecyclerView();
@@ -127,7 +125,7 @@ public class NewChatActivity extends ConnectivityActivity {
     public void onClickStartChat(View view) {
 
         // List that will be set to active and all members of the Chat
-        List<String> selected = new ArrayList<>();
+        final List<String> selected = new ArrayList<>();
 
         // Add the user's FirebaseId as a member
         selected.add(mAuthor.firebaseId);
@@ -137,19 +135,49 @@ public class NewChatActivity extends ConnectivityActivity {
             selected.add(author.firebaseId);
         }
 
-        mChat.generateFirebaseId();
-        mChat.setActiveMembers(selected);
-        mChat.setAllMembers(selected);
-        mChat.setIsGroup(selected.size() > 2);
+        // Check for duplicate Chats
+        Chat.checkDuplicateChats(selected, new FirebaseProviderUtils.FirebaseListener() {
+            @Override
+            public void onModelReady(BaseModel model) {
 
-        // Start the MessageActivity for the newly created Chat
+                Chat chat;
+
+                if (model == null) {
+
+                    // No duplicate Chat, start a new Chat
+                    chat = new Chat();
+                    chat.generateFirebaseId();
+                    chat.setActiveMembers(selected);
+                    chat.setAllMembers(selected);
+                    chat.setIsGroup(selected.size() > 2);
+                } else {
+
+                    // Get a reference to the duplicate Chat
+                    chat = (Chat) model;
+                }
+
+                // Start the MessageActivity for the Chat
+                startMessageActivityForChat(chat);
+            }
+        });
+    }
+
+    /**
+     * Starts the MessageActivity for a Chat
+     *
+     * @param chat    Chat to start the MessageActivity for
+     */
+    private void startMessageActivityForChat(Chat chat) {
+
+        // Build the Intent and launch the Activity
         Intent intent = new Intent(this, MessageActivity.class);
-        intent.putExtra(CHAT_KEY, mChat.firebaseId);
+        intent.putExtra(CHAT_KEY, chat.firebaseId);
 
-        DataCache.getInstance().store(mChat);
+        DataCache.getInstance().store(chat);
 
         startActivity(intent);
 
+        // Remove this Activity from the back stack
         finish();
     }
 
