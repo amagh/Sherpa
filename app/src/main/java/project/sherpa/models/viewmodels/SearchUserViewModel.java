@@ -45,6 +45,8 @@ public class SearchUserViewModel extends BaseObservable {
 
         // Set Author so it cannot be selected
         mAuthor = null;
+
+        notifyPropertyChanged(BR.query);
     }
 
     @Bindable
@@ -55,6 +57,8 @@ public class SearchUserViewModel extends BaseObservable {
     public void setAuthor(Author author) {
         mAuthor = author;
         notifyPropertyChanged(BR.author);
+        notifyPropertyChanged(BR.name);
+        notifyPropertyChanged(BR.authorImage);
     }
 
     @BindingAdapter("author")
@@ -100,5 +104,6 @@ public class SearchUserViewModel extends BaseObservable {
 
         notifyPropertyChanged(BR.query);
         notifyPropertyChanged(BR.author);
+        notifyPropertyChanged(BR.authorImage);
     }
 }
