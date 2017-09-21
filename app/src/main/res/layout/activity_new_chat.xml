@@ -87,6 +87,7 @@
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:src="@drawable/ic_next_white"
+            android:onClick="onClickStartChat"
             app:layout_anchor="@id/new_chat_tb"
             app:layout_anchorGravity="bottom|end|right"/>
 
