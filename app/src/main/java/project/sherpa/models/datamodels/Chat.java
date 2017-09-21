@@ -125,12 +125,12 @@ public class Chat extends BaseModel {
         return chat;
     }
 
-    public int compare(Chat otherChat) {
+    public int compareTo(Chat otherChat) {
 
         return lastMessageDate < otherChat.lastMessageDate
-                ? -1
-                : lastMessageDate > otherChat.lastMessageDate
                 ? 1
+                : lastMessageDate > otherChat.lastMessageDate
+                ? -1
                 : 0;
     }
 

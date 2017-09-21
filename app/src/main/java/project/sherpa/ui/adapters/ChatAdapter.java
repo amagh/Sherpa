@@ -27,12 +27,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private SortedListAdapterCallback<Chat> mSortedListCallback = new SortedListAdapterCallback<Chat>(this) {
         @Override
         public int compare(Chat o1, Chat o2) {
-            return o1.compare(o2);
+            return o1.compareTo(o2);
         }
 
         @Override
         public boolean areContentsTheSame(Chat oldItem, Chat newItem) {
-            return oldItem.equals(newItem);
+            return oldItem.firebaseId.equals(newItem.firebaseId);
         }
 
         @Override
@@ -68,6 +68,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         return mSortedList.size();
     }
 
+    @Override
+    public void setHasStableIds(boolean hasStableIds) {
+        super.setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return mSortedList.get(position).firebaseId.hashCode();
+    }
+
     /**
      * Adds the chat to be displayed by the Adapter
      * @param chat
@@ -91,7 +101,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 oldChat.setLastAuthorId(chat.getLastAuthorId());
                 oldChat.setLastAuthorName(chat.getLastAuthorName());
 
-                notifyDataSetChanged();
+                notifyItemChanged(i);
+                mSortedList.recalculatePositionOfItemAt(i);
             }
         }
 
