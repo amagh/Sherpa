@@ -248,6 +248,22 @@ public class Chat extends BaseModel {
      * @param message    Message details to be set as the last message details for the Chat
      */
     public void updateChatWithNewMessage(final Message message) {
+
+        // Check if this is a new Chat
+        if (messageCount == 0) {
+
+            // Update Chat with the values of the new message
+            lastMessage = message.getMessage();
+            lastMessageId = message.firebaseId;
+            lastAuthorId = message.getAuthorId();
+            lastAuthorName = message.getAuthorName();
+            messageCount++;
+
+            FirebaseProviderUtils.insertOrUpdateModel(this);
+
+            return;
+        }
+
         FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.CHATS)
                 .child(firebaseId)
