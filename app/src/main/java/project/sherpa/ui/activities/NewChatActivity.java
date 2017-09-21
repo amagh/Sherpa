@@ -174,6 +174,7 @@ public class NewChatActivity extends ConnectivityActivity {
         intent.putExtra(CHAT_KEY, chat.firebaseId);
 
         DataCache.getInstance().store(chat);
+        DataCache.getInstance().store(mAuthor);
 
         startActivity(intent);
 
