@@ -339,10 +339,12 @@ public class ChatFragment extends ConnectivityFragment {
             return this.chatId;
         }
 
+        // Begins listening for changes in this Chat
         void start() {
             reference.addValueEventListener(this);
         }
 
+        // Stops listening for changes in this Chat
         void stop() {
             reference.removeEventListener(this);
         }
@@ -354,6 +356,7 @@ public class ChatFragment extends ConnectivityFragment {
                     dataSnapshot);
 
             if (chat == null) {
+                // Chat does not exist - stop listening for this chat
                 reference.removeEventListener(this);
                 mAuthor.removeChat(getActivity(), this.chatId);
 
