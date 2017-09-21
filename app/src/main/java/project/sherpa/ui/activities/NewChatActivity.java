@@ -140,6 +140,7 @@ public class NewChatActivity extends ConnectivityActivity {
         mChat.generateFirebaseId();
         mChat.setActiveMembers(selected);
         mChat.setAllMembers(selected);
+        mChat.setIsGroup(selected.size() > 2);
 
         // Start the MessageActivity for the newly created Chat
         Intent intent = new Intent(this, MessageActivity.class);
@@ -148,6 +149,8 @@ public class NewChatActivity extends ConnectivityActivity {
         DataCache.getInstance().store(mChat);
 
         startActivity(intent);
+
+        finish();
     }
 
     /**
