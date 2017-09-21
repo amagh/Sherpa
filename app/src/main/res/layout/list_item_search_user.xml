@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/list_search_user_iv"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"

@@ -18,7 +18,7 @@
         app:authorImage="@{vm.authorImage}"
         app:selected="@{vm.selected}">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/list_author_iv"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
