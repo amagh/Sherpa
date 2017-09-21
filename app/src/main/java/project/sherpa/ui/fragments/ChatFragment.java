@@ -35,12 +35,14 @@ import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.ui.activities.MessageActivity;
+import project.sherpa.ui.activities.NewChatActivity;
 import project.sherpa.ui.adapters.ChatAdapter;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 
+import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
 
 /**
@@ -295,15 +297,12 @@ public class ChatFragment extends ConnectivityFragment {
      */
     public void addNewChat() {
 
-        // Generate a new Chat and add the current user as a member of the Chat
-        Chat chat = new Chat();
-        chat.addMember(getActivity(), mAuthor.firebaseId);
+        Intent intent = new Intent(getActivity(), NewChatActivity.class);
+        intent.putExtra(AUTHOR_KEY, mAuthor.firebaseId);
 
-        // Add the chat to the User and update it in Firebase
-        mAuthor.addChat(getActivity(), chat.firebaseId);
+        DataCache.getInstance().store(mAuthor);
 
-        // Start the MessageActivity for the Chat
-        startMessageActivity(chat);
+        startActivity(intent);
     }
 
     /**
