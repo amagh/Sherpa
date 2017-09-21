@@ -8,11 +8,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -156,6 +158,21 @@ public class MessageViewModel extends BaseObservable {
 
         // Set the top margin for the layout
         ((RecyclerView.LayoutParams) layout.getLayoutParams()).topMargin = topMargin;
+    }
+
+    @Bindable
+    public int getImeAction() {
+        return EditorInfo.IME_ACTION_SEND;
+    }
+
+    @BindingAdapter({"imeAction"})
+    public static void setupEditText(EditText editText, int imeAction) {
+
+        // Work around for multiline EditText with IME option
+        editText.setImeOptions(imeAction);
+        editText.setRawInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
+                InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
     }
 
     /**
