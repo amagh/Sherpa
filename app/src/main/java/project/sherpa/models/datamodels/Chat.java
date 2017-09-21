@@ -141,31 +141,18 @@ public class Chat extends BaseModel {
      * @param authorId    FirebaseId of the author to add to the chat
      */
     public void addMember(Context context, String authorId) {
-        boolean newChat = false;
 
-        if (activeMembers == null) {
-            newChat = true;
-            activeMembers = new ArrayList<>();
-        }
-
+        // Add the user to the Active and All members Lists
         if (!activeMembers.contains(authorId)) {
             activeMembers.add(authorId);
-        }
-
-        if (allMembers == null) {
-            allMembers = new ArrayList<>();
         }
 
         if (!allMembers.contains(authorId)) {
             allMembers.add(authorId);
         }
 
-        if (newChat) {
-            FirebaseProviderUtils.insertOrUpdateModel(this);
-        } else {
-            addMemberToFirebase(authorId);
-        }
 
+        addMemberToFirebase(authorId);
         ContentProviderUtils.insertChat(context, this);
     }
 
@@ -194,15 +181,19 @@ public class Chat extends BaseModel {
                             chat.getActiveMembers().add(authorId);
                         }
 
-                        chat.setMemberCode(buildMemberCode(chat.getActiveMembers()));
-                        mutableData.setValue(chat);
+                        if (!chat.getAllMembers().contains(authorId)) {
+                            chat.getAllMembers().remove(authorId);
+                        }
 
+                        mutableData.setValue(chat.toMap());
                         return Transaction.success(mutableData);
                     }
 
                     @Override
                     public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-
+                        if (databaseError != null) {
+                            Timber.e("Error adding member to chat on Firebase: " + databaseError.getDetails());
+                        }
                     }
                 });
     }
@@ -217,6 +208,11 @@ public class Chat extends BaseModel {
         removeMemberFromFirebase(authorId);
     }
 
+    /**
+     * Removes a user from the list of active members of the Chat on Firebase
+     *
+     * @param authorId    FirebaseId of the Author to be removed
+     */
     private void removeMemberFromFirebase(final String authorId) {
         FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.CHATS)
@@ -234,9 +230,8 @@ public class Chat extends BaseModel {
 
                         // Modify the Chat
                         chat.getActiveMembers().remove(authorId);
-                        chat.setMemberCode(buildMemberCode(chat.getActiveMembers()));
-                        mutableData.setValue(chat);
 
+                        mutableData.setValue(chat.toMap());
                         return Transaction.success(mutableData);
                     }
 
@@ -245,10 +240,6 @@ public class Chat extends BaseModel {
 
                     }
                 });
-    }
-
-    private String buildMemberCode() {
-        return buildMemberCode(activeMembers);
     }
 
     /**
@@ -324,6 +315,15 @@ public class Chat extends BaseModel {
     }
 
     /**
+     * Builds the memberCode for the Chat. {@link #buildMemberCode(List)}
+     *
+     * @return memberCode
+     */
+    private String buildMemberCode() {
+        return buildMemberCode(activeMembers);
+    }
+
+    /**
      * Checks the FirebaseDatabase to see if there are any chats with the same members as the List
      * of members in the signature
      *
@@ -366,6 +366,17 @@ public class Chat extends BaseModel {
                 chatQuery.removeEventListener(this);
             }
         });
+    }
+
+    /**
+     * Generates a FirebaseId for a new Chat. This allows a new Chat to be passed to another
+     * Activity without uploading it to Firebase Database until a message is sent.
+     */
+    public void generateFirebaseId() {
+        firebaseId = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.CHATS)
+                .push()
+                .getKey();
     }
 
     //********************************************************************************************//
