@@ -7,6 +7,10 @@
         <variable
             name="vm"
             type="project.sherpa.models.viewmodels.ChatViewModel"/>
+
+        <variable
+            name="uvm"
+            type="project.sherpa.models.viewmodels.SearchUserViewModel"/>
     </data>
 
     <android.support.design.widget.CoordinatorLayout
@@ -50,6 +54,7 @@
                 android:hint="@string/chat_add_member_hint"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:text="@{uvm.query}"
                 style="@style/TextAppearance.AppCompat.Body1"
                 app:layout_constraintStart_toEndOf="@id/new_chat_add_user_iv"
                 app:layout_constraintEnd_toEndOf="parent"
