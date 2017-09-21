@@ -449,7 +449,8 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
     /**
      * Attaches a Guide to a message and sends it
-     * @param guideId
+     *
+     * @param guideId    The FirebaseId of the Guide to attach
      */
     public void attachGuideToMessage(String guideId) {
         mMessage.attachGuide(guideId);
@@ -470,8 +471,20 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                     @Override
                     public void onSuccess(Void aVoid) {
 
-                        // Add the message to the local database
+                        boolean newChat = false;
+
+                        if (mChat.getMessageCount() == 0) {
+                            newChat = true;
+                        }
+
+                        // Update the Chat's last message fields on Firebase
                         mChat.updateChatWithNewMessage(mMessage);
+
+                        if (newChat) {
+                            // Add the Chat to each member of the Chat so that they receive the
+                            // message
+                            addChatToMembers();
+                        }
 
                         mMessage.setStatus(0);
                         ContentProviderUtils.insertModel(getActivity(), mMessage);
@@ -494,14 +507,13 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     }
 
     /**
-     * Downloads the profile of all Authors in the chat
-     *
-     * @param chat    The Chat containing members
+     * Adds the Chat to the List of Chats for all members in the Chat. To be used if the Chat is
+     * new and the members haven't been updated with the Chat yet.
      */
-    private void downloadUsersForChat(Chat chat) {
+    private void addChatToMembers() {
 
-        // Iterate through each member and download their profile from Firebase
-        for (String authorId : chat.getActiveMembers()) {
+        // Iterate through each member and add the Chat to their profile
+        for (String authorId : mChat.getActiveMembers()) {
             FirebaseProviderUtils.getModel(
                     FirebaseProviderUtils.FirebaseType.AUTHOR,
                     authorId,
@@ -509,7 +521,8 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                         @Override
                         public void onModelReady(BaseModel model) {
                             if (model != null) {
-                                ContentProviderUtils.insertModel(getActivity(), model);
+                                Author author = (Author) model;
+                                author.addChat(getActivity(), mChat.firebaseId);
                             }
                         }
                     }
