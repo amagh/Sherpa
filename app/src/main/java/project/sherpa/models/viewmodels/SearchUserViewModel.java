@@ -4,7 +4,6 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.net.Uri;
-import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 
@@ -25,19 +24,22 @@ public class SearchUserViewModel extends BaseObservable {
 
     private NewChatActivity mActivity;
     private Author mAuthor;
-    private String query;
-    private Handler mQueryHandler = new Handler();
+    private String mQuery;
+
+    public SearchUserViewModel(NewChatActivity activity) {
+        mActivity = activity;
+    }
 
     @Bindable
     public String getQuery() {
-        return this.query;
+        return mQuery;
     }
 
     public void setQuery(final String query) {
-        this.query = query;
+        mQuery = query;
 
         // Query Firebase to see if there are any matching users
-        if (this.query.length() > 2) {
+        if (mQuery.length() > 2) {
             mActivity.runQueryForUsername(query);
         }
 
@@ -82,9 +84,21 @@ public class SearchUserViewModel extends BaseObservable {
             return null;
         }
 
+        // Return the Uri for the StorageReference for the author's image
         return Uri.parse(FirebaseStorage.getInstance().getReference()
                 .child(IMAGE_PATH)
                 .child(mAuthor.firebaseId + JPEG_EXT)
                 .toString());
+    }
+
+    /**
+     * Resets the ViewModel to accept a new query
+     */
+    public void reset() {
+        mQuery = null;
+        mAuthor = null;
+
+        notifyPropertyChanged(BR.query);
+        notifyPropertyChanged(BR.author);
     }
 }
