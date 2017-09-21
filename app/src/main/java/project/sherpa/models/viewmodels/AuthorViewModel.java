@@ -1,5 +1,6 @@
 package project.sherpa.models.viewmodels;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
@@ -130,7 +131,7 @@ public class AuthorViewModel extends BaseObservable {
                 @Override
                 public void onSuccess(StorageMetadata storageMetadata) {
                     // Load from Firebase Storage
-                    if (imageView.getContext() != null) {
+                    if (imageView.getContext() != null && !((Activity) imageView.getContext()).isFinishing()) {
                         Glide.with(imageView.getContext())
                                 .using(new FirebaseImageLoader())
                                 .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
