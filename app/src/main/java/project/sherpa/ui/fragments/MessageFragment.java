@@ -85,12 +85,10 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
             if (dataSnapshot.exists()) {
                 Chat chat = (Chat) FirebaseProviderUtils.getModelFromSnapshot(CHAT, dataSnapshot);
 
-                if (chat != null && chat.getMessageCount() > mChat.getMessageCount()) {
+                if (chat == null || chat.getMessageCount() <= mChat.getMessageCount()) return;
 
-                    // Retrieve the number of new messages that the current chat does not contain
-                    getMessages(chat.getMessageCount() - mChat.getMessageCount());
-                }
-
+                // Retrieve the number of new messages that the current chat does not contain
+                getMessages(chat.getMessageCount() - mChat.getMessageCount());
 
                 // Re-reference the member field to the new Chat and cache it
                 mChat = chat;
@@ -151,6 +149,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
             // Set the Chat for the Fragment
             Chat chat = (Chat) DataCache.getInstance().get(chatId);
+            Timber.d(chat.toMap().toString());
             setChat(chat);
 
             setMessageBinding();
@@ -168,7 +167,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
         // Options to add to the group and leave the Chat should only be available in a group Chat
-        if (mChat.isGroup()) {
+        if (mChat.getGroup()) {
             inflater.inflate(R.menu.menu_message, menu);
         }
     }
@@ -384,6 +383,8 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
         // Load messages from the database
         getActivity().getSupportLoaderManager().restartLoader(MESSAGE_LOADER, args, this);
+
+        Timber.d(chat.toMap().toString());
 
         mChat = chat;
         getNewMessagesSinceLastChat();
