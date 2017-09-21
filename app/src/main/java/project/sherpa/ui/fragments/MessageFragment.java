@@ -166,9 +166,11 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_message, menu);
 
-        if (mChat.getActiveMembers().size() < 3) menu.getItem(1).setVisible(false);
+        // Options to add to the group and leave the Chat should only be available in a group Chat
+        if (mChat.isGroup()) {
+            inflater.inflate(R.menu.menu_message, menu);
+        }
     }
 
     @Override
