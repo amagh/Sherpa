@@ -126,8 +126,11 @@ public class NewChatActivity extends ConnectivityActivity {
      */
     public void onClickStartChat(View view) {
 
-        // Get the Author's selected by the user
+        // List that will be set to active and all members of the Chat
         List<String> selected = new ArrayList<>();
+
+        // Add the user's FirebaseId as a member
+        selected.add(mAuthor.firebaseId);
 
         // Add all the FirebaseIds of the selected user's to the Chat's list of members
         for (Author author : mAdapter.getSelected()) {
