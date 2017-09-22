@@ -20,19 +20,39 @@
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin">
 
-        <ImageView
-            android:layout_width="@dimen/user_edit_icon_size"
-            android:layout_height="@dimen/user_edit_icon_size"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:padding="@dimen/user_edit_icon_padding"
-            android:layout_gravity="end"
-            android:src="@drawable/ic_close"
-            android:tint="@color/red_900"
-            android:contentDescription="@string/content_description_edit_profile_cancel_button"
-            android:onClick="@{vm::onClickEdit}"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground"
-            app:editVisibility="@{vm.editVisibility}"/>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/user_author_iv"
+                android:layout_width="@dimen/user_image_size"
+                android:layout_height="@dimen/user_image_size"
+                android:src="@drawable/ic_account_circle"
+                android:contentDescription="@string/content_description_author_image"
+                android:onClick="@{vm::onClickProfileImage}"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="-40dp"
+                app:authorImage="@{vm.authorImage}"
+                app:civ_border_width="@dimen/user_backdrop_separator_height"
+                app:civ_border_color="@color/grey_400"
+                app:civ_fill_color="@android:color/white"/>
+
+            <ImageView
+                android:layout_width="@dimen/user_edit_icon_size"
+                android:layout_height="@dimen/user_edit_icon_size"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:padding="@dimen/user_edit_icon_padding"
+                android:layout_gravity="end"
+                android:src="@drawable/ic_close"
+                android:tint="@color/red_900"
+                android:contentDescription="@string/content_description_edit_profile_cancel_button"
+                android:onClick="@{vm::onClickEdit}"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                app:editVisibility="@{vm.editVisibility}"/>
+
+        </FrameLayout>
 
         <EditText
             android:id="@+id/list_author_name_tv"
