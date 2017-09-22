@@ -3,8 +3,11 @@ package project.sherpa.models.viewmodels;
 import android.database.Cursor;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.BindingAdapter;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,6 +43,7 @@ public class ChatViewModel extends BaseObservable {
     private Chat mChat;
     private String mAddUsername;
     private boolean mAddMember;
+    private boolean mNewMessage;
 
     public ChatViewModel(AppCompatActivity appCompatActivity, Chat chat) {
         mActivity = appCompatActivity;
@@ -136,6 +140,28 @@ public class ChatViewModel extends BaseObservable {
 
     public void setAddUsername(String username) {
         mAddUsername = username;
+    }
+
+    @Bindable
+    public boolean getNewMessage() {
+        return mNewMessage;
+    }
+
+    /**
+     * Sets whether this chat should set the Typeface to BOLD to notify the user of a new message
+     *
+     * @param newMessage    Boolean value for whether this chat has an unread message
+     */
+    public void setNewMessage(boolean newMessage) {
+        mNewMessage = newMessage;
+
+        notifyPropertyChanged(BR.newMessage);
+    }
+
+    @BindingAdapter("newMessage")
+    public static void setNewMessage(TextView textView, boolean newMessage) {
+        int textStyle = newMessage ? Typeface.BOLD : Typeface.NORMAL;
+        textView.setTypeface(Typeface.SANS_SERIF, textStyle);
     }
 
     /**
