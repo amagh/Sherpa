@@ -218,6 +218,7 @@
     <string name="chat_attachment_text">Attachment</string>
     <string name="chat_add_member_hint">Type a user\'s username</string>
     <string name="toast_error_add_self">Cannot add yourself to the chat</string>
+    <string name="toast_error_user_in_chat">User is already in chat</string>
     <string name="toast_error_user_does_not_exist">User does not exist</string>
     
     <!-- Dummy text for testing purposes -->

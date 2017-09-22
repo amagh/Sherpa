@@ -203,7 +203,14 @@ public class ChatViewModel extends BaseObservable {
                             mActivity.getString(R.string.toast_error_user_does_not_exist),
                             Toast.LENGTH_SHORT)
                             .show();
-
+                    return;
+                } else if (mChat.getActiveMembers().contains(author.firebaseId)) {
+                    // Don't add a user that is already in the Chat
+                    Toast.makeText(
+                            mActivity,
+                            mActivity.getString(R.string.toast_error_user_in_chat),
+                            Toast.LENGTH_SHORT)
+                            .show();
                     return;
                 }
 
