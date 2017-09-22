@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -49,7 +52,10 @@ import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
  * Created by Alvin on 9/15/2017.
  */
 
-public class ChatFragment extends ConnectivityFragment {
+public class ChatFragment extends ConnectivityFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    // ** Constants ** //
+    private static final int CHAT_LOADER = 5884;
 
     // ** Member Variables ** //
     private FragmentChatBinding mBinding;
@@ -59,6 +65,7 @@ public class ChatFragment extends ConnectivityFragment {
     private Pair<DatabaseReference, ValueEventListener> mAuthorReferenceListenerPair;
     private Map<String, ChatValueEventListener> mEventListenerMap = new HashMap<>();
     private List<String> mAuthorIdList = new ArrayList<>();
+    private Map<String, Chat> mDatabaseChatMap = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -166,6 +173,9 @@ public class ChatFragment extends ConnectivityFragment {
     public void onResume() {
         super.onResume();
 
+        // Start the CursorLoader
+        getActivity().getSupportLoaderManager().restartLoader(CHAT_LOADER, null, this);
+
         if (mAuthorReferenceListenerPair != null) {
             mAuthorReferenceListenerPair.first.addValueEventListener(mAuthorReferenceListenerPair.second);
         }
@@ -175,6 +185,34 @@ public class ChatFragment extends ConnectivityFragment {
                 listener.start();
             }
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(
+                getActivity(),
+                GuideProvider.Chats.CONTENT_URI,
+                null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        // Add each Chat in the database to a Map for easier access to check its message coung
+        // against the Firebase one
+        if (data != null) {
+            if (data.moveToFirst()) {
+                do {
+                    Chat chat = Chat.createChatFromCursor(data);
+                    mDatabaseChatMap.put(chat.firebaseId, chat);
+                } while (data.moveToNext());
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 
     /**
@@ -370,6 +408,17 @@ public class ChatFragment extends ConnectivityFragment {
                 mAuthor.removeChat(getActivity(), chat.firebaseId);
 
                 mEventListenerMap.remove(this.chatId);
+            }
+
+            if (mDatabaseChatMap.get(chat.firebaseId) != null) {
+                Chat databaseChat = mDatabaseChatMap.get(chat.firebaseId);
+
+                // Set whether the Chat has unread messages
+                mAdapter.setHasNewMessage(
+                        chat.firebaseId,
+                        chat.getMessageCount() > databaseChat.getMessageCount());
+            } else {
+                mAdapter.setHasNewMessage(chat.firebaseId, true);
             }
         }
 
