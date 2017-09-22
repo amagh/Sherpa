@@ -5,4 +5,9 @@
         android:id="@+id/menu_user_log_off"
         android:title="@string/menu_user_log_off"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_user_edit"
+        android:title="@string/menu_user_edit_profile"
+        app:showAsAction="never" />
 </menu>

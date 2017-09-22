@@ -143,7 +143,7 @@
 
     <string name="content_description_author_image">Author Image</string>
     <string name="content_description_author_backdrop">Author Backdrop</string>
-    <string name="content_description_edit_profile_button">Edit Profile</string>
+    <string name="menu_user_edit_profile">Edit Profile</string>
     <string name="content_description_edit_profile_cancel_button">Cancel Editing Profile</string>
     <string name="content_description_create_fab">Add a Guide</string>
 

@@ -125,8 +125,6 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         mBinding.fabDial.setMenuListener(this);
         mBinding.fabDial.getChildAt(0).setContentDescription(getString(R.string.content_description_create_fab));
 
-        setLayoutBehaviors();
-
         initRecyclerView();
 
         if (savedInstanceState != null) {
@@ -203,14 +201,6 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         return mBinding.getRoot();
     }
 
-    private void setLayoutBehaviors() {
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mBinding.userAuthorIv.getLayoutParams();
-        params.setBehavior(new VanishingBehavior());
-
-        CoordinatorLayout.LayoutParams params2 = (CoordinatorLayout.LayoutParams) mBinding.userSeparatorV.getLayoutParams();
-        params2.setBehavior(new VanishingBehavior());
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_user, menu);
@@ -238,6 +228,9 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                         ACCOUNT_ACTIVITY_REQUEST_CODE);
 
                 return true;
+
+            case R.id.menu_user_edit:
+                switchAuthorLayout();
         }
 
         return false;
