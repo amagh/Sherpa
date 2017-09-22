@@ -57,7 +57,6 @@ import project.sherpa.ui.activities.OpenDraftActivity;
 import project.sherpa.ui.adapters.AuthorDetailsAdapter;
 import project.sherpa.ui.adapters.GuideAdapter;
 import project.sherpa.ui.behaviors.FabSpeedDialScrollBehavior;
-import project.sherpa.ui.behaviors.VanishingBehavior;
 import project.sherpa.ui.dialogs.ProgressDialog;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
