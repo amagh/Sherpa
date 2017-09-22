@@ -1,5 +1,6 @@
 package project.sherpa.utilities;
 
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
@@ -14,8 +15,8 @@ public class DataCache {
 
     // ** Member Variables ** //
     private static DataCache sDataCache = new DataCache();
-    private HashMap<String, WeakReference<BaseModel>> mDataMap;
-    private HashMap<String, WeakReference<Section[]>> mArrayMap;
+    private HashMap<String, SoftReference<BaseModel>> mDataMap;
+    private HashMap<String, SoftReference<Section[]>> mArrayMap;
 
     private DataCache() {
         mDataMap = new HashMap<>();
@@ -39,10 +40,27 @@ public class DataCache {
     public void store(BaseModel model) {
 
         // Create a WeakReference to the data
-        WeakReference<BaseModel> dataReference = new WeakReference<>(model);
+        SoftReference<BaseModel> dataReference = new SoftReference<>(model);
+
+        lock(model);
 
         // Add the WeakReference to the DataCache
         mDataMap.put(model.firebaseId, dataReference);
+    }
+
+    private void lock(BaseModel model) {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        t.start();
     }
 
     /**
@@ -56,7 +74,7 @@ public class DataCache {
         Section section = sections[0];
 
         // Create a WeakReference to the Array
-        WeakReference<Section[]> arrayReference = new WeakReference<>(sections);
+        SoftReference<Section[]> arrayReference = new SoftReference<>(sections);
 
         // Cache the Array
         mArrayMap.put(section.guideId, arrayReference);
@@ -71,7 +89,7 @@ public class DataCache {
     public BaseModel get(String firebaseId) {
 
         // Attempt to retrieve the data from cache
-        WeakReference<BaseModel> dataReference = mDataMap.get(firebaseId);
+        SoftReference<BaseModel> dataReference = mDataMap.get(firebaseId);
 
         // Check to ensure the data is valid
         if (dataReference != null && dataReference.get() != null) {
@@ -94,7 +112,7 @@ public class DataCache {
     public Section[] getSections(String guideId) {
 
         // Attempt to retrieve the data from cache
-        WeakReference<Section[]> sectionReference = mArrayMap.get(guideId);
+        SoftReference<Section[]> sectionReference = mArrayMap.get(guideId);
 
         // Check to ensure the data is valid
         if (sectionReference != null && sectionReference.get() != null) {
