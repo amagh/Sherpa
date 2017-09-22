@@ -238,10 +238,7 @@ public class GuideProvider {
                 name = "CHATS_BY_ID",
                 type = "vnd.android.cursor.dir/chats",
                 whereColumn = GuideDatabase.CHATS + "." + ChatEntry.FIREBASE_ID,
-                pathSegment = 1,
-                join = "JOIN "                  + GuideDatabase.AUTHORS         + " ON "    +
-                        GuideDatabase.CHATS     + "." + ChatEntry.MEMBER_ID     + " = "     +
-                        GuideDatabase.AUTHORS   + "." + AuthorEntry.FIREBASE_ID)
+                pathSegment = 1)
         public static Uri byId(String firebaseId) {
             return CONTENT_URI.buildUpon()
                     .appendPath(firebaseId)

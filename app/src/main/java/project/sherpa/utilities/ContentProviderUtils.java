@@ -659,33 +659,19 @@ public class ContentProviderUtils {
     }
 
     /**
-     * Converts a Chat to an Array of ContentValues and bulk inserts them into the database. a
-     * ContentValues is created for each member of the chat.
+     * Creates a ContentValues for a Chat data model
      *
-     * @param context    Interface to global Context
      * @param chat Chat to be inserted into the database
      */
-    public static void insertChat(Context context, Chat chat) {
-
-        // Init the Array of ContentValues to be inserted
-        ContentValues[] chatValues = new ContentValues[chat.getActiveMembers().size()];
+    public static ContentValues getValuesForChat(Chat chat) {
 
         // Create a ContentValues for each member of the chat
-        for (int i = 0; i < chatValues.length; i++) {
-            chatValues[i] = new ContentValues();
-            ContentValues values = chatValues[i];
+        ContentValues values = new ContentValues();
 
-            values.put(GuideContract.ChatEntry.FIREBASE_ID,     chat.firebaseId);
-            values.put(GuideContract.ChatEntry.MEMBER_ID,       chat.getActiveMembers().get(i));
-            values.put(GuideContract.ChatEntry.LAST_MESSAGE_ID, chat.getLastMessageId());
-            values.put(GuideContract.ChatEntry.LAST_MESSAGE,    chat.getLastMessage());
-            values.put(GuideContract.ChatEntry.MESSAGE_COUNT,   chat.getMessageCount());
-        }
+        values.put(GuideContract.ChatEntry.FIREBASE_ID,     chat.firebaseId);
+        values.put(GuideContract.ChatEntry.MESSAGE_COUNT,   chat.getMessageCount());
 
-        // Bulk insert
-        context.getContentResolver().bulkInsert(
-                GuideProvider.Chats.CONTENT_URI,
-                chatValues);
+        return values;
     }
 
     /**
@@ -710,6 +696,8 @@ public class ContentProviderUtils {
             return getValuesForArea((Area) model);
         } else if (model instanceof Message) {
             return getValuesForMessage((Message) model);
+        } else if (model instanceof Chat) {
+            return getValuesForChat((Chat) model);
         }
 
         return null;
@@ -736,6 +724,8 @@ public class ContentProviderUtils {
             return GuideProvider.Areas.CONTENT_URI;
         } else if (model instanceof Message) {
             return GuideProvider.Messages.CONTENT_URI;
+        } else if (model instanceof Chat) {
+            return GuideProvider.Chats.CONTENT_URI;
         }
 
         return null;

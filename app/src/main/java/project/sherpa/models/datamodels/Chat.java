@@ -12,7 +12,6 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -86,41 +85,17 @@ public class Chat extends BaseModel {
 
         // Get column indices
         int idxFirebaseId           = 1;
-        int idxMemberId             = cursor.getColumnIndex(GuideContract.ChatEntry.MEMBER_ID);
         int idxMessageCount         = cursor.getColumnIndex(GuideContract.ChatEntry.MESSAGE_COUNT);
-        int idxLastAuthorId         = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_AUTHOR_ID);
-        int idxLastAuthorName       = cursor.getColumnIndex(GuideContract.AuthorEntry.NAME);
-        int idxLastMessageId        = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE_ID);
-        int idxLastMessage          = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE);
-        int idxLastMessageDate      = cursor.getColumnIndex(GuideContract.ChatEntry.LAST_MESSAGE_DATE);
 
         // Get the value from the Cursor
         String firebaseId           = cursor.getString(idxFirebaseId);
         int messageCount            = cursor.getInt(idxMessageCount);
-        String lastAuthorId         = cursor.getString(idxLastAuthorId);
-        String lastAuthorName       = cursor.getString(idxLastAuthorName);
-        String lastMessageId        = cursor.getString(idxLastMessageId);
-        String lastMessage          = cursor.getString(idxLastMessage);
-        long lastMessageDate        = cursor.getLong(idxLastMessageDate);
-
-        // Iterate through each value in the Cursor and add the memberId to the members List
-        List<String> activeMembers  = new ArrayList<>();
-        do {
-            activeMembers.add(cursor.getString(idxMemberId));
-        } while (cursor.moveToNext());
 
         // Create and populate a new Chat
         Chat chat = new Chat();
 
         chat.firebaseId         = firebaseId;
         chat.messageCount       = messageCount;
-        chat.lastAuthorId       = lastAuthorId;
-        chat.lastAuthorName     = lastAuthorName;
-        chat.lastMessageId      = lastMessageId;
-        chat.lastMessage        = lastMessage;
-        chat.lastMessageDate    = lastMessageDate;
-        chat.activeMembers      = activeMembers;
-        chat.memberCode         = buildMemberCode(activeMembers);
 
         return chat;
     }
@@ -153,7 +128,7 @@ public class Chat extends BaseModel {
 
 
         addMemberToFirebase(authorId);
-        ContentProviderUtils.insertChat(context, this);
+        ContentProviderUtils.insertModel(context, this);
     }
 
     /**
@@ -281,16 +256,12 @@ public class Chat extends BaseModel {
                             return Transaction.abort();
                         } else {
 
-                            Timber.d("Pre-modification Chat Values: " + chat.toMap().toString());
-
                             // Update the Chat values
                             chat.setLastMessage(message.getMessage());
                             chat.setLastMessageId(message.firebaseId);
                             chat.setLastAuthorId(message.getAuthorId());
                             chat.setLastAuthorName(message.getAuthorName());
                             chat.setMessageCount(chat.getMessageCount() + 1);
-
-                            Timber.d("Post-modification Chat Values: " + chat.toMap().toString());
 
                             mutableData.setValue(chat.toMap());
                         }
