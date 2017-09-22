@@ -9,6 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import project.sherpa.R;
 import project.sherpa.databinding.ListItemChatBinding;
 import project.sherpa.models.datamodels.Chat;
@@ -41,6 +44,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         }
     };
     private SortedList<Chat> mSortedList = new SortedList<Chat>(Chat.class, mSortedListCallback);
+    private List<String> mNewMessageList = new ArrayList<>();
 
     public ChatAdapter(AppCompatActivity activity, ClickHandler<Chat> clickHandler) {
         mActivity = activity;
@@ -136,6 +140,40 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         notifyDataSetChanged();
     }
 
+    /**
+     * Sets whether a Chat has an unread, new message
+     *
+     * @param chatId           The FirebaseId of the Chat to change the newMessage status for
+     * @param hasNewMessage    Boolean value whether this Chat should change to indicate an unread
+     *                         message
+     */
+    public void setHasNewMessage(String chatId, boolean hasNewMessage) {
+
+        // Check for whether any values were actually changed
+        boolean changed = false;
+
+        // Check whether it's newMessage status should be changed and change it
+        if (hasNewMessage && !mNewMessageList.contains(chatId)) {
+            mNewMessageList.add(chatId);
+            changed = true;
+
+        } else if (!hasNewMessage && mNewMessageList.contains(chatId)) {
+            mNewMessageList.remove(chatId);
+            changed = true;
+        }
+
+        // Notify change on the changed item
+        if (changed) {
+            for (int i = 0; i < mSortedList.size(); i++) {
+                Chat chat = mSortedList.get(i);
+                if (chat.firebaseId.equals(chatId)) {
+                    notifyItemChanged(i);
+                    return;
+                }
+            }
+        }
+    }
+
     class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // ** Member Variables ** //
@@ -153,6 +191,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             // Bind the Chat at the ViewHolder's position to the ViewHolder's binding
             Chat chat = mSortedList.get(position);
             ChatViewModel vm = new ChatViewModel(mActivity, chat);
+
+            // Set the Typeface to indicate whether the Chat has an unread message
+            vm.setNewMessage(mNewMessageList.contains(chat.firebaseId));
 
             mBinding.setVm(vm);
         }
