@@ -85,6 +85,9 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
             if (dataSnapshot.exists()) {
                 Chat chat = (Chat) FirebaseProviderUtils.getModelFromSnapshot(CHAT, dataSnapshot);
 
+                // Update the database entry for the Chat
+                ContentProviderUtils.insertModel(getActivity(), mChat);
+
                 if (chat == null || chat.getMessageCount() <= mChat.getMessageCount()) return;
 
                 // Retrieve the number of new messages that the current chat does not contain
@@ -93,9 +96,6 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                 // Re-reference the member field to the new Chat and cache it
                 mChat = chat;
                 DataCache.getInstance().store(mChat);
-
-                // Update the database entry for the Chat
-                ContentProviderUtils.insertChat(getActivity(), mChat);
             }
         }
 
@@ -149,7 +149,6 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
             // Set the Chat for the Fragment
             Chat chat = (Chat) DataCache.getInstance().get(chatId);
-            Timber.d(chat.toMap().toString());
             setChat(chat);
 
             setMessageBinding();
@@ -383,8 +382,6 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
         // Load messages from the database
         getActivity().getSupportLoaderManager().restartLoader(MESSAGE_LOADER, args, this);
-
-        Timber.d(chat.toMap().toString());
 
         mChat = chat;
         getNewMessagesSinceLastChat();
