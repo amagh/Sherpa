@@ -4,7 +4,7 @@
 
     <item>
         <shape android:shape="oval">
-            <solid android:color="@color/colorAccent"/>
+            <solid android:color="@color/colorPrimary"/>
             <stroke
                 android:color="@color/grey_400"
                 android:width="@dimen/user_backdrop_separator_height"/>
