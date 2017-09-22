@@ -38,6 +38,7 @@ import project.sherpa.ui.activities.ChatActivity;
 import project.sherpa.ui.fragments.UserFragment;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.GeneralUtils;
+import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_ACCOUNT;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
@@ -57,6 +58,7 @@ public class AuthorViewModel extends BaseObservable {
     private int mEditVisibility = View.INVISIBLE;
     private boolean mAccepted = false;
     private boolean mSelected = false;
+    private boolean mEditMode = false;
 
     public AuthorViewModel(@NonNull AppCompatActivity activity, @NonNull Author author) {
         mAuthor = author;
@@ -295,6 +297,10 @@ public class AuthorViewModel extends BaseObservable {
         }
     }
 
+    public void setInEditMode(boolean isInEditMode) {
+        mEditMode = isInEditMode;
+    }
+
     public void onClickEdit(View view) {
 
         // Switch the layout between edit and display
@@ -312,7 +318,7 @@ public class AuthorViewModel extends BaseObservable {
 
         // Check to ensure the user is clicking their own backdrop image
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null || !user.getUid().equals(mAuthor.firebaseId)) {
+        if (user == null || !user.getUid().equals(mAuthor.firebaseId) || !mEditMode) {
             return;
         }
 
@@ -327,7 +333,7 @@ public class AuthorViewModel extends BaseObservable {
 
         // Check to ensure the user is clicking their own profile image
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null || !user.getUid().equals(mAuthor.firebaseId)) {
+        if (user == null || !user.getUid().equals(mAuthor.firebaseId) || !mEditMode) {
             return;
         }
 

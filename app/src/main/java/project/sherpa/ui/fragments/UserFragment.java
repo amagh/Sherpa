@@ -447,8 +447,10 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         ContentProviderUtils.insertModel(getActivity(), mAuthor);
 
         // Add the Author to the Adapter so their info can be displayed
+        AuthorViewModel vm = new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor);
         mAdapter.addModel(mAuthor);
-        mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
+        mAdapter.setAuthorViewModel(vm);
+        mBinding.setVm(vm);
 
         // Setup for someone viewing their own profile
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
