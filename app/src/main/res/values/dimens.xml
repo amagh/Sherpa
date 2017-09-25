@@ -82,6 +82,8 @@
     <dimen name="user_social_icon_padding">24dp</dimen>
     <dimen name="user_social_icon_horizontal_margin">48dp</dimen>
 
+    <dimen name="list_user_top_margin">56dp</dimen>
+
     <dimen name="create_guide_hero_icon_size">48dp</dimen>
     <dimen name="create_guide_toolbar_icon_padding">12dp</dimen>
     <dimen name="create_guide_error_icon_top_margin">36dp</dimen>

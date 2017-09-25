@@ -13,63 +13,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
+        android:layout_marginTop="@dimen/list_user_top_margin"
         android:layout_marginBottom="@dimen/card_vertical_separation"
         android:orientation="vertical"
         android:descendantFocusability="afterDescendants">
-
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/user_social_cl"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            app:layout_anchor="@+id/user_ab"
-            app:layout_anchorGravity="bottom|center_horizontal">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/user_author_iv"
-                android:layout_width="@dimen/user_image_size"
-                android:layout_height="@dimen/user_image_size"
-                android:src="@drawable/ic_account_circle"
-                android:contentDescription="@string/content_description_author_image"
-                android:onClick="@{vm::onClickProfileImage}"
-                android:layout_gravity="center_horizontal"
-                app:authorImage="@{vm.authorImage}"
-                app:layout_constraintBottom_toTopOf="@+id/space"
-                app:layout_constraintStart_toEndOf="@+id/user_add_friend_iv"
-                app:layout_constraintEnd_toStartOf="@+id/user_message_iv"
-                app:layout_constraintHorizontal_chainStyle="spread"
-                app:civ_border_width="@dimen/user_backdrop_separator_height"
-                app:civ_border_color="@color/grey_400"
-                app:civ_fill_color="@android:color/white"/>
-
-            <android.support.v4.widget.Space
-                android:id="@+id/space"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginBottom="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-            <ImageView
-                android:id="@+id/user_add_friend_iv"
-                android:layout_width="@dimen/user_social_icon_size"
-                android:layout_height="@dimen/user_social_icon_size"
-                android:src="@drawable/ic_add_person_circle"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/user_author_iv"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-            <ImageView
-                android:id="@+id/user_message_iv"
-                android:layout_width="@dimen/user_social_icon_size"
-                android:layout_height="@dimen/user_social_icon_size"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:src="@drawable/ic_message_circle"
-                app:layout_constraintStart_toEndOf="@id/user_author_iv"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-        </android.support.constraint.ConstraintLayout>
 
         <TextView
             android:id="@+id/list_author_name_tv"
