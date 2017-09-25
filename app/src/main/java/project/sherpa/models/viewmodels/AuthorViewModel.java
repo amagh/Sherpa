@@ -1,5 +1,7 @@
 package project.sherpa.models.viewmodels;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.databinding.BaseObservable;
@@ -8,6 +10,7 @@ import android.databinding.BindingAdapter;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -30,11 +33,13 @@ import com.google.firebase.storage.StorageReference;
 
 import java.lang.ref.WeakReference;
 
+import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.ui.activities.ChatActivity;
+import project.sherpa.ui.behaviors.VanishingBehavior;
 import project.sherpa.ui.fragments.UserFragment;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.GeneralUtils;
@@ -297,8 +302,107 @@ public class AuthorViewModel extends BaseObservable {
         }
     }
 
+    @Bindable
+    public boolean getInEditMode() {
+        return mEditMode;
+    }
+
     public void setInEditMode(boolean isInEditMode) {
         mEditMode = isInEditMode;
+
+        notifyPropertyChanged(BR.inEditMode);
+    }
+
+    @BindingAdapter({"messageIv", "inEditMode"})
+    public static void animateSocialVisibility(final ImageView friendIv, final ImageView messageIv, boolean inEditMode) {
+
+        // Get the parameters for the parent ViewGroup so that the Behavior can be modified
+        ConstraintLayout layout = (ConstraintLayout) friendIv.getParent();
+        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
+
+        if (inEditMode) {
+            if (friendIv.getAlpha() == 0) {
+
+                // Views are already hidden. No need to animate. Just set visibility to GONE
+                friendIv.setVisibility(View.GONE);
+                messageIv.setVisibility(View.GONE);
+                return;
+            }
+
+            // Disable Behavior so animation does not clash
+            params.setBehavior(null);
+
+            // Hide the social buttons as they do not need to be visible when editing profile
+            new AdditiveAnimator().setDuration(300)
+                    .target(friendIv).scale(0).alpha(0)
+                    .target(messageIv).scale(0).alpha(0)
+                    .addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+
+                            // Set the visibility to GONE
+                            friendIv.setVisibility(View.GONE);
+                            messageIv.setVisibility(View.GONE);
+
+                            // Reset the layout Behavior so that the profile image still animates
+                            params.setBehavior(new VanishingBehavior());
+                        }
+                    })
+                    .start();
+
+        } else {
+
+            if (friendIv.getAlpha() == 0) {
+
+                // Views are invisible, so just set visibility to VISIBLE
+                friendIv.setVisibility(View.VISIBLE);
+                messageIv.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            // Disable Behavior so animation does not clash
+            params.setBehavior(null);
+
+            // Hide the Views temporarily
+            new AdditiveAnimator().setDuration(0)
+                    .target(friendIv).scale(0).alpha(0)
+                    .target(messageIv).scale(0).alpha(0)
+                    .start();
+
+            // Animate the Views in
+            new AdditiveAnimator().setDuration(300)
+                    .target(friendIv).scale(1).alpha(1)
+                    .target(messageIv).scale(1).alpha(1)
+                    .addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            super.onAnimationStart(animation);
+
+                            // Set visibility to VISIBLE on animation start
+                            friendIv.setVisibility(View.VISIBLE);
+                            messageIv.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+
+                            // Reset the Behavior so it acts normally
+                            params.setBehavior(new VanishingBehavior());
+                        }
+                    })
+                    .start();
+        }
+    }
+
+    @Bindable
+    public int getSocialVisibility() {
+        if (mEditMode) {
+            return View.GONE;
+        } else {
+            return View.VISIBLE;
+        }
     }
 
     public void onClickEdit(View view) {

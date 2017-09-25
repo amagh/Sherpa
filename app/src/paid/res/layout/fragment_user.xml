@@ -84,7 +84,6 @@
                 android:src="@drawable/ic_account_circle"
                 android:contentDescription="@string/content_description_author_image"
                 android:onClick="@{vm::onClickProfileImage}"
-
                 app:authorImage="@{vm.authorImage}"
                 app:layout_constraintStart_toEndOf="@+id/user_add_friend_iv"
                 app:layout_constraintEnd_toStartOf="@+id/user_message_iv"
@@ -99,6 +98,8 @@
                 android:layout_width="@dimen/user_social_icon_size"
                 android:layout_height="@dimen/user_social_icon_size"
                 android:src="@drawable/ic_add_person_circle"
+                app:messageIv="@{userMessageIv}"
+                app:inEditMode="@{vm.inEditMode}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/user_author_iv"
                 app:layout_constraintBottom_toBottomOf="parent"/>
