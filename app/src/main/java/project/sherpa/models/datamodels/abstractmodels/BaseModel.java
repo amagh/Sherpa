@@ -9,6 +9,10 @@ import java.util.Map;
  */
 
 public abstract class BaseModel {
+
+    // ** Constants ** //
+    public static final String FIREBASE_ID = "firebaseId";
+
     // ** Member Variables ** //
     public String firebaseId;
     private boolean draft;

@@ -6,7 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.firebase.geofire.GeoFire;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,6 +34,8 @@ import project.sherpa.files.ImageFile;
 import project.sherpa.files.abstractfiles.BaseFile;
 import project.sherpa.models.datamodels.Area;
 import project.sherpa.models.datamodels.Author;
+import project.sherpa.models.datamodels.Chat;
+import project.sherpa.models.datamodels.Message;
 import project.sherpa.models.datamodels.Rating;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.datamodels.Guide;
@@ -42,7 +46,9 @@ import timber.log.Timber;
 import static junit.framework.Assert.assertNotNull;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AREA;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.CHAT;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.MESSAGE;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.RATING;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.SECTION;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.TRAIL;
@@ -60,14 +66,16 @@ public class FirebaseProviderUtils {
     public static final String BACKDROP_SUFFIX = "_bd";
     public static final String GEOFIRE_PATH = "geofire";
 
-    @IntDef({GUIDE, TRAIL, AUTHOR, SECTION, AREA, RATING})
+    @IntDef({GUIDE, TRAIL, AUTHOR, SECTION, AREA, RATING, CHAT, MESSAGE})
     public @interface FirebaseType {
-        int GUIDE = 0;
-        int TRAIL = 1;
-        int AUTHOR = 2;
-        int SECTION = 3;
-        int AREA = 4;
-        int RATING = 5;
+        int GUIDE       = 0;
+        int TRAIL       = 1;
+        int AUTHOR      = 2;
+        int SECTION     = 3;
+        int AREA        = 4;
+        int RATING      = 5;
+        int CHAT        = 6;
+        int MESSAGE     = 7;
     }
 
     public static final String RATING_DIRECTORY = "ratings";
@@ -95,6 +103,12 @@ public class FirebaseProviderUtils {
             case AREA:
                 return GuideDatabase.AREAS;
 
+            case CHAT:
+                return GuideDatabase.CHATS;
+
+            case MESSAGE:
+                return GuideDatabase.MESSAGES;
+
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
         }
     }
@@ -118,6 +132,10 @@ public class FirebaseProviderUtils {
             return GuideDatabase.SECTIONS;
         } else if (model instanceof Area) {
             return GuideDatabase.AREAS;
+        } else if (model instanceof Chat) {
+            return GuideDatabase.CHATS;
+        } else if (model instanceof Message) {
+            return GuideDatabase.MESSAGES;
         } else {
             throw new UnsupportedOperationException("Unknown model:" + model.getClass());
         }
@@ -171,6 +189,14 @@ public class FirebaseProviderUtils {
                 models = new Rating[modelList.size()];
                 break;
 
+            case CHAT:
+                models = new Chat[modelList.size()];
+                break;
+
+            case MESSAGE:
+                models = new Message[modelList.size()];
+                break;
+
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
         }
 
@@ -213,11 +239,19 @@ public class FirebaseProviderUtils {
                 model = dataSnapshot.getValue(Rating.class);
                 break;
 
+            case CHAT:
+                model = dataSnapshot.getValue(Chat.class);
+                break;
+
+            case MESSAGE:
+                model = dataSnapshot.getValue(Message.class);
+                break;
+
             default: throw new UnsupportedOperationException("Unknown Firebase type " + type);
         }
 
         // Set the model's firebaseId
-        assertNotNull(model);
+        if (model == null) return null;
         model.firebaseId = dataSnapshot.getKey();
 
         return model;
@@ -699,6 +733,47 @@ public class FirebaseProviderUtils {
                 ratingsQuery.removeEventListener(this);
             }
         });
+    }
+
+    /**
+     * Either inserts a new data model to Firebase or updates an existing value
+     *
+     * @param model              BaseModel to be inserted/updated
+     */
+    public static Task<Void> insertOrUpdateModel(BaseModel model) {
+
+        String directory = null;
+
+        // Operation depends on whether the model already has a FirebaseId
+        if (model.firebaseId == null) {
+
+            // Retrieve a FirebaseId for the model and insert it into the Firebase Database
+            directory = getDirectoryFromModel(model);
+
+            if (model instanceof Section) {
+                directory += "/" + ((Section) model).guideId;
+            } else if (model instanceof Message) {
+                directory += "/" + ((Message) model).getChatId();
+            }
+
+            model.firebaseId = FirebaseDatabase.getInstance().getReference()
+                    .child(directory)
+                    .push()
+                    .getKey();
+        }
+
+        // Run an update on the values
+        Map<String, Object> childUpdates = new HashMap<>();
+
+        // Set the directory if it is null and append the FirebaseId
+        if (directory == null) directory = getDirectoryFromModel(model);
+        directory += "/" + model.firebaseId;
+
+        childUpdates.put(directory, model.toMap());
+
+        // Initialize the task
+        return FirebaseDatabase.getInstance().getReference()
+                .updateChildren(childUpdates);
     }
 
     /**

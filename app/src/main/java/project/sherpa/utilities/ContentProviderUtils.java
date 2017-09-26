@@ -17,7 +17,9 @@ import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideProvider;
 import project.sherpa.models.datamodels.Area;
 import project.sherpa.models.datamodels.Author;
+import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.Guide;
+import project.sherpa.models.datamodels.Message;
 import project.sherpa.models.datamodels.Section;
 import project.sherpa.models.datamodels.Trail;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
@@ -67,6 +69,29 @@ public class ContentProviderUtils {
         context.getContentResolver().bulkInsert(
                 GuideProvider.Sections.CONTENT_URI,
                 sectionValues);
+    }
+
+    /**
+     * Bulk inserts an Array of Messages into the database
+     *
+     * @param context     Interface to global Context
+     * @param messages    Array of Messages to be inserted into the database
+     */
+    public static void bulkInsertMessages(Context context, Message... messages) {
+
+        // Init Array of ContentValues to be bulk inserted
+        ContentValues[] messageValues = new ContentValues[messages.length];
+
+        // Create ContentValues for each Message to be inserted
+        for (int i = 0; i < messages.length; i++) {
+            Message message = messages[i];
+            messageValues[i] = getValuesForMessage(message);
+        }
+
+        // Bulk insert
+        context.getContentResolver().bulkInsert(
+                GuideProvider.Messages.CONTENT_URI,
+                messageValues);
     }
 
     /**
@@ -608,6 +633,43 @@ public class ContentProviderUtils {
             values.put(GuideContract.AreaEntry.DRAFT,           1);
         }
 
+        return values;
+    }
+
+    /**
+     * Creates a Content Values for a Message data model
+     *
+     * @param message    Message to be Converted to ContentValues
+     * @return ContentValues describing a Message
+     */
+    private static ContentValues getValuesForMessage(Message message) {
+        ContentValues values = new ContentValues();
+
+        values.put(GuideContract.MessageEntry.FIREBASE_ID,      message.firebaseId);
+        values.put(GuideContract.MessageEntry.CHAT_ID,          message.getChatId());
+        values.put(GuideContract.MessageEntry.AUTHOR_ID,        message.getAuthorId());
+        values.put(GuideContract.MessageEntry.DATE,             message.getDate() == 0
+                                                                        ? System.currentTimeMillis()
+                                                                        : message.getDate());
+        values.put(GuideContract.MessageEntry.MESSAGE,          message.getMessage());
+        values.put(GuideContract.MessageEntry.ATTACHMENT,       message.getAttachment());
+        values.put(GuideContract.MessageEntry.ATTACHMENT_TYPE,  message.getAttachmentType());
+
+        return values;
+    }
+
+    /**
+     * Creates a ContentValues for a Chat data model
+     *
+     * @param chat Chat to be inserted into the database
+     */
+    public static ContentValues getValuesForChat(Chat chat) {
+
+        // Create a ContentValues for each member of the chat
+        ContentValues values = new ContentValues();
+
+        values.put(GuideContract.ChatEntry.FIREBASE_ID,     chat.firebaseId);
+        values.put(GuideContract.ChatEntry.MESSAGE_COUNT,   chat.getMessageCount());
 
         return values;
     }
@@ -632,6 +694,10 @@ public class ContentProviderUtils {
             return getValuesForSection((Section) model);
         } else if (model instanceof Area) {
             return getValuesForArea((Area) model);
+        } else if (model instanceof Message) {
+            return getValuesForMessage((Message) model);
+        } else if (model instanceof Chat) {
+            return getValuesForChat((Chat) model);
         }
 
         return null;
@@ -656,6 +722,10 @@ public class ContentProviderUtils {
             return GuideProvider.Sections.CONTENT_URI;
         } else if (model instanceof Area) {
             return GuideProvider.Areas.CONTENT_URI;
+        } else if (model instanceof Message) {
+            return GuideProvider.Messages.CONTENT_URI;
+        } else if (model instanceof Chat) {
+            return GuideProvider.Chats.CONTENT_URI;
         }
 
         return null;

@@ -1,16 +1,25 @@
 package project.sherpa.models.datamodels;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import project.sherpa.data.GuideContract;
 import project.sherpa.models.datamodels.abstractmodels.BaseModelWithImage;
+import project.sherpa.utilities.ContentProviderUtils;
+import project.sherpa.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 7/17/2017.
@@ -26,6 +35,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
     private static final String HAS_IMAGE               = "hasImage";
     private static final String SCORE                   = "score";
     private static final String FAVORITES               = "favorites";
+    public static final String CHATS                    = "chats";
 
     // ** Member Variables ** //
     public String name;
@@ -33,6 +43,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
     public String description;
     public int score;
     public Map<String, String> favorites;
+    private List<String> chats;
 
     public Author() {}
 
@@ -89,16 +100,69 @@ public class Author extends BaseModelWithImage implements Parcelable {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(NAME, name);
-        map.put(USERNAME, username);
-        map.put(LOWER_CASE_USERNAME, username.toLowerCase());
-        map.put(DESCRIPTION, description);
-        map.put(LOWER_CASE_NAME, name.toLowerCase());
-        map.put(HAS_IMAGE, hasImage);
-        map.put(SCORE, score);
-        map.put(FAVORITES, favorites);
+        map.put(NAME,                   name);
+        map.put(USERNAME,               username);
+        map.put(LOWER_CASE_USERNAME,    username.toLowerCase());
+        map.put(DESCRIPTION,            description);
+        map.put(LOWER_CASE_NAME,        name.toLowerCase());
+        map.put(HAS_IMAGE,              hasImage);
+        map.put(SCORE,                  score);
+        map.put(FAVORITES,              favorites);
+        map.put(CHATS,                  chats);
 
         return map;
+    }
+
+    /**
+     * Adds a Chat to the User's Firebase Profile
+     *
+     * @param context    Interface to global Context
+     * @param chatId     FirebaseId of the Chat to be added to this Author's list of Chats
+     */
+    public void addChat(Context context, String chatId) {
+        if (chats == null) {
+            chats = new ArrayList<>();
+        }
+
+        // Add the Chat
+        if (!chats.contains(chatId)) {
+
+            chats.add(chatId);
+
+            // Update Firebase Database
+            FirebaseProviderUtils.insertOrUpdateModel(this);
+
+            // Update the local database if modifying logged in User
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null && user.getUid().equals(firebaseId)) {
+                ContentProviderUtils.insertModel(context, this);
+            }
+        }
+    }
+
+    /**
+     * Removes a Chat from this Author's list of Chats
+     *
+     * @param context    Interface to global Context
+     * @param chatId     FirebaseId of the Chat to be removed
+     */
+    public void removeChat(Context context, String chatId) {
+        if (chats == null) return;
+
+        // Remove the Chat
+        if (chats.contains(chatId)) {
+
+            chats.remove(chatId);
+
+            // Update Firebase Database
+            FirebaseProviderUtils.insertOrUpdateModel(this);
+
+            // Update the local database if modifying logged in User
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null && user.getUid().equals(firebaseId)) {
+                ContentProviderUtils.insertModel(context, this);
+            }
+        }
     }
 
     //********************************************************************************************//
@@ -109,11 +173,19 @@ public class Author extends BaseModelWithImage implements Parcelable {
         return username;
     }
 
+    public List<String> getChats() {
+        return chats;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
 
-    //********************************************************************************************//
+    public void setChats(List<String> chats) {
+        this.chats = chats;
+    }
+
+//********************************************************************************************//
     //***************************** Parcelable Related Methods ***********************************//
     //********************************************************************************************//
 

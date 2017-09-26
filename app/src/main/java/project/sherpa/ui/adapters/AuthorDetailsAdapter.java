@@ -36,9 +36,11 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
     private WeakReference<AppCompatActivity> mActivity;
     private List<BaseModel> mModelList;
     private boolean mEnableEdit = false;
-    private boolean mIsInEditMode = false;
+    private boolean mInEditMode = false;
     private GuideAdapter.ClickHandler mClickHandler;
+
     private Author mUser;
+    private AuthorViewModel mAuthorViewModel;
 
     public AuthorDetailsAdapter(AppCompatActivity activity, GuideAdapter.ClickHandler clickHandler) {
         mActivity = new WeakReference<>(activity);
@@ -101,7 +103,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
         BaseModel model = mModelList.get(position);
 
         if (model instanceof Author) {
-            if (!mIsInEditMode) {
+            if (!mInEditMode) {
                 return AUTHOR_VIEW_TYPE;
             } else {
                 return AUTHOR_EDIT_VIEW_TYPE;
@@ -112,6 +114,11 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
             return super.getItemViewType(position);
         }
 
+    }
+
+    public void setAuthorViewModel(AuthorViewModel authorViewModel) {
+        mAuthorViewModel = authorViewModel;
+        notifyItemChanged(0);
     }
 
     /**
@@ -149,7 +156,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
      * Switches the layout used for the Author BaseModel between one for display or one for editing.
      */
     public void switchAuthorLayout() {
-        mIsInEditMode = !mIsInEditMode;
+        mInEditMode = !mInEditMode;
 
         notifyItemChanged(0);
     }
@@ -201,17 +208,19 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
 
             // Cast the Model and ViewDataBinding based on the type of BaseModel
             if (model instanceof Author) {
-                AuthorViewModel vm = new AuthorViewModel(mActivity.get(), (Author) model);
 
                 if (mEnableEdit) {
                     // Enable editing of info if user is viewing their own profile
-                    vm.enableEditing();
+                    mAuthorViewModel.enableEditing();
                 }
 
-                if (!mIsInEditMode) {
-                    ((ListItemAuthorDetailsBinding) mBinding).setVm(vm);
+                // Set whether the ViewModel is in EditMode
+                mAuthorViewModel.setInEditMode(mInEditMode);
+
+                if (!mInEditMode) {
+                    ((ListItemAuthorDetailsBinding) mBinding).setVm(mAuthorViewModel);
                 } else {
-                    ((ListItemAuthorDetailsEditBinding) mBinding).setVm(vm);
+                    ((ListItemAuthorDetailsEditBinding) mBinding).setVm(mAuthorViewModel);
                 }
             } else if (model instanceof Guide) {
                 GuideViewModel vm = new GuideViewModel(mBinding.getRoot().getContext(), (Guide) model);
@@ -222,7 +231,8 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
                     vm.setAuthor(mUser);
                 }
 
-                ((ListItemGuideBinding) mBinding).setVm(vm);
+                ((ListItemGuideBinding) mBinding).top.setVm(vm);
+                ((ListItemGuideBinding) mBinding).bottom.setVm(vm);
             }
         }
     }

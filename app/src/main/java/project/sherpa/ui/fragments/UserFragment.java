@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.databinding.library.baseAdapters.BR;
@@ -45,11 +47,13 @@ import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideDatabase;
 import project.sherpa.databinding.FragmentUserBinding;
 import project.sherpa.models.datamodels.Author;
+import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.Rating;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.ui.activities.AccountActivity;
+import project.sherpa.ui.activities.MessageActivity;
 import project.sherpa.ui.activities.SelectAreaTrailActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.activities.MainActivity;
@@ -68,6 +72,7 @@ import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
+import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
@@ -125,7 +130,7 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         mBinding.fabDial.setMenuListener(this);
         mBinding.fabDial.getChildAt(0).setContentDescription(getString(R.string.content_description_create_fab));
 
-        setLayoutBehaviors();
+        setLayoutBehavior();
 
         initRecyclerView();
 
@@ -175,8 +180,10 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                 mAuthor = getArguments().getParcelable(AUTHOR_KEY);
 
                 // Add the Author to the Adapter so their info can be displayed
+                AuthorViewModel vm = new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor);
+                mBinding.setVm(vm);
+                mAdapter.setAuthorViewModel(vm);
                 mAdapter.addModel(mAuthor);
-                mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
 
                 // Load the Guides that the Author has created into the Adapter
                 loadGuidesForAuthor();
@@ -203,12 +210,11 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         return mBinding.getRoot();
     }
 
-    private void setLayoutBehaviors() {
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mBinding.userAuthorIv.getLayoutParams();
-        params.setBehavior(new VanishingBehavior());
+    private void setLayoutBehavior() {
+        CoordinatorLayout.LayoutParams params =
+                (CoordinatorLayout.LayoutParams) mBinding.userSocialCl.getLayoutParams();
 
-        CoordinatorLayout.LayoutParams params2 = (CoordinatorLayout.LayoutParams) mBinding.userSeparatorV.getLayoutParams();
-        params2.setBehavior(new VanishingBehavior());
+        params.setBehavior(new VanishingBehavior());
     }
 
     @Override
@@ -238,6 +244,9 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                         ACCOUNT_ACTIVITY_REQUEST_CODE);
 
                 return true;
+
+            case R.id.menu_user_edit:
+                switchAuthorLayout();
         }
 
         return false;
@@ -451,9 +460,14 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
 
         mAuthor = author;
 
+        DataCache.getInstance().store(mAuthor);
+        ContentProviderUtils.insertModel(getActivity(), mAuthor);
+
         // Add the Author to the Adapter so their info can be displayed
+        AuthorViewModel vm = new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor);
         mAdapter.addModel(mAuthor);
-        mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
+        mAdapter.setAuthorViewModel(vm);
+        mBinding.setVm(vm);
 
         // Setup for someone viewing their own profile
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -653,6 +667,53 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
 
                 // Update the values
                 FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+            }
+        });
+    }
+
+    /**
+     * Starts the MessageActivity with the User whose profile the user is viewing
+     */
+    public void startMessageActivityToUser() {
+
+        // Show ProgressBar
+        mBinding.userMessagePb.setVisibility(View.VISIBLE);
+
+        // Add the members that would be in the Chat to a List and check if there is a duplicate Chat
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        final List<String> chatMembers = new ArrayList<>();
+        chatMembers.add(user.getUid());
+        chatMembers.add(mAuthor.firebaseId);
+
+        Chat.checkDuplicateChats(chatMembers, new FirebaseProviderUtils.FirebaseListener() {
+            @Override
+            public void onModelReady(BaseModel model) {
+
+                Chat chat;
+
+                if (model == null) {
+                    // No duplicate Chat. Start a new Chat with the user
+
+                    chat = new Chat();
+                    chat.generateFirebaseId();
+                    chat.setActiveMembers(chatMembers);
+                    chat.setAllMembers(chatMembers);
+                    chat.setGroup(chatMembers.size() > 2);
+                } else {
+
+                    // Start the duplicate Chat
+                    chat = (Chat) model;
+                }
+
+                Intent intent = new Intent(getActivity(), MessageActivity.class);
+                intent.putExtra(CHAT_KEY, chat.firebaseId);
+
+                DataCache.getInstance().store(chat);
+
+                startActivity(intent);
+
+                mBinding.userMessagePb.setVisibility(View.GONE);
             }
         });
     }

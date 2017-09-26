@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.MessageViewModel"/>
+    </data>
+
+    <FrameLayout
+        android:id="@+id/message_guide_fl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/message_send_container_horizontal_padding"
+        android:layout_marginStart="@dimen/message_send_container_horizontal_padding"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/messaging_guide_padding"
+        android:paddingBottom="@dimen/messaging_guide_padding"
+        android:background="@drawable/chat_bubble_guide"
+        app:topMargin="@{vm.topMargin}"
+        tools:layout_marginTop="8dp">
+
+        <include
+            android:id="@+id/message_guide"
+            layout="@layout/layout_guide_item_top"/>
+
+    </FrameLayout>
+
+</layout>

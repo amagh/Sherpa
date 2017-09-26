@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.ChatViewModel"/>
+
+        <variable
+            name="uvm"
+            type="project.sherpa.models.viewmodels.SearchUserViewModel"/>
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/new_chat_cl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/new_chat_abl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/new_chat_tb"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorPrimary"
+                style="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <ImageView
+                android:id="@+id/new_chat_add_user_iv"
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="?attr/actionBarSize"
+                android:src="@drawable/places_ic_search"
+                android:padding="@dimen/activity_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <EditText
+                android:id="@+id/new_chat_add_user_tv"
+                android:layout_width="0dp"
+                android:layout_height="?attr/actionBarSize"
+                android:inputType="text"
+                android:hint="@string/chat_add_member_hint"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:text="@={uvm.query}"
+                style="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintStart_toEndOf="@id/new_chat_add_user_iv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/new_chat_add_user_iv"
+                app:backgroundTint="@android:color/transparent"/>
+
+            <View
+                android:id="@+id/new_chat_add_user_separator_v"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/list_item_separator_height"
+                android:background="@color/grey_400"
+                app:layout_constraintTop_toBottomOf="@id/new_chat_add_user_tv"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/new_chat_rv"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/new_chat_add_user_separator_v"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/new_chat_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:src="@drawable/ic_next_white"
+            android:onClick="onClickStartChat"
+            app:layout_anchor="@id/new_chat_tb"
+            app:layout_anchorGravity="bottom|end|right"/>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+
+</layout>

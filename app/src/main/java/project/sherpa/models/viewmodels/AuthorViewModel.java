@@ -1,10 +1,18 @@
 package project.sherpa.models.viewmodels;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
+import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.net.Uri;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +24,7 @@ import com.android.databinding.library.baseAdapters.BR;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,15 +34,18 @@ import com.google.firebase.storage.StorageReference;
 
 import java.lang.ref.WeakReference;
 
+import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Author;
+import project.sherpa.ui.activities.ChatActivity;
+import project.sherpa.ui.behaviors.VanishingBehavior;
 import project.sherpa.ui.fragments.UserFragment;
+import project.sherpa.utilities.Constants;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.GeneralUtils;
 
-import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_ACCOUNT;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
 import static project.sherpa.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
@@ -45,11 +57,14 @@ import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
  */
 
 public class AuthorViewModel extends BaseObservable {
+
     // ** Member Variables ** //
     private Author mAuthor;
     private WeakReference<AppCompatActivity> mActivity;
     private int mEditVisibility = View.INVISIBLE;
     private boolean mAccepted = false;
+    private boolean mSelected = false;
+    private boolean mEditMode = false;
 
     public AuthorViewModel(@NonNull AppCompatActivity activity, @NonNull Author author) {
         mAuthor = author;
@@ -67,10 +82,8 @@ public class AuthorViewModel extends BaseObservable {
         if (mActivity.get() == null) return null;
 
         // Retrieve the Fragment using the FragmentManager
-        UserFragment fragment = (UserFragment) mActivity.get().getSupportFragmentManager()
-                .findFragmentByTag(FRAG_TAG_ACCOUNT);
-
-        return fragment;
+        return (UserFragment) mActivity.get().getSupportFragmentManager()
+                .findFragmentByTag(Constants.FragmentTags.FRAG_TAG_USER);
     }
 
     @Bindable
@@ -79,7 +92,16 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @Bindable
+    public String getUsername() {
+        return mAuthor.getUsername();
+    }
+
+    @Bindable
     public Uri getAuthorImage() {
+
+        if (mSelected) {
+            return null;
+        }
 
         // Check whether the Author has a Uri for an offline ImageUri
         if (mAuthor.getImageUri() != null) {
@@ -98,7 +120,12 @@ public class AuthorViewModel extends BaseObservable {
     @BindingAdapter("authorImage")
     public static void loadImage(final ImageView imageView, final Uri authorImage) {
 
-        if (authorImage == null) return;
+        if (authorImage == null) {
+            imageView.setImageDrawable(
+                    ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_account_circle));
+
+            return;
+        }
 
         // Check whether to load image from File or from Firebase Storage
         if (authorImage.getScheme().matches("gs")) {
@@ -110,7 +137,7 @@ public class AuthorViewModel extends BaseObservable {
                 @Override
                 public void onSuccess(StorageMetadata storageMetadata) {
                     // Load from Firebase Storage
-                    if (imageView.getContext() != null) {
+                    if (imageView.getContext() != null && !((Activity) imageView.getContext()).isFinishing()) {
                         Glide.with(imageView.getContext())
                                 .using(new FirebaseImageLoader())
                                 .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
@@ -118,6 +145,12 @@ public class AuthorViewModel extends BaseObservable {
                                 .error(R.drawable.ic_account_circle)
                                 .into(imageView);
                     }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    imageView.setImageDrawable(
+                            ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_account_circle));
                 }
             });
 
@@ -237,6 +270,131 @@ public class AuthorViewModel extends BaseObservable {
         fab.setVisibility(fabVisibility);
     }
 
+    @Bindable
+    public int getMessageVisibility() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        return user != null
+                ? View.VISIBLE
+                : View.GONE;
+    }
+
+    @Bindable
+    public boolean getSelected() {
+        return mSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        mSelected = selected;
+
+        notifyPropertyChanged(BR.selected);
+    }
+
+    @BindingAdapter({"imageView", "authorImage", "selected"})
+    public static void setSelectedBackground(ConstraintLayout layout, ImageView imageView, Uri authorImage, boolean selected) {
+        layout.setSelected(selected);
+
+        if (selected) {
+            imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.chat_selected_user));
+        } else {
+            loadImage(imageView, authorImage);
+        }
+    }
+
+    @Bindable
+    public boolean getInEditMode() {
+        return mEditMode;
+    }
+
+    public void setInEditMode(boolean isInEditMode) {
+        mEditMode = isInEditMode;
+
+        notifyPropertyChanged(BR.inEditMode);
+    }
+
+    @BindingAdapter({"messageIv", "inEditMode"})
+    public static void animateSocialVisibility(final ImageView friendIv, final ImageView messageIv, boolean inEditMode) {
+
+        // Get the parameters for the parent ViewGroup so that the Behavior can be modified
+        ConstraintLayout layout = (ConstraintLayout) friendIv.getParent();
+        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
+
+        if (inEditMode) {
+            if (friendIv.getAlpha() == 0) {
+
+                // Views are already hidden. No need to animate. Just set visibility to GONE
+                friendIv.setVisibility(View.GONE);
+                messageIv.setVisibility(View.GONE);
+                return;
+            }
+
+            // Disable Behavior so animation does not clash
+            params.setBehavior(null);
+
+            // Hide the social buttons as they do not need to be visible when editing profile
+            new AdditiveAnimator().setDuration(300)
+                    .target(friendIv).scale(0).alpha(0)
+                    .target(messageIv).scale(0).alpha(0)
+                    .addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+
+                            // Set the visibility to GONE
+                            friendIv.setVisibility(View.GONE);
+                            messageIv.setVisibility(View.GONE);
+
+                            // Reset the layout Behavior so that the profile image still animates
+                            params.setBehavior(new VanishingBehavior());
+                        }
+                    })
+                    .start();
+
+        } else {
+
+            if (friendIv.getAlpha() == 0) {
+
+                // Views are invisible, so just set visibility to VISIBLE
+                friendIv.setVisibility(View.VISIBLE);
+                messageIv.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            // Disable Behavior so animation does not clash
+            params.setBehavior(null);
+
+            // Hide the Views temporarily
+            new AdditiveAnimator().setDuration(0)
+                    .target(friendIv).scale(0).alpha(0)
+                    .target(messageIv).scale(0).alpha(0)
+                    .start();
+
+            // Animate the Views in
+            new AdditiveAnimator().setDuration(300)
+                    .target(friendIv).scale(1).alpha(1)
+                    .target(messageIv).scale(1).alpha(1)
+                    .addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            super.onAnimationStart(animation);
+
+                            // Set visibility to VISIBLE on animation start
+                            friendIv.setVisibility(View.VISIBLE);
+                            messageIv.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+
+                            // Reset the Behavior so it acts normally
+                            params.setBehavior(new VanishingBehavior());
+                        }
+                    })
+                    .start();
+        }
+    }
+
     public void onClickEdit(View view) {
 
         // Switch the layout between edit and display
@@ -254,7 +412,7 @@ public class AuthorViewModel extends BaseObservable {
 
         // Check to ensure the user is clicking their own backdrop image
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null || !user.getUid().equals(mAuthor.firebaseId)) {
+        if (user == null || !user.getUid().equals(mAuthor.firebaseId) || !mEditMode) {
             return;
         }
 
@@ -269,7 +427,7 @@ public class AuthorViewModel extends BaseObservable {
 
         // Check to ensure the user is clicking their own profile image
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null || !user.getUid().equals(mAuthor.firebaseId)) {
+        if (user == null || !user.getUid().equals(mAuthor.firebaseId) || !mEditMode) {
             return;
         }
 
@@ -278,6 +436,23 @@ public class AuthorViewModel extends BaseObservable {
                 getFragment(),
                 REQUEST_CODE_PROFILE_PIC,
                 FilePickerConst.FILE_TYPE_MEDIA);
+    }
+
+    /**
+     * Click response for the messaging button in the UserFragment
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickMessage(View view) {
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null && user.getUid().equals(mAuthor.firebaseId)) {
+            Intent intent = new Intent(mActivity.get(), ChatActivity.class);
+            getFragment().startActivity(intent);
+        } else {
+            getFragment().startMessageActivityToUser();
+        }
     }
 
     /**

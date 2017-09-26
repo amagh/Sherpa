@@ -3,7 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <dimen name="list_item_separater_height">0.5dp</dimen>
+    <dimen name="list_item_separator_height">0.5dp</dimen>
 
     <item name="activated_alpha" type="dimen" format="float">1</item>
     <item name="hidden_alpha" type="dimen" format="float">0</item>
@@ -78,6 +78,12 @@
     <dimen name="user_image_size">80dp</dimen>
     <dimen name="user_edit_icon_size">32dp</dimen>
     <dimen name="user_edit_icon_padding">4dp</dimen>
+    <dimen name="user_social_icon_size">32dp</dimen>
+    <dimen name="user_social_icon_padding">8dp</dimen>
+    <dimen name="user_social_icon_horizontal_margin">48dp</dimen>
+    <dimen name="user_social_progress_bar_padding">6dp</dimen>
+
+    <dimen name="list_user_top_margin">56dp</dimen>
 
     <dimen name="create_guide_hero_icon_size">48dp</dimen>
     <dimen name="create_guide_toolbar_icon_padding">12dp</dimen>
@@ -100,6 +106,34 @@
 
     <dimen name="widget_title_size">56dp</dimen>
 
+    <dimen name="message_author_image_size">26dp</dimen>
+    <dimen name="message_author_margin">8dp</dimen>
+    <dimen name="message_outer_horizontal_margin">8dp</dimen>
+    <dimen name="message_horizontal_padding">8dp</dimen>
+    <dimen name="message_vertical_padding">6dp</dimen>
+    <dimen name="message_send_container_horizontal_padding">66dp</dimen>
+    <dimen name="message_receive_container_horizontal_padding">32dp</dimen>
+    <item name="message_default_top_padding" type="dimen" format="float">8</item>
+    <item name="message_contracted_top_padding" type="dimen" format="float">2</item>
+
+    <dimen name="messaging_text_bottom_margin">5dp</dimen>
+    <dimen name="messaging_text_horizontal_padding">12dp</dimen>
+    <dimen name="messaging_outline_vertical_margin">4dp</dimen>
+    <dimen name="messaging_separator_bottom_margin">9dp</dimen>
+    <dimen name="messaging_icon_size">48dp</dimen>
+    <dimen name="messaging_add_guide_image_left_margin">8dp</dimen>
+    <dimen name="messaging_icon_padding">12dp</dimen>
+    <dimen name="messaging_cancel_icon_size">16dp</dimen>
+
+    <dimen name="messaging_guide_padding">12dp</dimen>
+    <dimen name="messaging_guide_send_horizontal_margin">78dp</dimen>
+
+    <dimen name="chat_bubble_corner_radius">8dp</dimen>
+    <dimen name="messaging_bubble_corner_radius">16dp</dimen>
+
+    <dimen name="chat_author_icon_size">32dp</dimen>
+
+    <dimen name="list_author_icon_padding">12dp</dimen>
     <!--
 Refer to App Widget Documentation for margin information
 http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
