@@ -64,7 +64,7 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
 
         // Inflate layout based on ViewType
         switch (viewType) {
-            case AUTHOR_VIEW_TYPE:      layoutId = R.layout.list_item_author_chat;
+            case AUTHOR_VIEW_TYPE:      layoutId = R.layout.list_item_friend;
                 break;
 
             case SEARCH_USER_VIEW_TYPE: layoutId = R.layout.list_item_search_user;

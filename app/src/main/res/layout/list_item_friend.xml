@@ -20,11 +20,12 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/list_author_iv"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:padding="@dimen/list_author_icon_padding"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_width="@dimen/chat_author_icon_size"
+            android:layout_height="@dimen/chat_author_icon_size"
             android:src="@drawable/ic_account_circle"
             app:authorImage="@{vm.authorImage}"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -33,6 +34,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@{vm.name}"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             app:layout_constraintStart_toEndOf="@id/list_author_iv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
