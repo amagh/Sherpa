@@ -45,11 +45,13 @@ import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideDatabase;
 import project.sherpa.databinding.FragmentUserBinding;
 import project.sherpa.models.datamodels.Author;
+import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.Rating;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.ui.activities.AccountActivity;
+import project.sherpa.ui.activities.MessageActivity;
 import project.sherpa.ui.activities.SelectAreaTrailActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.activities.MainActivity;
@@ -68,6 +70,7 @@ import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
+import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
@@ -175,8 +178,10 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                 mAuthor = getArguments().getParcelable(AUTHOR_KEY);
 
                 // Add the Author to the Adapter so their info can be displayed
+                AuthorViewModel vm = new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor);
+                mBinding.setVm(vm);
+                mAdapter.setAuthorViewModel(vm);
                 mAdapter.addModel(mAuthor);
-                mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor));
 
                 // Load the Guides that the Author has created into the Adapter
                 loadGuidesForAuthor();
