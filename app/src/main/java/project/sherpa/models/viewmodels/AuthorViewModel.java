@@ -451,7 +451,7 @@ public class AuthorViewModel extends BaseObservable {
             Intent intent = new Intent(mActivity.get(), ChatActivity.class);
             getFragment().startActivity(intent);
         } else {
-            Toast.makeText(mActivity.get(), "Test", Toast.LENGTH_SHORT).show();
+            getFragment().startMessageActivityToUser();
         }
     }
 

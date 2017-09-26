@@ -669,6 +669,48 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         });
     }
 
+    /**
+     * Starts the MessageActivity with the User whose profile the user is viewing
+     */
+    public void startMessageActivityToUser() {
+
+        // Add the members that would be in the Chat to a List and check if there is a duplicate Chat
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        final List<String> chatMembers = new ArrayList<>();
+        chatMembers.add(user.getUid());
+        chatMembers.add(mAuthor.firebaseId);
+
+        Chat.checkDuplicateChats(chatMembers, new FirebaseProviderUtils.FirebaseListener() {
+            @Override
+            public void onModelReady(BaseModel model) {
+
+                Chat chat;
+
+                if (model == null) {
+                    // No duplicate Chat. Start a new Chat with the user
+
+                    chat = new Chat();
+                    chat.generateFirebaseId();
+                    chat.setActiveMembers(chatMembers);
+                    chat.setAllMembers(chatMembers);
+                    chat.setGroup(chatMembers.size() > 2);
+                } else {
+
+                    // Start the duplicate Chat
+                    chat = (Chat) model;
+                }
+
+                Intent intent = new Intent(getActivity(), MessageActivity.class);
+                intent.putExtra(CHAT_KEY, chat.firebaseId);
+
+                DataCache.getInstance().store(chat);
+
+                startActivity(intent);
+            }
+        });
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
