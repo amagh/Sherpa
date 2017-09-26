@@ -109,6 +109,7 @@
                 android:layout_width="@dimen/user_social_icon_size"
                 android:layout_height="@dimen/user_social_icon_size"
                 android:src="@drawable/ic_message_circle"
+                android:onClick="@{vm::onClickMessage}"
                 app:layout_constraintStart_toEndOf="@id/user_author_iv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>

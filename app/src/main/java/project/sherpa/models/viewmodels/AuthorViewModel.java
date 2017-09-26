@@ -8,6 +8,7 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.net.Uri;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -41,11 +42,10 @@ import project.sherpa.models.datamodels.Author;
 import project.sherpa.ui.activities.ChatActivity;
 import project.sherpa.ui.behaviors.VanishingBehavior;
 import project.sherpa.ui.fragments.UserFragment;
+import project.sherpa.utilities.Constants;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.GeneralUtils;
-import timber.log.Timber;
 
-import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_ACCOUNT;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
 import static project.sherpa.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
@@ -57,6 +57,7 @@ import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
  */
 
 public class AuthorViewModel extends BaseObservable {
+
     // ** Member Variables ** //
     private Author mAuthor;
     private WeakReference<AppCompatActivity> mActivity;
@@ -81,10 +82,8 @@ public class AuthorViewModel extends BaseObservable {
         if (mActivity.get() == null) return null;
 
         // Retrieve the Fragment using the FragmentManager
-        UserFragment fragment = (UserFragment) mActivity.get().getSupportFragmentManager()
-                .findFragmentByTag(FRAG_TAG_ACCOUNT);
-
-        return fragment;
+        return (UserFragment) mActivity.get().getSupportFragmentManager()
+                .findFragmentByTag(Constants.FragmentTags.FRAG_TAG_USER);
     }
 
     @Bindable
@@ -396,15 +395,6 @@ public class AuthorViewModel extends BaseObservable {
         }
     }
 
-    @Bindable
-    public int getSocialVisibility() {
-        if (mEditMode) {
-            return View.GONE;
-        } else {
-            return View.VISIBLE;
-        }
-    }
-
     public void onClickEdit(View view) {
 
         // Switch the layout between edit and display
@@ -455,20 +445,13 @@ public class AuthorViewModel extends BaseObservable {
      */
     public void onClickMessage(View view) {
 
-        // Check to see if the user clicked the messaging icon on their own profile or anothers
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (mAuthor.firebaseId.equals(user.getUid())) {
-
-            // Open the MessageActivity
+        if (user != null && user.getUid().equals(mAuthor.firebaseId)) {
             Intent intent = new Intent(mActivity.get(), ChatActivity.class);
-            mActivity.get().startActivity(intent);
+            getFragment().startActivity(intent);
         } else {
-            Toast.makeText(
-                    mActivity.get(),
-                    "Test",
-                    Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(mActivity.get(), "Test", Toast.LENGTH_SHORT).show();
         }
     }
 
