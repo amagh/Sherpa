@@ -18,7 +18,7 @@ import project.sherpa.ui.fragments.SavedGuidesFragment;
 import project.sherpa.ui.fragments.SearchFragment;
 import project.sherpa.ui.fragments.UserFragment;
 
-import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_ACCOUNT;
+import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_USER;
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_FAVORITE;
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_HOME;
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_SAVED_GUIDES;
@@ -53,7 +53,7 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
                     break;
                 case R.id.navigation_account:
                     fragment = new UserFragment();
-                    tag = FRAG_TAG_ACCOUNT;
+                    tag = FRAG_TAG_USER;
                     break;
 
                 case R.id.navigation_favorites:

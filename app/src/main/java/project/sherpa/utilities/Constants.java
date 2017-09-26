@@ -24,7 +24,7 @@ public class Constants {
 
         public static final String FRAG_TAG_HOME            = "home_frag";
         public static final String FRAG_TAG_SEARCH          = "search_frag";
-        public static final String FRAG_TAG_ACCOUNT         = "account_frag";
+        public static final String FRAG_TAG_USER            = "user_frag";
         public static final String FRAG_TAG_FAVORITE        = "favorite_frag";
         public static final String FRAG_TAG_SAVED_GUIDES    = "saved_guides_frag";
         public static final String FRAG_TAG_MESSAGES        = "message_tag";

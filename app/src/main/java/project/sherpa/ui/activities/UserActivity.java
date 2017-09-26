@@ -9,7 +9,7 @@ import project.sherpa.ui.fragments.UserFragment;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 
-import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_ACCOUNT;
+import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_USER;
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 
 /**
@@ -36,7 +36,7 @@ public class UserActivity extends ConnectivityActivity {
                 UserFragment fragment = UserFragment.newInstance(author);
 
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container, fragment, FRAG_TAG_ACCOUNT)
+                        .add(R.id.fragment_container, fragment, FRAG_TAG_USER)
                         .commit();
             } else {
                 loadAuthorFromFirebase(authorId);
