@@ -79,8 +79,9 @@
     <dimen name="user_edit_icon_size">32dp</dimen>
     <dimen name="user_edit_icon_padding">4dp</dimen>
     <dimen name="user_social_icon_size">32dp</dimen>
-    <dimen name="user_social_icon_padding">24dp</dimen>
+    <dimen name="user_social_icon_padding">8dp</dimen>
     <dimen name="user_social_icon_horizontal_margin">48dp</dimen>
+    <dimen name="user_social_progress_bar_padding">6dp</dimen>
 
     <dimen name="list_user_top_margin">56dp</dimen>
 

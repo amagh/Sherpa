@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.databinding.library.baseAdapters.BR;
@@ -674,6 +676,9 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
      */
     public void startMessageActivityToUser() {
 
+        // Show ProgressBar
+        mBinding.userMessagePb.setVisibility(View.VISIBLE);
+
         // Add the members that would be in the Chat to a List and check if there is a duplicate Chat
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -707,6 +712,8 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                 DataCache.getInstance().store(chat);
 
                 startActivity(intent);
+
+                mBinding.userMessagePb.setVisibility(View.GONE);
             }
         });
     }
