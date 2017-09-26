@@ -141,22 +141,29 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
             // Retrieve the FirebaseId of the Chat to retrieve messages for
             String chatId = GuideProvider.getIdFromUri((Uri) args.getParcelable(CHAT_KEY));
+            final Chat chat   = (Chat) DataCache.getInstance().get(chatId);
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
                 mAuthor = (Author) DataCache.getInstance().get(user.getUid());
+
+                if (mAuthor == null) {
+                    FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
+                        @Override
+                        public void onModelReady(BaseModel model) {
+                            mAuthor = (Author) model;
+
+                            if (mAuthor != null) {
+                                // Set the Chat for the Fragment
+                                startChat(chat);
+                            }
+                        }
+                    });
+                } else {
+                    // Set the Chat for the Fragment
+                    startChat(chat);
+                }
             }
-
-            // Set the Chat for the Fragment
-            Chat chat = (Chat) DataCache.getInstance().get(chatId);
-            setChat(chat);
-
-            setMessageBinding();
-        }
-
-        // If the device user is the only member of the chat, then set up the
-        if (mChat.getActiveMembers().size() == 1) {
-            mChatViewModel.setAddMember(true);
         }
 
         return mBinding.getRoot();
@@ -271,13 +278,15 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
      */
     private void setMessageListener() {
 
-        if (mChatReference == null) {
+        if (mChatReference == null && mChat != null) {
             mChatReference = FirebaseDatabase.getInstance().getReference()
                     .child(GuideDatabase.CHATS)
                     .child(mChat.firebaseId);
         }
 
-        mChatReference.addValueEventListener(mMessageListener);
+        if (mChatReference != null) {
+            mChatReference.addValueEventListener(mMessageListener);
+        }
     }
 
     /**
@@ -363,6 +372,11 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         }
     }
 
+    private void startChat(Chat chat) {
+        setChat(chat);
+        setMessageBinding();
+    }
+
     /**
      * Sets the Chat to be used for this Fragment to retrieve messages for
      *
@@ -386,6 +400,9 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         mChat = chat;
         getNewMessagesSinceLastChat();
         setChatBinding();
+
+        // Start listening for messages
+        setMessageListener();
 
         setActionBar();
     }
