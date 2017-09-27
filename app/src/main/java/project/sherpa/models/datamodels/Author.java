@@ -9,6 +9,11 @@ import android.support.annotation.IntDef;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,9 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import project.sherpa.data.GuideContract;
+import project.sherpa.data.GuideDatabase;
 import project.sherpa.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 7/17/2017.
@@ -197,60 +204,74 @@ public class Author extends BaseModelWithImage implements Parcelable {
      * @param listType    The type of List to modify
      * @param userId      The FirebaseId of the user to be added to the List
      */
-    public void addUserToList(@AuthorLists int listType, String userId) {
+    public void addUserToList(@AuthorLists final int listType, final String userId) {
 
-        // Get a reference to the List that will be modified
-        List<String> list = null;
+        // Init the Handler for the Firebase Transaction
+        Transaction.Handler handler = new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
 
-        // Reference the List based on the listType
-        switch (listType) {
-            case AuthorLists.FRIENDS:           list = friends;
-                break;
-            case AuthorLists.FOLLOWING:         list = following;
-                break;
-            case AuthorLists.FOLLOWERS:         list = followers;
-                break;
-            case AuthorLists.SENT_REQUESTS:     list = sentRequests;
-                break;
-            case AuthorLists.RECEIVED_REQUESTS: list = receivedRequests;
-                break;
-        }
+                // Convert the data to an Author
+                Author author = mutableData.getValue(Author.class);
 
-        // Init the List if it does not exist
-        if (list == null) {
-            list = new ArrayList<>();
-        }
+                if (author == null) {
 
-        // Boolean check for whether to update the Firebase profile
-        boolean update = false;
+                    // Weird glitch, re-run the transaction with the same parameters
+                    addUserToList(listType, userId);
+                    return Transaction.abort();
+                }
 
-        // Add the user to the List
-        if (!list.contains(userId)) {
-            list.add(userId);
+                // Get a reference to the List that will be modified
+                List<String> list = null;
 
-            update = true;
-        }
+                // Reference the List based on the listType
+                switch (listType) {
+                    case AuthorLists.FOLLOWING:         list = author.getFollowing();
+                        break;
+                    case AuthorLists.FOLLOWERS:         list = author.getFollowers();
+                        break;
+                    case AuthorLists.SENT_REQUESTS:     list = author.getSentRequests();
+                        break;
+                    case AuthorLists.RECEIVED_REQUESTS: list = author.getReceivedRequests();
+                        break;
+                }
 
-        if (listType == AuthorLists.RECEIVED_REQUESTS && sentRequests.contains(userId) ||
-                listType == AuthorLists.SENT_REQUESTS && receivedRequests.contains(userId)) {
+                // Init the List if it does not exist
+                if (list == null) {
+                    list = new ArrayList<>();
+                }
 
-            // If user has both sent and received a request for this user, accept the request and
-            // become friends
-            acceptUserAsFriend(userId);
+                // Add the user to the List
+                if (!list.contains(userId)) list.add(userId);
 
-            // Do not update the Firebase profile as it will be updated in of the methods called by
-            // acceptUserAsFriend()
-            update = false;
-        }
+                if (listType == AuthorLists.RECEIVED_REQUESTS && sentRequests.contains(userId) ||
+                        listType == AuthorLists.SENT_REQUESTS && receivedRequests.contains(userId)) {
 
-        if (listType == AuthorLists.FRIENDS) {
-            // Do not update the Firebase profile as it will be updated in of the methods called by
-            // acceptUserAsFriend()
-            update = false;
-        }
+                    // If user has both sent and received a request for this user, accept the request and
+                    // become friends
+                    author.getFriends().add(userId);
+                    author.getSentRequests().remove(userId);
+                    author.getReceivedRequests().remove(userId);
+                    if (author.getFollowing().contains(userId)) author.getFollowing().remove(userId);
+                }
 
-        // Update the author's profile in Firebase
-        if (update) FirebaseProviderUtils.insertOrUpdateModel(this);
+                mutableData.setValue(author.toMap());
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                if (databaseError != null) {
+                    Timber.e("Error adding user to list: " + databaseError.getDetails());
+                }
+            }
+        };
+
+        // Run the update operation as a Transaction
+        FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.AUTHORS)
+                .child(firebaseId)
+                .runTransaction(handler);
     }
 
     /**
@@ -259,64 +280,64 @@ public class Author extends BaseModelWithImage implements Parcelable {
      * @param listType    The type of List to remove the user from
      * @param userId      The FirebaseId of the user to be removed
      */
-    public void removeUserFromList(@AuthorLists int listType, String userId) {
+    public void removeUserFromList(@AuthorLists final int listType, final String userId) {
 
-        // Get a reference to the List that will be modified
-        List<String> list = null;
+        // Init the Handler for the Firebase Transaction
+        Transaction.Handler handler = new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
 
-        // Reference the List based on the listType
-        switch (listType) {
-            case AuthorLists.FRIENDS:           list = friends;
-                break;
-            case AuthorLists.FOLLOWING:         list = following;
-                break;
-            case AuthorLists.FOLLOWERS:         list = followers;
-                break;
-            case AuthorLists.SENT_REQUESTS:     list = sentRequests;
-                break;
-            case AuthorLists.RECEIVED_REQUESTS: list = receivedRequests;
-                break;
-        }
+                // Convert the data to an Author
+                Author author = mutableData.getValue(Author.class);
 
-        if (list == null) return;
+                if (author == null) {
 
-        // Boolean check for whether to update the Firebase profile
-        boolean update = false;
+                    // Weird glitch, re-run the transaction with the same parameters
+                    removeUserFromList(listType, userId);
+                    return Transaction.abort();
+                }
 
-        // Remove the userId from the List
-        if (list.contains(userId)) {
-            list.remove(userId);
+                // Get a reference to the List that will be modified
+                List<String> list = null;
 
-            update = true;
-        }
+                // Reference the List based on the listType
+                switch (listType) {
+                    case AuthorLists.FRIENDS:           list = author.getFriends();
+                        break;
+                    case AuthorLists.FOLLOWING:         list = author.getFollowing();
+                        break;
+                    case AuthorLists.FOLLOWERS:         list = author.getFollowers();
+                        break;
+                    case AuthorLists.SENT_REQUESTS:     list = author.getSentRequests();
+                        break;
+                    case AuthorLists.RECEIVED_REQUESTS: list = author.getReceivedRequests();
+                        break;
+                }
 
-        if (listType == AuthorLists.RECEIVED_REQUESTS && sentRequests.contains(userId) ||
-                listType == AuthorLists.SENT_REQUESTS && receivedRequests.contains(userId)) {
+                if (list == null) return Transaction.abort();
 
-            // Do not update the Firebase profile as it will be updated by another method
-            update = false;
-        }
+                // Remove the userId from the List
+                if (list.contains(userId)) {
+                    list.remove(userId);
+                }
 
-        if (update) FirebaseProviderUtils.insertOrUpdateModel(this);
-    }
+                mutableData.setValue(author.toMap());
+                return Transaction.success(mutableData);
+            }
 
-    /**
-     * Accepts the user as a friend and adds them to the friends list
-     *
-     * @param friendId    The FirebaseId of the user to add to the friend list
-     */
-    private void acceptUserAsFriend(String friendId) {
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                if (databaseError != null) {
+                    Timber.e("Error removing user from list: " + databaseError.getDetails());
+                }
+            }
+        };
 
-        // Check whether the user has both sent and received a request to this user
-        if (receivedRequests.contains(friendId) && sentRequests.contains(friendId)) {
-
-            // Add the user to the friends list
-            addUserToList(AuthorLists.FRIENDS, friendId);
-
-            // Remove the user from the requests lists
-            removeUserFromList(AuthorLists.SENT_REQUESTS, friendId);
-            removeUserFromList(AuthorLists.RECEIVED_REQUESTS, friendId);
-        }
+        // Run the update operation as a Transaction
+        FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.AUTHORS)
+                .child(firebaseId)
+                .runTransaction(handler);
     }
 
     //********************************************************************************************//
