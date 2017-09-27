@@ -2,7 +2,6 @@ package project.sherpa.ui.fragments;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +16,7 @@ import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.ui.adapters.FriendAdapter;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
+import project.sherpa.ui.fragments.abstractfragments.BaseFriendFragment;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 
@@ -24,27 +24,16 @@ import project.sherpa.utilities.FirebaseProviderUtils;
  * Created by Alvin on 9/26/2017.
  */
 
-public class FriendFragment extends ConnectivityFragment {
+public class FriendFragment extends BaseFriendFragment {
 
     // ** Member Variables ** //
-    private FragmentFriendBinding mBinding;
     private FriendAdapter mAdapter;
-    private Author mUser;
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_friend, container, false);
-
-        initRecyclerView();
-        loadUser();
-
-        return mBinding.getRoot();
-    }
 
     /**
      * Initializes the RecyclerView and its components
      */
-    private void initRecyclerView() {
+    @Override
+    protected void initRecyclerView() {
         mAdapter = new FriendAdapter(new ClickHandler<Author>() {
             @Override
             public void onClick(Author clickedItem) {
@@ -58,31 +47,14 @@ public class FriendFragment extends ConnectivityFragment {
     /**
      * Loads the user's profile
      */
-    private void loadUser() {
-
-        // Attempt to retrieve the user from the cache
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) return;
-
-        mUser = (Author) DataCache.getInstance().get(user.getUid());
+    @Override
+    protected void loadUser() {
+        super.loadUser();
 
         if (mUser != null) {
 
             // Load the friends list for this user
             loadFriendsList(mUser);
-        } else {
-
-            // User's profile was not stored in cache. Load it from Firebase
-            FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
-                @Override
-                public void onModelReady(BaseModel model) {
-                    if (model == null) return;
-
-                    // Store the user in cache and recursively call the loadUser function
-                    DataCache.getInstance().store(model);
-                    loadUser();
-                }
-            });
         }
     }
 
