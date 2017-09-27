@@ -230,8 +230,11 @@
 
     <!-- Friend Follow Strings -->
     <string name="friend_follow_friend_request_text">Send a Friend Request</string>
+    <string name="friend_follow_respond_friend_request_text">Respond to Friend  Request</string>
+    <string name="friend_follow_un_friend_text">Un-friend this User</string>
     <string name="friend_follow_friend_description_text">Friends can see the private guides made by the author</string>
     <string name="friend_follow_follow_text">Follow this Author</string>
+    <string name="friend_follow_un_follow_text">Stop Following this Author</string>
     <string name="friend_follow_follow_description_text">Find out when this author releases a new guide</string>
     
     <!-- Dummy text for testing purposes -->

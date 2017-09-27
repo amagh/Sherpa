@@ -4,98 +4,111 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.constraint.ConstraintLayout
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.FriendFollowViewModel"/>
+    </data>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/friend_follow_tb"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:background="@color/colorPrimary"/>
 
-        <FrameLayout
-            android:id="@+id/friend_follow_friend_fl"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/friend_follow_friend_cl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/friend_follow_tb"
-            android:background="?attr/selectableItemBackground"/>
+            android:background="?attr/selectableItemBackground">
 
-        <TextView
-            android:id="@+id/friend_follow_friend_tv"
-            android:layout_width="0dp"
+            <TextView
+                android:id="@+id/friend_follow_friend_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@{vm.friendRequestText}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/friend_follow_friend_cl"
+                tools:text="@string/friend_follow_friend_request_text"
+                style="@style/TextAppearance.AppCompat.Body1"/>
+
+            <TextView
+                android:id="@+id/friend_follow_friend_description_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:text="@string/friend_follow_friend_description_text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/friend_follow_friend_tv"
+                app:layout_constraintBottom_toBottomOf="parent"
+                style="@style/TextAppearance.AppCompat.Caption" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/friend_follow_follow_cl"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:text="@string/friend_follow_friend_request_text"
+            android:visibility="@{vm.followVisibility}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/friend_follow_friend_fl"
-            app:layout_constraintBottom_toTopOf="@+id/friend_follow_friend_description_tv"
-            app:layout_constraintVertical_chainStyle="packed"
-            style="@style/TextAppearance.AppCompat.Body1"/>
+            app:layout_constraintTop_toBottomOf="@id/friend_follow_friend_cl"
+            android:background="?attr/selectableItemBackground">
 
-        <TextView
-            android:id="@+id/friend_follow_friend_description_tv"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:text="@string/friend_follow_friend_description_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/friend_follow_friend_tv"
-            app:layout_constraintBottom_toBottomOf="@id/friend_follow_friend_fl"
-            style="@style/TextAppearance.AppCompat.Caption"/>
+            <TextView
+                android:id="@+id/friend_follow_follow_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@{vm.followText}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/friend_follow_follow_cl"
+                app:layout_constraintBottom_toTopOf="@+id/friend_follow_follow_description_tv"
+                app:layout_constraintVertical_chainStyle="packed"
+                style="@style/TextAppearance.AppCompat.Body1"
+                tools:text="@string/friend_follow_follow_text"/>
 
-        <FrameLayout
-            android:id="@+id/friend_follow_follow_fl"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/friend_follow_friend_fl"
-            android:background="?attr/selectableItemBackground"/>
+            <TextView
+                android:id="@+id/friend_follow_follow_description_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:text="@string/friend_follow_follow_description_text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/friend_follow_follow_tv"
+                app:layout_constraintBottom_toBottomOf="@id/friend_follow_follow_cl"
+                style="@style/TextAppearance.AppCompat.Caption"/>
 
-        <TextView
-            android:id="@+id/friend_follow_follow_tv"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:text="@string/friend_follow_follow_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/friend_follow_follow_fl"
-            app:layout_constraintBottom_toTopOf="@id/friend_follow_follow_description_tv"
-            app:layout_constraintVertical_chainStyle="packed"
-            style="@style/TextAppearance.AppCompat.Body1"/>
-
-        <TextView
-            android:id="@+id/friend_follow_follow_description_tv"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:text="@string/friend_follow_follow_description_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/friend_follow_follow_tv"
-            app:layout_constraintBottom_toBottomOf="@id/friend_follow_follow_fl"
-            style="@style/TextAppearance.AppCompat.Caption"/>
-
-    </android.support.constraint.ConstraintLayout>
+        </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
 </layout>
