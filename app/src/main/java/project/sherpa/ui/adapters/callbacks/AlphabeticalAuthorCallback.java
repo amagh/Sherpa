@@ -27,6 +27,6 @@ public class AlphabeticalAuthorCallback extends SortedListAdapterCallback<Author
 
     @Override
     public boolean areItemsTheSame(Author item1, Author item2) {
-        return item1 == item2;
+        return item1.firebaseId.equals(item2.firebaseId);
     }
 }
