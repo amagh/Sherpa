@@ -14,6 +14,7 @@ import project.sherpa.R;
 import project.sherpa.databinding.ListItemFriendBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.viewmodels.AuthorViewModel;
+import project.sherpa.ui.adapters.callbacks.AlphabeticalAuthorCallback;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
 
 /**
@@ -23,22 +24,7 @@ import project.sherpa.ui.adapters.interfaces.ClickHandler;
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
 
     // ** Member Variables ** //
-    private SortedListAdapterCallback<Author> mSortedCallback = new SortedListAdapterCallback<Author>(this) {
-        @Override
-        public int compare(Author o1, Author o2) {
-            return o1.name.compareTo(o2.name);
-        }
-
-        @Override
-        public boolean areContentsTheSame(Author oldItem, Author newItem) {
-            return oldItem.firebaseId.equals(newItem.firebaseId);
-        }
-
-        @Override
-        public boolean areItemsTheSame(Author item1, Author item2) {
-            return item1 == item2;
-        }
-    };
+    private SortedListAdapterCallback<Author> mSortedCallback = new AlphabeticalAuthorCallback(this);
     private SortedList<Author> mSortedList = new SortedList<>(Author.class, mSortedCallback);
     private ClickHandler<Author> mClickHandler;
 
