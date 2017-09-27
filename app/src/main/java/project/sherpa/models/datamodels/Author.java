@@ -43,12 +43,14 @@ public class Author extends BaseModelWithImage implements Parcelable {
     public static final String RECEIVED_REQUESTS        = "receivedRequests";
     public static final String SENT_REQUESTS            = "sentRequests";
 
-    @IntDef({AuthorLists.FRIENDS, AuthorLists.FOLLOWING, AuthorLists.SENT_REQUESTS, AuthorLists.RECEIVED_REQUESTS})
+    @IntDef({AuthorLists.FRIENDS, AuthorLists.FOLLOWING, AuthorLists.FOLLOWERS,
+            AuthorLists.SENT_REQUESTS, AuthorLists.RECEIVED_REQUESTS})
     public @interface AuthorLists {
         int FRIENDS             = 0;
         int FOLLOWING           = 1;
-        int SENT_REQUESTS       = 2;
-        int RECEIVED_REQUESTS   = 3;
+        int FOLLOWERS           = 2;
+        int SENT_REQUESTS       = 3;
+        int RECEIVED_REQUESTS   = 4;
     }
 
     // ** Member Variables ** //
@@ -206,6 +208,8 @@ public class Author extends BaseModelWithImage implements Parcelable {
                 break;
             case AuthorLists.FOLLOWING:         list = following;
                 break;
+            case AuthorLists.FOLLOWERS:         list = followers;
+                break;
             case AuthorLists.SENT_REQUESTS:     list = sentRequests;
                 break;
             case AuthorLists.RECEIVED_REQUESTS: list = receivedRequests;
@@ -265,6 +269,8 @@ public class Author extends BaseModelWithImage implements Parcelable {
             case AuthorLists.FRIENDS:           list = friends;
                 break;
             case AuthorLists.FOLLOWING:         list = following;
+                break;
+            case AuthorLists.FOLLOWERS:         list = followers;
                 break;
             case AuthorLists.SENT_REQUESTS:     list = sentRequests;
                 break;
