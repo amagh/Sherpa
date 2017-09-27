@@ -22,6 +22,11 @@ import project.sherpa.ui.adapters.interfaces.ClickHandler;
 
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
+    // ** Constants ** //
+    private static final int FRIEND_VIEW_TYPE           = 0;
+    private static final int RECEIVED_HEADER_VIEW_TYPE  = 1;
+    private static final int SENT_HEADER_VIEW_TYPE      = 2;
+
     // ** Member Variables ** //
     private SortedList.Callback<Author> mSortedCallback = new SortedList.Callback<Author>() {
         @Override
@@ -103,15 +108,29 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     public RequestViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
-        ListItemFriendBinding binding =
-                DataBindingUtil.inflate(inflater, R.layout.list_item_friend, parent, false);
+        int layoutId = -1;
+
+        // Switch layouts based on ViewType
+        switch (viewType) {
+            case FRIEND_VIEW_TYPE:          layoutId = R.layout.list_item_friend;
+                break;
+            case RECEIVED_HEADER_VIEW_TYPE: layoutId = R.layout.header_received_requests;
+                break;
+            case SENT_HEADER_VIEW_TYPE:     layoutId = R.layout.header_sent_requests;
+                break;
+        }
+
+        ViewDataBinding binding =
+                DataBindingUtil.inflate(inflater, layoutId, parent, false);
 
         return new RequestViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(RequestViewHolder holder, int position) {
-        if (position == 0 || position == mReceivedRequestList.size()) return;
+
+        // No data to bind for headers
+        if (position == 0 || position == mReceivedRequestList.size() + 1) return;
 
         holder.bind(position);
     }
@@ -134,10 +153,30 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         return totalSize;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+
+        // Header ViewTypes
+        if (position == 0) return RECEIVED_HEADER_VIEW_TYPE;
+        if (position == mReceivedRequestList.size() + 1) return SENT_HEADER_VIEW_TYPE;
+
+        return FRIEND_VIEW_TYPE;
+    }
+
+    /**
+     * Adds a received request to be displayed by the Adapter
+     *
+     * @param request    Request to be added to the Adapter
+     */
     public void addReceivedRequest(Author request) {
         mReceivedRequestList.add(request);
     }
 
+    /**
+     * Adds a sent request to be displayed by the Adapter
+     *
+     * @param request    Request to be added to the Adapter
+     */
     public void addSentRequest(Author request) {
         mSentRequestList.add(request);
     }
