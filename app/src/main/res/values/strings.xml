@@ -227,6 +227,12 @@
     <string name="page_title_friends">Friends</string>
     <string name="page_title_following">Following</string>
     <string name="page_title_requests">Requests</string>
+
+    <!-- Friend Follow Strings -->
+    <string name="friend_follow_friend_request_text">Send a Friend Request</string>
+    <string name="friend_follow_friend_description_text">Friends can see the private guides made by the author</string>
+    <string name="friend_follow_follow_text">Follow this Author</string>
+    <string name="friend_follow_follow_description_text">Find out when this author releases a new guide</string>
     
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/friend_follow_tb"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@color/colorPrimary"/>
+
+        <FrameLayout
+            android:id="@+id/friend_follow_friend_fl"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/friend_follow_tb"
+            android:background="?attr/selectableItemBackground"/>
+
+        <TextView
+            android:id="@+id/friend_follow_friend_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:text="@string/friend_follow_friend_request_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/friend_follow_friend_fl"
+            app:layout_constraintBottom_toTopOf="@+id/friend_follow_friend_description_tv"
+            app:layout_constraintVertical_chainStyle="packed"
+            style="@style/TextAppearance.AppCompat.Body1"/>
+
+        <TextView
+            android:id="@+id/friend_follow_friend_description_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:text="@string/friend_follow_friend_description_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/friend_follow_friend_tv"
+            app:layout_constraintBottom_toBottomOf="@id/friend_follow_friend_fl"
+            style="@style/TextAppearance.AppCompat.Caption"/>
+
+        <FrameLayout
+            android:id="@+id/friend_follow_follow_fl"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/friend_follow_friend_fl"
+            android:background="?attr/selectableItemBackground"/>
+
+        <TextView
+            android:id="@+id/friend_follow_follow_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:text="@string/friend_follow_follow_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/friend_follow_follow_fl"
+            app:layout_constraintBottom_toTopOf="@id/friend_follow_follow_description_tv"
+            app:layout_constraintVertical_chainStyle="packed"
+            style="@style/TextAppearance.AppCompat.Body1"/>
+
+        <TextView
+            android:id="@+id/friend_follow_follow_description_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:text="@string/friend_follow_follow_description_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/friend_follow_follow_tv"
+            app:layout_constraintBottom_toBottomOf="@id/friend_follow_follow_fl"
+            style="@style/TextAppearance.AppCompat.Caption"/>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>
