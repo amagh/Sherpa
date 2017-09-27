@@ -64,6 +64,7 @@ public class FriendFragment extends BaseFriendFragment {
      * @param user    User to load the friend's list for
      */
     private void loadFriendsList(Author user) {
+        if (user.getFriends() == null) return;
 
         // Get each friend from the friend list and add them to the Adapter
         for (String friendId : user.getFriends()) {

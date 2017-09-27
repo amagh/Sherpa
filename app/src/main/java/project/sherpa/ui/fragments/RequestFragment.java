@@ -53,6 +53,7 @@ public class RequestFragment extends BaseFriendFragment {
      * @param user    The user whose friend requests are to be added
      */
     private void loadReceivedRequests(Author user) {
+        if (user.getReceivedRequests() == null) return;
 
         for (String requestId : user.getReceivedRequests()) {
             FirebaseProviderUtils.getModel(FirebaseProviderUtils.FirebaseType.AUTHOR, requestId,
@@ -73,6 +74,7 @@ public class RequestFragment extends BaseFriendFragment {
      * @param user    The user whose friend requests are to be added
      */
     private void loadSentRequests(Author user) {
+        if (user.getSentRequests() == null) return;
 
         for (String requestId : user.getSentRequests()) {
             FirebaseProviderUtils.getModel(FirebaseProviderUtils.FirebaseType.AUTHOR, requestId,

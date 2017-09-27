@@ -52,6 +52,7 @@ public class FollowingFragment extends BaseFriendFragment {
      * @param user    User to retrieve the follow list from
      */
     private void loadFollowingList(Author user) {
+        if (user.getFollowing() == null) return;
 
         // Get each user from the user's list of people they are following and add them to the
         // Adapter
