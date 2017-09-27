@@ -41,6 +41,7 @@ import project.sherpa.R;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.ui.activities.ChatActivity;
 import project.sherpa.ui.activities.FriendActivity;
+import project.sherpa.ui.activities.FriendFollowActivity;
 import project.sherpa.ui.behaviors.VanishingBehavior;
 import project.sherpa.ui.fragments.UserFragment;
 import project.sherpa.utilities.Constants;
@@ -463,6 +464,8 @@ public class AuthorViewModel extends BaseObservable {
         if (user != null && user.getUid().equals(mAuthor.firebaseId)) {
             Intent intent = new Intent(mActivity.get(), FriendActivity.class);
             getFragment().startActivity(intent);
+        } else {
+            getFragment().startFriendFollowActivity();
         }
     }
 

@@ -53,6 +53,7 @@ import project.sherpa.models.datamodels.Rating;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.ui.activities.AccountActivity;
+import project.sherpa.ui.activities.FriendFollowActivity;
 import project.sherpa.ui.activities.MessageActivity;
 import project.sherpa.ui.activities.SelectAreaTrailActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
@@ -716,6 +717,15 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                 mBinding.userMessagePb.setVisibility(View.GONE);
             }
         });
+    }
+
+    public void startFriendFollowActivity() {
+        Intent intent = new Intent(getActivity(), FriendFollowActivity.class);
+        intent.putExtra(AUTHOR_KEY, mAuthor.firebaseId);
+
+//        DataCache.getInstance().store(mAuthor);
+
+        startActivity(intent);
     }
 
     @Override
