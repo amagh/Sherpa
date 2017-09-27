@@ -39,6 +39,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
     public static final String CHATS                    = "chats";
     public static final String FRIENDS                  = "friends";
     public static final String FOLLOWING                = "following";
+    public static final String FOLLOWERS                = "followers";
     public static final String RECEIVED_REQUESTS        = "receivedRequests";
     public static final String SENT_REQUESTS            = "sentRequests";
 
@@ -59,6 +60,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
     private List<String> chats;
     private List<String> friends;
     private List<String> following;
+    private List<String> followers;
     private List<String> receivedRequests;
     private List<String> sentRequests;
 
@@ -128,6 +130,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
         map.put(CHATS,                  chats);
         map.put(FRIENDS,                friends);
         map.put(FOLLOWING,              following);
+        map.put(FOLLOWERS,              followers);
         map.put(RECEIVED_REQUESTS,      receivedRequests);
         map.put(SENT_REQUESTS,          sentRequests);
 
@@ -330,6 +333,10 @@ public class Author extends BaseModelWithImage implements Parcelable {
         return following;
     }
 
+    public List<String> getFollowers() {
+        return followers;
+    }
+
     public List<String> getReceivedRequests() {
         return receivedRequests;
     }
@@ -352,6 +359,10 @@ public class Author extends BaseModelWithImage implements Parcelable {
 
     public void setFollowing(List<String> following) {
         this.following = following;
+    }
+
+    public void setFollowers(List<String> followers) {
+        this.followers = followers;
     }
 
     public void setReceivedRequests(List<String> receivedRequests) {
