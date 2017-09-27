@@ -100,6 +100,7 @@
                 android:padding="@dimen/user_social_icon_padding"
                 android:src="@drawable/ic_person_add"
                 android:background="@drawable/social_button_background"
+                android:onClick="@{vm::onClickFriend}"
                 app:messageIv="@{userMessageIv}"
                 app:inEditMode="@{vm.inEditMode}"
                 app:layout_constraintStart_toStartOf="parent"
