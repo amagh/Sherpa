@@ -322,6 +322,22 @@ public class Author extends BaseModelWithImage implements Parcelable {
         return chats;
     }
 
+    public List<String> getFriends() {
+        return friends;
+    }
+
+    public List<String> getFollowing() {
+        return following;
+    }
+
+    public List<String> getReceivedRequests() {
+        return receivedRequests;
+    }
+
+    public List<String> getSentRequests() {
+        return sentRequests;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -330,7 +346,23 @@ public class Author extends BaseModelWithImage implements Parcelable {
         this.chats = chats;
     }
 
-//********************************************************************************************//
+    public void setFriends(List<String> friends) {
+        this.friends = friends;
+    }
+
+    public void setFollowing(List<String> following) {
+        this.following = following;
+    }
+
+    public void setReceivedRequests(List<String> receivedRequests) {
+        this.receivedRequests = receivedRequests;
+    }
+
+    public void setSentRequests(List<String> sentRequests) {
+        this.sentRequests = sentRequests;
+    }
+
+    //********************************************************************************************//
     //***************************** Parcelable Related Methods ***********************************//
     //********************************************************************************************//
 
