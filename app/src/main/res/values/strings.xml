@@ -220,6 +220,10 @@
     <string name="toast_error_add_self">Cannot add yourself to the chat</string>
     <string name="toast_error_user_in_chat">User is already in chat</string>
     <string name="toast_error_user_does_not_exist">User does not exist</string>
+
+    <!-- Friend Strings -->
+    <string name="header_received_requests">Friend Requests</string>
+    <string name="header_sent_requests">Sent Requests</string>
     
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
