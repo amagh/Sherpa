@@ -224,6 +224,9 @@
     <!-- Friend Strings -->
     <string name="header_received_requests">Friend Requests</string>
     <string name="header_sent_requests">Sent Requests</string>
+    <string name="page_title_friends">Friends</string>
+    <string name="page_title_following">Following</string>
+    <string name="page_title_requests">Requests</string>
     
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>

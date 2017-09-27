@@ -1,10 +1,14 @@
 package project.sherpa.ui.adapters;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.view.ViewGroup;
+import android.util.SparseArray;
 
+import java.lang.ref.WeakReference;
+
+import project.sherpa.R;
 import project.sherpa.ui.fragments.FollowingFragment;
 import project.sherpa.ui.fragments.FriendFragment;
 import project.sherpa.ui.fragments.RequestFragment;
@@ -15,21 +19,36 @@ import project.sherpa.ui.fragments.RequestFragment;
 
 public class FriendFragmentAdapter extends FragmentPagerAdapter {
 
-    public FriendFragmentAdapter(FragmentManager fragmentManager) {
+    // ** Member Variables ** //
+    private SparseArray<Fragment> fragmentArray = new SparseArray<>();
+    private WeakReference<Context> mContext;
+
+    public FriendFragmentAdapter(Context context, FragmentManager fragmentManager) {
         super(fragmentManager);
+        mContext = new WeakReference<>(context);
     }
 
     @Override
     public Fragment getItem(int position) {
-        switch (position) {
-            case 0:
-                return new FriendFragment();
-            case 1:
-                return new FollowingFragment();
-            case 2:
-                return new RequestFragment();
+
+        // Retrieve the Fragment from the SparseArray
+        Fragment fragment = fragmentArray.get(position);
+
+        // Instantiate the Fragment if it is null
+        if (fragment == null) {
+            switch (position) {
+                case 0: fragmentArray.put(position, new FriendFragment());
+                    break;
+                case 1: fragmentArray.put(position, new FollowingFragment());
+                    break;
+                case 2: fragmentArray.put(position, new RequestFragment());
+                    break;
+            }
+
+            return getItem(position);
+        } else {
+            return fragment;
         }
-        return null;
     }
 
     @Override
@@ -41,11 +60,11 @@ public class FriendFragmentAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "Friends";
+                return mContext.get().getString(R.string.page_title_friends);
             case 1:
-                return "Following";
+                return mContext.get().getString(R.string.page_title_following);
             case 2:
-                return "Friend Requests";
+                return mContext.get().getString(R.string.page_title_requests);
         }
 
         return super.getPageTitle(position);
