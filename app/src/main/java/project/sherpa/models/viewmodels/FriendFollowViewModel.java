@@ -4,6 +4,7 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.view.View;
+import android.widget.Toast;
 
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Author;
@@ -30,8 +31,6 @@ public class FriendFollowViewModel extends BaseObservable {
     @Bindable
     public String getFriendRequestText() {
 
-        Timber.d("Add Friend Request Text");
-
         // Change the text for the Friend Request option
         if (mSendingUser.getFriends() != null &&
                 mSendingUser.getFriends().contains(mReceivingUser.firebaseId)) {
@@ -55,7 +54,7 @@ public class FriendFollowViewModel extends BaseObservable {
     @Bindable
     public int getFollowVisibility() {
 
-        if (mSendingUser == null) {
+        if (mSendingUser == null || mReceivingUser == null) {
             return View.GONE;
         }
 
@@ -67,6 +66,15 @@ public class FriendFollowViewModel extends BaseObservable {
             return View.GONE;
         } else {
 
+            return View.VISIBLE;
+        }
+    }
+
+    @Bindable
+    public int getFriendVisibility() {
+        if (mSendingUser == null || mReceivingUser == null) {
+            return View.GONE;
+        } else {
             return View.VISIBLE;
         }
     }
@@ -99,19 +107,21 @@ public class FriendFollowViewModel extends BaseObservable {
             mSendingUser.removeUserFromList(FRIENDS, mReceivingUser.firebaseId);
             mReceivingUser.removeUserFromList(FRIENDS, mSendingUser.firebaseId);
         } else if (mSendingUser.getReceivedRequests() != null &&
-                !mSendingUser.getReceivedRequests().contains(mReceivingUser.firebaseId)){
+                mSendingUser.getReceivedRequests().contains(mReceivingUser.firebaseId)){
+
+
+        } else {
 
             // Add the Friend request to both users' lists
             mSendingUser.addUserToList(SENT_REQUESTS, mReceivingUser.firebaseId);
             mReceivingUser.addUserToList(RECEIVED_REQUESTS, mSendingUser.firebaseId);
-        } else if (mSendingUser.getReceivedRequests().contains(mReceivingUser.firebaseId)) {
-
         }
     }
 
     public void onClickFollow(View view) {
 
-        if (mSendingUser.getFollowing().contains(mReceivingUser.firebaseId)) {
+        if (mSendingUser.getFollowing() != null &&
+                mSendingUser.getFollowing().contains(mReceivingUser.firebaseId)) {
 
             // User is already following this Author. Stop following
             mSendingUser.removeUserFromList(FOLLOWING, mReceivingUser.firebaseId);
