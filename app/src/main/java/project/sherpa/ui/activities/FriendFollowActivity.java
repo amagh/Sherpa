@@ -85,6 +85,14 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
     }
 
     /**
+     * Sets the title for the ActionBar
+     */
+    private void initToolbar() {
+        setSupportActionBar(mBinding.friendFollowTb);
+        getSupportActionBar().setTitle(getString(R.string.friend_follow_title, mReceiveUser.getUsername()));
+    }
+
+    /**
      * Loads the Firebase profile for the logged in FirebaseUser
      */
     private synchronized void loadSendUserProfile() {
@@ -159,6 +167,8 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
 
             // ViewModel not instantiated, notify the Thread that mReceiveUser is loaded
             notifyAll();
+
+            initToolbar();
         } else if (mReceiveUser != null) {
 
             // ViewModel is loaded, notify it to update its values

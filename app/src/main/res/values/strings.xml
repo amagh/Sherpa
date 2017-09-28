@@ -229,6 +229,7 @@
     <string name="page_title_requests">Requests</string>
 
     <!-- Friend Follow Strings -->
+    <string name="friend_follow_title">Connect with %s</string>
     <string name="friend_follow_friend_request_text">Send a Friend Request</string>
     <string name="friend_follow_respond_friend_request_text">Respond to Friend  Request</string>
     <string name="friend_follow_un_friend_text">Un-friend this User</string>
@@ -242,6 +243,7 @@
     <string name="accept_friend_request_dialog_accept_text">Accept</string>
     <string name="accept_friend_request_dialog_reject_text">Reject</string>
     <string name="accept_friend_request_dialog_message_text">Accept friend request from %s ?</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 
