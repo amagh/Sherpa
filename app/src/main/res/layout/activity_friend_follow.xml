@@ -19,10 +19,11 @@
             android:id="@+id/friend_follow_tb"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:onClick="@{vm::onClickFriend}"
+            android:background="@color/colorPrimary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/colorPrimary"/>
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/friend_follow_friend_cl"
@@ -70,10 +71,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="@{vm.followVisibility}"
+            android:onClick="@{vm::onClickFollow}"
+            android:background="?attr/selectableItemBackground"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/friend_follow_friend_cl"
-            android:background="?attr/selectableItemBackground">
+            app:layout_constraintTop_toBottomOf="@id/friend_follow_friend_cl">
 
             <TextView
                 android:id="@+id/friend_follow_follow_tv"
