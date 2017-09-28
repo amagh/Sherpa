@@ -256,11 +256,18 @@ public class Author extends BaseModelWithImage implements Parcelable {
 
                         // If user has both sent and received a request for this user, accept the request and
                         // become friends
+                        if (author.getFriends() == null) author.setFriends(new ArrayList<String>());
                         author.getFriends().add(userId);
+
                         author.getSentRequests().remove(userId);
                         author.getReceivedRequests().remove(userId);
-                        if (author.getFollowing().contains(userId))
+
+                        if (author.getFollowing() != null && author.getFollowing().contains(userId))
                             author.getFollowing().remove(userId);
+
+                        if (author.getFollowers() != null && author.getFollowers().contains(userId)) {
+                            author.getFollowers().remove(userId);
+                        }
                     }
                 }
 
