@@ -86,7 +86,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                 Chat chat = (Chat) FirebaseProviderUtils.getModelFromSnapshot(CHAT, dataSnapshot);
 
                 // Update the database entry for the Chat
-                ContentProviderUtils.insertModel(getActivity(), mChat);
+                ContentProviderUtils.insertModel(getContext(), mChat);
 
                 if (chat == null || chat.getMessageCount() <= mChat.getMessageCount()) return;
 
