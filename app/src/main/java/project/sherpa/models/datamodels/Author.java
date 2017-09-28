@@ -346,6 +346,32 @@ public class Author extends BaseModelWithImage implements Parcelable {
                 .runTransaction(handler);
     }
 
+    /**
+     * Updates the Author with new values from another Author. This can be used to update the
+     * cached Author, allowing it to update all Authors that are referencing the cached Object.
+     *
+     * @param newAuthorValues    Author with the values that are to replace the existing Author
+     */
+    public void updateAuthorValues(Author newAuthorValues) {
+
+        // Check to ensure that the Author values used to replace the current Author has the same
+        // FirebaseId
+        if (!newAuthorValues.firebaseId.equals(firebaseId)) return;
+
+        name                = newAuthorValues.name;
+        username            = newAuthorValues.username;
+        description         = newAuthorValues.description;
+        hasImage            = newAuthorValues.hasImage;
+        score               = newAuthorValues.score;
+        favorites           = newAuthorValues.favorites;
+        chats               = newAuthorValues.chats;
+        friends             = newAuthorValues.friends;
+        following           = newAuthorValues.following;
+        followers           = newAuthorValues.followers;
+        receivedRequests    = newAuthorValues.receivedRequests;
+        sentRequests        = newAuthorValues.sentRequests;
+    }
+
     //********************************************************************************************//
     //************************************ Getters & Setters *************************************//
     //********************************************************************************************//
