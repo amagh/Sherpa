@@ -70,6 +70,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
             super(binding.getRoot());
 
             mBinding = binding;
+            mBinding.getRoot().setOnClickListener(this);
         }
 
         void bind(int position) {
