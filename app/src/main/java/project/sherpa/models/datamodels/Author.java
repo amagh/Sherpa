@@ -250,15 +250,18 @@ public class Author extends BaseModelWithImage implements Parcelable {
                     list.add(userId);
                 }
 
-                if (listType == AuthorLists.RECEIVED_REQUESTS && sentRequests.contains(userId) ||
-                        listType == AuthorLists.SENT_REQUESTS && receivedRequests.contains(userId)) {
+                if (listType == AuthorLists.RECEIVED_REQUESTS || listType == AuthorLists.SENT_REQUESTS) {
+                    if ((author.getSentRequests() != null && author.getSentRequests().contains(userId)) &&
+                            (author.getReceivedRequests() != null && author.getReceivedRequests().contains(userId))) {
 
-                    // If user has both sent and received a request for this user, accept the request and
-                    // become friends
-                    author.getFriends().add(userId);
-                    author.getSentRequests().remove(userId);
-                    author.getReceivedRequests().remove(userId);
-                    if (author.getFollowing().contains(userId)) author.getFollowing().remove(userId);
+                        // If user has both sent and received a request for this user, accept the request and
+                        // become friends
+                        author.getFriends().add(userId);
+                        author.getSentRequests().remove(userId);
+                        author.getReceivedRequests().remove(userId);
+                        if (author.getFollowing().contains(userId))
+                            author.getFollowing().remove(userId);
+                    }
                 }
 
                 mutableData.setValue(author.toMap());
