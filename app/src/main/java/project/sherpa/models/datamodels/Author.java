@@ -226,23 +226,29 @@ public class Author extends BaseModelWithImage implements Parcelable {
 
                 // Reference the List based on the listType
                 switch (listType) {
-                    case AuthorLists.FOLLOWING:         list = author.getFollowing();
+                    case AuthorLists.FOLLOWING:
+                        list = author.getFollowing();
+                        if (list == null) author.setFollowing(list = new ArrayList<>());
                         break;
-                    case AuthorLists.FOLLOWERS:         list = author.getFollowers();
+                    case AuthorLists.FOLLOWERS:
+                        list = author.getFollowers();
+                        if (list == null) author.setFollowers(list = new ArrayList<>());
                         break;
-                    case AuthorLists.SENT_REQUESTS:     list = author.getSentRequests();
+                    case AuthorLists.SENT_REQUESTS:
+                        list = author.getSentRequests();
+                        if (list == null) author.setSentRequests(list = new ArrayList<>());
                         break;
-                    case AuthorLists.RECEIVED_REQUESTS: list = author.getReceivedRequests();
+                    case AuthorLists.RECEIVED_REQUESTS:
+                        list = author.getReceivedRequests();
+                        if (list == null) author.setReceivedRequests(list = new ArrayList<>());
                         break;
                 }
 
-                // Init the List if it does not exist
-                if (list == null) {
-                    list = new ArrayList<>();
-                }
+               if (!list.contains(userId)) {
 
-                // Add the user to the List
-                if (!list.contains(userId)) list.add(userId);
+                    // Add the user to the List
+                    list.add(userId);
+                }
 
                 if (listType == AuthorLists.RECEIVED_REQUESTS && sentRequests.contains(userId) ||
                         listType == AuthorLists.SENT_REQUESTS && receivedRequests.contains(userId)) {
