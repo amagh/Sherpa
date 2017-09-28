@@ -128,10 +128,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
     @Override
     public void onBindViewHolder(RequestViewHolder holder, int position) {
-
-        // No data to bind for headers
-        if (position == 0 || position == mReceivedRequestList.size() + 1) return;
-
         holder.bind(position);
     }
 
@@ -157,8 +153,12 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     public int getItemViewType(int position) {
 
         // Header ViewTypes
-        if (position == 0) return RECEIVED_HEADER_VIEW_TYPE;
-        if (position == mReceivedRequestList.size() + 1) return SENT_HEADER_VIEW_TYPE;
+        if (mReceivedRequestList.size() > 0 && position == 0) {
+            return RECEIVED_HEADER_VIEW_TYPE;
+        } else if ((mReceivedRequestList.size() > 0 && position == mReceivedRequestList.size() + 1) ||
+                mReceivedRequestList.size() == 0 && position == 0) {
+            return SENT_HEADER_VIEW_TYPE;
+        }
 
         return FRIEND_VIEW_TYPE;
     }
@@ -196,16 +196,22 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         void bind(int position) {
 
+            if (getItemViewType() == SENT_HEADER_VIEW_TYPE || getItemViewType() == RECEIVED_HEADER_VIEW_TYPE) {
+                return;
+            }
+
             Author request;
 
             // Get the Author at the modified position
-            if (position < mReceivedRequestList.size() + 1) {
+            if (mReceivedRequestList.size() > 0 && position < mReceivedRequestList.size() + 1) {
 
                 // Take into account the header for received requests
                 request = mReceivedRequestList.get(position - 1);
-            } else {
+            } else if (mReceivedRequestList.size() > 0){
                 // Take into account the headers for received and sent requests
                 request = mSentRequestList.get(position - 2 - mReceivedRequestList.size());
+            } else {
+                request = mSentRequestList.get(position - 1);
             }
 
             AuthorViewModel vm = new AuthorViewModel((AppCompatActivity) mBinding.getRoot().getContext(), request);
