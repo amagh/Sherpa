@@ -1,14 +1,15 @@
 package project.sherpa.models.viewmodels;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Toast;
 
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Author;
-import timber.log.Timber;
+import project.sherpa.ui.dialogs.AcceptFriendRequestDialog;
 
 import static project.sherpa.models.datamodels.Author.AuthorLists.*;
 
@@ -18,6 +19,7 @@ import static project.sherpa.models.datamodels.Author.AuthorLists.*;
 
 public class FriendFollowViewModel extends BaseObservable {
 
+    // ** Member Variables ** //
     private Context mContext;
     private Author mSendingUser;
     private Author mReceivingUser;
@@ -43,12 +45,16 @@ public class FriendFollowViewModel extends BaseObservable {
             // User has already received a friend request from this user. Show text to accept
             return mContext.getString(R.string.friend_follow_respond_friend_request_text);
 
+        } else if (mSendingUser.getSentRequests() != null &&
+                mSendingUser.getSentRequests().contains(mReceivingUser.firebaseId)){
+
+            // User has already sent a request. Show option to cancel request
+            return mContext.getString(R.string.friend_follow_cancel_request);
         } else {
+
             // User has not received a request from this user. Show text to send a request
             return mContext.getString(R.string.friend_follow_friend_request_text);
         }
-
-
     }
 
     @Bindable
@@ -98,7 +104,12 @@ public class FriendFollowViewModel extends BaseObservable {
         }
     }
 
-    public void onClickFriend(View view) {
+    /**
+     * Click response for friend section
+     *
+     * @param view    View that was clicked
+     */
+    public void onClickFriend(final View view) {
 
         if (mSendingUser.getFriends() != null &&
                 mSendingUser.getFriends().contains(mReceivingUser.firebaseId)) {
@@ -107,9 +118,38 @@ public class FriendFollowViewModel extends BaseObservable {
             mSendingUser.removeUserFromList(FRIENDS, mReceivingUser.firebaseId);
             mReceivingUser.removeUserFromList(FRIENDS, mSendingUser.firebaseId);
         } else if (mSendingUser.getReceivedRequests() != null &&
-                mSendingUser.getReceivedRequests().contains(mReceivingUser.firebaseId)){
+                mSendingUser.getReceivedRequests().contains(mReceivingUser.firebaseId)) {
 
+            // Show Dialog confirming friend acceptance
+            AcceptFriendRequestDialog dialog = AcceptFriendRequestDialog.newInstance(
+                    mReceivingUser.getUsername(),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
 
+                            // Accept as friend
+                            mSendingUser.addUserToList(SENT_REQUESTS, mReceivingUser.firebaseId);
+                            mReceivingUser.addUserToList(RECEIVED_REQUESTS, mSendingUser.firebaseId);
+                        }
+                    },
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                            // Remove the request
+                            mSendingUser.removeUserFromList(RECEIVED_REQUESTS, mReceivingUser.firebaseId);
+                            mReceivingUser.removeUserFromList(SENT_REQUESTS, mSendingUser.firebaseId);
+                        }
+                    });
+
+            dialog.show(((AppCompatActivity) view.getContext()).getSupportFragmentManager(), null);
+
+        } else if (mSendingUser.getSentRequests() != null &&
+                mSendingUser.getSentRequests().contains(mReceivingUser.firebaseId)) {
+
+            // Cancel friend request
+            mSendingUser.removeUserFromList(SENT_REQUESTS, mReceivingUser.firebaseId);
+            mReceivingUser.removeUserFromList(RECEIVED_REQUESTS, mSendingUser.firebaseId);
         } else {
 
             // Add the Friend request to both users' lists
@@ -118,6 +158,11 @@ public class FriendFollowViewModel extends BaseObservable {
         }
     }
 
+    /**
+     * Click response for follow section
+     *
+     * @param view    View that was clicked
+     */
     public void onClickFollow(View view) {
 
         if (mSendingUser.getFollowing() != null &&

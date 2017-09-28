@@ -236,6 +236,7 @@
     <string name="friend_follow_follow_text">Follow this Author</string>
     <string name="friend_follow_un_follow_text">Stop Following this Author</string>
     <string name="friend_follow_follow_description_text">Find out when this author releases a new guide</string>
+    <string name="friend_follow_cancel_request">Cancel friend request.</string>
 
     <!-- AcceptFriendRequestDialog Strings -->
     <string name="accept_friend_request_dialog_accept_text">Accept</string>
