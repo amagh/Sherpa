@@ -268,7 +268,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
             @Override
             public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
                 if (databaseError != null) {
-                    Timber.e("Error adding user to list: " + databaseError.getDetails());
+                    Timber.e("Error adding user to list: " + databaseError.getMessage());
                 }
             }
         };
@@ -334,7 +334,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
             @Override
             public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
                 if (databaseError != null) {
-                    Timber.e("Error removing user from list: " + databaseError.getDetails());
+                    Timber.e("Error removing user from list: " + databaseError.getMessage());
                 }
             }
         };
