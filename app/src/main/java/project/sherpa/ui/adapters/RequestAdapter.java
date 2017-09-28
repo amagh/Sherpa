@@ -191,6 +191,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
             if (binding instanceof ListItemFriendBinding) {
                 mBinding = (ListItemFriendBinding) binding;
+                mBinding.getRoot().setOnClickListener(this);
             }
         }
 
@@ -207,7 +208,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
                 // Take into account the header for received requests
                 request = mReceivedRequestList.get(position - 1);
-            } else if (mReceivedRequestList.size() > 0){
+            } else if (mReceivedRequestList.size() > 0) {
                 // Take into account the headers for received and sent requests
                 request = mSentRequestList.get(position - 2 - mReceivedRequestList.size());
             } else {
@@ -225,13 +226,15 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             Author request;
 
             // Get the Author at the modified position
-            if (position < mReceivedRequestList.size() + 1) {
+            if (mReceivedRequestList.size() > 0 && position < mReceivedRequestList.size() + 1) {
 
                 // Take into account the header for received requests
                 request = mReceivedRequestList.get(position - 1);
-            } else {
+            } else if (mReceivedRequestList.size() > 0) {
                 // Take into account the headers for received and sent requests
                 request = mSentRequestList.get(position - 2 - mReceivedRequestList.size());
+            } else {
+                request = mSentRequestList.get(position - 1);
             }
 
             mClickHandler.onClick(request);
