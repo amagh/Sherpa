@@ -31,7 +31,7 @@ import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.ui.activities.AttachActivity;
-import project.sherpa.ui.activities.ConnectivityActivity;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
 import project.sherpa.utilities.DataCache;

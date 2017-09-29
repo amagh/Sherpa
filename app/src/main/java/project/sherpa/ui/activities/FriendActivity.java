@@ -2,16 +2,13 @@ package project.sherpa.ui.activities;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
-import android.view.View;
 
-import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.sherpa.R;
 import project.sherpa.databinding.ActivityFriendBinding;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.adapters.FriendFragmentAdapter;
-import project.sherpa.ui.fragments.abstractfragments.BaseFriendFragment;
 
 /**
  * Created by Alvin on 9/26/2017.

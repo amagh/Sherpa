@@ -1,4 +1,4 @@
-package project.sherpa.ui.activities;
+package project.sherpa.ui.activities.abstractactivities;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

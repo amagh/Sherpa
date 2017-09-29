@@ -14,9 +14,9 @@ import project.sherpa.databinding.ActivityFriendFollowBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.FriendFollowViewModel;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.objects.SmartValueEventListener;
-import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import project.sherpa.R;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.fragments.ChatFragment;
 
 /**
