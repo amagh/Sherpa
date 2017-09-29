@@ -3,6 +3,7 @@ package project.sherpa.models.viewmodels;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
@@ -41,15 +42,14 @@ import project.sherpa.R;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.ui.activities.ChatActivity;
 import project.sherpa.ui.activities.FriendActivity;
-import project.sherpa.ui.activities.FriendFollowActivity;
 import project.sherpa.ui.behaviors.VanishingBehavior;
 import project.sherpa.ui.fragments.UserFragment;
 import project.sherpa.utilities.Constants;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.GeneralUtils;
 
-import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
-import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
+import static project.sherpa.models.viewmodels.AuthorViewModel.FriendIconTypes.*;
+import static project.sherpa.utilities.Constants.RequestCodes.*;
 import static project.sherpa.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
 import static project.sherpa.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
@@ -59,6 +59,15 @@ import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
  */
 
 public class AuthorViewModel extends BaseObservable {
+
+    // ** Constants ** //
+    @IntDef({INVALID, CONNECT, SOCIAL, SOCIAL_WITH_REQUEST})
+    @interface FriendIconTypes {
+        int INVALID                 = -1;
+        int CONNECT                 = 0;
+        int SOCIAL                  = 1;
+        int SOCIAL_WITH_REQUEST     = 2;
+    }
 
     // ** Member Variables ** //
     private Author mAuthor;
@@ -394,6 +403,50 @@ public class AuthorViewModel extends BaseObservable {
                         }
                     })
                     .start();
+        }
+    }
+
+    @Bindable
+    @AuthorViewModel.FriendIconTypes
+    public int getFriendIcon() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) return INVALID;
+
+        if (user.getUid().equals(mAuthor.firebaseId) && mAuthor.getReceivedRequests() != null) {
+            return SOCIAL_WITH_REQUEST;
+        } else if (user.getUid().equals(mAuthor.firebaseId) && mAuthor.getReceivedRequests() == null) {
+            return SOCIAL;
+        } else {
+            return CONNECT;
+        }
+    }
+
+    @BindingAdapter("friendIcon")
+    public static void loadFriendIcon(ImageView friendImageView, @FriendIconTypes int friendIcon) {
+
+        Context context = friendImageView.getContext();
+
+        switch (friendIcon) {
+            case SOCIAL_WITH_REQUEST:
+                friendImageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_group));
+                friendImageView.setBackground(ContextCompat.getDrawable(
+                        context,
+                        R.drawable.social_button_notification_background));
+                break;
+
+            case SOCIAL:
+                friendImageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_group));
+                friendImageView.setBackground(ContextCompat.getDrawable(
+                        context,
+                        R.drawable.social_button_background));
+                break;
+
+            case CONNECT:
+                friendImageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_person_add));
+                friendImageView.setBackground(ContextCompat.getDrawable(
+                        context,
+                        R.drawable.social_button_background));
         }
     }
 
