@@ -97,6 +97,9 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
     @Override
     public void runQueryForUsername(final String query) {
 
+        // Set the Author to null so their information isn't showing when the query changes
+        mViewModel.setAuthor(null);
+
         // Cancel any pending searches
         mHandler.removeCallbacksAndMessages(null);
 
@@ -104,6 +107,7 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
         mHandler.postDelayed(new Runnable() {
                  @Override
                  public void run() {
+
                      FirebaseProviderUtils.queryForUsername(query, new FirebaseProviderUtils.FirebaseListener() {
                          @Override
                          public void onModelReady(BaseModel model) {
@@ -123,8 +127,12 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
 
     @Override
     public void resetAdapter() {
-        mViewModel.setQuery(null);
-        mViewModel.notifyPropertyChanged(BR._all);
+
+        // Cancel any pending searches
+        mHandler.removeCallbacksAndMessages(null);
+
+        // Set Author so it cannot be selected
+        mViewModel.setAuthor(null);
     }
 
     /**
