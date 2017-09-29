@@ -112,8 +112,8 @@
                 android:layout_height="@dimen/user_social_icon_size"
                 android:padding="@dimen/user_social_icon_padding"
                 android:src="@drawable/ic_message"
-                android:background="@drawable/social_button_background"
                 android:onClick="@{vm::onClickMessage}"
+                app:messageIcon="@{vm.messageIcon}"
                 app:layout_constraintStart_toEndOf="@id/user_author_iv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>

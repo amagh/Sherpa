@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -39,18 +40,25 @@ import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.sherpa.R;
+import project.sherpa.data.GuideProvider;
 import project.sherpa.models.datamodels.Author;
+import project.sherpa.models.datamodels.Chat;
+import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.ui.activities.ChatActivity;
 import project.sherpa.ui.activities.FriendActivity;
 import project.sherpa.ui.behaviors.VanishingBehavior;
 import project.sherpa.ui.fragments.UserFragment;
 import project.sherpa.utilities.Constants;
+import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.GeneralUtils;
 
 import static project.sherpa.models.viewmodels.AuthorViewModel.FriendIconTypes.*;
+import static project.sherpa.models.viewmodels.AuthorViewModel.MessageIconTypes.*;
 import static project.sherpa.utilities.Constants.RequestCodes.*;
 import static project.sherpa.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.CHAT;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.MESSAGE;
 import static project.sherpa.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
 
@@ -69,6 +77,12 @@ public class AuthorViewModel extends BaseObservable {
         int SOCIAL_WITH_REQUEST     = 2;
     }
 
+    @IntDef({MESSAGE, NEW_MESSAGE})
+    @interface MessageIconTypes {
+        int MESSAGE     = 0;
+        int NEW_MESSAGE = 1;
+    }
+
     // ** Member Variables ** //
     private Author mAuthor;
     private WeakReference<AppCompatActivity> mActivity;
@@ -76,6 +90,7 @@ public class AuthorViewModel extends BaseObservable {
     private boolean mAccepted = false;
     private boolean mSelected = false;
     private boolean mEditMode = false;
+    private boolean mHasNewMessages = false;
 
     public AuthorViewModel(@NonNull AppCompatActivity activity, @NonNull Author author) {
         mAuthor = author;
@@ -403,6 +418,82 @@ public class AuthorViewModel extends BaseObservable {
                         }
                     })
                     .start();
+        }
+    }
+
+    @Bindable
+    @MessageIconTypes
+    public int getMessageIcon() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // Checks to see whether this process should check for new messages
+        if (user == null) return MESSAGE;
+        if (!user.getUid().equals(mAuthor.firebaseId)) return MESSAGE;
+        if (mAuthor.getChats() == null) return MESSAGE;
+
+        // Boolean is already set to display new messages, no need to check for new messages
+        if (mHasNewMessages) return NEW_MESSAGE;
+
+        for (String chatId : mAuthor.getChats()) {
+
+            // Check if there is a database copy of the Chat
+            Cursor cursor = getFragment().getContext().getContentResolver().query(
+                    GuideProvider.Chats.byId(chatId),
+                    null, null, null, null);
+
+            if (cursor != null) {
+                if (!cursor.moveToFirst()) {
+
+                    // No database version. Must mean there are new messages
+                    return NEW_MESSAGE;
+                }
+
+                // Compare the database Chat with the version on Firebase
+                final Chat databaseChat = Chat.createChatFromCursor(cursor);
+
+                if (databaseChat.getMessageCount() == 0) return NEW_MESSAGE;
+
+                FirebaseProviderUtils.getModel(CHAT, chatId,
+                        new FirebaseProviderUtils.FirebaseListener() {
+                            @Override
+                            public void onModelReady(BaseModel model) {
+                                Chat firebaseChat = (Chat) model;
+
+                                if (firebaseChat.getMessageCount() > databaseChat.getMessageCount()) {
+
+                                    // Firebase version has new messages set boolean and notify
+                                    mHasNewMessages = true;
+                                    notifyPropertyChanged(BR.messageIcon);
+                                }
+                            }
+                        });
+
+                // Close the Cursor
+                cursor.close();
+            } else {
+                return NEW_MESSAGE;
+            }
+        }
+
+        return MESSAGE;
+    }
+
+    @BindingAdapter("messageIcon")
+    public static void loadMessageIcon(ImageView messageImageView, @MessageIconTypes int messageIcon) {
+
+        Context context = messageImageView.getContext();
+        switch (messageIcon) {
+            case MESSAGE:
+                messageImageView.setBackground(ContextCompat.getDrawable(
+                        context,
+                        R.drawable.social_button_background));
+                break;
+
+            case NEW_MESSAGE:
+                messageImageView.setBackground(ContextCompat.getDrawable(
+                        context,
+                        R.drawable.social_button_notification_background));
+                break;
         }
     }
 
