@@ -10,6 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import project.sherpa.R;
 import project.sherpa.databinding.ListItemFriendBinding;
 import project.sherpa.models.datamodels.Author;
@@ -53,12 +57,73 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     }
 
     /**
+     * Sets the data that should be displayed by the Adapter
+     *
+     * @param friends    Array of Authors whose data should be displayed by the Adapter
+     */
+    public void setFriendList(Author[] friends) {
+
+        // Convert the Array to a List and run the overloaded method setFriendList(List)
+        List<Author> friendList = new ArrayList<>(Arrays.asList(friends));
+        setFriendList(friendList);
+    }
+
+    /**
+     * Sets the data that should be displayed by the Adapter
+     *
+     * @param friendList    List of Authors whose data should eb displayed by the Adapter
+     */
+    public void setFriendList(List<Author> friendList) {
+
+        // Start batched updates
+        mSortedList.beginBatchedUpdates();
+
+        // Iterate through the SortedList and check to see if any of the items are in friendList
+        for (int i = mSortedList.size() - 1; i >= 0; i--) {
+            Author listFriend = mSortedList.get(i);
+            boolean exists = false;
+
+            // Check for matches against friendList
+            for (int j = friendList.size() - 1; j >= 0; j--) {
+                Author friend = friendList.get(j);
+
+                if (friend.firebaseId.equals(listFriend.firebaseId)) {
+
+                    // Match found, remove the friend so it is not added to the SortedList
+                    friendList.remove(friend);
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+
+                // Friend is not in friendList, so it should be removed from the Adapter
+                mSortedList.removeItemAt(i);
+            }
+        }
+
+        // Add all missing elements from the friendList
+        mSortedList.addAll(friendList);
+
+        // End batched updates
+        mSortedList.endBatchedUpdates();
+    }
+
+    /**
      * Adds an Author to be displayed in the Adapter
      *
      * @param author    Author to be displayed
      */
     public void addFriend(Author author) {
         mSortedList.add(author);
+    }
+
+    /**
+     * Clears the Adapter
+     */
+    public void clear() {
+        mSortedList.clear();
     }
 
     class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
