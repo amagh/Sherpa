@@ -798,4 +798,10 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         // Hide the ProgressBar as nothing is actually loading
         mBinding.userPb.setVisibility(View.GONE);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mBinding.getVm().notifyPropertyChanged(BR._all);
+    }
 }
