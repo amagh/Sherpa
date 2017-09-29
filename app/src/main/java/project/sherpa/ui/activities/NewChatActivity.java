@@ -20,6 +20,7 @@ import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.SearchUserViewModel;
 import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
+import project.sherpa.ui.activities.interfaces.SearchUserInterface;
 import project.sherpa.ui.adapters.ChatAuthorAdapter;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
@@ -31,7 +32,7 @@ import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
  * Created by Alvin on 9/19/2017.
  */
 
-public class NewChatActivity extends ConnectivityActivity {
+public class NewChatActivity extends ConnectivityActivity implements SearchUserInterface {
 
     // ** Constants ** //
     private static final int SEARCH_DELAY   = 750;
@@ -92,6 +93,7 @@ public class NewChatActivity extends ConnectivityActivity {
      *
      * @param query    Username entered by the user
      */
+    @Override
     public void runQueryForUsername(final String query) {
 
         // Cancel any pending searches
