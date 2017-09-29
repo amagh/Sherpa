@@ -7,4 +7,5 @@ package project.sherpa.ui.activities.interfaces;
 public interface SearchUserInterface {
 
     void runQueryForUsername(String username);
+    void resetAdapter();
 }

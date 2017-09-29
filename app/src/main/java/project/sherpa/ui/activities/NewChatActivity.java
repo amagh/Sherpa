@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import project.sherpa.BR;
 import project.sherpa.R;
 import project.sherpa.databinding.ActivityNewChatBinding;
 import project.sherpa.models.datamodels.Author;
@@ -118,6 +119,12 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
 
         // Filter the friend's list for any friends that match the query
         filter(query);
+    }
+
+    @Override
+    public void resetAdapter() {
+        mViewModel.setQuery(null);
+        mViewModel.notifyPropertyChanged(BR._all);
     }
 
     /**
