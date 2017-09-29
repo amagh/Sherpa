@@ -341,6 +341,10 @@ public class AuthorViewModel extends BaseObservable {
     @BindingAdapter({"messageIv", "inEditMode"})
     public static void animateSocialVisibility(final ImageView friendIv, final ImageView messageIv, boolean inEditMode) {
 
+        // User is not logged in, no social buttons to animate
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
         // Get the parameters for the parent ViewGroup so that the Behavior can be modified
         ConstraintLayout layout = (ConstraintLayout) friendIv.getParent();
         final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
@@ -422,6 +426,18 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @Bindable
+    public int getSocialVisibility() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // Only show social buttons if the user is logged in
+        if (user != null) {
+            return View.VISIBLE;
+        } else {
+            return View.GONE;
+        }
+    }
+
+    @Bindable
     @MessageIconTypes
     public int getMessageIcon() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -432,7 +448,10 @@ public class AuthorViewModel extends BaseObservable {
         if (mAuthor.getChats() == null) return MESSAGE;
 
         // Boolean is already set to display new messages, no need to check for new messages
-        if (mHasNewMessages) return NEW_MESSAGE;
+        if (mHasNewMessages) {
+            mHasNewMessages = false;
+            return NEW_MESSAGE;
+        }
 
         for (String chatId : mAuthor.getChats()) {
 
