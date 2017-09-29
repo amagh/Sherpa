@@ -42,10 +42,9 @@ public class SearchUserViewModel extends BaseObservable {
         // Query Firebase to see if there are any matching users
         if (mQuery.length() > 2) {
             mSearchInterface.runQueryForUsername(query);
+        } else {
+            mSearchInterface.resetAdapter();
         }
-
-        // Set Author so it cannot be selected
-        mAuthor = null;
 
         notifyPropertyChanged(BR.query);
     }
