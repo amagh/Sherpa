@@ -21,6 +21,7 @@ public abstract class SmartValueEventListener implements ValueEventListener {
     private int mType;
     private DatabaseReference mReference;
     private String mFirebaseId;
+    private boolean mStarted;
 
     public SmartValueEventListener(@FirebaseProviderUtils.FirebaseType int type, String firebaseId) {
         mType = type;
@@ -33,11 +34,17 @@ public abstract class SmartValueEventListener implements ValueEventListener {
     }
 
     public void start() {
-        mReference.addValueEventListener(this);
+        if (!mStarted) {
+            mReference.addValueEventListener(this);
+            mStarted = true;
+        }
     }
 
     public void stop() {
-        mReference.removeEventListener(this);
+        if (mStarted) {
+            mReference.removeEventListener(this);
+            mStarted = false;
+        }
     }
 
     public abstract void onModelChange(BaseModel model);
