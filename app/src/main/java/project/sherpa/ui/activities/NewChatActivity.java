@@ -67,7 +67,7 @@ public class NewChatActivity extends ConnectivityActivity {
      */
     private void setupViewModel() {
         mViewModel = new SearchUserViewModel(this);
-        mBinding.setUvm(mViewModel);
+        mBinding.searchUserLayout.setUvm(mViewModel);
     }
 
     /**
@@ -78,8 +78,8 @@ public class NewChatActivity extends ConnectivityActivity {
         // Pass in the shared ViewModel
         mAdapter = new ChatAuthorAdapter(mViewModel);
 
-        mBinding.newChatRv.setLayoutManager(new LinearLayoutManager(this));
-        mBinding.newChatRv.setAdapter(mAdapter);
+        mBinding.searchUserLayout.searchUserRv.setLayoutManager(new LinearLayoutManager(this));
+        mBinding.searchUserLayout.searchUserRv.setAdapter(mAdapter);
     }
 
     private void loadFriends() {

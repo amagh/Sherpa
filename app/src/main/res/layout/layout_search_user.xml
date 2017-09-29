@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="uvm"
+            type="project.sherpa.models.viewmodels.SearchUserViewModel"/>
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <ImageView
+            android:id="@+id/search_user_add_iv"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/places_ic_search"
+            android:padding="@dimen/activity_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <EditText
+            android:id="@+id/search_user_tv"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:inputType="text"
+            android:hint="@string/chat_add_member_hint"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:text="@={uvm.query}"
+            style="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintStart_toEndOf="@id/search_user_add_iv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/search_user_add_iv"
+            app:backgroundTint="@android:color/transparent"/>
+
+        <View
+            android:id="@+id/search_user_separator_v"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/grey_400"
+            app:layout_constraintTop_toBottomOf="@+id/search_user_tv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/search_user_rv"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/search_user_separator_v"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>
