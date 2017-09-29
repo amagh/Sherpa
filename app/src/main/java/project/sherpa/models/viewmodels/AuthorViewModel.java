@@ -91,6 +91,7 @@ public class AuthorViewModel extends BaseObservable {
     private boolean mSelected = false;
     private boolean mEditMode = false;
     private boolean mHasNewMessages = false;
+    private boolean mShowSocialAddButton = false;
 
     public AuthorViewModel(@NonNull AppCompatActivity activity, @NonNull Author author) {
         mAuthor = author;
@@ -431,6 +432,15 @@ public class AuthorViewModel extends BaseObservable {
 
         // Only show social buttons if the user is logged in
         if (user != null) {
+            return View.VISIBLE;
+        } else {
+            return View.GONE;
+        }
+    }
+
+    @Bindable
+    public int getSocialAddButtonVisibility() {
+        if (mShowSocialAddButton) {
             return View.VISIBLE;
         } else {
             return View.GONE;

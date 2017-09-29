@@ -29,6 +29,20 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
+        <ImageView
+            android:id="@+id/list_author_social_iv"
+            android:layout_width="@dimen/chat_author_icon_size"
+            android:layout_height="@dimen/chat_author_icon_size"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:padding="@dimen/list_author_social_icon_padding"
+            android:src="@drawable/ic_person_add"
+            android:tint="@color/grey_700"
+            android:visibility="@{vm.socialAddButtonVisibility}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
         <TextView
             android:id="@+id/list_author_tv"
             android:layout_width="0dp"
@@ -36,8 +50,10 @@
             android:text="@{vm.name}"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             app:layout_constraintStart_toEndOf="@id/list_author_iv"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/list_author_social_iv"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/list_author_username_tv"
             app:layout_constraintVertical_chainStyle="packed"
