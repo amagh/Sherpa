@@ -179,7 +179,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if (oldMessage.firebaseId.equals(message.firebaseId)) {
                 newItem = false;
                 oldMessage.setDate(message.getDate());
-                notifyItemChanged(i);
+                mSortedList.recalculatePositionOfItemAt(i);
                 break;
             }
         }
