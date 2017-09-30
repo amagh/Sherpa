@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 
 import project.sherpa.R;
 import project.sherpa.ads.viewmodels.AdViewModel;
-import project.sherpa.ui.activities.ConnectivityActivity;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 
 /**
  * Created by Alvin on 9/7/2017.

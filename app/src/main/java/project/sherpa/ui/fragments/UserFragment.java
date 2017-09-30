@@ -53,6 +53,7 @@ import project.sherpa.models.datamodels.Rating;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.ui.activities.AccountActivity;
+import project.sherpa.ui.activities.FriendFollowActivity;
 import project.sherpa.ui.activities.MessageActivity;
 import project.sherpa.ui.activities.SelectAreaTrailActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
@@ -718,6 +719,15 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         });
     }
 
+    public void startFriendFollowActivity() {
+        Intent intent = new Intent(getActivity(), FriendFollowActivity.class);
+        intent.putExtra(AUTHOR_KEY, mAuthor.firebaseId);
+
+//        DataCache.getInstance().store(mAuthor);
+
+        startActivity(intent);
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -787,5 +797,11 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
 
         // Hide the ProgressBar as nothing is actually loading
         mBinding.userPb.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mBinding.getVm().notifyPropertyChanged(BR._all);
     }
 }

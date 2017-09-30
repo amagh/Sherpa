@@ -40,6 +40,7 @@ public class Constants {
         public static final String TRAIL_KEY    = "trail";
         public static final String SECTION_KEY  = "section";
         public static final String CHAT_KEY     = "chat";
+        public static final String SEARCH_KEY   = "searchType";
 
     }
 }

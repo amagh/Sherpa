@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import project.sherpa.R;
-import project.sherpa.databinding.ListItemAuthorChatBinding;
+import project.sherpa.databinding.ListItemFriendBinding;
 import project.sherpa.databinding.ListItemSearchUserBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.viewmodels.AuthorViewModel;
@@ -64,7 +64,7 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
 
         // Inflate layout based on ViewType
         switch (viewType) {
-            case AUTHOR_VIEW_TYPE:      layoutId = R.layout.list_item_author_chat;
+            case AUTHOR_VIEW_TYPE:      layoutId = R.layout.list_item_friend;
                 break;
 
             case SEARCH_USER_VIEW_TYPE: layoutId = R.layout.list_item_search_user;
@@ -167,7 +167,7 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
                 // chat
                 vm.setSelected(mSelected.contains(author));
 
-                ((ListItemAuthorChatBinding) mBinding).setVm(vm);
+                ((ListItemFriendBinding) mBinding).setVm(vm);
             } else {
                 ((ListItemSearchUserBinding) mBinding).setVm(mViewModel);
             }

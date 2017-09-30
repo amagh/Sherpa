@@ -27,7 +27,7 @@ import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import project.sherpa.BR;
 import project.sherpa.R;
 import project.sherpa.models.datamodels.PlaceModel;
-import project.sherpa.ui.activities.ConnectivityActivity;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.adapters.PlaceAdapter;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.ui.fragments.SearchFragment;

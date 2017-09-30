@@ -220,7 +220,30 @@
     <string name="toast_error_add_self">Cannot add yourself to the chat</string>
     <string name="toast_error_user_in_chat">User is already in chat</string>
     <string name="toast_error_user_does_not_exist">User does not exist</string>
-    
+
+    <!-- Friend Strings -->
+    <string name="header_received_requests">Friend Requests</string>
+    <string name="header_sent_requests">Sent Requests</string>
+    <string name="page_title_friends">Friends</string>
+    <string name="page_title_following">Following</string>
+    <string name="page_title_requests">Requests</string>
+
+    <!-- Friend Follow Strings -->
+    <string name="friend_follow_title">Connect with %s</string>
+    <string name="friend_follow_friend_request_text">Send a Friend Request</string>
+    <string name="friend_follow_respond_friend_request_text">Respond to Friend  Request</string>
+    <string name="friend_follow_un_friend_text">Un-friend this User</string>
+    <string name="friend_follow_friend_description_text">Friends can see the private guides made by the author</string>
+    <string name="friend_follow_follow_text">Follow this Author</string>
+    <string name="friend_follow_un_follow_text">Stop Following this Author</string>
+    <string name="friend_follow_follow_description_text">Find out when this author releases a new guide</string>
+    <string name="friend_follow_cancel_request">Cancel friend request.</string>
+
+    <!-- AcceptFriendRequestDialog Strings -->
+    <string name="accept_friend_request_dialog_accept_text">Accept</string>
+    <string name="accept_friend_request_dialog_reject_text">Reject</string>
+    <string name="accept_friend_request_dialog_message_text">Accept friend request from %s ?</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 

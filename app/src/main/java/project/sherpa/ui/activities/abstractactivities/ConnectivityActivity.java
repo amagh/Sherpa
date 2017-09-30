@@ -1,4 +1,4 @@
-package project.sherpa.ui.activities;
+package project.sherpa.ui.activities.abstractactivities;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;

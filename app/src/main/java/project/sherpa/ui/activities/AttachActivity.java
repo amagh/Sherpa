@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Message;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.fragments.FavoritesFragment;
 
 import static project.sherpa.models.datamodels.Message.ATTACHMENT_TYPE;

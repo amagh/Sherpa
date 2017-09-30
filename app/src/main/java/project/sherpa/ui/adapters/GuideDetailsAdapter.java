@@ -30,7 +30,7 @@ import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.models.viewmodels.GuideViewModel;
 import project.sherpa.models.viewmodels.RatingViewModel;
 import project.sherpa.models.viewmodels.SectionViewModel;
-import project.sherpa.ui.activities.MapboxActivity;
+import project.sherpa.ui.activities.abstractactivities.MapboxActivity;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 

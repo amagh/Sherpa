@@ -1,9 +1,9 @@
 package project.sherpa.utilities;
 
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
+import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Section;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 
@@ -39,16 +39,35 @@ public class DataCache {
      */
     public void store(BaseModel model) {
 
-        // Create a WeakReference to the data
+        // Create a SoftReference to the data
         SoftReference<BaseModel> dataReference = new SoftReference<>(model);
 
         lock(model);
 
-        // Add the WeakReference to the DataCache
-        mDataMap.put(model.firebaseId, dataReference);
+        // Check to see if model being added to the cache is already in the cache
+        if (mDataMap.get(model.firebaseId) != null && get(model.firebaseId) instanceof Author) {
+
+            // Update the Author with the new values instead of replacing the Author
+            Author cachedAuthor = (Author) get(model.firebaseId);
+            cachedAuthor.updateAuthorValues((Author) model);
+
+        } else {
+            // Add the SoftReference to the DataCache
+            mDataMap.put(model.firebaseId, dataReference);
+        }
     }
 
+    /**
+     * Helper method to keep the Object cached for a short period of time to allow the cache to
+     * be able to pass Objects from one Activity to another
+     *
+     * @param model    Model to be locked
+     */
     private void lock(BaseModel model) {
+
+        // Start a new Thread for a short period of time. Due to the hard-reference to the Object
+        // in the signature, this will keep the Object from being GC'd for however long the Thread
+        // is alive.
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -73,7 +92,7 @@ public class DataCache {
         // Get a reference to one of the Sections for the guide's firebaseId
         Section section = sections[0];
 
-        // Create a WeakReference to the Array
+        // Create a SoftReference to the Array
         SoftReference<Section[]> arrayReference = new SoftReference<>(sections);
 
         // Cache the Array
@@ -94,7 +113,7 @@ public class DataCache {
         // Check to ensure the data is valid
         if (dataReference != null && dataReference.get() != null) {
 
-            // Return the data from the WeakReference
+            // Return the data from the SoftReference
             return dataReference.get();
         } else {
 
@@ -117,7 +136,7 @@ public class DataCache {
         // Check to ensure the data is valid
         if (sectionReference != null && sectionReference.get() != null) {
 
-            // Return the data from the WeakReference
+            // Return the data from the SoftReference
             return sectionReference.get();
         } else {
 

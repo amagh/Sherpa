@@ -3,7 +3,9 @@ package project.sherpa.models.viewmodels;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -38,17 +40,25 @@ import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.sherpa.R;
+import project.sherpa.data.GuideProvider;
 import project.sherpa.models.datamodels.Author;
+import project.sherpa.models.datamodels.Chat;
+import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.ui.activities.ChatActivity;
+import project.sherpa.ui.activities.FriendActivity;
 import project.sherpa.ui.behaviors.VanishingBehavior;
 import project.sherpa.ui.fragments.UserFragment;
 import project.sherpa.utilities.Constants;
+import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.GeneralUtils;
 
-import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
-import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
+import static project.sherpa.models.viewmodels.AuthorViewModel.FriendIconTypes.*;
+import static project.sherpa.models.viewmodels.AuthorViewModel.MessageIconTypes.*;
+import static project.sherpa.utilities.Constants.RequestCodes.*;
 import static project.sherpa.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.CHAT;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.MESSAGE;
 import static project.sherpa.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
 
@@ -58,6 +68,21 @@ import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
 
 public class AuthorViewModel extends BaseObservable {
 
+    // ** Constants ** //
+    @IntDef({INVALID, CONNECT, SOCIAL, SOCIAL_WITH_REQUEST})
+    @interface FriendIconTypes {
+        int INVALID                 = -1;
+        int CONNECT                 = 0;
+        int SOCIAL                  = 1;
+        int SOCIAL_WITH_REQUEST     = 2;
+    }
+
+    @IntDef({MESSAGE, NEW_MESSAGE})
+    @interface MessageIconTypes {
+        int MESSAGE     = 0;
+        int NEW_MESSAGE = 1;
+    }
+
     // ** Member Variables ** //
     private Author mAuthor;
     private WeakReference<AppCompatActivity> mActivity;
@@ -65,6 +90,8 @@ public class AuthorViewModel extends BaseObservable {
     private boolean mAccepted = false;
     private boolean mSelected = false;
     private boolean mEditMode = false;
+    private boolean mHasNewMessages = false;
+    private boolean mShowSocialAddButton = false;
 
     public AuthorViewModel(@NonNull AppCompatActivity activity, @NonNull Author author) {
         mAuthor = author;
@@ -315,6 +342,10 @@ public class AuthorViewModel extends BaseObservable {
     @BindingAdapter({"messageIv", "inEditMode"})
     public static void animateSocialVisibility(final ImageView friendIv, final ImageView messageIv, boolean inEditMode) {
 
+        // User is not logged in, no social buttons to animate
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
         // Get the parameters for the parent ViewGroup so that the Behavior can be modified
         ConstraintLayout layout = (ConstraintLayout) friendIv.getParent();
         final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
@@ -395,6 +426,141 @@ public class AuthorViewModel extends BaseObservable {
         }
     }
 
+    @Bindable
+    public int getSocialVisibility() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // Only show social buttons if the user is logged in
+        if (user != null) {
+            return View.VISIBLE;
+        } else {
+            return View.GONE;
+        }
+    }
+
+    @Bindable
+    @MessageIconTypes
+    public int getMessageIcon() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // Checks to see whether this process should check for new messages
+        if (user == null) return MESSAGE;
+        if (!user.getUid().equals(mAuthor.firebaseId)) return MESSAGE;
+        if (mAuthor.getChats() == null) return MESSAGE;
+
+        // Boolean is already set to display new messages, no need to check for new messages
+        if (mHasNewMessages) {
+            mHasNewMessages = false;
+            return NEW_MESSAGE;
+        }
+
+        for (String chatId : mAuthor.getChats()) {
+
+            // Check if there is a database copy of the Chat
+            Cursor cursor = getFragment().getContext().getContentResolver().query(
+                    GuideProvider.Chats.byId(chatId),
+                    null, null, null, null);
+
+            if (cursor != null) {
+                if (!cursor.moveToFirst()) {
+
+                    // No database version. Must mean there are new messages
+                    return NEW_MESSAGE;
+                }
+
+                // Compare the database Chat with the version on Firebase
+                final Chat databaseChat = Chat.createChatFromCursor(cursor);
+
+                if (databaseChat.getMessageCount() == 0) return NEW_MESSAGE;
+
+                FirebaseProviderUtils.getModel(CHAT, chatId,
+                        new FirebaseProviderUtils.FirebaseListener() {
+                            @Override
+                            public void onModelReady(BaseModel model) {
+                                Chat firebaseChat = (Chat) model;
+
+                                if (firebaseChat.getMessageCount() > databaseChat.getMessageCount()) {
+
+                                    // Firebase version has new messages set boolean and notify
+                                    mHasNewMessages = true;
+                                    notifyPropertyChanged(BR.messageIcon);
+                                }
+                            }
+                        });
+
+                // Close the Cursor
+                cursor.close();
+            } else {
+                return NEW_MESSAGE;
+            }
+        }
+
+        return MESSAGE;
+    }
+
+    @BindingAdapter("messageIcon")
+    public static void loadMessageIcon(ImageView messageImageView, @MessageIconTypes int messageIcon) {
+
+        Context context = messageImageView.getContext();
+        switch (messageIcon) {
+            case MESSAGE:
+                messageImageView.setBackground(ContextCompat.getDrawable(
+                        context,
+                        R.drawable.social_button_background));
+                break;
+
+            case NEW_MESSAGE:
+                messageImageView.setBackground(ContextCompat.getDrawable(
+                        context,
+                        R.drawable.social_button_notification_background));
+                break;
+        }
+    }
+
+    @Bindable
+    @AuthorViewModel.FriendIconTypes
+    public int getFriendIcon() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) return INVALID;
+
+        if (user.getUid().equals(mAuthor.firebaseId) && mAuthor.getReceivedRequests() != null) {
+            return SOCIAL_WITH_REQUEST;
+        } else if (user.getUid().equals(mAuthor.firebaseId) && mAuthor.getReceivedRequests() == null) {
+            return SOCIAL;
+        } else {
+            return CONNECT;
+        }
+    }
+
+    @BindingAdapter("friendIcon")
+    public static void loadFriendIcon(ImageView friendImageView, @FriendIconTypes int friendIcon) {
+
+        Context context = friendImageView.getContext();
+
+        switch (friendIcon) {
+            case SOCIAL_WITH_REQUEST:
+                friendImageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_group));
+                friendImageView.setBackground(ContextCompat.getDrawable(
+                        context,
+                        R.drawable.social_button_notification_background));
+                break;
+
+            case SOCIAL:
+                friendImageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_group));
+                friendImageView.setBackground(ContextCompat.getDrawable(
+                        context,
+                        R.drawable.social_button_background));
+                break;
+
+            case CONNECT:
+                friendImageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_person_add));
+                friendImageView.setBackground(ContextCompat.getDrawable(
+                        context,
+                        R.drawable.social_button_background));
+        }
+    }
+
     public void onClickEdit(View view) {
 
         // Switch the layout between edit and display
@@ -452,6 +618,18 @@ public class AuthorViewModel extends BaseObservable {
             getFragment().startActivity(intent);
         } else {
             getFragment().startMessageActivityToUser();
+        }
+    }
+
+    public void onClickFriend(View view) {
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null && user.getUid().equals(mAuthor.firebaseId)) {
+            Intent intent = new Intent(mActivity.get(), FriendActivity.class);
+            getFragment().startActivity(intent);
+        } else {
+            getFragment().startFriendFollowActivity();
         }
     }
 

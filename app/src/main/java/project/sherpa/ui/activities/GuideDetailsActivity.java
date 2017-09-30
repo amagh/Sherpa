@@ -15,6 +15,7 @@ import java.util.List;
 
 import project.sherpa.R;
 import project.sherpa.databinding.ActivityGuideDetailsBinding;
+import project.sherpa.ui.activities.abstractactivities.MapboxActivity;
 import project.sherpa.ui.adapters.GuideDetailsFragmentAdapter;
 import project.sherpa.ui.fragments.GuideDetailsFragment;
 import project.sherpa.ui.fragments.GuideDetailsMapFragment;

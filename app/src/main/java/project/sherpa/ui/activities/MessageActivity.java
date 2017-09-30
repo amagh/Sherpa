@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import project.sherpa.R;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.fragments.MessageFragment;
 
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_MESSAGES;

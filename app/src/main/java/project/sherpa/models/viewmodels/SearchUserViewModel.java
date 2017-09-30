@@ -12,6 +12,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import project.sherpa.BR;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.ui.activities.NewChatActivity;
+import project.sherpa.ui.activities.interfaces.SearchUserInterface;
 
 import static project.sherpa.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
@@ -22,12 +23,12 @@ import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
 
 public class SearchUserViewModel extends BaseObservable {
 
-    private NewChatActivity mActivity;
+    private SearchUserInterface mSearchInterface;
     private Author mAuthor;
     private String mQuery;
 
-    public SearchUserViewModel(NewChatActivity activity) {
-        mActivity = activity;
+    public SearchUserViewModel(SearchUserInterface searchInterface) {
+        mSearchInterface = searchInterface;
     }
 
     @Bindable
@@ -40,11 +41,10 @@ public class SearchUserViewModel extends BaseObservable {
 
         // Query Firebase to see if there are any matching users
         if (mQuery.length() > 2) {
-            mActivity.runQueryForUsername(query);
+            mSearchInterface.runQueryForUsername(query);
+        } else {
+            mSearchInterface.resetAdapter();
         }
-
-        // Set Author so it cannot be selected
-        mAuthor = null;
 
         notifyPropertyChanged(BR.query);
     }

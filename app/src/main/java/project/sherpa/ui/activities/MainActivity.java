@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Guide;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.fragments.FavoritesFragment;
 import project.sherpa.ui.fragments.GuideListFragment;
 import project.sherpa.ui.fragments.SavedGuidesFragment;

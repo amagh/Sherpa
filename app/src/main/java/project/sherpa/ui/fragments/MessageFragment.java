@@ -48,6 +48,7 @@ import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import project.sherpa.utilities.objects.SmartValueEventListener;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
@@ -77,33 +78,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
     private ChatViewModel mChatViewModel;
 
-    private DatabaseReference mChatReference;
-    private ValueEventListener mMessageListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-
-            if (dataSnapshot.exists()) {
-                Chat chat = (Chat) FirebaseProviderUtils.getModelFromSnapshot(CHAT, dataSnapshot);
-
-                // Update the database entry for the Chat
-                ContentProviderUtils.insertModel(getActivity(), mChat);
-
-                if (chat == null || chat.getMessageCount() <= mChat.getMessageCount()) return;
-
-                // Retrieve the number of new messages that the current chat does not contain
-                getMessages(chat.getMessageCount() - mChat.getMessageCount());
-
-                // Re-reference the member field to the new Chat and cache it
-                mChat = chat;
-                DataCache.getInstance().store(mChat);
-            }
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
+    private SmartValueEventListener mMessageListener;
 
     /**
      * Factory pattern for instantiating MessageFragment
@@ -278,14 +253,29 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
      */
     private void setMessageListener() {
 
-        if (mChatReference == null && mChat != null) {
-            mChatReference = FirebaseDatabase.getInstance().getReference()
-                    .child(GuideDatabase.CHATS)
-                    .child(mChat.firebaseId);
+        if (mMessageListener == null && mChat != null) {
+            mMessageListener = new SmartValueEventListener(CHAT, mChat.firebaseId) {
+                @Override
+                public void onModelChange(BaseModel model) {
+                    Chat chat = (Chat) model;
+
+                    // Update the database entry for the Chat
+                    ContentProviderUtils.insertModel(getContext(), mChat);
+
+                    if (chat == null || chat.getMessageCount() <= mChat.getMessageCount()) return;
+
+                    // Retrieve the number of new messages that the current chat does not contain
+                    getMessages(chat.getMessageCount() - mChat.getMessageCount());
+
+                    // Re-reference the member field to the new Chat and cache it
+                    mChat = chat;
+                    DataCache.getInstance().store(mChat);
+                }
+            };
         }
 
-        if (mChatReference != null) {
-            mChatReference.addValueEventListener(mMessageListener);
+        if (mMessageListener != null) {
+            mMessageListener.start();
         }
     }
 
@@ -294,9 +284,9 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
      */
     private void removeMessageListener() {
 
-        if (mChatReference == null) return;
-
-        mChatReference.removeEventListener(mMessageListener);
+        if (mMessageListener != null) {
+            mMessageListener.stop();
+        }
     }
 
     /**

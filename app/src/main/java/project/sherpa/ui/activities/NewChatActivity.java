@@ -13,12 +13,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import project.sherpa.BR;
 import project.sherpa.R;
 import project.sherpa.databinding.ActivityNewChatBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.SearchUserViewModel;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
+import project.sherpa.ui.activities.interfaces.SearchUserInterface;
 import project.sherpa.ui.adapters.ChatAuthorAdapter;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
@@ -30,7 +33,7 @@ import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
  * Created by Alvin on 9/19/2017.
  */
 
-public class NewChatActivity extends ConnectivityActivity {
+public class NewChatActivity extends ConnectivityActivity implements SearchUserInterface {
 
     // ** Constants ** //
     private static final int SEARCH_DELAY   = 750;
@@ -67,7 +70,7 @@ public class NewChatActivity extends ConnectivityActivity {
      */
     private void setupViewModel() {
         mViewModel = new SearchUserViewModel(this);
-        mBinding.setUvm(mViewModel);
+        mBinding.searchUserLayout.setUvm(mViewModel);
     }
 
     /**
@@ -78,8 +81,8 @@ public class NewChatActivity extends ConnectivityActivity {
         // Pass in the shared ViewModel
         mAdapter = new ChatAuthorAdapter(mViewModel);
 
-        mBinding.newChatRv.setLayoutManager(new LinearLayoutManager(this));
-        mBinding.newChatRv.setAdapter(mAdapter);
+        mBinding.searchUserLayout.searchUserRv.setLayoutManager(new LinearLayoutManager(this));
+        mBinding.searchUserLayout.searchUserRv.setAdapter(mAdapter);
     }
 
     private void loadFriends() {
@@ -91,7 +94,11 @@ public class NewChatActivity extends ConnectivityActivity {
      *
      * @param query    Username entered by the user
      */
+    @Override
     public void runQueryForUsername(final String query) {
+
+        // Set the Author to null so their information isn't showing when the query changes
+        mViewModel.setAuthor(null);
 
         // Cancel any pending searches
         mHandler.removeCallbacksAndMessages(null);
@@ -100,6 +107,7 @@ public class NewChatActivity extends ConnectivityActivity {
         mHandler.postDelayed(new Runnable() {
                  @Override
                  public void run() {
+
                      FirebaseProviderUtils.queryForUsername(query, new FirebaseProviderUtils.FirebaseListener() {
                          @Override
                          public void onModelReady(BaseModel model) {
@@ -115,6 +123,16 @@ public class NewChatActivity extends ConnectivityActivity {
 
         // Filter the friend's list for any friends that match the query
         filter(query);
+    }
+
+    @Override
+    public void resetAdapter() {
+
+        // Cancel any pending searches
+        mHandler.removeCallbacksAndMessages(null);
+
+        // Set Author so it cannot be selected
+        mViewModel.setAuthor(null);
     }
 
     /**
