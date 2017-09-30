@@ -8,6 +8,10 @@
         <variable
             name="vm"
             type="project.sherpa.models.viewmodels.AuthorViewModel"/>
+
+        <variable
+            name="fvm"
+            type="project.sherpa.models.viewmodels.ListItemFriendViewModel"/>
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -38,7 +42,8 @@
             android:padding="@dimen/list_author_social_icon_padding"
             android:src="@drawable/ic_person_add"
             android:tint="@color/grey_700"
-            android:visibility="@{vm.socialAddButtonVisibility}"
+            android:visibility="@{fvm.socialButtonVisibility}"
+            android:onClick="@{fvm::onClickSocialButton}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
