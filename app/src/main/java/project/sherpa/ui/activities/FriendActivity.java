@@ -1,14 +1,20 @@
 package project.sherpa.ui.activities;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
+import android.view.View;
 
 import project.sherpa.R;
 import project.sherpa.databinding.ActivityFriendBinding;
 import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.adapters.FriendFragmentAdapter;
+
+import static project.sherpa.ui.activities.SearchUserActivity.SearchTypes.FOLLOW;
+import static project.sherpa.ui.activities.SearchUserActivity.SearchTypes.FRIEND;
+import static project.sherpa.utilities.Constants.IntentKeys.SEARCH_KEY;
 
 /**
  * Created by Alvin on 9/26/2017.
@@ -83,5 +89,26 @@ public class FriendActivity extends ConnectivityActivity {
                 }
             }
         });
+    }
+
+    /**
+     * Click response for the FAB to start the SearchUserActivity for either following or sending
+     * friend requests
+     *
+     * @param view    FAB that was clicked
+     */
+    public void onClickAddSocialFab(View view) {
+
+        // Build the Intent to launch the SearchUserActivity
+        Intent intent = new Intent(this, SearchUserActivity.class);
+
+        // Put an extra for whether the user is looking for users to follow or friend
+        if (mBinding.friendVp.getCurrentItem() == 0) {
+            intent.putExtra(SEARCH_KEY, FRIEND);
+        } else if (mBinding.friendVp.getCurrentItem() == 1) {
+            intent.putExtra(SEARCH_KEY, FOLLOW);
+        }
+
+        startActivity(intent);
     }
 }
