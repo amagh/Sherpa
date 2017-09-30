@@ -33,6 +33,9 @@ public abstract class SmartValueEventListener implements ValueEventListener {
                 .child(mFirebaseId);
     }
 
+    /**
+     * Starts Listening for data on mReference
+     */
     public void start() {
         if (!mStarted) {
             mReference.addValueEventListener(this);
@@ -40,6 +43,9 @@ public abstract class SmartValueEventListener implements ValueEventListener {
         }
     }
 
+    /**
+     * Stops listening for data on mReference
+     */
     public void stop() {
         if (mStarted) {
             mReference.removeEventListener(this);
@@ -47,12 +53,19 @@ public abstract class SmartValueEventListener implements ValueEventListener {
         }
     }
 
+    /**
+     * Returns the data from Firebase at mReference. Called every time the data changes
+     *
+     * @param model    The BaseModel describing the data at mReference
+     */
     public abstract void onModelChange(BaseModel model);
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        BaseModel model = FirebaseProviderUtils.getModelFromSnapshot(mType, dataSnapshot);
-        onModelChange(model);
+        if (dataSnapshot.exists()) {
+            BaseModel model = FirebaseProviderUtils.getModelFromSnapshot(mType, dataSnapshot);
+            onModelChange(model);
+        }
     }
 
     @Override
