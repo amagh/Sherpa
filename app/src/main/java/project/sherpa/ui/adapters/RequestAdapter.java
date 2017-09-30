@@ -14,6 +14,7 @@ import project.sherpa.R;
 import project.sherpa.databinding.ListItemFriendBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.viewmodels.AuthorViewModel;
+import project.sherpa.models.viewmodels.ListItemFriendViewModel;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
 
 /**
@@ -215,8 +216,11 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                 request = mSentRequestList.get(position - 1);
             }
 
-            AuthorViewModel vm = new AuthorViewModel((AppCompatActivity) mBinding.getRoot().getContext(), request);
+            AuthorViewModel vm  = new AuthorViewModel((AppCompatActivity) mBinding.getRoot().getContext(), request);
+            ListItemFriendViewModel fvm = new ListItemFriendViewModel(request);
+
             mBinding.setVm(vm);
+            mBinding.setFvm(fvm);
         }
 
         @Override
