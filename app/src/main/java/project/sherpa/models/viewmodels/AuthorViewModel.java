@@ -439,15 +439,6 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @Bindable
-    public int getSocialAddButtonVisibility() {
-        if (mShowSocialAddButton) {
-            return View.VISIBLE;
-        } else {
-            return View.GONE;
-        }
-    }
-
-    @Bindable
     @MessageIconTypes
     public int getMessageIcon() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
