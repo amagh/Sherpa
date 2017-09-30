@@ -18,6 +18,7 @@ import project.sherpa.R;
 import project.sherpa.databinding.ListItemFriendBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.viewmodels.AuthorViewModel;
+import project.sherpa.models.viewmodels.ListItemFriendViewModel;
 import project.sherpa.ui.adapters.callbacks.AlphabeticalAuthorCallback;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
 
@@ -31,6 +32,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     private SortedListAdapterCallback<Author> mSortedCallback = new AlphabeticalAuthorCallback(this);
     private SortedList<Author> mSortedList = new SortedList<>(Author.class, mSortedCallback);
     private ClickHandler<Author> mClickHandler;
+    private boolean mShowSocialButton;
 
     public FriendAdapter(ClickHandler<Author> clickHandler) {
         mClickHandler = clickHandler;
@@ -111,6 +113,16 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     }
 
     /**
+     * Sets whether the list items should display the social quick access button
+     *
+     * @param show    Boolean value for whether the button should show
+     */
+    public void showAddSocialButton(boolean show) {
+        mShowSocialButton = show;
+        notifyDataSetChanged();
+    }
+
+    /**
      * Adds an Author to be displayed in the Adapter
      *
      * @param author    Author to be displayed
@@ -143,7 +155,14 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
             // Bind the data for the Author at the ViewHolder's position to the ViewHolder's Views
             Author author = mSortedList.get(position);
             AuthorViewModel vm = new AuthorViewModel((AppCompatActivity) mBinding.getRoot().getContext(), author);
+
+            // Show the social quick action button
+            ListItemFriendViewModel fvm = new ListItemFriendViewModel(author);
+
+            if (mShowSocialButton) fvm.setShowSocialButton(true);
+
             mBinding.setVm(vm);
+            mBinding.setFvm(fvm);
         }
 
         @Override
