@@ -77,6 +77,11 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
      */
     public void setFriendList(List<Author> friendList) {
 
+        if (friendList == null || friendList.size() == 0) {
+            clear();
+            return;
+        }
+
         // Start batched updates
         mSortedList.beginBatchedUpdates();
 
