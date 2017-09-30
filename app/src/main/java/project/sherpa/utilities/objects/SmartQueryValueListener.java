@@ -13,7 +13,7 @@ import timber.log.Timber;
  * Created by Alvin on 9/29/2017.
  */
 
-public abstract class SmartQueryValueListener implements ValueEventListener {
+public abstract class SmartQueryValueListener<T extends BaseModel> implements ValueEventListener {
 
     // ** Member Variables ** //
     @FirebaseProviderUtils.FirebaseType
@@ -51,12 +51,12 @@ public abstract class SmartQueryValueListener implements ValueEventListener {
      *
      * @param models    An Array of BaseModels matching mType describing the data at mQuery
      */
-    public abstract void onQueryChanged(BaseModel[] models);
+    public abstract void onQueryChanged(T[] models);
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
         if (dataSnapshot.exists()) {
-            BaseModel[] models = FirebaseProviderUtils.getModelsFromSnapshot(mType, dataSnapshot);
+            T[] models = (T[]) FirebaseProviderUtils.getModelsFromSnapshot(mType, dataSnapshot);
             onQueryChanged(models);
         }
     }
