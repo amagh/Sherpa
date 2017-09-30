@@ -86,6 +86,7 @@
         <activity android:name=".ui.activities.NewChatActivity"/>
         <activity android:name=".ui.activities.FriendActivity"/>
         <activity android:name=".ui.activities.FriendFollowActivity"/>
+        <activity android:name=".ui.activities.SearchUserActivity"/>
     </application>
 
 </manifest>
