@@ -87,6 +87,9 @@
         <activity android:name=".ui.activities.FriendActivity"/>
         <activity android:name=".ui.activities.FriendFollowActivity"/>
         <activity android:name=".ui.activities.SearchUserActivity"/>
+        <service
+            android:name=".services.firebaseservice.FirebaseProviderService"
+            android:enabled="true" />
     </application>
 
 </manifest>
