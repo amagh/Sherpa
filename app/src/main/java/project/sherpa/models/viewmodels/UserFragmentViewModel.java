@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -23,22 +22,17 @@ import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator;
 import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.sherpa.R;
-import project.sherpa.data.GuideProvider;
 import project.sherpa.models.datamodels.Author;
-import project.sherpa.models.datamodels.Chat;
-import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.ui.activities.ChatActivity;
 import project.sherpa.ui.activities.FriendActivity;
 import project.sherpa.ui.behaviors.VanishingBehavior;
-import project.sherpa.ui.fragments.TestUserFragment;
-import project.sherpa.utilities.FirebaseProviderUtils;
+import project.sherpa.ui.fragments.UserFragment;
 import project.sherpa.utilities.GeneralUtils;
 
 import static project.sherpa.models.viewmodels.UserFragmentViewModel.FriendIconTypes.*;
 import static project.sherpa.models.viewmodels.UserFragmentViewModel.MessageIconTypes.*;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
-import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.CHAT;
 
 /**
  * Created by Alvin on 10/2/2017.
@@ -63,12 +57,12 @@ public class UserFragmentViewModel extends BaseObservable {
     
     // ** Member Variables ** //
     private Author mUser;
-    private TestUserFragment mFragment;
+    private UserFragment mFragment;
     private boolean mEditMode;
     private boolean mHasNewMessages;
 
 
-    public UserFragmentViewModel(Author user, TestUserFragment fragment) {
+    public UserFragmentViewModel(Author user, UserFragment fragment) {
         mUser = user;
         mFragment = fragment;
     }

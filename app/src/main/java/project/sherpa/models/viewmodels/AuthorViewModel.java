@@ -25,7 +25,7 @@ import java.lang.ref.WeakReference;
 
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Author;
-import project.sherpa.ui.fragments.TestUserFragment;
+import project.sherpa.ui.fragments.UserFragment;
 import project.sherpa.utilities.Constants;
 import project.sherpa.utilities.FirebaseProviderUtils;
 
@@ -55,12 +55,12 @@ public class AuthorViewModel extends BaseObservable {
     }
 
     @Bindable
-    public TestUserFragment getFragment() {
+    public UserFragment getFragment() {
 
         if (mActivity.get() == null) return null;
 
         // Retrieve the Fragment using the FragmentManager
-        return (TestUserFragment) mActivity.get().getSupportFragmentManager()
+        return (UserFragment) mActivity.get().getSupportFragmentManager()
                 .findFragmentByTag(Constants.FragmentTags.FRAG_TAG_USER);
     }
 

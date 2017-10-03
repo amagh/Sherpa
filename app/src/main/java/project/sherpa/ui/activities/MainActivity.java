@@ -8,8 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.MenuItem;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.mapbox.mapboxsdk.Mapbox;
 
 import project.sherpa.R;
@@ -20,9 +18,7 @@ import project.sherpa.ui.fragments.FavoritesFragment;
 import project.sherpa.ui.fragments.GuideListFragment;
 import project.sherpa.ui.fragments.SavedGuidesFragment;
 import project.sherpa.ui.fragments.SearchFragment;
-import project.sherpa.ui.fragments.TestUserFragment;
 import project.sherpa.ui.fragments.UserFragment;
-import project.sherpa.utilities.FirebaseProviderUtils;
 
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_USER;
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_FAVORITE;
@@ -58,10 +54,7 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
                     tag = FRAG_TAG_SEARCH;
                     break;
                 case R.id.navigation_account:
-
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    fragment = TestUserFragment.newInstance(user.getUid());
-
+                    fragment = new UserFragment();
                     tag = FRAG_TAG_USER;
                     break;
 
