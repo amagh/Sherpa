@@ -1,4 +1,4 @@
-package project.sherpa.utilities.objects;
+package project.sherpa.services.firebaseservice;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

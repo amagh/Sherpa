@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
-import project.sherpa.utilities.objects.SmartValueEventListener;
 
 /**
  * A background service that is used as a server for data from Firebase Database. By keeping the

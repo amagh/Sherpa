@@ -31,9 +31,7 @@ import project.sherpa.ui.adapters.FriendAdapter;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
-import project.sherpa.utilities.objects.SmartQueryValueListener;
-import project.sherpa.utilities.objects.SmartValueEventListener;
-import timber.log.Timber;
+import project.sherpa.services.firebaseservice.SmartValueEventListener;
 
 import static project.sherpa.ui.activities.SearchUserActivity.SearchTypes.FOLLOW;
 import static project.sherpa.ui.activities.SearchUserActivity.SearchTypes.FRIEND;

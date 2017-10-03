@@ -111,7 +111,7 @@ public class UserFragmentViewModel extends BaseObservable {
         if (user == null) return;
 
         // Get the parameters for the parent ViewGroup so that the Behavior can be modified
-        ConstraintLayout                     layout = (ConstraintLayout) friendIv.getParent();
+        ConstraintLayout layout = (ConstraintLayout) friendIv.getParent();
         final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
 
         if (inEditMode) {
@@ -202,6 +202,11 @@ public class UserFragmentViewModel extends BaseObservable {
         }
     }
 
+    public void setHasNewMessages(boolean hasNewMessages) {
+        mHasNewMessages = hasNewMessages;
+        notifyPropertyChanged(BR.messageIcon);
+    }
+
     @Bindable
     @MessageIconTypes
     public int getMessageIcon() {
@@ -216,47 +221,6 @@ public class UserFragmentViewModel extends BaseObservable {
         if (mHasNewMessages) {
             mHasNewMessages = false;
             return NEW_MESSAGE;
-        }
-
-        for (String chatId : mUser.getChats()) {
-
-            // Check if there is a database copy of the Chat
-            Cursor cursor = mFragment.getContext().getContentResolver().query(
-                    GuideProvider.Chats.byId(chatId),
-                    null, null, null, null);
-
-            if (cursor != null) {
-                if (!cursor.moveToFirst()) {
-
-                    // No database version. Must mean there are new messages
-                    return NEW_MESSAGE;
-                }
-
-                // Compare the database Chat with the version on Firebase
-                final Chat databaseChat = Chat.createChatFromCursor(cursor);
-
-                if (databaseChat.getMessageCount() == 0) return NEW_MESSAGE;
-
-                FirebaseProviderUtils.getModel(CHAT, chatId,
-                        new FirebaseProviderUtils.FirebaseListener() {
-                            @Override
-                            public void onModelReady(BaseModel model) {
-                                Chat firebaseChat = (Chat) model;
-
-                                if (firebaseChat.getMessageCount() > databaseChat.getMessageCount()) {
-
-                                    // Firebase version has new messages set boolean and notify
-                                    mHasNewMessages = true;
-                                    notifyPropertyChanged(BR.messageIcon);
-                                }
-                            }
-                        });
-
-                // Close the Cursor
-                cursor.close();
-            } else {
-                return NEW_MESSAGE;
-            }
         }
 
         return MESSAGE;
