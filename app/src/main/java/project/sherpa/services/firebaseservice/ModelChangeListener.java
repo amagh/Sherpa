@@ -46,6 +46,10 @@ public abstract class ModelChangeListener<T extends BaseModel> {
         }
     }
 
+    public T getModel() {
+        return mModel;
+    }
+
     /**
      * Delivers the data corresponding to the receiver when it becomes ready
      *
