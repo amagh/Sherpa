@@ -27,9 +27,7 @@ public class ListItemAuthorDetailsEditViewModel extends BaseObservable {
     // ** Member Variables ** //
     private Author mAuthor;
     private boolean mAccepted;
-    private boolean mEditMode;
     private AppCompatActivity mActivity;
-    private int mEditVisibility;
 
     public ListItemAuthorDetailsEditViewModel(AppCompatActivity activity, Author author) {
         mActivity = activity;
@@ -77,17 +75,6 @@ public class ListItemAuthorDetailsEditViewModel extends BaseObservable {
             FirebaseProviderUtils.insertOrUpdateModel(author);
             fragment.switchAuthorLayout();
         }
-    }
-
-    @Bindable
-    public boolean getInEditMode() {
-        return mEditMode;
-    }
-
-    public void setInEditMode(boolean isInEditMode) {
-        mEditMode = isInEditMode;
-
-        notifyPropertyChanged(BR.inEditMode);
     }
 
     public void onClickEdit(View view) {

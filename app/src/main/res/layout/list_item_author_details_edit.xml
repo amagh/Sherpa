@@ -35,8 +35,7 @@
             android:contentDescription="@string/content_description_edit_profile_cancel_button"
             android:onClick="@{evm::onClickEdit}"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground"
-            app:editVisibility="@{vm.editVisibility}"/>
+            android:background="?attr/selectableItemBackground"/>
 
         <EditText
             android:id="@+id/list_author_name_tv"
