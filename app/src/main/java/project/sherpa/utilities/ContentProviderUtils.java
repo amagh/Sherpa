@@ -730,4 +730,37 @@ public class ContentProviderUtils {
 
         return null;
     }
+
+    /**
+     * Checks the number of messages that have been inserted into the local database for a given
+     * Chat
+     *
+     * @param context    Interface to global Context
+     * @param chatId     FirebaseId of the Chat to check
+     * @return The number of messages in the local database for the Chat
+     */
+    public static int getMessageCount(Context context, String chatId) {
+
+        // Query the database for the Chat
+        Cursor cursor = context.getContentResolver().query(
+                GuideProvider.Chats.byId(chatId),
+                null, null, null, null);
+
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+
+                    // Return the number of messages
+                    return Chat.createChatFromCursor(cursor).getMessageCount();
+                }
+            } finally {
+
+                // Close the Cursor
+                cursor.close();
+            }
+        }
+
+        // Chat is not in database, return 0 for zero messages downloaded
+        return 0;
+    }
 }
