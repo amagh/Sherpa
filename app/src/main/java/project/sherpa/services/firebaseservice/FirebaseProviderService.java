@@ -111,7 +111,7 @@ public class FirebaseProviderService extends Service {
             mModelListenerMap.get(smartValueEventListener).add(modelChangeListener);
 
             // Immediately deliver the existing data to the ModelChangeListener
-            modelChangeListener.updateModel();
+            if (smartValueEventListener.getModel() != null) modelChangeListener.updateModel();
         }
     }
 
