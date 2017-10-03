@@ -370,6 +370,32 @@ public class Chat extends BaseModel {
                 .getKey();
     }
 
+    /**
+     * Updates the values of the Chat with new values from an update Chat with the same FirebaseId
+     *
+     * @param newModelValues    Chat with new values to replace the current values
+     */
+    @Override
+    public void updateValues(BaseModel newModelValues) {
+
+        // Cast the BaseModel to a Chat
+        if (!(newModelValues instanceof Chat)) return;
+        Chat newChatValues = (Chat) newModelValues;
+
+        // Check to ensure the new Chat has the same FirebaseId as the one it is replacing
+        if (!newChatValues.firebaseId.equals(firebaseId)) return;
+
+        activeMembers   = newChatValues.activeMembers;
+        allMembers      = newChatValues.allMembers;
+        messageCount    = newChatValues.messageCount;
+        lastAuthorId    = newChatValues.lastAuthorId;
+        lastAuthorName  = newChatValues.lastAuthorName;
+        lastMessageId   = newChatValues.lastMessageId;
+        lastMessage     = newChatValues.lastMessage;
+        lastMessageDate = newChatValues.lastMessageDate;
+        memberCode      = newChatValues.memberCode;
+    }
+
     //********************************************************************************************//
     //*********************************** Getters & Setters **************************************//
     //********************************************************************************************//

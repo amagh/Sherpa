@@ -84,6 +84,27 @@ public class Area extends BaseModel implements Parcelable, AreaAdapterSortable {
         return map;
     }
 
+    /**
+     * Updates the Area with new values from an updated Area+
+     *
+     * @param newModelValues    BaseModel containing the new Values
+     */
+    @Override
+    public void updateValues(BaseModel newModelValues) {
+
+        // Cast newModelValues to an Area
+        if (!(newModelValues instanceof Area)) return;
+        Area newAreaValues = (Area) newModelValues;
+
+        // Check to ensure newAreaValues has the same FirebaseId
+        if (!newAreaValues.firebaseId.equals(firebaseId)) return;
+
+        name        = newAreaValues.name;
+        latitude    = newAreaValues.latitude;
+        longitude   = newAreaValues.longitude;
+        location    = newAreaValues.location;
+    }
+
     @Override
     public String getName() {
         return name;

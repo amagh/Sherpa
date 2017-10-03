@@ -19,6 +19,7 @@ import java.util.Map;
 
 import project.sherpa.data.GuideContract;
 import project.sherpa.files.GpxFile;
+import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.sherpa.utilities.objects.GpxStats;
 import project.sherpa.utilities.GpxUtils;
@@ -234,6 +235,40 @@ public class Guide extends BaseModelWithImage implements Parcelable {
 
         // Set the gpxUri to the File's path
         return gpxFile;
+    }
+
+    /**
+     * Updates the field values for the Guide with new ones from a Guide with the same FirebaseId
+     *
+     * @param newModelValues    BaseModel containing the new Values
+     */
+    @Override
+    public void updateValues(BaseModel newModelValues) {
+
+        // Cast newModelValues to a Guide
+        if (!(newModelValues instanceof Guide)) return;
+        Guide newGuideValues = (Guide) newModelValues;
+
+        // Ensure that the newGuideValues has the same FirebaseId
+        if (!newGuideValues.firebaseId.equals(firebaseId)) return;
+
+        title       = newGuideValues.title;
+        trailId     = newGuideValues.trailId;
+        trailName   = newGuideValues.trailName;
+        authorId    = newGuideValues.authorId;
+        authorName  = newGuideValues.authorName;
+        dateAdded   = newGuideValues.dateAdded;
+        rating      = newGuideValues.rating;
+        reviews     = newGuideValues.reviews;
+        latitude    = newGuideValues.latitude;
+        longitude   = newGuideValues.longitude;
+        distance    = newGuideValues.distance;
+        elevation   = newGuideValues.elevation;
+        difficulty  = newGuideValues.difficulty;
+        area        = newGuideValues.area;
+        favorite    = newGuideValues.favorite;
+        addDate     = newGuideValues.addDate;
+        gpxUri      = newGuideValues.gpxUri;
     }
 
     //********************************************************************************************//

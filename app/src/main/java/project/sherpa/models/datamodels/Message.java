@@ -150,6 +150,31 @@ public class Message extends BaseModel {
         }
     }
 
+    /**
+     * Updates the field values with new values from an updated Message with the same FirebaseId
+     *
+     * @param newModelValues    BaseModel containing the new Values
+     */
+    @Override
+    public void updateValues(BaseModel newModelValues) {
+
+        // Case newModelValues to a Message
+        if (!(newModelValues instanceof Message)) return;
+        Message newMessageValues = (Message) newModelValues;
+
+        // Check to ensure the newMessageValues has the same FirebaseId
+        if (!newMessageValues.firebaseId.equals(firebaseId)) return;
+
+        authorId        = newMessageValues.authorId;
+        authorName      = newMessageValues.authorName;
+        message         = newMessageValues.message;
+        attachment      = newMessageValues.attachment;
+        attachmentType  = newMessageValues.attachmentType;
+        chatId          = newMessageValues.chatId;
+        date            = newMessageValues.date;
+        status          = newMessageValues.status;
+    }
+
     //********************************************************************************************//
     //*********************************** Getters & Setters **************************************//
     //********************************************************************************************//
