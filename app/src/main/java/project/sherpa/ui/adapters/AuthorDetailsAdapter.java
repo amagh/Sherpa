@@ -21,6 +21,8 @@ import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.models.viewmodels.GuideViewModel;
+import project.sherpa.models.viewmodels.ListItemAuthorDetailsEditViewModel;
+import project.sherpa.models.viewmodels.ListItemFriendViewModel;
 
 /**
  * Created by Alvin on 8/1/2017.
@@ -220,6 +222,10 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
                 if (!mInEditMode) {
                     ((ListItemAuthorDetailsBinding) mBinding).setVm(mAuthorViewModel);
                 } else {
+                    ListItemAuthorDetailsEditViewModel evm = new ListItemAuthorDetailsEditViewModel(
+                                    (AppCompatActivity) mBinding.getRoot().getContext(),
+                                    (Author) model);
+                    ((ListItemAuthorDetailsEditBinding) mBinding).setEvm(evm);
                     ((ListItemAuthorDetailsEditBinding) mBinding).setVm(mAuthorViewModel);
                 }
             } else if (model instanceof Guide) {
