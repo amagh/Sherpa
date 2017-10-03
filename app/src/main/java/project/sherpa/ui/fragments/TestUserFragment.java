@@ -180,7 +180,7 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
      */
     private void initRecyclerView() {
 
-        mAdapter = new AuthorDetailsAdapter((AppCompatActivity) getActivity(), new GuideAdapter.ClickHandler() {
+        mAdapter = new AuthorDetailsAdapter(new GuideAdapter.ClickHandler() {
             @Override
             public void onGuideClicked(Guide guide) {
 
@@ -366,10 +366,6 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
      * Sets up the layouts to be appropriate for someone viewing their own profile
      */
     private void setupForSelfProfile() {
-
-        // Enable option to edit their profile
-        mAdapter.enableEditing();
-        mBinding.getVm().enableEditing();
 
         // Add the SupportActionBar so the menu items can be created, but remove the title
         if (getActivity() != null) {
