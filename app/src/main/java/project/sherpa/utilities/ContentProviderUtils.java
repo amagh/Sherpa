@@ -460,6 +460,10 @@ public class ContentProviderUtils {
                 // Close the Cursor
                 cursor.close();
             }
+
+            // Delete Chats and Messages
+            context.getContentResolver().delete(GuideProvider.Chats.CONTENT_URI, null, null);
+            context.getContentResolver().delete(GuideProvider.Messages.CONTENT_URI, null, null);
         }
     }
 
