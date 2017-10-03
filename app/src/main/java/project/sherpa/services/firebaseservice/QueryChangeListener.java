@@ -14,13 +14,15 @@ public abstract class QueryChangeListener<T extends BaseModel> {
 
     // ** Member Variables ** //
     @FirebaseProviderUtils.FirebaseType
-    private int mType;
-    private Query mQuery;
+    private final int mType;
+    private final Query mQuery;
+    private final String mQueryKey;
     private T[] mModels;
 
-    public QueryChangeListener(@FirebaseProviderUtils.FirebaseType int type, Query query) {
+    public QueryChangeListener(@FirebaseProviderUtils.FirebaseType int type, Query query, String queryKey) {
         mType = type;
         mQuery = query;
+        mQueryKey = queryKey;
     }
 
     /**
@@ -54,9 +56,7 @@ public abstract class QueryChangeListener<T extends BaseModel> {
         return mQuery;
     }
 
-    public String getUriString() {
-        return mQuery.toString();
+    public String getQueryKey() {
+        return mQuery.getRef() + mQueryKey;
     }
-
-
 }
