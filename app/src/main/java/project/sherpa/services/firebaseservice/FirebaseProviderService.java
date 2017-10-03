@@ -187,6 +187,16 @@ public class FirebaseProviderService extends Service {
         }
     }
 
+    public void unregisterQueryChangeListener(QueryChangeListener queryChangeListener) {
+
+        SmartQueryValueListener smartQueryValueListener = mSmartQueryMap.get(queryChangeListener.getUriString());
+        if (mQueryListenerMap.get(smartQueryValueListener).contains(queryChangeListener)) {
+            mQueryListenerMap.get(smartQueryValueListener).remove(queryChangeListener);
+        }
+
+        cleanUp();
+    }
+
     /**
      * Cleans up mSmartListenerMap by stopping and removing any SmartValueEventListeners that no
      * longer have any ModelChangeListeners attached to it.
@@ -218,6 +228,23 @@ public class FirebaseProviderService extends Service {
                         listener.stop();
                         mModelListenerMap.remove(listener);
                         mSmartListenerMap.remove(firebaseId);
+                    }
+                }
+
+                // Iterate through each SmartQueryValueListener and stop any that don't have any
+                // registered QueryChangeListeners attached to it
+                for (int i = mSmartQueryMap.size() - 1; i >= 0; i--) {
+
+                    String queryKey = keyList.get(i);
+                    SmartQueryValueListener listener = mSmartQueryMap.get(queryKey);
+
+                    if (mQueryListenerMap.get(listener).size() == 0) {
+
+                        // SmartQueryValueListener does not have any QueryChangeListeners attached.
+                        // Stop it and remove the SmartQueryValueListener from the Map
+                        listener.stop();
+                        mQueryListenerMap.remove(listener);
+                        mSmartQueryMap.remove(queryKey);
                     }
                 }
             }
