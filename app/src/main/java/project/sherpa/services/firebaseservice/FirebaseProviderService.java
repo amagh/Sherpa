@@ -32,8 +32,13 @@ public class FirebaseProviderService extends Service {
 
     // ** Member Variables ** //
     private IBinder mBinder = new FirebaseProviderBinder();
+
     private Map<String, SmartValueEventListener> mSmartListenerMap = new HashMap<>();
     private Map<SmartValueEventListener, List<ModelChangeListener>> mModelListenerMap = new HashMap<>();
+
+    private Map<String, SmartQueryValueListener> mSmartQueryMap = new HashMap<>();
+    private Map<SmartQueryValueListener, List<QueryChangeListener>> mQueryListenerMap = new HashMap<>();
+
     private Handler mCleanUpHandler = new Handler();
 
     @Nullable
@@ -107,9 +112,8 @@ public class FirebaseProviderService extends Service {
                 mModelListenerMap.put(smartValueEventListener, new ArrayList<ModelChangeListener>());
             }
 
-            List<ModelChangeListener> modelChangeListenerList = mModelListenerMap.get(smartValueEventListener);
-            if (!modelChangeListenerList.contains(modelChangeListener)) {
-                modelChangeListenerList.add(modelChangeListener);
+            if (!mModelListenerMap.get(smartValueEventListener).contains(modelChangeListener)) {
+                mModelListenerMap.get(smartValueEventListener).add(modelChangeListener);
             }
 
             // Immediately deliver the existing data to the ModelChangeListener
@@ -132,6 +136,55 @@ public class FirebaseProviderService extends Service {
         }
 
         cleanUp();
+    }
+
+    /**
+     * Registers a QueryChangeListener to being observing for changes in the corresponding
+     * SmartQueryValueListener. If the SmartQueryValueListener for the QueryChangeListener does not
+     * exist, then it is started.
+     *
+     * @param queryChangeListener    The QueryChangeListener to register for changes in data
+     */
+    public synchronized void registerQueryChangeListener(QueryChangeListener queryChangeListener) {
+
+        // Get the corresponding SmartQueryValueListener from mSmartQueryMap
+        SmartQueryValueListener smartQueryValueListener = mSmartQueryMap.get(queryChangeListener.getUriString());
+
+        if (smartQueryValueListener == null) {
+
+            // SmartQueryValueListener is not in mSmartQueryMap, init it and put it in
+            smartQueryValueListener = new SmartQueryValueListener(
+                    queryChangeListener.getType(),
+                    queryChangeListener.getQuery()) {
+
+                @Override
+                public void onQueryChanged(BaseModel[] models) {
+                    for (QueryChangeListener listener : mQueryListenerMap.get(this)) {
+                        listener.updateModels(models);
+                    }
+                }
+            };
+
+            // Start listening for changes
+            smartQueryValueListener.start();
+            mSmartQueryMap.put(queryChangeListener.getUriString(), smartQueryValueListener);
+        }
+
+        // Init the List of attached QueryChangeListeners for the SmartQueryValueListener if it
+        // hasn't been initialized yet
+        if (mQueryListenerMap.get(smartQueryValueListener) == null) {
+            mQueryListenerMap.put(smartQueryValueListener, new ArrayList<QueryChangeListener>());
+        }
+
+        // Add the QueryChangeListener to the List of attached QueryChangeListeners
+        if (!mQueryListenerMap.get(smartQueryValueListener).contains(queryChangeListener)) {
+            mQueryListenerMap.get(smartQueryValueListener).add(queryChangeListener);
+        }
+
+        // Return the data returned by the Query if it isn't null
+        if (smartQueryValueListener.getData() != null) {
+            queryChangeListener.updateModels(smartQueryValueListener.getData());
+        }
     }
 
     /**
