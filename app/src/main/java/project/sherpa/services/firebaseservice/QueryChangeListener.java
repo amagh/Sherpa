@@ -2,8 +2,6 @@ package project.sherpa.services.firebaseservice;
 
 import com.google.firebase.database.Query;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.utilities.FirebaseProviderUtils;
@@ -30,8 +28,9 @@ public abstract class QueryChangeListener<T extends BaseModel> {
      *
      * @param models    An Array of BaseModels corresponding to the data returned by the Query
      */
-    void updateModels(T[] models) {
-        mModels = models;
+    void updateModels(BaseModel[] models) {
+
+        mModels = (T[]) models;
         onQueryChanged(mModels);
     }
 
