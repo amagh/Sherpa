@@ -55,6 +55,7 @@ import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.models.viewmodels.UserFragmentViewModel;
 import project.sherpa.services.firebaseservice.FirebaseProviderService;
 import project.sherpa.services.firebaseservice.ModelChangeListener;
+import project.sherpa.services.firebaseservice.QueryChangeListener;
 import project.sherpa.ui.activities.AccountActivity;
 import project.sherpa.ui.activities.FriendFollowActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
@@ -75,6 +76,7 @@ import project.sherpa.services.firebaseservice.FirebaseProviderService.*;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
+import static junit.framework.Assert.assertNotNull;
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
@@ -83,6 +85,7 @@ import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_PROFI
 import static project.sherpa.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.CHAT;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
 import static project.sherpa.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
 
@@ -104,6 +107,7 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
     private AuthorDetailsAdapter mAdapter;
     private List<BaseModel> mModelList;
     private Map<String, ModelChangeListener> mListenerMap = new HashMap<>();
+    private QueryChangeListener<Guide> mGuideQueryListener;
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -166,6 +170,22 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
 
         if (savedInstanceState != null) {
 
+            // Restore mModelList from SavedInstanceState
+            ArrayList<String> modelIdList = savedInstanceState.getStringArrayList(MODEL_LIST_KEY);
+
+            if (modelIdList != null) {
+                for (String modelId : modelIdList) {
+                    if (mAuthor == null) {
+                        Author author = (Author) DataCache.getInstance().get(modelId);
+
+                        setAuthor(author);
+                        continue;
+                    }
+
+                    Guide guide = (Guide) DataCache.getInstance().get(modelId);
+                    mAdapter.addModel(guide);
+                }
+            }
         }
 
         setHasOptionsMenu(true);
@@ -228,6 +248,8 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
             mService.registerModelChangeListener(listener);
         }
 
+        if (mGuideQueryListener != null) mService.registerQueryChangeListener(mGuideQueryListener);
+
         // Reset the message icon
         if (mBinding.getUfvm() != null) mBinding.getUfvm().setHasNewMessages(false);
     }
@@ -245,6 +267,8 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
         for (ModelChangeListener listener : mListenerMap.values()) {
             mService.unregisterModelChangeListener(listener);
         }
+
+        if (mGuideQueryListener != null) mService.unregisterQueryChangeListener(mGuideQueryListener);
     }
 
     /**
@@ -290,10 +314,11 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
         ModelChangeListener<Author> listener = new ModelChangeListener<Author>(AUTHOR, userId) {
             @Override
             public void onModelReady(Author author) {
-                setAuthor(author);
+
+                if (mAuthor == null) setAuthor(author);
 
                 // Load the Guides that the Author has created
-                loadGuidesForAuthor(mAuthor);
+                if (mModelList.size() == 1) loadGuidesForAuthor(mAuthor);
 
                 if (mAuthor.firebaseId.equals(getFirebaseId())) {
                     setChatListeners();
@@ -354,33 +379,21 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
     private void loadGuidesForAuthor(Author author) {
 
         // Build a query to find all guides Authored by the author
-        final Query guideQuery = FirebaseDatabase.getInstance().getReference()
+        Query guideQuery = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.GUIDES)
                 .orderByChild(GuideContract.GuideEntry.AUTHOR_ID)
                 .equalTo(author.firebaseId);
 
-        guideQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        mGuideQueryListener = new QueryChangeListener<Guide>(GUIDE, guideQuery, author.firebaseId) {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) return;
-
-                // Add each Guide to the Adapter
-                Guide[] guides = (Guide[]) FirebaseProviderUtils.getModelsFromSnapshot(
-                        FirebaseProviderUtils.FirebaseType.GUIDE,
-                        dataSnapshot);
-
+            public void onQueryChanged(Guide[] guides) {
                 for (Guide guide : guides) {
                     mAdapter.addModel(guide);
                 }
-
-                guideQuery.removeEventListener(this);
             }
+        };
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                guideQuery.removeEventListener(this);
-            }
-        });
+        mService.registerQueryChangeListener(mGuideQueryListener);
     }
 
     /**
