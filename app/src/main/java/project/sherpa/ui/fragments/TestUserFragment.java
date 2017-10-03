@@ -37,7 +37,6 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +103,7 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
     private Author mAuthor;
     private AuthorDetailsAdapter mAdapter;
     private List<BaseModel> mModelList;
+    private Map<String, ModelChangeListener> mListenerMap = new HashMap<>();
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -111,12 +111,23 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
             mService = binder.getService();
             mBound = true;
 
-            String userId = TestUserFragment.this.getArguments().getString(AUTHOR_KEY, null);
-            loadUserSelfProfile();
-            loadUserProfile(userId);
+            Bundle args = TestUserFragment.this.getArguments();
+            String userId = null;
 
-            if (mSelfModelChangeListener.getFirebaseId().equals(mModelChangeListener.getFirebaseId())) {
-                setChatListeners();
+            if (args == null) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) userId = user.getUid();
+
+            } else {
+                userId = args.getString(AUTHOR_KEY, null);
+            }
+
+            if (userId == null) {
+                Intent intent = new Intent(getActivity(), AccountActivity.class);
+                startActivityForResult(intent, ACCOUNT_ACTIVITY_REQUEST_CODE);
+            } else {
+                loadUserSelfProfile();
+                loadUserProfile(userId);
             }
         }
 
@@ -125,10 +136,6 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
             mBound = false;
         }
     };
-    private ModelChangeListener<Author> mSelfModelChangeListener;
-    private ModelChangeListener<Author> mModelChangeListener;
-    private Map<String, ModelChangeListener> mListenerMap = new HashMap<>();
-
 
     /**
      * Factory pattern for creating a new instance of the Fragment
@@ -210,22 +217,19 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-
-        if (mModelChangeListener != null) mService.unregisterModelChangeListener(mModelChangeListener);
-        if (mSelfModelChangeListener != null) mService.unregisterModelChangeListener(mSelfModelChangeListener);
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
 
         Intent intent = new Intent(getActivity(), FirebaseProviderService.class);
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
-        if (mModelChangeListener != null) mService.registerModelChangeListener(mModelChangeListener);
-        if (mSelfModelChangeListener != null) mService.registerModelChangeListener(mSelfModelChangeListener);
+        // Start listening for changes in the data
+        for (ModelChangeListener listener : mListenerMap.values()) {
+            mService.registerModelChangeListener(listener);
+        }
+
+        // Reset the message icon
+        if (mBinding.getUfvm() != null) mBinding.getUfvm().setHasNewMessages(false);
     }
 
     @Override
@@ -235,6 +239,11 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
         if (mBound) {
             getActivity().unbindService(mConnection);
             mBound = false;
+        }
+
+        // Stop listening for changes in the data
+        for (ModelChangeListener listener : mListenerMap.values()) {
+            mService.unregisterModelChangeListener(listener);
         }
     }
 
@@ -250,7 +259,7 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
         if (user == null) return;
 
         // Get the data for the logged in user
-        mSelfModelChangeListener = new ModelChangeListener<Author>(AUTHOR, user.getUid()) {
+        ModelChangeListener<Author> listener = new ModelChangeListener<Author>(AUTHOR, user.getUid()) {
             @Override
             public void onModelReady(Author model) {
 
@@ -264,25 +273,33 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
             }
         };
 
-        mService.registerModelChangeListener(mSelfModelChangeListener);
+        mService.registerModelChangeListener(listener);
+        mListenerMap.put(user.getUid(), listener);
     }
 
     /**
      * Loads a user's Firebase profile
-     * @param userId
+     *
+     * @param userId    FirebaseId of the user to load
      */
     private void loadUserProfile(final String userId) {
 
         // Only load the user's profile if it hasn't already been loaded
-        if (mModelChangeListener != null && mAuthor != null) return;
+        if (mListenerMap.get(userId)!= null && mAuthor != null) return;
 
-        mModelChangeListener = new ModelChangeListener<Author>(AUTHOR, userId) {
+        ModelChangeListener<Author> listener = new ModelChangeListener<Author>(AUTHOR, userId) {
             @Override
             public void onModelReady(Author author) {
                 setAuthor(author);
 
                 // Load the Guides that the Author has created
                 loadGuidesForAuthor(mAuthor);
+
+                if (mAuthor.firebaseId.equals(getFirebaseId())) {
+                    setChatListeners();
+                }
+
+                mBinding.userPb.setVisibility(View.GONE);
             }
 
             @Override
@@ -291,7 +308,8 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
             }
         };
 
-        mService.registerModelChangeListener(mModelChangeListener);
+        mService.registerModelChangeListener(listener);
+        mListenerMap.put(userId, listener);
     }
 
     /**
@@ -316,11 +334,14 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (user != null && user.getUid().equals(mAuthor.firebaseId)) {
+        if (mAuthor != null && user != null && user.getUid().equals(mAuthor.firebaseId)) {
             setupForSelfProfile();
         }
     }
 
+    /**
+     * Forces the binding to refresh its Views
+     */
     private void updateAuthor() {
         mBinding.getVm().notifyPropertyChanged(BR._all);
     }
@@ -378,23 +399,38 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
         params.setBehavior(new FabSpeedDialScrollBehavior());
     }
 
+    /**
+     * Sets ModelChangeListeners for each of the Chats that the user is a part of to notify the
+     * user if they have a new message
+     */
     private void setChatListeners() {
 
-        if (mAuthor == null || mAuthor.getChats() == null) return;
         for (String chatId : mAuthor.getChats()) {
             if (mListenerMap.get(chatId) != null) return;
 
-            mListenerMap.put(chatId, new ModelChangeListener(CHAT, chatId) {
+            mListenerMap.put(chatId, new ModelChangeListener<Chat>(CHAT, chatId) {
                 @Override
-                public void onModelReady(BaseModel model) {
+                public void onModelReady(Chat chat) {
+                    int localMessageCount = ContentProviderUtils.getMessageCount(getActivity(), chat.firebaseId);
+                    int firebaseMessageCount = chat.getMessageCount();
 
+                    if (firebaseMessageCount > localMessageCount) {
+                        mBinding.getUfvm().setHasNewMessages(true);
+                    }
                 }
 
                 @Override
                 public void onModelChanged() {
+                    int localMessageCount = ContentProviderUtils.getMessageCount(getActivity(), getModel().firebaseId);
+                    int firebaseMessageCount = getModel().getMessageCount();
 
+                    if (firebaseMessageCount > localMessageCount) {
+                        mBinding.getUfvm().setHasNewMessages(true);
+                    }
                 }
             });
+
+            mService.registerModelChangeListener(mListenerMap.get(chatId));
         }
     }
 
@@ -407,10 +443,6 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_user_log_off:
-                // Reset the data in the Adapter
-                mModelList = new ArrayList<>();
-                mAdapter.setModelList(mModelList);
-
                 // Clean the database to start fresh
                 ContentProviderUtils.cleanDatabase(getActivity(), new Author());
 
@@ -420,9 +452,9 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
                 FirebaseAuth.getInstance().signOut();
 
                 // Start the AccountActivity
-                startActivityForResult(
-                        new Intent(getActivity(), AccountActivity.class),
-                        ACCOUNT_ACTIVITY_REQUEST_CODE);
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new TestUserFragment())
+                        .commit();
 
                 return true;
 
@@ -438,7 +470,11 @@ public class TestUserFragment extends ConnectivityFragment implements FabSpeedDi
 
         if (requestCode == ACCOUNT_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK && data.getBooleanExtra(AUTHOR_KEY, false)) {
-//                loadUserSelfProfile(true);
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    loadUserSelfProfile();
+                    loadUserProfile(user.getUid());
+                }
             } else {
                 // Handle the log out based on the Activity the Fragment is in
                 if (getActivity() instanceof MainActivity) {
