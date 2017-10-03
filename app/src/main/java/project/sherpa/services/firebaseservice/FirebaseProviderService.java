@@ -108,7 +108,10 @@ public class FirebaseProviderService extends Service {
                 mModelListenerMap.put(smartValueEventListener, new ArrayList<ModelChangeListener>());
             }
 
-            mModelListenerMap.get(smartValueEventListener).add(modelChangeListener);
+            List<ModelChangeListener> modelChangeListenerList = mModelListenerMap.get(smartValueEventListener);
+            if (!modelChangeListenerList.contains(modelChangeListener)) {
+                modelChangeListenerList.add(modelChangeListener);
+            }
 
             // Immediately deliver the existing data to the ModelChangeListener
             if (smartValueEventListener.getModel() != null) modelChangeListener.updateModel();
@@ -123,7 +126,11 @@ public class FirebaseProviderService extends Service {
     public synchronized void unregisterModelChangeListener(ModelChangeListener modelChangeListener) {
 
         SmartValueEventListener smartValueEventListener = mSmartListenerMap.get(modelChangeListener.getFirebaseId());
-        mModelListenerMap.get(smartValueEventListener).remove(modelChangeListener);
+        List<ModelChangeListener> modelChangeListenerList = mModelListenerMap.get(smartValueEventListener);
+
+        if (modelChangeListenerList != null && modelChangeListenerList.contains(modelChangeListener)) {
+            modelChangeListenerList.remove(modelChangeListener);
+        }
 
         cleanUp();
     }
