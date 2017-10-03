@@ -59,7 +59,9 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
                     break;
                 case R.id.navigation_account:
 
-                    fragment = new UserFragment();
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    fragment = TestUserFragment.newInstance(user.getUid());
+
                     tag = FRAG_TAG_USER;
                     break;
 
