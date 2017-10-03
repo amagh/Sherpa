@@ -148,7 +148,7 @@ public class FirebaseProviderService extends Service {
     public synchronized void registerQueryChangeListener(QueryChangeListener queryChangeListener) {
 
         // Get the corresponding SmartQueryValueListener from mSmartQueryMap
-        SmartQueryValueListener smartQueryValueListener = mSmartQueryMap.get(queryChangeListener.getUriString());
+        SmartQueryValueListener smartQueryValueListener = mSmartQueryMap.get(queryChangeListener.getQueryKey());
 
         if (smartQueryValueListener == null) {
 
@@ -167,7 +167,7 @@ public class FirebaseProviderService extends Service {
 
             // Start listening for changes
             smartQueryValueListener.start();
-            mSmartQueryMap.put(queryChangeListener.getUriString(), smartQueryValueListener);
+            mSmartQueryMap.put(queryChangeListener.getQueryKey(), smartQueryValueListener);
         }
 
         // Init the List of attached QueryChangeListeners for the SmartQueryValueListener if it
@@ -189,8 +189,10 @@ public class FirebaseProviderService extends Service {
 
     public void unregisterQueryChangeListener(QueryChangeListener queryChangeListener) {
 
-        SmartQueryValueListener smartQueryValueListener = mSmartQueryMap.get(queryChangeListener.getUriString());
-        if (mQueryListenerMap.get(smartQueryValueListener).contains(queryChangeListener)) {
+        SmartQueryValueListener smartQueryValueListener = mSmartQueryMap.get(queryChangeListener.getQueryKey());
+        List<QueryChangeListener> queryListenerList = mQueryListenerMap.get(smartQueryValueListener);
+
+        if (queryListenerList != null && queryListenerList.contains(queryChangeListener)) {
             mQueryListenerMap.get(smartQueryValueListener).remove(queryChangeListener);
         }
 
@@ -230,6 +232,9 @@ public class FirebaseProviderService extends Service {
                         mSmartListenerMap.remove(firebaseId);
                     }
                 }
+
+                // Set the keyList to the keySet for mSmartQueryMap
+                keyList = new ArrayList<>(mSmartQueryMap.keySet());
 
                 // Iterate through each SmartQueryValueListener and stop any that don't have any
                 // registered QueryChangeListeners attached to it
