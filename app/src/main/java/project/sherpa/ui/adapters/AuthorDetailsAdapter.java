@@ -35,17 +35,14 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
     private static final int GUIDE_VIEW_TYPE        = 2;
 
     // ** Member Variables ** //
-    private WeakReference<AppCompatActivity> mActivity;
     private List<BaseModel> mModelList;
-    private boolean mEnableEdit = false;
     private boolean mInEditMode = false;
     private GuideAdapter.ClickHandler mClickHandler;
 
     private Author mUser;
     private AuthorViewModel mAuthorViewModel;
 
-    public AuthorDetailsAdapter(AppCompatActivity activity, GuideAdapter.ClickHandler clickHandler) {
-        mActivity = new WeakReference<>(activity);
+    public AuthorDetailsAdapter(GuideAdapter.ClickHandler clickHandler) {
         mClickHandler = clickHandler;
     }
 
@@ -148,13 +145,6 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
     }
 
     /**
-     * Enables the edit button on the ViewHolder for the Author
-     */
-    public void enableEditing() {
-        mEnableEdit = true;
-    }
-
-    /**
      * Switches the layout used for the Author BaseModel between one for display or one for editing.
      */
     public void switchAuthorLayout() {
@@ -211,20 +201,13 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
             // Cast the Model and ViewDataBinding based on the type of BaseModel
             if (model instanceof Author) {
 
-                if (mEnableEdit) {
-                    // Enable editing of info if user is viewing their own profile
-                    mAuthorViewModel.enableEditing();
-                }
-
-                // Set whether the ViewModel is in EditMode
-                mAuthorViewModel.setInEditMode(mInEditMode);
-
                 if (!mInEditMode) {
                     ((ListItemAuthorDetailsBinding) mBinding).setVm(mAuthorViewModel);
                 } else {
                     ListItemAuthorDetailsEditViewModel evm = new ListItemAuthorDetailsEditViewModel(
                                     (AppCompatActivity) mBinding.getRoot().getContext(),
                                     (Author) model);
+
                     ((ListItemAuthorDetailsEditBinding) mBinding).setEvm(evm);
                     ((ListItemAuthorDetailsEditBinding) mBinding).setVm(mAuthorViewModel);
                 }
