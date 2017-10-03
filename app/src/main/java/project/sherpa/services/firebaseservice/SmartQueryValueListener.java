@@ -6,6 +6,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
@@ -20,6 +21,7 @@ public abstract class SmartQueryValueListener<T extends BaseModel> implements Va
     private int mType;
     private Query mQuery;
     private boolean mStarted;
+    private BaseModel[] mModels;
 
     public SmartQueryValueListener(@FirebaseProviderUtils.FirebaseType int type, Query query) {
         mType = type;
@@ -47,6 +49,16 @@ public abstract class SmartQueryValueListener<T extends BaseModel> implements Va
     }
 
     /**
+     * Returns the most updated data for this Listener
+     *
+     * @return An Array of BaseModels corresponding to the data returned by the Query on the last
+     * update
+     */
+    public BaseModel[] getData() {
+        return mModels;
+    }
+
+    /**
      * Returns the data retrieved at mQuery. Called every time the data changes
      *
      * @param models    An Array of BaseModels matching mType describing the data at mQuery
@@ -57,6 +69,13 @@ public abstract class SmartQueryValueListener<T extends BaseModel> implements Va
     public void onDataChange(DataSnapshot dataSnapshot) {
         if (dataSnapshot.exists()) {
             T[] models = (T[]) FirebaseProviderUtils.getModelsFromSnapshot(mType, dataSnapshot);
+            mModels = models;
+
+            // Cache each returned Object
+            for (BaseModel model : mModels) {
+                DataCache.getInstance().store(model);
+            }
+
             onQueryChanged(models);
         }
     }
