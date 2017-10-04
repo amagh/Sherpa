@@ -1,10 +1,14 @@
 package project.sherpa.ui.fragments;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -39,6 +43,8 @@ import project.sherpa.models.datamodels.Message;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.ChatViewModel;
 import project.sherpa.models.viewmodels.MessageViewModel;
+import project.sherpa.services.firebaseservice.FirebaseProviderService;
+import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.ui.activities.AttachActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.activities.MessageActivity;
@@ -48,11 +54,13 @@ import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.services.firebaseservice.SmartValueEventListener;
+import project.sherpa.services.firebaseservice.FirebaseProviderService.*;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static project.sherpa.models.datamodels.Message.ATTACHMENT_TYPE;
 import static project.sherpa.models.datamodels.Message.AttachmentType.GUIDE_TYPE;
+import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_ATTACH_GUIDE;
@@ -77,7 +85,39 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
     private ChatViewModel mChatViewModel;
 
-    private SmartValueEventListener mMessageListener;
+    private ModelChangeListener<Chat> mChatListener;
+    private boolean mBound;
+    private FirebaseProviderService mService;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+
+            // Bind to the Service
+            FirebaseProviderBinder binder = (FirebaseProviderBinder) iBinder;
+            mService = binder.getService();
+            mBound = true;
+
+            Bundle args = getArguments();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            if (args == null || user == null) {
+                getActivity().finish();
+                return;
+            }
+
+            // Set the Author as the logged in Author
+            mAuthor = (Author) DataCache.getInstance().get(user.getUid());
+
+            // Start the Chat
+            String chatId = GuideProvider.getIdFromUri((Uri) args.getParcelable(CHAT_KEY));
+            setChatListener(chatId);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBound = false;
+        }
+    };
 
     /**
      * Factory pattern for instantiating MessageFragment
@@ -102,43 +142,10 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_message, container, false);
 
         setHasOptionsMenu(true);
-
         initRecyclerView();
-
-        // Retrieve the Bundle containing the Uri
-        Bundle args = getArguments();
-        if (args != null) {
-
-            // Retrieve the FirebaseId of the Chat to retrieve messages for
-            String chatId = GuideProvider.getIdFromUri((Uri) args.getParcelable(CHAT_KEY));
-            final Chat chat   = (Chat) DataCache.getInstance().get(chatId);
-
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user != null) {
-                mAuthor = (Author) DataCache.getInstance().get(user.getUid());
-
-                if (mAuthor == null) {
-                    FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
-                        @Override
-                        public void onModelReady(BaseModel model) {
-                            mAuthor = (Author) model;
-
-                            if (mAuthor != null) {
-                                // Set the Chat for the Fragment
-                                startChat(chat);
-                            }
-                        }
-                    });
-                } else {
-                    // Set the Chat for the Fragment
-                    startChat(chat);
-                }
-            }
-        }
 
         return mBinding.getRoot();
     }
@@ -201,14 +208,19 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     public void onStart() {
         super.onStart();
 
-        setMessageListener();
+        if (!mBound) {
+            Intent intent = new Intent(getActivity(), FirebaseProviderService.class);
+            getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
+
+        if (mChatListener != null) mService.registerModelChangeListener(mChatListener);
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        removeMessageListener();
+        if (mChatListener != null) mService.unregisterModelChangeListener(mChatListener);
     }
 
     @Override
@@ -230,6 +242,9 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         }
     }
 
+    /**
+     * Initializes the RecyclerView and its components
+     */
     private void initRecyclerView() {
         mAdapter = new MessageAdapter(getActivity(), new ClickHandler<Guide>() {
             @Override
@@ -248,44 +263,32 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     }
 
     /**
-     * Sets a ValueListener on the DatabaseReference for the chat to listen for new messages
+     * Sets the ModelChangeListener for the Chat.
+     *
+     * @param chatId    The FirebaseId of the Chat to set a ModelChangeListener for
      */
-    private void setMessageListener() {
+    private void setChatListener(String chatId) {
+        mChatListener = new ModelChangeListener<Chat>(CHAT, chatId) {
+            @Override
+            public void onModelReady(Chat chat) {
+                if (chat == null) return;
 
-        if (mMessageListener == null && mChat != null) {
-            mMessageListener = new SmartValueEventListener(CHAT, mChat.firebaseId) {
-                @Override
-                public void onModelChange(BaseModel model) {
-                    Chat chat = (Chat) model;
+                // Set the Chat for the Fragment
+                startChat(chat);
+            }
 
-                    // Update the database entry for the Chat
-                    ContentProviderUtils.insertModel(getContext(), mChat);
+            @Override
+            public void onModelChanged() {
 
-                    if (chat == null || chat.getMessageCount() <= mChat.getMessageCount()) return;
+                // Retrieve new messages from Firebase
+                getMessages(getModel().getNewMessageCount(getActivity()));
 
-                    // Retrieve the number of new messages that the current chat does not contain
-                    getMessages(chat.getMessageCount() - mChat.getMessageCount());
+                // Update the database entry for the Chat
+                ContentProviderUtils.insertModel(getActivity(), getModel());
+            }
+        };
 
-                    // Re-reference the member field to the new Chat and cache it
-                    mChat = chat;
-                    DataCache.getInstance().store(mChat);
-                }
-            };
-        }
-
-        if (mMessageListener != null) {
-            mMessageListener.start();
-        }
-    }
-
-    /**
-     * Removes the ValueListener from the DatabaseReference for the chat
-     */
-    private void removeMessageListener() {
-
-        if (mMessageListener != null) {
-            mMessageListener.stop();
-        }
+        mService.registerModelChangeListener(mChatListener);
     }
 
     /**
@@ -390,8 +393,8 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
         getNewMessagesSinceLastChat();
         setChatBinding();
 
-        // Start listening for messages
-        setMessageListener();
+//        // Start listening for messages
+//        setMessageListener();
 
         setActionBar();
     }
