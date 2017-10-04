@@ -402,11 +402,11 @@ public class Chat extends BaseModel {
      * @param context    Interface to global Context
      * @return True if there are unread messages. False otherwise.
      */
-    public boolean hasNewMessages(Context context) {
+    public int getNewMessageCount(Context context) {
 
         // Query database for number of messages on local copy of Chat
         int localMessageCount = ContentProviderUtils.getMessageCount(context, firebaseId);
-        return messageCount > localMessageCount;
+        return messageCount - localMessageCount;
     }
 
     //********************************************************************************************//

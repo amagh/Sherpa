@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
@@ -17,11 +16,7 @@ import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -190,7 +185,7 @@ public class ChatFragment extends ConnectivityFragment {
 
                     // Check to see if there are any unread messages and set the layout to reflect
                     // it in the Adapter
-                    mAdapter.setHasNewMessage(chat.firebaseId, chat.hasNewMessages(getActivity()));
+                    mAdapter.setHasNewMessage(chat.firebaseId, chat.getNewMessageCount(getActivity()) > 0);
                 }
 
                 @Override
@@ -200,7 +195,7 @@ public class ChatFragment extends ConnectivityFragment {
                     // it in the Adapter
                     mAdapter.setHasNewMessage(
                             getModel().firebaseId,
-                            getModel().hasNewMessages(getActivity()));
+                            getModel().getNewMessageCount(getActivity()) > 0);
                 }
             });
 
