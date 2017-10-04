@@ -43,6 +43,7 @@ import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.services.firebaseservice.FirebaseProviderService.*;
+import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
@@ -239,26 +240,37 @@ public class ChatFragment extends ConnectivityFragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        Intent intent = new Intent(getActivity(), FirebaseProviderService.class);
-        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    public void onResume() {
+        super.onResume();
 
         // Start listening to changes in the ModelChangeListeners
         for (ModelChangeListener listener : mListenerMap.values()) {
+            mAdapter.setHasNewMessage(listener.getFirebaseId(), false);
             mService.registerModelChangeListener(listener);
         }
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
 
         // Stop listening to changes in the ModelChangeListeners
         for (ModelChangeListener listener : mListenerMap.values()) {
             mService.unregisterModelChangeListener(listener);
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Intent intent = new Intent(getActivity(), FirebaseProviderService.class);
+        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
 
         // Unbind the FirebaseProviderService
         getActivity().unbindService(mConnection);

@@ -278,6 +278,8 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
 
                 // Set the Chat for the Fragment
                 startChat(chat);
+
+                ContentProviderUtils.insertModel(getActivity(), chat);
             }
 
             @Override
