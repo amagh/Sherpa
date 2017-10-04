@@ -396,6 +396,19 @@ public class Chat extends BaseModel {
         memberCode      = newChatValues.memberCode;
     }
 
+    /**
+     * Checks to see if there are any new messages compared to the Chat's copy on the local database
+     *
+     * @param context    Interface to global Context
+     * @return True if there are unread messages. False otherwise.
+     */
+    public boolean hasNewMessages(Context context) {
+
+        // Query database for number of messages on local copy of Chat
+        int localMessageCount = ContentProviderUtils.getMessageCount(context, firebaseId);
+        return messageCount > localMessageCount;
+    }
+
     //********************************************************************************************//
     //*********************************** Getters & Setters **************************************//
     //********************************************************************************************//
