@@ -208,6 +208,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     public void onStart() {
         super.onStart();
 
+        // Start listening for changes in data
         if (!mBound) {
             Intent intent = new Intent(getActivity(), FirebaseProviderService.class);
             getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -217,10 +218,12 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
 
+        // Stop listening for changes
         if (mChatListener != null) mService.unregisterModelChangeListener(mChatListener);
+        if (mBound) getActivity().unbindService(mConnection);
     }
 
     @Override
