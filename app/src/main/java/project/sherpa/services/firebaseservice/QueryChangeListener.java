@@ -57,6 +57,6 @@ public abstract class QueryChangeListener<T extends BaseModel> {
     }
 
     public String getQueryKey() {
-        return mQuery.getRef() + mQueryKey;
+        return mQuery.getRef() + "/" + mQueryKey;
     }
 }
