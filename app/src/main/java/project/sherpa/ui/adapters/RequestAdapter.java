@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import project.sherpa.R;
 import project.sherpa.databinding.ListItemFriendBinding;
 import project.sherpa.models.datamodels.Author;
@@ -180,6 +183,80 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
      */
     public void addSentRequest(Author request) {
         mSentRequestList.add(request);
+    }
+
+    /**
+     * Removes the received request from the Adapter
+     *
+     * @param requestId    FirebaseId of the request to be removed
+     */
+    public void removeReceivedRequest(String requestId) {
+
+        for (int i = 0; i < mReceivedRequestList.size(); i++) {
+            Author request = mReceivedRequestList.get(i);
+
+            if (request.firebaseId.equals(requestId)) {
+                mReceivedRequestList.removeItemAt(i);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Removes a sent request from the Adapter
+     *
+     * @param requestId    FirebaseId of the request to be removed
+     */
+    public void removeSentRequest(String requestId) {
+
+        for (int i = 0; i < mSentRequestList.size(); i++) {
+            Author request = mSentRequestList.get(i);
+
+            if (request.firebaseId.equals(requestId)) {
+                mSentRequestList.removeItemAt(i);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Retrieves a List of the FirebaseIds of the received requests
+     *
+     * @return List of the FirebaseIds of the received requests
+     */
+    public List<String> getReceivedFirebaseIds() {
+        List<String> receivedIdList = new ArrayList<>();
+
+        for (int i = 0; i < mReceivedRequestList.size(); i++) {
+            Author request = mReceivedRequestList.get(i);
+            receivedIdList.add(request.firebaseId);
+        }
+
+        return receivedIdList;
+    }
+
+    /**
+     * Generates a List of the FirebaseIds of the sent requests
+     *
+     * @return List of the FirebaseIds of the sent requests
+     */
+    public List<String> getSentFirebaseIds() {
+        List<String> receivedIdList = new ArrayList<>();
+
+        for (int i = 0; i < mSentRequestList.size(); i++) {
+            Author request = mSentRequestList.get(i);
+            receivedIdList.add(request.firebaseId);
+        }
+
+        return receivedIdList;
+    }
+
+    public void clearReceivedRequests() {
+        mReceivedRequestList.clear();
+    }
+
+    public void clearSentRequests() {
+        mSentRequestList.clear();
     }
 
     class RequestViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
