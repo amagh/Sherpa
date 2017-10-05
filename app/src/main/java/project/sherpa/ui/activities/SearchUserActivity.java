@@ -1,9 +1,13 @@
 package project.sherpa.ui.activities;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,6 +29,8 @@ import project.sherpa.databinding.ActivitySearchUserBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.SearchUserViewModel;
+import project.sherpa.services.firebaseservice.FirebaseProviderService;
+import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.activities.interfaces.SearchUserInterface;
 import project.sherpa.ui.adapters.FriendAdapter;
@@ -32,6 +38,7 @@ import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.services.firebaseservice.SmartValueEventListener;
+import project.sherpa.services.firebaseservice.FirebaseProviderService.FirebaseProviderBinder;
 
 import static project.sherpa.ui.activities.SearchUserActivity.SearchTypes.FOLLOW;
 import static project.sherpa.ui.activities.SearchUserActivity.SearchTypes.FRIEND;
@@ -58,9 +65,26 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
     private Author mUser;
     private FriendAdapter mAdapter;
     private Handler mSearchHandler = new Handler();
-    private SmartValueEventListener mUserListener;
     private List<Author> mResultList;
     private int mSearchType;
+    ModelChangeListener<Author> mUserListener;
+    private FirebaseProviderService mService;
+    private boolean mBound;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            FirebaseProviderBinder binder = (FirebaseProviderBinder) iBinder;
+            mService = binder.getService();
+            mBound = true;
+
+            loadCurrentUser();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBound = false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,9 +93,27 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
 
         mSearchType = getIntent().getIntExtra(SEARCH_KEY, FOLLOW);
 
-        loadCurrentUser();
         initRecyclerView();
         initViewModel();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!mBound) {
+            Intent intent = new Intent(this, FirebaseProviderService.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mBound) {
+            unbindService(mConnection);
+        }
     }
 
     /**
@@ -86,8 +128,6 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
                 // is the person they are trying to connect with
                 Intent intent = new Intent(SearchUserActivity.this, UserActivity.class);
                 intent.putExtra(AUTHOR_KEY, clickedItem.firebaseId);
-
-                DataCache.getInstance().store(clickedItem);
 
                 startActivity(intent);
             }
@@ -119,41 +159,29 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
             return;
         }
 
-        // Retrieve the user's profile from cache
-        mUser = (Author) DataCache.getInstance().get(user.getUid());
-
-        if (mUserListener == null) {
-
-            // Set a Listener to listen for changes to the profile
-            mUserListener = new SmartValueEventListener(AUTHOR, user.getUid()) {
-                @Override
-                public void onModelChange(BaseModel model) {
-                    if (model == null) return;
-
-                    // Store the changes in the profile in the cache
-                    DataCache.getInstance().store(model);
-
-                    // Re-run this method to update the Adapter
-                    loadCurrentUser();
-                }
-            };
-
-            mUserListener.start();
-        }
-
-        if (mUser != null && mResultList != null) {
-
-            // Update the Adapter with the changes in the logged in user
-            removeExistingFromResults(mResultList, mUser.getFriends());
-
-            if (mSearchType == FOLLOW) {
-                removeExistingFromResults(mResultList, mUser.getFollowing());
-            } else {
-                removeExistingFromResults(mResultList, mUser.getSentRequests());
+        mUserListener = new ModelChangeListener<Author>(AUTHOR, user.getUid()) {
+            @Override
+            public void onModelReady(Author model) {
+                mUser = model;
             }
 
-            mAdapter.setFriendList(mResultList);
-        }
+            @Override
+            public void onModelChanged() {
+
+                // Update the Adapter with the changes in the logged in user
+                removeExistingFromResults(mResultList, mUser.getFriends());
+
+                if (mSearchType == FOLLOW) {
+                    removeExistingFromResults(mResultList, mUser.getFollowing());
+                } else {
+                    removeExistingFromResults(mResultList, mUser.getSentRequests());
+                }
+
+                mAdapter.setFriendList(mResultList);
+            }
+        };
+
+        mService.registerModelChangeListener(mUserListener);
     }
 
     /**
