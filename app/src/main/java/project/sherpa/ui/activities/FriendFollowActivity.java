@@ -41,47 +41,15 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
     private ModelChangeListener<Author> mSendUserListener;
     private ModelChangeListener<Author> mReceiveUserListener;
 
-    private boolean mBound;
-    private FirebaseProviderService mService;
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            FirebaseProviderBinder binder = (FirebaseProviderBinder) iBinder;
-            mService = binder.getService();
-            mBound = true;
-
-            // Load the user profile for the logged in FirebaseUser
-            loadSendUserProfile();
-
-            // Load the user profile for the user being accessed
-            String userId = getIntent().getStringExtra(AUTHOR_KEY);
-            loadReceiveUserProfile(userId);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBound = false;
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_friend_follow);
+        bindFirebaseProviderService(true);
 
         if (getIntent() == null) finish();
 
         addConnectivityCallback(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (!mBound) {
-            Intent intent = new Intent(this, FirebaseProviderService.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        }
     }
 
     @Override
@@ -101,13 +69,6 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-
-        if (mBound) unbindService(mConnection);
-    }
-
-    @Override
     public void onConnected() {
         FirebaseDatabase.getInstance().goOnline();
     }
@@ -115,6 +76,17 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
     @Override
     public void onDisconnected() {
         FirebaseDatabase.getInstance().goOffline();
+    }
+
+    @Override
+    protected void onServiceConnected() {
+
+        // Load the user profile for the logged in FirebaseUser
+        loadSendUserProfile();
+
+        // Load the user profile for the user being accessed
+        String userId = getIntent().getStringExtra(AUTHOR_KEY);
+        loadReceiveUserProfile(userId);
     }
 
     /**

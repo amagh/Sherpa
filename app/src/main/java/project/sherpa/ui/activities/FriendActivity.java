@@ -39,38 +39,15 @@ public class FriendActivity extends ConnectivityActivity {
     private ActivityFriendBinding mBinding;
     private FriendFragmentAdapter mAdapter;
     private int mSelectedPage;
-    private FirebaseProviderService mService;
-    private boolean mBound;
     private ModelChangeListener<Author> mAuthorListener;
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            FirebaseProviderBinder binder = (FirebaseProviderBinder) iBinder;
-            mService = binder.getService();
-            mBound = true;
-
-            setAuthorChangeListener();
-            getCurrentFragment().onAuthorChanged(mAuthorListener.getModel());
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBound = false;
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_friend);
+        bindFirebaseProviderService(true);
 
         initViewPager();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        doBindService();
     }
 
     @Override
@@ -80,15 +57,15 @@ public class FriendActivity extends ConnectivityActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        doUnbindService();
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         if (mAuthorListener != null) mService.unregisterModelChangeListener(mAuthorListener);
+    }
+
+    @Override
+    protected void onServiceConnected() {
+        setAuthorChangeListener();
+        getCurrentFragment().onAuthorChanged(mAuthorListener.getModel());
     }
 
     /**
@@ -128,26 +105,6 @@ public class FriendActivity extends ConnectivityActivity {
      */
     private BaseFriendFragment getCurrentFragment() {
         return (BaseFriendFragment) mAdapter.getItem(mBinding.friendVp.getCurrentItem());
-    }
-
-    /**
-     * Binds the FirebaseProviderService to the Activity
-     */
-    private synchronized void doBindService() {
-        if (!mBound) {
-            Intent intent = new Intent(this, FirebaseProviderService.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        }
-    }
-
-    /**
-     * Unbinds the FirebaseProviderService from the Activity
-     */
-    private synchronized void doUnbindService() {
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
     }
 
     /**
