@@ -1,6 +1,11 @@
 package project.sherpa.ui.fragments;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.ViewDataBinding;
+import android.os.IBinder;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -12,7 +17,9 @@ import java.lang.reflect.Method;
 
 import project.sherpa.R;
 import project.sherpa.ads.viewmodels.AdViewModel;
+import project.sherpa.services.firebaseservice.FirebaseProviderService;
 import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
+import project.sherpa.services.firebaseservice.FirebaseProviderService.FirebaseProviderBinder;
 
 /**
  * Created by Alvin on 9/7/2017.
@@ -23,6 +30,25 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
     // ** Member Variables ** //
     private Snackbar mSnackbar;
 
+    protected FirebaseProviderService mService;
+    private boolean mBindService;
+    private boolean mBound;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            FirebaseProviderBinder binder = (FirebaseProviderBinder) iBinder;
+            mService = binder.getService();
+            mBound = true;
+
+            ConnectivityFragment.this.onServiceConnected();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBound = false;
+        }
+    };
+
     @Override
     public void onStart() {
         super.onStart();
@@ -31,6 +57,8 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
         if (getActivity() instanceof ConnectivityActivity) {
             ((ConnectivityActivity) getActivity()).addConnectivityCallback(this);
         }
+
+        bindService();
     }
 
     @Override
@@ -41,6 +69,8 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
         if (getActivity() instanceof ConnectivityActivity) {
             ((ConnectivityActivity) getActivity()).removeConnectivityCallback(this);
         }
+
+        unBindService();
     }
 
     @Override
@@ -77,6 +107,36 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
                 }
             });
         }
+    }
+
+    /**
+     * Binds the FirebaseProviderService for ths Fragment
+     */
+    private synchronized void bindService() {
+        if (!mBound && mBindService) {
+            Intent intent = new Intent(getActivity(), FirebaseProviderService.class);
+            getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
+
+    /**
+     * Unbinds the FirebaseProviderService for this Fragment
+     */
+    private synchronized void unBindService() {
+        if (mBound && mBindService) {
+            getActivity().unbindService(mConnection);
+        }
+    }
+
+    public void bindFirebaseProviderService(boolean bindService) {
+        mBindService = bindService;
+    }
+
+    /**
+     * Called when the FirebaseProviderService is bound
+     */
+    protected void onServiceConnected() {
+
     }
 
     /**
