@@ -95,7 +95,7 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
     /**
      * Loads the Firebase profile for the logged in FirebaseUser
      */
-    private synchronized void loadSendUserProfile() {
+    private void loadSendUserProfile() {
 
         // Get the FirebaseUser
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -128,8 +128,8 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
 
         if (mSendUser != null && mViewModel == null) {
 
-            // ViewModel not instantiated, notify the Thread that mSendUser is loaded
-            notifyAll();
+            // ViewModel not instantiated, attempt to load the ViewModel
+            loadViewModel();
         } else if (mSendUser != null) {
 
             // ViewModel is loaded, notify it to update its values
@@ -142,7 +142,7 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
      *
      * @param userId    FirebaseId of the user to be retrieved
      */
-    private synchronized void loadReceiveUserProfile(final String userId) {
+    private void loadReceiveUserProfile(final String userId) {
 
         // Attempt to retrieve the user from the cache
         mReceiveUser = (Author) DataCache.getInstance().get(userId);
@@ -153,7 +153,6 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
                 @Override
                 public void onModelChange(BaseModel model) {
                     if (model == null) return;
-                    DataCache.getInstance().store(model);
 
                     loadReceiveUserProfile(userId);
                 }
@@ -165,8 +164,8 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
 
         if (mReceiveUser != null && mViewModel == null) {
 
-            // ViewModel not instantiated, notify the Thread that mReceiveUser is loaded
-            notifyAll();
+            // ViewModel not instantiated, attempt to load the ViewModel
+            loadViewModel();
 
             initToolbar();
         } else if (mReceiveUser != null) {
@@ -181,32 +180,12 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
      */
     private void loadViewModel() {
 
-        // Init the Thread that will set the ViewModel
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
+        if (mReceiveUser == null || mSendUser == null) return;
 
-                // Lock to the Activity
-                synchronized (FriendFollowActivity.this) {
+        // Init and set the ViewModel
+        mViewModel = new FriendFollowViewModel(FriendFollowActivity.this, mSendUser, mReceiveUser);
 
-                    // Wait while mReceiveUser and mSendUser are loading
-                    while (mReceiveUser == null || mSendUser == null) {
-                        try {
-                            FriendFollowActivity.this.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    // Init and set the ViewModel
-                    mViewModel = new FriendFollowViewModel(FriendFollowActivity.this, mSendUser, mReceiveUser);
-
-                    mBinding.setVm(mViewModel);
-                    mBinding.notifyPropertyChanged(BR._all);
-                }
-            }
-        });
-
-        thread.start();
+        mBinding.setVm(mViewModel);
+        mBinding.notifyPropertyChanged(BR._all);
     }
 }
