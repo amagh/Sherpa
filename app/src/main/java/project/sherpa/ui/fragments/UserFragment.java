@@ -99,45 +99,12 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
 
     // ** Member Variables ** //
     private FragmentUserBinding mBinding;
-    private FirebaseProviderService mService;
-    private boolean mBound;
     private Author mAuthor;
     private AuthorDetailsAdapter mAdapter;
     private List<BaseModel> mModelList;
+
     private Map<String, ModelChangeListener> mListenerMap = new HashMap<>();
     private QueryChangeListener<Guide> mGuideQueryListener;
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            FirebaseProviderBinder binder = (FirebaseProviderBinder) iBinder;
-            mService = binder.getService();
-            mBound = true;
-
-            Bundle args = UserFragment.this.getArguments();
-            String userId = null;
-
-            if (args == null) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null) userId = user.getUid();
-
-            } else {
-                userId = args.getString(AUTHOR_KEY, null);
-            }
-
-            if (userId == null) {
-                Intent intent = new Intent(getActivity(), AccountActivity.class);
-                startActivityForResult(intent, ACCOUNT_ACTIVITY_REQUEST_CODE);
-            } else {
-                loadUserSelfProfile();
-                loadUserProfile(userId);
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBound = false;
-        }
-    };
 
     /**
      * Factory pattern for creating a new instance of the Fragment
@@ -162,6 +129,7 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_user, container, false);
+        bindFirebaseProviderService(true);
 
         initFabSpeedDialer();
         initRecyclerView();
@@ -235,11 +203,8 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        Intent intent = new Intent(getActivity(), FirebaseProviderService.class);
-        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    public void onResume() {
+        super.onResume();
 
         // Start listening for changes in the data
         for (ModelChangeListener listener : mListenerMap.values()) {
@@ -250,16 +215,12 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
 
         // Reset the message icon
         if (mBinding.getUfvm() != null) mBinding.getUfvm().setHasNewMessages(false);
+        mBinding.getVm().notifyPropertyChanged(BR._all);
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-
-        if (mBound) {
-            getActivity().unbindService(mConnection);
-            mBound = false;
-        }
+    public void onPause() {
+        super.onPause();
 
         // Stop listening for changes in the data
         for (ModelChangeListener listener : mListenerMap.values()) {
@@ -267,6 +228,29 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         }
 
         if (mGuideQueryListener != null) mService.unregisterQueryChangeListener(mGuideQueryListener);
+    }
+
+    @Override
+    protected void onServiceConnected() {
+
+        Bundle args = UserFragment.this.getArguments();
+        String userId = null;
+
+        if (args == null) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) userId = user.getUid();
+
+        } else {
+            userId = args.getString(AUTHOR_KEY, null);
+        }
+
+        if (userId == null) {
+            Intent intent = new Intent(getActivity(), AccountActivity.class);
+            startActivityForResult(intent, ACCOUNT_ACTIVITY_REQUEST_CODE);
+        } else {
+            loadUserSelfProfile();
+            loadUserProfile(userId);
+        }
     }
 
     /**
@@ -703,9 +687,4 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         mBinding.userPb.setVisibility(View.GONE);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        mBinding.getVm().notifyPropertyChanged(BR._all);
-    }
 }
