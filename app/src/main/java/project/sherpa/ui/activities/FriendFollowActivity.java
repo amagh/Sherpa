@@ -1,7 +1,12 @@
 package project.sherpa.ui.activities;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.IBinder;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -12,11 +17,11 @@ import project.sherpa.BR;
 import project.sherpa.R;
 import project.sherpa.databinding.ActivityFriendFollowBinding;
 import project.sherpa.models.datamodels.Author;
-import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.FriendFollowViewModel;
+import project.sherpa.services.firebaseservice.FirebaseProviderService;
+import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
-import project.sherpa.utilities.DataCache;
-import project.sherpa.services.firebaseservice.SmartValueEventListener;
+import project.sherpa.services.firebaseservice.FirebaseProviderService.FirebaseProviderBinder;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
@@ -32,7 +37,32 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
     private Author mSendUser;
     private Author mReceiveUser;
     private FriendFollowViewModel mViewModel;
-    private SmartValueEventListener[] listeners = new SmartValueEventListener[2];
+
+    private ModelChangeListener<Author> mSendUserListener;
+    private ModelChangeListener<Author> mReceiveUserListener;
+
+    private boolean mBound;
+    private FirebaseProviderService mService;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            FirebaseProviderBinder binder = (FirebaseProviderBinder) iBinder;
+            mService = binder.getService();
+            mBound = true;
+
+            // Load the user profile for the logged in FirebaseUser
+            loadSendUserProfile();
+
+            // Load the user profile for the user being accessed
+            String userId = getIntent().getStringExtra(AUTHOR_KEY);
+            loadReceiveUserProfile(userId);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBound = false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,36 +72,39 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
         if (getIntent() == null) finish();
 
         addConnectivityCallback(this);
-
-        // Start the process that will load the ViewModel
-        loadViewModel();
-
-        // Load the user profile for the logged in FirebaseUser
-        loadSendUserProfile();
-
-        // Load the user profile for the user being accessed
-        String userId = getIntent().getStringExtra(AUTHOR_KEY);
-        loadReceiveUserProfile(userId);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        // Start listening for changes
-        for (SmartValueEventListener listener : listeners) {
-            if (listener != null) listener.start();
+        if (!mBound) {
+            Intent intent = new Intent(this, FirebaseProviderService.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mSendUserListener != null) mService.registerModelChangeListener(mSendUserListener);
+        if (mReceiveUserListener != null) mService.registerModelChangeListener(mReceiveUserListener);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        // Stop listening for changes
-        for (SmartValueEventListener listener : listeners) {
-            if (listener != null) listener.stop();
-        }
+        if (mSendUserListener != null) mService.unregisterModelChangeListener(mSendUserListener);
+        if (mReceiveUserListener != null) mService.unregisterModelChangeListener(mReceiveUserListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mBound) unbindService(mConnection);
     }
 
     @Override
@@ -107,34 +140,30 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
             return;
         }
 
-        // Attempt to retrieve the user from the cache
-        mSendUser = (Author) DataCache.getInstance().get(user.getUid());
+        mSendUserListener = new ModelChangeListener<Author>(AUTHOR, user.getUid()) {
+            @Override
+            public void onModelReady(Author model) {
+                mSendUser = model;
 
-        if (listeners[0] == null) {
-            // Author does not exist in the cache, load it from Firebase
-            SmartValueEventListener listener = new SmartValueEventListener(AUTHOR, user.getUid()) {
-                @Override
-                public void onModelChange(BaseModel model) {
-                    if (model == null) return;
-                    DataCache.getInstance().store(model);
+                // ViewModel not instantiated, attempt to load the ViewModel
+                if (mViewModel == null) loadViewModel();
 
-                    loadSendUserProfile();
-                }
-            };
+                    // ViewModel is loaded, notify it to update its values
+                else mViewModel.notifyPropertyChanged(BR._all);
+            }
 
-            listener.start();
-            listeners[0] = listener;
-        }
+            @Override
+            public void onModelChanged() {
 
-        if (mSendUser != null && mViewModel == null) {
+                // ViewModel not instantiated, attempt to load the ViewModel
+                if (mViewModel == null) loadViewModel();
 
-            // ViewModel not instantiated, attempt to load the ViewModel
-            loadViewModel();
-        } else if (mSendUser != null) {
+                    // ViewModel is loaded, notify it to update its values
+                else mViewModel.notifyPropertyChanged(BR._all);
+            }
+        };
 
-            // ViewModel is loaded, notify it to update its values
-            mViewModel.notifyPropertyChanged(BR._all);
-        }
+        mService.registerModelChangeListener(mSendUserListener);
     }
 
     /**
@@ -144,35 +173,32 @@ public class FriendFollowActivity extends ConnectivityActivity implements Connec
      */
     private void loadReceiveUserProfile(final String userId) {
 
-        // Attempt to retrieve the user from the cache
-        mReceiveUser = (Author) DataCache.getInstance().get(userId);
+        mReceiveUserListener = new ModelChangeListener<Author>(AUTHOR, userId) {
+            @Override
+            public void onModelReady(Author model) {
+                mReceiveUser = model;
 
-        if (listeners[1] == null) {
-            // Author does not exist in the cache, load it from Firebase
-            SmartValueEventListener listener = new SmartValueEventListener(AUTHOR, userId) {
-                @Override
-                public void onModelChange(BaseModel model) {
-                    if (model == null) return;
-
-                    loadReceiveUserProfile(userId);
+                // ViewModel not instantiated, attempt to load the ViewModel
+                if (mViewModel == null) {
+                    loadViewModel();
+                    initToolbar();
                 }
-            };
 
-            listener.start();
-            listeners[1] = listener;
-        }
+                    // ViewModel is loaded, notify it to update its values
+                else mViewModel.notifyPropertyChanged(BR._all);
+            }
 
-        if (mReceiveUser != null && mViewModel == null) {
+            @Override
+            public void onModelChanged() {
+                // ViewModel not instantiated, attempt to load the ViewModel
+                if (mViewModel == null) loadViewModel();
 
-            // ViewModel not instantiated, attempt to load the ViewModel
-            loadViewModel();
+                    // ViewModel is loaded, notify it to update its values
+                else mViewModel.notifyPropertyChanged(BR._all);
+            }
+        };
 
-            initToolbar();
-        } else if (mReceiveUser != null) {
-
-            // ViewModel is loaded, notify it to update its values
-            mViewModel.notifyPropertyChanged(BR._all);
-        }
+        mService.registerModelChangeListener(mReceiveUserListener);
     }
 
     /**
