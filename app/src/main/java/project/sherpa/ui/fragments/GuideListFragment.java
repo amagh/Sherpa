@@ -13,11 +13,8 @@ import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,12 +28,16 @@ import project.sherpa.databinding.FragmentGuideListBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.services.firebaseservice.ModelChangeListener;
+import project.sherpa.services.firebaseservice.QueryChangeListener;
 import project.sherpa.ui.activities.MainActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
 
 /**
  * Created by Alvin on 7/21/2017.
@@ -49,6 +50,8 @@ public class GuideListFragment extends ConnectivityFragment {
     private GuideAdapter mAdapter;
     private Author mAuthor;
     private List<Guide> mGuideList;
+    private QueryChangeListener<Guide> mGuideQueryListener;
+    private ModelChangeListener<Author> mUserListener;
 
     public GuideListFragment() {}
 
@@ -56,6 +59,7 @@ public class GuideListFragment extends ConnectivityFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // DataBind inflation of the View
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_guide_list, container, false);
+        bindFirebaseProviderService(true);
 
         ((MainActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
 
@@ -98,13 +102,19 @@ public class GuideListFragment extends ConnectivityFragment {
     }
 
     @Override
-    public void onConnected() {
-        super.onConnected();
+    public void onDisconnected() {
+        super.onDisconnected();
+
+        mBinding.guideListPb.setVisibility(View.GONE);
+    }
+
+    @Override
+    protected void onServiceConnected() {
 
         if (mAuthor == null) {
 
             // Attempt to load a logged in user's favorite data
-            loadFavoriteData();
+            loadCurrentUser();
         }
 
         // If Adapter is empty, load the Guides from Firebase
@@ -119,54 +129,38 @@ public class GuideListFragment extends ConnectivityFragment {
         }
     }
 
-    @Override
-    public void onDisconnected() {
-        super.onDisconnected();
-
-        mBinding.guideListPb.setVisibility(View.GONE);
-    }
-
+    /**
+     * Initiates the QueryChangeListener for the latest guides
+     */
     private void loadGuides() {
 
-        final Query guideQuery = FirebaseDatabase.getInstance().getReference()
+        Query guideQuery = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.GUIDES)
                 .orderByKey()
                 .limitToLast(20);
 
-        guideQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        mGuideQueryListener = new QueryChangeListener<Guide>(GUIDE, guideQuery, null) {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Guide[] guides = (Guide[]) FirebaseProviderUtils.getModelsFromSnapshot(
-                        FirebaseProviderUtils.FirebaseType.GUIDE,
-                        dataSnapshot);
+            public void onQueryChanged(Guide[] models) {
 
-                mGuideList = Arrays.asList(guides);
+                // Convert the Array of Guides to a List, reverse them so the newest guides are
+                // first and then set it to the Adapter
+                mGuideList = new ArrayList<>(Arrays.asList(models));
                 Collections.reverse(mGuideList);
                 mAdapter.setGuides(mGuideList);
 
-                // Hide ProgressBar
+                // Hide the ProgressBar
                 mBinding.guideListPb.setVisibility(View.GONE);
-
-                DataCache cache = DataCache.getInstance();
-                for (Guide guide : mGuideList) {
-                    cache.store(guide);
-                }
-
-                guideQuery.removeEventListener(this);
             }
+        };
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-                guideQuery.removeEventListener(this);
-            }
-        });
+        mService.registerQueryChangeListener(mGuideQueryListener);
     }
 
     /**
      * Loads a logged in user's favorite data from Firebase
      */
-    private void loadFavoriteData() {
+    private void loadCurrentUser() {
 
         // Check if the user is logged into their account
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -174,26 +168,24 @@ public class GuideListFragment extends ConnectivityFragment {
         // Not logged in, nothing to do
         if (user == null) return;
 
-        // Retrieve the current user from DataCache
-        mAuthor = (Author) DataCache.getInstance().get(user.getUid());
+        mUserListener = new ModelChangeListener<Author>(AUTHOR, user.getUid()) {
+            @Override
+            public void onModelReady(Author model) {
+                mAuthor = model;
 
-        if (mAuthor != null) {
+                // Set the Author to the Adapter so that the favorite data can be synchronized
+                mAdapter.setAuthor(mAuthor);
+            }
 
-            // For checking to see if a guide has been favorite'd by the user
-            mAdapter.setAuthor(mAuthor);
-        } else {
+            @Override
+            public void onModelChanged() {
 
-            // User not found in cache. Load from Firebase
-            FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
-                @Override
-                public void onModelReady(BaseModel model) {
-                    mAuthor = (Author) model;
+                // Update the favorite status in the Adapter
+                mAdapter.updateViewModelFavorites();
+            }
+        };
 
-                    // For checking to see if a guide has been favorite'd by the user
-                    mAdapter.setAuthor(mAuthor);
-                }
-            });
-        }
+        mService.registerModelChangeListener(mUserListener);
     }
 
     @Override

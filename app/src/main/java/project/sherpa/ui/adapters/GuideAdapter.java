@@ -7,8 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.databinding.library.baseAdapters.BR;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import project.sherpa.R;
 import project.sherpa.databinding.ListItemGuideBinding;
@@ -34,6 +38,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     private boolean useSearchLayout;
     private String mHighlighted;
     private Author mAuthor;
+    private Map<Guide, GuideViewModel> mViewModelMap = new HashMap<>();
 
     public GuideAdapter(ClickHandler clickHandler) {
         mHandler = clickHandler;
@@ -202,6 +207,16 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     }
 
     /**
+     * Updates the favorite status of each guide in the Adapter
+     */
+    public void updateViewModelFavorites() {
+
+        for (GuideViewModel vm : mViewModelMap.values()) {
+            vm.notifyPropertyChanged(BR.favorite);
+        }
+    }
+
+    /**
      * For passing information about the clicked guide to the Activity/Fragment
      */
     public interface ClickHandler {
@@ -229,7 +244,10 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
             // DataBinding
             if (!useSearchLayout) {
 
-                GuideViewModel vm = new GuideViewModel(mBinding.getRoot().getContext(), guide);
+                GuideViewModel vm = mViewModelMap.get(guide) != null
+                        ? mViewModelMap.get(guide)
+                        : new GuideViewModel(mBinding.getRoot().getContext(), guide);
+
                 vm.setAuthor(mAuthor);
 
                 ((ListItemGuideBinding) mBinding).top.setVm(vm);
