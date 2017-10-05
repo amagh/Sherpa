@@ -25,7 +25,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 import project.sherpa.BuildConfig;
 import project.sherpa.R;
-import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideProvider;
 import project.sherpa.databinding.FragmentGuideDetailsBinding;
@@ -37,12 +36,12 @@ import project.sherpa.models.viewmodels.GuideViewModel;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.activities.UserActivity;
 import project.sherpa.ui.adapters.GuideDetailsAdapter;
+import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.MapUtils;
 import project.sherpa.utilities.OfflineGuideManager;
-import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;

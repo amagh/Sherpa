@@ -64,6 +64,7 @@ import project.sherpa.ui.adapters.AuthorDetailsAdapter;
 import project.sherpa.ui.adapters.GuideAdapter;
 import project.sherpa.ui.behaviors.FabSpeedDialScrollBehavior;
 import project.sherpa.ui.dialogs.ProgressDialog;
+import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;

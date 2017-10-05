@@ -1,13 +1,9 @@
 package project.sherpa.ui.fragments;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
@@ -33,17 +29,14 @@ import project.sherpa.databinding.FragmentChatBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
-import project.sherpa.services.firebaseservice.FirebaseProviderService;
 import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.ui.activities.MessageActivity;
 import project.sherpa.ui.activities.NewChatActivity;
 import project.sherpa.ui.adapters.ChatAdapter;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
+import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.ContentProviderUtils;
-import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
-import project.sherpa.services.firebaseservice.FirebaseProviderService.*;
-import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
@@ -68,27 +61,10 @@ public class ChatFragment extends ConnectivityFragment {
     private List<String> mAuthorIdList = new ArrayList<>();
     private Map<String, Chat> mDatabaseChatMap = new HashMap<>();
 
-    private FirebaseProviderService mService;
-    private boolean mBound;
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            FirebaseProviderBinder binder = (FirebaseProviderBinder) iBinder;
-            mService = binder.getService();
-            mBound = true;
-
-            loadCurrentUser();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBound = false;
-        }
-    };
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat, container, false);
+        bindFirebaseProviderService(true);
         initRecyclerView();
         return mBinding.getRoot();
     }
@@ -97,8 +73,6 @@ public class ChatFragment extends ConnectivityFragment {
      * Loads the current logged in Firebase User
      */
     private void loadCurrentUser() {
-
-        if (!mBound) return;
 
         // Get the User and load their profile from the DataCache
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -141,8 +115,6 @@ public class ChatFragment extends ConnectivityFragment {
      * user if they have a new message
      */
     private void loadChats() {
-
-        if (!mBound) return;
 
         // Remove any Chats from the local database that have been deleted from the Firebase profile
         checkAndRemoveDeletedChats();
@@ -261,23 +233,8 @@ public class ChatFragment extends ConnectivityFragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        if (!mBound) {
-            Intent intent = new Intent(getActivity(), FirebaseProviderService.class);
-            getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        if (mBound) {
-            // Unbind the FirebaseProviderService
-            getActivity().unbindService(mConnection);
-        }
+    protected void onServiceConnected() {
+        loadCurrentUser();
     }
 
     /**

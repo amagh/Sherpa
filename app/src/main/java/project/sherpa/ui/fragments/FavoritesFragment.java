@@ -34,6 +34,7 @@ import project.sherpa.ui.activities.AttachActivity;
 import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
+import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 

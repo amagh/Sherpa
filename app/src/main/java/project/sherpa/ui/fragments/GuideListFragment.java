@@ -27,13 +27,12 @@ import project.sherpa.data.GuideDatabase;
 import project.sherpa.databinding.FragmentGuideListBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Guide;
-import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.services.firebaseservice.QueryChangeListener;
 import project.sherpa.ui.activities.MainActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
+import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.DataCache;
-import project.sherpa.utilities.FirebaseProviderUtils;
 
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;

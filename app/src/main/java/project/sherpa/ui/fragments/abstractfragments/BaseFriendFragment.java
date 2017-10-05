@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import project.sherpa.R;
 import project.sherpa.databinding.FragmentFriendBinding;
 import project.sherpa.models.datamodels.Author;
-import project.sherpa.ui.fragments.ConnectivityFragment;
 
 /**
  * Created by Alvin on 9/26/2017.

@@ -37,7 +37,7 @@ import project.sherpa.R;
 import project.sherpa.firebasestorage.StorageProvider;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.ui.fragments.FavoritesFragment;
-import project.sherpa.ui.fragments.MapboxFragment;
+import project.sherpa.ui.fragments.abstractfragments.MapboxFragment;
 import project.sherpa.ui.views.SmartMapView;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.ui.activities.CreateGuideActivity;

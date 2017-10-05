@@ -1,14 +1,10 @@
 package project.sherpa.ui.fragments;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -43,24 +39,21 @@ import project.sherpa.models.datamodels.Message;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.ChatViewModel;
 import project.sherpa.models.viewmodels.MessageViewModel;
-import project.sherpa.services.firebaseservice.FirebaseProviderService;
 import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.ui.activities.AttachActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.activities.MessageActivity;
 import project.sherpa.ui.adapters.MessageAdapter;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
+import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
-import project.sherpa.services.firebaseservice.SmartValueEventListener;
-import project.sherpa.services.firebaseservice.FirebaseProviderService.*;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static project.sherpa.models.datamodels.Message.ATTACHMENT_TYPE;
 import static project.sherpa.models.datamodels.Message.AttachmentType.GUIDE_TYPE;
-import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_ATTACH_GUIDE;
@@ -86,38 +79,6 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     private ChatViewModel mChatViewModel;
 
     private ModelChangeListener<Chat> mChatListener;
-    private boolean mBound;
-    private FirebaseProviderService mService;
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-
-            // Bind to the Service
-            FirebaseProviderBinder binder = (FirebaseProviderBinder) iBinder;
-            mService = binder.getService();
-            mBound = true;
-
-            Bundle args = getArguments();
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-            if (args == null || user == null) {
-                getActivity().finish();
-                return;
-            }
-
-            // Set the Author as the logged in Author
-            mAuthor = (Author) DataCache.getInstance().get(user.getUid());
-
-            // Start the Chat
-            String chatId = GuideProvider.getIdFromUri((Uri) args.getParcelable(CHAT_KEY));
-            setChatListener(chatId);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBound = false;
-        }
-    };
 
     /**
      * Factory pattern for instantiating MessageFragment
@@ -143,6 +104,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_message, container, false);
+        bindFirebaseProviderService(true);
 
         setHasOptionsMenu(true);
         initRecyclerView();
@@ -205,25 +167,36 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        // Start listening for changes in data
-        if (!mBound) {
-            Intent intent = new Intent(getActivity(), FirebaseProviderService.class);
-            getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        }
-
+    public void onResume() {
+        super.onResume();
+        // Start listening for changes
         if (mChatListener != null) mService.registerModelChangeListener(mChatListener);
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-
+    public void onPause() {
+        super.onPause();
         // Stop listening for changes
         if (mChatListener != null) mService.unregisterModelChangeListener(mChatListener);
-        if (mBound) getActivity().unbindService(mConnection);
+    }
+
+    @Override
+    protected void onServiceConnected() {
+
+        Bundle args = getArguments();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (args == null || user == null) {
+            getActivity().finish();
+            return;
+        }
+
+        // Set the Author as the logged in Author
+        mAuthor = (Author) DataCache.getInstance().get(user.getUid());
+
+        // Start the Chat
+        String chatId = GuideProvider.getIdFromUri((Uri) args.getParcelable(CHAT_KEY));
+        setChatListener(chatId);
     }
 
     @Override

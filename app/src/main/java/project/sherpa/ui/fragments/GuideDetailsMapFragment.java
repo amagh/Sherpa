@@ -7,13 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import project.sherpa.R;
-import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.databinding.FragmentGuideDetailsMapBinding;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.GuideDetailsMapViewModel;
 import project.sherpa.models.viewmodels.GuideViewModel;
 import project.sherpa.ui.activities.GuideDetailsActivity;
+import project.sherpa.ui.fragments.abstractfragments.MapboxFragment;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import timber.log.Timber;

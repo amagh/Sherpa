@@ -1,4 +1,4 @@
-package project.sherpa.ui.fragments;
+package project.sherpa.ui.fragments.abstractfragments;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -70,7 +70,7 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
             ((ConnectivityActivity) getActivity()).removeConnectivityCallback(this);
         }
 
-        unBindService();
+        unbindService();
     }
 
     @Override
@@ -122,12 +122,18 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
     /**
      * Unbinds the FirebaseProviderService for this Fragment
      */
-    private synchronized void unBindService() {
+    private synchronized void unbindService() {
         if (mBound && mBindService) {
             getActivity().unbindService(mConnection);
         }
     }
 
+    /**
+     * Sets whether the Fragment should bind to FirebaseProviderService
+     *
+     * @param bindService    Boolean value for whether the Fragment should connect to the
+     *                       FirebaseProviderService
+     */
     public void bindFirebaseProviderService(boolean bindService) {
         mBindService = bindService;
     }
@@ -135,14 +141,12 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
     /**
      * Called when the FirebaseProviderService is bound
      */
-    protected void onServiceConnected() {
-
-    }
+    protected void onServiceConnected() {}
 
     /**
      * Loads the ViewModel to serve ads
      */
-    void loadAdViewModel(ViewDataBinding binding) {
+    public void loadAdViewModel(ViewDataBinding binding) {
 
         // Check if the ViewDataBinding contains a method for setting the AdViewModel. This method
         // should only exist in the free version of the app.

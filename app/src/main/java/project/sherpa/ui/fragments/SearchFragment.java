@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 import project.sherpa.R;
-import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.databinding.FragmentSearchBinding;
 import project.sherpa.firebasestorage.StorageProvider;
 import project.sherpa.models.datamodels.Guide;
@@ -47,6 +46,7 @@ import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.SearchViewModel;
 import project.sherpa.ui.activities.MainActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
+import project.sherpa.ui.fragments.abstractfragments.MapboxFragment;
 import project.sherpa.utilities.ColorGenerator;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
