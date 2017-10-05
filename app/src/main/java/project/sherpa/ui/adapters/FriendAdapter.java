@@ -137,10 +137,44 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     }
 
     /**
+     * Removes a friend from the Adapter
+     *
+     * @param friendId    FirebaseId of the friend to be removed
+     */
+    public void removeFriend(String friendId) {
+
+        // Remove the friend with FirebaseId friendId
+        for (int i = 0; i < mSortedList.size(); i++) {
+            Author friend = mSortedList.get(i);
+
+            if (friend.firebaseId.equals(friendId)) {
+                mSortedList.removeItemAt(i);
+                return;
+            }
+        }
+    }
+
+    /**
      * Clears the Adapter
      */
     public void clear() {
         mSortedList.clear();
+    }
+
+    /**
+     * Returns a List of all the FirebaseIds of the friends in the Adapter
+     *
+     * @return List of all the FirebaseIds of the friends in the Adapter
+     */
+    public List<String> getFirebaseIds() {
+        List<String> friendIdList = new ArrayList<>();
+
+        for (int i = 0; i < mSortedList.size(); i++) {
+            Author friend =  mSortedList.get(i);
+            friendIdList.add(friend.firebaseId);
+        }
+
+        return friendIdList;
     }
 
     class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
