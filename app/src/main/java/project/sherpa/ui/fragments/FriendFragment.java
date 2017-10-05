@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.List;
+
 import project.sherpa.R;
 import project.sherpa.databinding.FragmentFriendBinding;
 import project.sherpa.models.datamodels.Author;
@@ -21,6 +23,7 @@ import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.ui.fragments.abstractfragments.BaseFriendFragment;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 
@@ -53,39 +56,75 @@ public class FriendFragment extends BaseFriendFragment {
         mBinding.friendRv.setAdapter(mAdapter);
     }
 
-    /**
-     * Loads the user's profile
-     */
+
     @Override
-    protected void loadUser() {
-        super.loadUser();
-
-        if (mUser != null) {
-
-            // Load the friends list for this user
-            loadFriendsList(mUser);
+    public void onAuthorChanged(Author user) {
+        if (mUser == null) {
+            mUser = user;
+            loadFriendsList();
+        } else {
+            updateFriendsList();
         }
     }
 
     /**
      * Loads the friend list and adds them to the Adapter
-     *
-     * @param user    User to load the friend's list for
      */
-    private void loadFriendsList(Author user) {
-        if (user.getFriends() == null) return;
+    private void loadFriendsList() {
+        if (mUser.getFriends() == null) return;
+
+        Timber.d("Loading friends");
 
         // Get each friend from the friend list and add them to the Adapter
-        for (String friendId : user.getFriends()) {
-            FirebaseProviderUtils.getModel(FirebaseProviderUtils.FirebaseType.AUTHOR, friendId,
-                    new FirebaseProviderUtils.FirebaseListener() {
-                        @Override
-                        public void onModelReady(BaseModel model) {
-                            if (model == null) return;
-
-                            mAdapter.addFriend((Author) model);
-                        }
-                    });
+        for (String friendId : mUser.getFriends()) {
+            addFriendToAdapter(friendId);
         }
+    }
+
+    /**
+     * Updates the friend List
+     */
+    private void updateFriendsList() {
+        Timber.d("Updating friends list");
+        if (mUser.getFriends() == null) {
+            Timber.d("Clearing friend adapter");
+            mAdapter.clear();
+            return;
+        }
+
+        List<String> adapterIdList = mAdapter.getFirebaseIds();
+
+        // Remove any users that are no longer friends with the user
+        for (String adapterFriendId : adapterIdList) {
+            if (!mUser.getFriends().contains(adapterFriendId)) {
+                Timber.d("Removing " + adapterFriendId + " from the Adapter");
+                mAdapter.removeFriend(adapterFriendId);
+            }
+        }
+
+        // Add any users that have become friends with the user
+        for (String newFriendId : mUser.getFriends()) {
+            if (!adapterIdList.contains(newFriendId)) {
+                Timber.d("Adding " + newFriendId + " to the Adapter");
+                addFriendToAdapter(newFriendId);
+            }
+        }
+    }
+
+    /**
+     * Downloads a user's profile and adds them to the Adapter
+     *
+     * @param friendId    FirebaseId of the friend to be added to the Adapter
+     */
+    private void addFriendToAdapter(String friendId) {
+        FirebaseProviderUtils.getModel(FirebaseProviderUtils.FirebaseType.AUTHOR, friendId,
+                new FirebaseProviderUtils.FirebaseListener() {
+                    @Override
+                    public void onModelReady(BaseModel model) {
+                        if (model == null) return;
+
+                        mAdapter.addFriend((Author) model);
+                    }
+                });
     }
 }
