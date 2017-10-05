@@ -37,8 +37,6 @@ public class FollowingFragment extends BaseFriendFragment {
                 Intent intent = new Intent(getActivity(), UserActivity.class);
                 intent.putExtra(AUTHOR_KEY, clickedItem.firebaseId);
 
-                DataCache.getInstance().store(clickedItem);
-
                 startActivity(intent);
             }
         });

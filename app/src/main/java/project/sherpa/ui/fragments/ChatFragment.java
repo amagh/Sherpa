@@ -357,7 +357,6 @@ public class ChatFragment extends ConnectivityFragment {
                             // Add the Author to the DataCache and the local database
                             Author author = (Author) model;
 
-                            DataCache.getInstance().store(author);
                             ContentProviderUtils.insertModel(getActivity(), author);
 
                             // Add the Chat to the Adapter
@@ -376,8 +375,6 @@ public class ChatFragment extends ConnectivityFragment {
         Intent intent = new Intent(getActivity(), NewChatActivity.class);
         intent.putExtra(AUTHOR_KEY, mAuthor.firebaseId);
 
-        DataCache.getInstance().store(mAuthor);
-
         startActivity(intent);
     }
 
@@ -391,9 +388,6 @@ public class ChatFragment extends ConnectivityFragment {
         intent.putExtra(CHAT_KEY, chat.firebaseId);
 
         // Store the Chat and Author
-        DataCache.getInstance().store(chat);
-        DataCache.getInstance().store(mAuthor);
-
         startActivity(intent);
     }
 }

@@ -615,8 +615,6 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                 Intent intent = new Intent(getActivity(), MessageActivity.class);
                 intent.putExtra(CHAT_KEY, chat.firebaseId);
 
-                DataCache.getInstance().store(chat);
-
                 startActivity(intent);
 
                 mBinding.userMessagePb.setVisibility(View.GONE);
