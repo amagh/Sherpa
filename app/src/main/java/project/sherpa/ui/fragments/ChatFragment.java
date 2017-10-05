@@ -264,16 +264,20 @@ public class ChatFragment extends ConnectivityFragment {
     public void onStart() {
         super.onStart();
 
-        Intent intent = new Intent(getActivity(), FirebaseProviderService.class);
-        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        if (!mBound) {
+            Intent intent = new Intent(getActivity(), FirebaseProviderService.class);
+            getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        // Unbind the FirebaseProviderService
-        getActivity().unbindService(mConnection);
+        if (mBound) {
+            // Unbind the FirebaseProviderService
+            getActivity().unbindService(mConnection);
+        }
     }
 
     /**
