@@ -2,12 +2,15 @@ package project.sherpa.ui.activities.abstractactivities;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -15,6 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import project.sherpa.services.firebaseservice.FirebaseProviderService;
 
 /**
  * Created by Alvin on 8/9/2017.
@@ -29,6 +34,25 @@ public abstract class ConnectivityActivity extends AppCompatActivity {
     private Set<ConnectivityCallback> mCallbackSet;
     private boolean connectivityRegistered;
 
+    protected FirebaseProviderService mService;
+    private boolean mBindService;
+    private boolean mBound;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            FirebaseProviderService.FirebaseProviderBinder binder = (FirebaseProviderService.FirebaseProviderBinder) iBinder;
+            mService = binder.getService();
+            mBound = true;
+
+            ConnectivityActivity.this.onServiceConnected();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBound = false;
+        }
+    };
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -36,6 +60,8 @@ public abstract class ConnectivityActivity extends AppCompatActivity {
         if (!connectivityRegistered) {
             registerConnectivityListener();
         }
+
+        bindService();
     }
 
     @Override
@@ -45,6 +71,8 @@ public abstract class ConnectivityActivity extends AppCompatActivity {
         if (connectivityRegistered) {
             unregisterConnectivityListener();
         }
+
+        unbindService();
     }
 
     @Override
@@ -55,6 +83,37 @@ public abstract class ConnectivityActivity extends AppCompatActivity {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
+    /**
+     * Binds the FirebaseProviderService for ths Fragment
+     */
+    private synchronized void bindService() {
+        if (!mBound && mBindService) {
+            Intent intent = new Intent(this, FirebaseProviderService.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
+
+    /**
+     * Unbinds the FirebaseProviderService for this Fragment
+     */
+    private synchronized void unbindService() {
+        if (mBound && mBindService) {
+            unbindService(mConnection);
+        }
+    }
+
+    /**
+     * Sets whether the Activity should bind to FirebaseProviderService
+     *
+     * @param bindService    Boolean value for whether the Activity should connect to the
+     *                       FirebaseProviderService
+     */
+    public void bindFirebaseProviderService(boolean bindService) {
+        mBindService = bindService;
+    }
+
+    protected void onServiceConnected() {}
 
     /**
      * Sets the Callback for the ConnectivityListener
