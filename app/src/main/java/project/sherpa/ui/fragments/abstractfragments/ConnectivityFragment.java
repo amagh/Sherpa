@@ -123,7 +123,8 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
      * Unbinds the FirebaseProviderService for this Fragment
      */
     private synchronized void unbindService() {
-        if (mBound && mBindService) {
+        if (mBound) {
+            mBound = false;
             getActivity().unbindService(mConnection);
         }
     }

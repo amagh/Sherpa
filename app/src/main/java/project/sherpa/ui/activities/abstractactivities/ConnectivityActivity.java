@@ -65,14 +65,19 @@ public abstract class ConnectivityActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+
+        unbindService();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
 
         if (connectivityRegistered) {
             unregisterConnectivityListener();
         }
-
-        unbindService();
     }
 
     @Override
@@ -98,7 +103,8 @@ public abstract class ConnectivityActivity extends AppCompatActivity {
      * Unbinds the FirebaseProviderService for this Fragment
      */
     private synchronized void unbindService() {
-        if (mBound && mBindService) {
+        if (mBound) {
+            mBound = false;
             unbindService(mConnection);
         }
     }
