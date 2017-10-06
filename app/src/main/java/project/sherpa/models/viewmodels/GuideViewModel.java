@@ -668,22 +668,6 @@ public class GuideViewModel extends BaseObservable {
             ContentProviderUtils.toggleFavorite(mContext, mGuide);
         }
 
-        // If the user is on the FavoriteFragment and removing a favorite, then it needs to be
-        // removed from the Adapter when they click the favorite button
-        if (mContext instanceof AppCompatActivity) {
-
-            // Get a reference to the FavoriteFragment using the Fragment tag
-            FavoritesFragment fragment = (FavoritesFragment) ((AppCompatActivity) mContext)
-                    .getSupportFragmentManager()
-                    .findFragmentByTag(FRAG_TAG_FAVORITE);
-
-            if (!mGuide.isFavorite() && fragment != null) {
-
-                // Remove the Guide from the Adapter
-                fragment.removeGuideFromAdapter(mGuide);
-            }
-        }
-
         // Update the Widget
         FavoritesWidgetUpdateService.updateWidgets(mContext);
 
