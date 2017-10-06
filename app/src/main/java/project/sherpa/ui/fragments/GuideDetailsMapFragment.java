@@ -12,13 +12,17 @@ import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.GuideDetailsMapViewModel;
 import project.sherpa.models.viewmodels.GuideViewModel;
+import project.sherpa.services.firebaseservice.FirebaseProviderService;
+import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.fragments.abstractfragments.MapboxFragment;
+import project.sherpa.ui.fragments.interfaces.FirebaseProviderInterface;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
 
 /**
  * Created by Alvin on 8/7/2017.
@@ -31,6 +35,7 @@ public class GuideDetailsMapFragment extends MapboxFragment {
     private FragmentGuideDetailsMapBinding mBinding;
     private Guide mGuide;
     private boolean mTrackPosition;
+    private Bundle mSavedInstanceState;
 
     public GuideDetailsMapFragment() {}
 
@@ -56,30 +61,11 @@ public class GuideDetailsMapFragment extends MapboxFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mSavedInstanceState = savedInstanceState;
 
         // Inflate the View and set the ViewDataBinding
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_guide_details_map, container, false);
-
-        // Retrieve the Guide to populate the GuideViewModel
-        if (getArguments() != null && getArguments().getString(GUIDE_KEY) != null) {
-            String guideId = getArguments().getString(GUIDE_KEY);
-            mGuide = (Guide) DataCache.getInstance().get(guideId);
-
-            if (mGuide == null) {
-                mGuide = new Guide();
-                mGuide.firebaseId = guideId;
-            }
-
-        } else {
-            Timber.d("No Guide passed in the Bundle!");
-        }
-
-        // Initialize the Map
-        if (mGuide.authorId != null) {
-            initMap(savedInstanceState);
-        } else {
-            getGuideFromFirebase();
-        }
+        bindFirebaseProviderService(true);
 
         mBinding.setHandler(new GuideDetailsMapViewModel((GuideDetailsActivity) getActivity()));
 
@@ -92,15 +78,46 @@ public class GuideDetailsMapFragment extends MapboxFragment {
         return mBinding.getRoot();
     }
 
+    @Override
+    protected void onServiceConnected() {
+        String guideId = getArguments().getString(GUIDE_KEY);
+        loadGuide(guideId);
+    }
+
+    /**
+     * Loads a Guide from Firebase and initializes the MapboxMap
+     *
+     * @param guideId    FirebaseId of the guide to load the map for
+     */
+    private void loadGuide(String guideId) {
+
+        ModelChangeListener<Guide> guideListener = new ModelChangeListener<Guide>(GUIDE, guideId) {
+            @Override
+            public void onModelReady(Guide model) {
+                mGuide = model;
+                initMap();
+
+                mService.unregisterModelChangeListener(this);
+            }
+
+            @Override
+            public void onModelChanged() {
+
+            }
+        };
+
+        mService.registerModelChangeListener(guideListener);
+    }
+
     /**
      * Sets up the MapboxMap to show the trail
      */
-    private void initMap(Bundle savedInstanceState) {
-        Timber.d("Initializing MapView");
+    private void initMap() {
+        if (mBinding == null || mGuide == null) return;
 
         // Create a GuideViewModel, passing in the Guide
         GuideViewModel vm = new GuideViewModel(getActivity(), this, mGuide);
-        vm.addSavedInstanceState(savedInstanceState);
+        vm.addSavedInstanceState(mSavedInstanceState);
 
         if (mTrackPosition) {
             vm.setTrackUserPosition(true);
@@ -121,30 +138,5 @@ public class GuideDetailsMapFragment extends MapboxFragment {
         if (mTrackPosition && mBinding != null && mBinding.getVm() != null) {
             mBinding.getVm().setTrackUserPosition(true);
         }
-    }
-
-    /**
-     * Load the Guide details from Firebase and initialize the MapView for the Guide
-     */
-    private void getGuideFromFirebase() {
-
-        FirebaseProviderUtils.getModel(
-                FirebaseProviderUtils.FirebaseType.GUIDE,
-                mGuide.firebaseId,
-                new FirebaseProviderUtils.FirebaseListener() {
-                    @Override
-                    public void onModelReady(BaseModel model) {
-
-                        // Retrieve the Guide
-                        mGuide = (Guide) model;
-
-                        // Cache the Guide
-                        DataCache.getInstance().store(mGuide);
-
-                        // Initialize the MapView
-                        initMap(null);
-                    }
-                }
-        );
     }
 }

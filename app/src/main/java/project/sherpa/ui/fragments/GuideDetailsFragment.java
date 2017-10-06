@@ -61,7 +61,7 @@ import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.SECTIO
  * Created by Alvin on 8/7/2017.
  */
 
-public class GuideDetailsFragment extends ConnectivityFragment implements LoaderManager.LoaderCallbacks<Cursor>, FirebaseProviderInterface {
+public class GuideDetailsFragment extends ConnectivityFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // ** Constants ** //
     private static final int LOADER_GUIDE       = 3564;
@@ -80,14 +80,16 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
      * Factory for creating a GuideDetailsFragment for a specific Guide
      *
      * @param guideId    Guide whose details will be shown in the Fragment
+     * @param authorId   FirebaseId of the Author of the Guide
      * @return A GuideDetailsFragment with a Bundle attached for displaying details for a Guide
      */
-    public static GuideDetailsFragment newInstance(String guideId) {
+    public static GuideDetailsFragment newInstance(String guideId, String authorId) {
         // Init the Bundle that will be passed with the Fragment
         Bundle args = new Bundle();
 
         // Put the Guide from the signature into the Bundle
         args.putString(GUIDE_KEY, guideId);
+        args.putString(AUTHOR_KEY, authorId);
 
         // Initialize the Fragment and attach the args
         GuideDetailsFragment fragment = new GuideDetailsFragment();
@@ -99,6 +101,7 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_guide_details, container, false);
+        bindFirebaseProviderService(true);
 
         ((GuideDetailsActivity) getActivity()).setSupportActionBar(mBinding.guideDetailsTb);
 
@@ -412,19 +415,31 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
         if (mAuthor != null) mAdapter.addModel(mAuthor);
     }
 
-    public void onServiceConnected(FirebaseProviderService service) {
-        loadGuideFromFirebase(service);
+    public void onServiceConnected() {
+        loadGuideFromFirebase();
     }
 
-    private void loadGuideFromFirebase(FirebaseProviderService service) {
+    /**
+     * Loads all the information to display a Guide from Firebase
+     */
+    private void loadGuideFromFirebase() {
+
+        // Get the guideId and authorId from the argument Bundle passed to the Fragment
         Bundle args = getArguments();
         String guideId = args.getString(GUIDE_KEY);
+        String authorId = args.getString(AUTHOR_KEY);
 
-        loadGuide(service, guideId);
-        loadSections(service, guideId);
+        loadGuide(guideId);
+        loadSections(guideId);
+        loadAuthor(authorId);
     }
 
-    private void loadGuide(final FirebaseProviderService service, String guideId) {
+    /**
+     * Loads a Guide from Firebase
+     *
+     * @param guideId    FirebaseId of the Guide to load
+     */
+    private void loadGuide(String guideId) {
 
         if (mGuide != null) return;
 
@@ -437,8 +452,7 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
 
                 mBinding.setVm(new GuideViewModel(getActivity(), mGuide));
 
-                service.unregisterModelChangeListener(this);
-                loadAuthor(service, mGuide.authorId);
+                mService.unregisterModelChangeListener(this);
             }
 
             @Override
@@ -447,10 +461,15 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
             }
         };
 
-        service.registerModelChangeListener(guideListener);
+        mService.registerModelChangeListener(guideListener);
     }
 
-    private void loadAuthor(final FirebaseProviderService service, String authorId) {
+    /**
+     * Loads the author's profile from Firebase
+     *
+     * @param authorId    FirebaseId of the Author to load
+     */
+    private void loadAuthor(String authorId) {
 
         if (mAuthor != null) return;
 
@@ -458,10 +477,10 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
             @Override
             public void onModelReady(Author model) {
                 mAuthor = model;
-                mAdapter.addModel(model);
+                mAdapter.addModel(mAuthor);
                 stopCacheIcon();
 
-                service.unregisterModelChangeListener(this);
+                mService.unregisterModelChangeListener(this);
             }
 
             @Override
@@ -470,10 +489,15 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
             }
         };
 
-        service.registerModelChangeListener(authorListener);
+        mService.registerModelChangeListener(authorListener);
     }
 
-    private void loadSections(final FirebaseProviderService service, final String guideId) {
+    /**
+     * Loads the Sections for a Guide from Firebase
+     *
+     * @param guideId    FirebaseId of the Guide to load Sections for
+     */
+    private void loadSections(final String guideId) {
 
         if (mSections != null) return;
 
@@ -487,6 +511,7 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
                     @Override
                     public void onQueryChanged(Section[] models) {
                         mSections = models;
+                        DataCache.getInstance().store(mSections);
 
                         for (Section section : mSections) {
                             mAdapter.addModel(section);
@@ -494,11 +519,11 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
 
                         stopCacheIcon();
 
-                        service.unregisterQueryChangeListener(this);
+                        mService.unregisterQueryChangeListener(this);
                     }
                 };
 
-        service.registerQueryChangeListener(sectionListener);
+        mService.registerQueryChangeListener(sectionListener);
     }
 
     /**
