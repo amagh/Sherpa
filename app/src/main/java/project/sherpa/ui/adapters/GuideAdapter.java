@@ -217,6 +217,31 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     }
 
     /**
+     * Returns a List of FirebaseIds for all the Guides in the Adapter
+     *
+     * @return List of FirebaseIds of all Guides in the Adapter
+     */
+    public List<String> getFirebaseIds() {
+
+        List<String> firebaseIdList = new ArrayList<>();
+
+        for (Guide guide : mGuideList) {
+            firebaseIdList.add(guide.firebaseId);
+        }
+
+        return firebaseIdList;
+    }
+
+    /**
+     * Removes all elements from the Adapter
+     */
+    public void clear() {
+        int size = mGuideList.size();
+        mGuideList.clear();
+        notifyItemRangeRemoved(0, size);
+    }
+
+    /**
      * For passing information about the clicked guide to the Activity/Fragment
      */
     public interface ClickHandler {
