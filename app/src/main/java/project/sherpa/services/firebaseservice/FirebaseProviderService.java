@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import timber.log.Timber;
 
 /**
  * A background service that is used as a server for data from Firebase Database. By keeping the
@@ -68,6 +69,8 @@ public class FirebaseProviderService extends Service {
         SmartValueEventListener smartValueEventListener;
 
         if (!mSmartListenerMap.keySet().contains(firebaseId)) {
+
+            Timber.d("Starting SmartValueEventListener for: " + firebaseId);
 
             // No corresponding SmartValueEventListener. Start a new one
             smartValueEventListener = new SmartValueEventListener(
@@ -152,6 +155,8 @@ public class FirebaseProviderService extends Service {
 
         if (smartQueryValueListener == null) {
 
+            Timber.d("Starting SmartQueryValueListener for: " + queryChangeListener.getQueryKey());
+
             // SmartQueryValueListener is not in mSmartQueryMap, init it and put it in
             smartQueryValueListener = new SmartQueryValueListener(
                     queryChangeListener.getType(),
@@ -230,6 +235,8 @@ public class FirebaseProviderService extends Service {
                         listener.stop();
                         mModelListenerMap.remove(listener);
                         mSmartListenerMap.remove(firebaseId);
+
+                        Timber.d("Stopped SmartValueEventListener: " + firebaseId);
                     }
                 }
 
@@ -250,6 +257,8 @@ public class FirebaseProviderService extends Service {
                         listener.stop();
                         mQueryListenerMap.remove(listener);
                         mSmartQueryMap.remove(queryKey);
+
+                        Timber.d("Stopped SmartQueryValueListener: " + queryKey);
                     }
                 }
             }
