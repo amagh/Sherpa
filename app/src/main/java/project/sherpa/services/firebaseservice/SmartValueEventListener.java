@@ -42,6 +42,12 @@ public abstract class SmartValueEventListener implements ValueEventListener {
         if (!mStarted) {
             mReference.addValueEventListener(this);
             mStarted = true;
+
+            if (mModel == null && DataCache.getInstance().get(mFirebaseId) != null) {
+                mModel = DataCache.getInstance().get(mFirebaseId);
+
+                onModelChange();
+            }
         }
     }
 
