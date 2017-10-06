@@ -156,7 +156,7 @@ public abstract class ConnectivityFragment extends Fragment implements Connectiv
         try {
             setAdMethod = binding.getClass().getMethod("setAd", AdViewModel.class);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+
         }
 
         // If the binding contains the method, invoke it to set the AdViewModel and load the
