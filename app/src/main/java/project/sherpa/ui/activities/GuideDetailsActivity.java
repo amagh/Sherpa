@@ -19,12 +19,14 @@ import project.sherpa.ui.activities.abstractactivities.MapboxActivity;
 import project.sherpa.ui.adapters.GuideDetailsFragmentAdapter;
 import project.sherpa.ui.fragments.GuideDetailsFragment;
 import project.sherpa.ui.fragments.GuideDetailsMapFragment;
+import project.sherpa.ui.fragments.interfaces.FirebaseProviderInterface;
 import timber.log.Timber;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 public class GuideDetailsActivity extends MapboxActivity implements ViewPager.OnPageChangeListener {
+
     // ** Constants ** //
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1654;
 
@@ -37,6 +39,7 @@ public class GuideDetailsActivity extends MapboxActivity implements ViewPager.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_guide_details);
+        bindFirebaseProviderService(true);
 
         // Get the Guide passed in the Intent
         if (getIntent().getStringExtra(GUIDE_KEY) != null) {
@@ -106,11 +109,21 @@ public class GuideDetailsActivity extends MapboxActivity implements ViewPager.On
             // Disable on map page to allow for panning of map
             mBinding.guideDetailsVp.setSwipe(false);
         }
+
+        if (mService != null) {
+            ((FirebaseProviderInterface) mAdapter.getItem(position)).onServiceConnected(mService);
+        }
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+    @Override
+    protected void onServiceConnected() {
+        int position = mBinding.guideDetailsVp.getCurrentItem();
+        ((FirebaseProviderInterface) mAdapter.getItem(position)).onServiceConnected(mService);
     }
 
     /**
