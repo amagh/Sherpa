@@ -128,6 +128,7 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
                     // Open the GuideDetailsActivity
                     Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
                     intent.putExtra(GUIDE_KEY, guide.firebaseId);
+                    intent.putExtra(AUTHOR_KEY, guide.authorId);
 
                     startActivity(intent);
                 }

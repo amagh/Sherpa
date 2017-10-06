@@ -180,6 +180,7 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                 // Start the Activity to display Guide details
                 Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
                 intent.putExtra(GUIDE_KEY, guide.firebaseId);
+                intent.putExtra(AUTHOR_KEY, guide.authorId);
                 startActivity(intent);
             }
 

@@ -54,6 +54,7 @@ import timber.log.Timber;
 import static android.app.Activity.RESULT_OK;
 import static project.sherpa.models.datamodels.Message.ATTACHMENT_TYPE;
 import static project.sherpa.models.datamodels.Message.AttachmentType.GUIDE_TYPE;
+import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_ATTACH_GUIDE;
@@ -428,6 +429,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
     private void startGuideDetailsActivity(Guide guide) {
         Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
         intent.putExtra(GUIDE_KEY, guide.firebaseId);
+        intent.putExtra(AUTHOR_KEY, guide.authorId);
 
         DataCache.getInstance().store(guide);
 

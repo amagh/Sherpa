@@ -19,10 +19,12 @@ import project.sherpa.ui.activities.abstractactivities.MapboxActivity;
 import project.sherpa.ui.adapters.GuideDetailsFragmentAdapter;
 import project.sherpa.ui.fragments.GuideDetailsFragment;
 import project.sherpa.ui.fragments.GuideDetailsMapFragment;
+import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.ui.fragments.interfaces.FirebaseProviderInterface;
 import timber.log.Timber;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 public class GuideDetailsActivity extends MapboxActivity implements ViewPager.OnPageChangeListener {
@@ -33,37 +35,37 @@ public class GuideDetailsActivity extends MapboxActivity implements ViewPager.On
     // ** Member Variables ** //
     private ActivityGuideDetailsBinding mBinding;
     private GuideDetailsFragmentAdapter mAdapter;
-    private String mGuideId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_guide_details);
-        bindFirebaseProviderService(true);
 
         // Get the Guide passed in the Intent
         if (getIntent().getStringExtra(GUIDE_KEY) != null) {
-            mGuideId = getIntent().getStringExtra(GUIDE_KEY);
+            String guideId = getIntent().getStringExtra(GUIDE_KEY);
+            String authorId = getIntent().getStringExtra(AUTHOR_KEY);
+
+            // Init the ViewPager
+            initViewPager(guideId, authorId);
         } else {
             Timber.d("No guide passed in Intent!");
         }
 
-        // Init the ViewPager
-        initViewPager();
     }
 
     /**
      * Initializes the variables required for the ViewPager
      */
-    private void initViewPager() {
+    private void initViewPager(String guideId, String authorId) {
 
         // Initialize the Adapter
         mAdapter = new GuideDetailsFragmentAdapter(getSupportFragmentManager());
 
         // Initialize the Fragments that will be contained by the ViewPager
         List<Fragment> fragmentList = new ArrayList<>();
-        fragmentList.add(GuideDetailsFragment.newInstance(mGuideId));
-        fragmentList.add(GuideDetailsMapFragment.newInstance(mGuideId));
+        fragmentList.add(GuideDetailsFragment.newInstance(guideId, authorId));
+        fragmentList.add(GuideDetailsMapFragment.newInstance(guideId));
 
         // Set the List of Fragments for the Adapter
         mAdapter.swapFragmentList(fragmentList);
@@ -118,12 +120,6 @@ public class GuideDetailsActivity extends MapboxActivity implements ViewPager.On
     @Override
     public void onPageScrollStateChanged(int state) {
 
-    }
-
-    @Override
-    protected void onServiceConnected() {
-        int position = mBinding.guideDetailsVp.getCurrentItem();
-        ((FirebaseProviderInterface) mAdapter.getItem(position)).onServiceConnected(mService);
     }
 
     /**

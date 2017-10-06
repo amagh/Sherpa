@@ -26,6 +26,7 @@ import project.sherpa.ui.activities.MainActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
 import project.sherpa.utilities.DataCache;
 
+import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 /**
@@ -120,6 +121,7 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
                 // Start the GuideDetailsActivity for the selected Guide
                 Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
                 intent.putExtra(GUIDE_KEY, guide.firebaseId);
+                intent.putExtra(AUTHOR_KEY, guide.authorId);
 
                 startActivity(intent);
             }
