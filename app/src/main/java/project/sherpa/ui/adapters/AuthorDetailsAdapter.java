@@ -23,6 +23,7 @@ import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.models.viewmodels.GuideViewModel;
 import project.sherpa.models.viewmodels.ListItemAuthorDetailsEditViewModel;
 import project.sherpa.models.viewmodels.ListItemFriendViewModel;
+import project.sherpa.ui.adapters.interfaces.ClickHandler;
 
 /**
  * Created by Alvin on 8/1/2017.
@@ -37,12 +38,12 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
     // ** Member Variables ** //
     private List<BaseModel> mModelList;
     private boolean mInEditMode = false;
-    private GuideAdapter.ClickHandler mClickHandler;
+    private ClickHandler<Guide> mClickHandler;
 
     private Author mUser;
     private AuthorViewModel mAuthorViewModel;
 
-    public AuthorDetailsAdapter(GuideAdapter.ClickHandler clickHandler) {
+    public AuthorDetailsAdapter(ClickHandler<Guide> clickHandler) {
         mClickHandler = clickHandler;
     }
 
@@ -185,7 +186,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
 
             Guide guide = (Guide) mModelList.get(position);
 
-            mClickHandler.onGuideClicked(guide);
+            mClickHandler.onClick(guide);
         }
 
         /**

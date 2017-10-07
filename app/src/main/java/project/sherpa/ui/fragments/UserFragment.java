@@ -62,6 +62,7 @@ import project.sherpa.ui.activities.OpenDraftActivity;
 import project.sherpa.ui.activities.SelectAreaTrailActivity;
 import project.sherpa.ui.adapters.AuthorDetailsAdapter;
 import project.sherpa.ui.adapters.GuideAdapter;
+import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.ui.behaviors.FabSpeedDialScrollBehavior;
 import project.sherpa.ui.dialogs.ProgressDialog;
 import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
@@ -173,20 +174,15 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
      */
     private void initRecyclerView() {
 
-        mAdapter = new AuthorDetailsAdapter(new GuideAdapter.ClickHandler() {
+        mAdapter = new AuthorDetailsAdapter(new ClickHandler<Guide>() {
             @Override
-            public void onGuideClicked(Guide guide) {
+            public void onClick(Guide guide) {
 
                 // Start the Activity to display Guide details
                 Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
                 intent.putExtra(GUIDE_KEY, guide.firebaseId);
                 intent.putExtra(AUTHOR_KEY, guide.authorId);
                 startActivity(intent);
-            }
-
-            @Override
-            public void onGuideLongClicked(Guide guide) {
-
             }
         });
 
