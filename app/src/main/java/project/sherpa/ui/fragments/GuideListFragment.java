@@ -31,6 +31,8 @@ import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.services.firebaseservice.QueryChangeListener;
 import project.sherpa.ui.activities.MainActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
+import project.sherpa.ui.adapters.interfaces.ClickHandler;
+import project.sherpa.ui.adapters.interfaces.LongClickHandler;
 import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.DataCache;
 
@@ -209,16 +211,11 @@ public class GuideListFragment extends ConnectivityFragment {
     private void initRecyclerView() {
 
         // Set up the GuideAdapter to populate the RecyclerView
-        mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
+        mAdapter = new GuideAdapter(new ClickHandler<Guide>() {
             @Override
-            public void onGuideClicked(Guide guide) {
+            public void onClick(Guide guide) {
                 // Pass the clicked Guide to the Activity so it can start the GuideDetailsActivity
                 ((MainActivity) getActivity()).onGuideClicked(guide);
-            }
-
-            @Override
-            public void onGuideLongClicked(Guide guide) {
-
             }
         });
 

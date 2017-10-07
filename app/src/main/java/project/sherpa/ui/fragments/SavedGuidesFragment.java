@@ -24,6 +24,7 @@ import project.sherpa.models.datamodels.Guide;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.activities.MainActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
+import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.utilities.DataCache;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
@@ -114,9 +115,9 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
         mGuideList = new ArrayList<>();
 
         // Init the Adapter
-        mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
+        mAdapter = new GuideAdapter(new ClickHandler<Guide>() {
             @Override
-            public void onGuideClicked(Guide guide) {
+            public void onClick(Guide guide) {
 
                 // Start the GuideDetailsActivity for the selected Guide
                 Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
@@ -124,11 +125,6 @@ public class SavedGuidesFragment extends Fragment implements LoaderManager.Loade
                 intent.putExtra(AUTHOR_KEY, guide.authorId);
 
                 startActivity(intent);
-            }
-
-            @Override
-            public void onGuideLongClicked(Guide guide) {
-
             }
         });
 

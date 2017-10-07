@@ -20,6 +20,7 @@ import project.sherpa.data.GuideProvider;
 import project.sherpa.databinding.ActivityOpenDraftBinding;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.ui.adapters.GuideAdapter;
+import project.sherpa.ui.adapters.interfaces.ClickHandler;
 
 /**
  * Created by Alvin on 8/15/2017.
@@ -113,9 +114,9 @@ public class OpenDraftActivity extends AppCompatActivity implements LoaderManage
     private void initRecyclerView() {
 
         // Init the GuideAdapter
-        mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
+        mAdapter = new GuideAdapter(new ClickHandler<Guide>() {
             @Override
-            public void onGuideClicked(Guide guide) {
+            public void onClick(Guide guide) {
 
                 // Start the CreateGuideActivity and set the data to the Uri for the Guide to be
                 // opened
@@ -123,11 +124,6 @@ public class OpenDraftActivity extends AppCompatActivity implements LoaderManage
                 intent.setData(GuideProvider.Guides.withId(guide.firebaseId));
 
                 startActivity(intent);
-            }
-
-            @Override
-            public void onGuideLongClicked(Guide guide) {
-
             }
         });
 

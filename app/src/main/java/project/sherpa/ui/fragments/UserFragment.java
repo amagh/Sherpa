@@ -361,6 +361,9 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
      */
     private void loadGuidesForAuthor(Author author) {
 
+        // Skip loading the guides if they have already been set
+        if (mModelList.size() > 1) return;
+
         // Build a query to find all guides Authored by the author
         Query guideQuery = FirebaseDatabase.getInstance().getReference()
                 .child(GuideDatabase.GUIDES)

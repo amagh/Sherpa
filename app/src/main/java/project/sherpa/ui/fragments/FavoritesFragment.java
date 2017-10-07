@@ -35,6 +35,7 @@ import project.sherpa.ui.activities.AttachActivity;
 import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
+import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
@@ -112,9 +113,9 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
         mGuideList = new ArrayList<>();
 
         // Init the Adapter and set the click response
-        mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
+        mAdapter = new GuideAdapter(new ClickHandler<Guide>() {
             @Override
-            public void onGuideClicked(Guide guide) {
+            public void onClick(Guide guide) {
 
                 DataCache.getInstance().store(guide);
 
@@ -132,11 +133,6 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
 
                     startActivity(intent);
                 }
-            }
-
-            @Override
-            public void onGuideLongClicked(Guide guide) {
-
             }
         });
 
