@@ -159,6 +159,7 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         }
 
         setHasOptionsMenu(true);
+        loadAdViewModel(mBinding);
 
         return mBinding.getRoot();
     }
