@@ -153,6 +153,9 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                     mAdapter.addModel(guide);
                 }
             }
+
+            // Hide the ProgressBar because items will be loaded from SavedInstanceState
+            mBinding.userPb.setVisibility(View.GONE);
         }
 
         setHasOptionsMenu(true);
