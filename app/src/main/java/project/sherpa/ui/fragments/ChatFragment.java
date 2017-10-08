@@ -65,6 +65,7 @@ public class ChatFragment extends ConnectivityFragment {
         ((AppCompatActivity) getActivity()).setSupportActionBar(mBinding.chatTb);
 
         initRecyclerView();
+        loadAdViewModel(mBinding);
         return mBinding.getRoot();
     }
 
