@@ -3,13 +3,14 @@ package project.sherpa.ui.adapters;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 import project.sherpa.R;
@@ -36,12 +37,40 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
     private static final int GUIDE_VIEW_TYPE        = 2;
 
     // ** Member Variables ** //
-    private List<BaseModel> mModelList;
     private boolean mInEditMode = false;
     private ClickHandler<Guide> mClickHandler;
 
     private Author mUser;
     private AuthorViewModel mAuthorViewModel;
+    
+    private SortedListAdapterCallback<BaseModel> mSortedAdapter = new SortedListAdapterCallback<BaseModel>(this) {
+        @Override
+        public int compare(BaseModel o1, BaseModel o2) {
+            if (o1 instanceof Author) return -1;
+            if (o2 instanceof Author) return 1;
+            
+            if (o1 instanceof Guide && o2 instanceof Guide) {
+                return ((Guide) o1).rating > ((Guide) o2).rating
+                        ? -1
+                        : ((Guide) o1).rating < ((Guide) o2).rating
+                        ? 1
+                        : 0;
+            }
+            
+            return 0;
+        }
+
+        @Override
+        public boolean areContentsTheSame(BaseModel oldItem, BaseModel newItem) {
+            return oldItem.equals(newItem);
+        }
+
+        @Override
+        public boolean areItemsTheSame(BaseModel item1, BaseModel item2) {
+            return item1.firebaseId.equals(item2.firebaseId);
+        }
+    };
+    private SortedList<BaseModel> mSortedList = new SortedList<>(BaseModel.class, mSortedAdapter);
 
     public AuthorDetailsAdapter(ClickHandler<Guide> clickHandler) {
         mClickHandler = clickHandler;
@@ -89,18 +118,14 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
 
     @Override
     public int getItemCount() {
-        if (mModelList != null) {
-            return mModelList.size();
-        }
-
-        return 0;
+        return mSortedList.size();
     }
 
     @Override
     public int getItemViewType(int position) {
 
         // Return ViewType based on the type of Model in the position
-        BaseModel model = mModelList.get(position);
+        BaseModel model = mSortedList.get(position);
 
         if (model instanceof Author) {
             if (!mInEditMode) {
@@ -128,10 +153,8 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
      */
     public void setModelList(List<BaseModel> modelList) {
 
-        // Set List in signature to the memvar
-        mModelList = modelList;
-
-        notifyDataSetChanged();
+        // Add all items from modelList to the Adapter
+        mSortedList.addAll(modelList);
     }
 
     /**
@@ -140,9 +163,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
      * @param model    Model to add to the List
      */
     public void addModel(BaseModel model) {
-        mModelList.add(model);
-
-        notifyItemInserted(mModelList.size() - 1);
+        mSortedList.add(model);
     }
 
     /**
@@ -184,7 +205,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
         public void onClick(View view) {
             int position = getAdapterPosition();
 
-            Guide guide = (Guide) mModelList.get(position);
+            Guide guide = (Guide) mSortedList.get(position);
 
             mClickHandler.onClick(guide);
         }
@@ -197,7 +218,7 @@ public class AuthorDetailsAdapter extends RecyclerView.Adapter<AuthorDetailsAdap
         public void bind(int position) {
 
             // Get reference to the Model to be displayed
-            BaseModel model = mModelList.get(position);
+            BaseModel model = mSortedList.get(position);
 
             // Cast the Model and ViewDataBinding based on the type of BaseModel
             if (model instanceof Author) {
