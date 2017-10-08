@@ -119,7 +119,7 @@ public class GuideListFragment extends ConnectivityFragment {
         }
 
         // If Adapter is empty, load the Guides from Firebase
-        if (mAdapter.isEmpty()) {
+        if (mAdapter.getItemCount() == 0) {
 
             // Show the ProgressBar
             mBinding.guideListPb.setVisibility(View.VISIBLE);

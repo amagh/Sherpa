@@ -48,7 +48,6 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     }
 
     // ** Member Variables ** //
-    private List<Guide> mGuideList;
     private ClickHandler<Guide> mClickHandler;
     private LongClickHandler<Guide> mLongClickHandler;
     private boolean useSearchLayout;
@@ -148,10 +147,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     @Override
     public int getItemCount() {
         // Return the length of mGuides if it is not null
-        if (mGuideList != null) {
-            return mGuideList.size();
-        }
-        return 0;
+        return mSortedList.size();
     }
 
     @Override
@@ -168,7 +164,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     public long getItemId(int position) {
         // Use the hashcode of the FirebaseId as the Id for the Adapter. This will allow a
         // completely different list of Guides to be set and animated correctly.
-        return mGuideList.get(position).firebaseId.hashCode();
+        return mSortedList.get(position).firebaseId.hashCode();
     }
 
     /**
@@ -177,14 +173,8 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
      * @param guideList    A List of Guides to be used to bind data to the ViewHolders
      */
     public void setGuides(List<Guide> guideList) {
-//        // Set the mem var to the List parameter
-//        mGuideList = guideList;
-//
-//        if (mGuideList != null) {
-//            // Notify of change in data
-//            notifyDataSetChanged();
-//        }
 
+        // Clear the SortedList and then add all the items in the guideList to the SortedList
         mSortedList.beginBatchedUpdates();
         mSortedList.clear();
         mSortedList.addAll(guideList);
@@ -197,27 +187,6 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
      * @param guide    Guide to be added
      */
     public void addGuide(Guide guide) {
-//        // Check whether mGuideList has already been instantiated
-//        if (mGuideList == null) {
-//            // Has not been. Create a new List and put the Guide from the signature into it
-//            mGuideList = new ArrayList<>();
-//        }
-//
-//        // Check to see if Guide is already in the Adapter
-//        boolean newGuide = true;
-//
-//        for (Guide listGuide : mGuideList) {
-//            if (listGuide.firebaseId.equals(guide.firebaseId)) {
-//                newGuide = false;
-//            }
-//        }
-//
-//        if (newGuide) {
-//            // Add the Guide to the List
-//            mGuideList.add(guide);
-//            notifyItemInserted(mGuideList.size() - 1);
-//        }
-
         mSortedList.add(guide);
     }
 
@@ -227,7 +196,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
      * @param firebaseId    The FirebaseId of the Guide to be removed
      */
     public void removeGuide(String firebaseId) {
-
+        // Iterate through the List until a match to the FirebaseId is found
         for (int i = mSortedList.size() - 1; i >= 0; i--) {
             Guide guide = mSortedList.get(i);
 
@@ -235,18 +204,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
                 mSortedList.removeItemAt(i);
             }
         }
-//        // Iterate through the List until a match to the FirebaseId is found
-//        for (Guide guide : mGuideList) {
-//            if (guide.firebaseId.equals(firebaseId)) {
-//                // Get the position of the item to be removed
-//                int position = mGuideList.indexOf(guide);
-//
-//                // Remove the item and notify
-//                mGuideList.remove(position);
-//                notifyItemRemoved(position);
-//                return;
-//            }
-//        }
+
     }
 
     /**
@@ -257,18 +215,12 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
      */
     public int getPosition(String firebaseId) {
 
+        // Iterate through the List and try to find a match
         for (int i = 0; i < mSortedList.size(); i++) {
             if (mSortedList.get(i).firebaseId.equals(firebaseId)) {
                 return i;
             }
         }
-//        // Iterate through the List and try to find a match
-//        for (int i = 0; i < mGuideList.size(); i++) {
-//            if (mGuideList.get(i).firebaseId.equals(firebaseId)) {
-//                // If it matches, return the position of the Guide
-//                return i;
-//            }
-//        }
 
         return -1;
     }
@@ -280,15 +232,6 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
      */
     public void setUseSearchLayout(boolean useSearchLayout) {
         this.useSearchLayout = useSearchLayout;
-    }
-
-    /**
-     * Checks whether the Adapter has a valid list of data
-     *
-     * @return True if mGuideList is null or empty. False if mGuideList is populated.
-     */
-    public boolean isEmpty() {
-        return mGuideList == null || mGuideList.isEmpty();
     }
 
     /**
@@ -313,9 +256,6 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
         for (int i = 0; i < mSortedList.size(); i++) {
             firebaseIdList.add(mSortedList.get(i).firebaseId);
         }
-//        for (Guide guide : mGuideList) {
-//            firebaseIdList.add(guide.firebaseId);
-//        }
 
         return firebaseIdList;
     }
@@ -324,10 +264,6 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
      * Removes all elements from the Adapter
      */
     public void clear() {
-//        int size = mGuideList.size();
-//        mGuideList.clear();
-//        notifyItemRangeRemoved(0, size);
-
         mSortedList.clear();
     }
 
