@@ -140,7 +140,7 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
             // Restore mModelList from SavedInstanceState
             ArrayList<String> modelIdList = savedInstanceState.getStringArrayList(MODEL_LIST_KEY);
 
-            if (modelIdList != null) {
+            if (modelIdList != null && mModelList.size() == 0) {
                 for (String modelId : modelIdList) {
                     if (mAuthor == null) {
                         Author author = (Author) DataCache.getInstance().get(modelId);
@@ -300,7 +300,7 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                 if (mAuthor == null) setAuthor(author);
 
                 // Load the Guides that the Author has created
-                if (mModelList.size() == 1) loadGuidesForAuthor(mAuthor);
+                loadGuidesForAuthor(mAuthor);
 
                 if (mAuthor.firebaseId.equals(getFirebaseId())) {
                     setChatListeners();
@@ -361,7 +361,7 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
     private void loadGuidesForAuthor(Author author) {
 
         // Skip loading the guides if they have already been set
-        if (mModelList.size() > 1) return;
+        if (mGuideQueryListener != null) return;
 
         // Build a query to find all guides Authored by the author
         Query guideQuery = FirebaseDatabase.getInstance().getReference()
@@ -372,6 +372,9 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         mGuideQueryListener = new QueryChangeListener<Guide>(GUIDE, guideQuery, author.firebaseId) {
             @Override
             public void onQueryChanged(Guide[] guides) {
+
+                mBinding.userPb.setVisibility(View.GONE);
+
                 for (Guide guide : guides) {
                     mAdapter.addModel(guide);
                 }
