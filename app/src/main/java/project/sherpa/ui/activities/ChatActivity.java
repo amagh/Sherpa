@@ -25,7 +25,6 @@ public class ChatActivity extends ConnectivityActivity {
         setContentView(R.layout.activity_chat);
 
         mFragment = new ChatFragment();
-
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, mFragment)
                 .commit();
@@ -36,11 +35,10 @@ public class ChatActivity extends ConnectivityActivity {
      * @param view
      */
     public void onClickNewChat(View view) {
-        addNewMessage();
+        addNewChat();
     }
 
-    private void addNewMessage() {
-
+    private void addNewChat() {
         mFragment.addNewChat();
     }
 }
