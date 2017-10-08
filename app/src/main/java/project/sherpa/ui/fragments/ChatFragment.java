@@ -49,9 +49,6 @@ import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.CHAT;
 
 public class ChatFragment extends ConnectivityFragment {
 
-    // ** Constants ** //
-    private static final int CHAT_LOADER = 5884;
-
     // ** Member Variables ** //
     private FragmentChatBinding mBinding;
     private Author mAuthor;
@@ -59,12 +56,14 @@ public class ChatFragment extends ConnectivityFragment {
 
     private Map<String, ModelChangeListener> mListenerMap = new HashMap<>();
     private List<String> mAuthorIdList = new ArrayList<>();
-    private Map<String, Chat> mDatabaseChatMap = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat, container, false);
         bindFirebaseProviderService(true);
+
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mBinding.chatTb);
+
         initRecyclerView();
         return mBinding.getRoot();
     }
