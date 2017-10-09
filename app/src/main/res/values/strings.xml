@@ -214,6 +214,7 @@
     <string name="menu_leave_chat">Leave chat</string>
 
     <!-- Chat Strings -->
+    <string name="chat_activity_title">Chats</string>
     <string name="chat_last_message_text">%1$s: %2$s</string>
     <string name="chat_attachment_text">Attachment</string>
     <string name="chat_add_member_hint">Type a user\'s username</string>

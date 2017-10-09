@@ -22,11 +22,13 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import project.sherpa.BuildConfig;
 import project.sherpa.R;
-import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.data.GuideContract;
+import project.sherpa.data.GuideDatabase;
 import project.sherpa.data.GuideProvider;
 import project.sherpa.databinding.FragmentGuideDetailsBinding;
 import project.sherpa.models.datamodels.Author;
@@ -34,9 +36,14 @@ import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.Section;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.GuideViewModel;
+import project.sherpa.services.firebaseservice.FirebaseProviderService;
+import project.sherpa.services.firebaseservice.ModelChangeListener;
+import project.sherpa.services.firebaseservice.QueryChangeListener;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.activities.UserActivity;
 import project.sherpa.ui.adapters.GuideDetailsAdapter;
+import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
+import project.sherpa.ui.fragments.interfaces.FirebaseProviderInterface;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
@@ -46,6 +53,9 @@ import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.SECTION;
 
 /**
  * Created by Alvin on 8/7/2017.
@@ -66,20 +76,20 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
     private GuideDetailsAdapter mAdapter;
     private MenuItem mCacheMenuItem;
 
-    public GuideDetailsFragment() {}
-
     /**
      * Factory for creating a GuideDetailsFragment for a specific Guide
      *
      * @param guideId    Guide whose details will be shown in the Fragment
+     * @param authorId   FirebaseId of the Author of the Guide
      * @return A GuideDetailsFragment with a Bundle attached for displaying details for a Guide
      */
-    public static GuideDetailsFragment newInstance(String guideId) {
+    public static GuideDetailsFragment newInstance(String guideId, String authorId) {
         // Init the Bundle that will be passed with the Fragment
         Bundle args = new Bundle();
 
         // Put the Guide from the signature into the Bundle
         args.putString(GUIDE_KEY, guideId);
+        args.putString(AUTHOR_KEY, authorId);
 
         // Initialize the Fragment and attach the args
         GuideDetailsFragment fragment = new GuideDetailsFragment();
@@ -91,6 +101,7 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_guide_details, container, false);
+        bindFirebaseProviderService(true);
 
         ((GuideDetailsActivity) getActivity()).setSupportActionBar(mBinding.guideDetailsTb);
 
@@ -328,19 +339,6 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
     }
 
     @Override
-    public void onConnected() {
-        super.onConnected();
-
-        if (mGuide.authorId != null && mSections != null && mAuthor != null) return;
-
-        if (!ContentProviderUtils.isGuideCachedInDatabase(getActivity(), mGuide) && mSections == null) {
-            getDataFromFirebase();
-        } else {
-            initLoaders();
-        }
-    }
-
-    @Override
     public void onDisconnected() {
         super.onDisconnected();
 
@@ -355,6 +353,8 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
      * Sets up the RecyclerView, Adapter, and LayoutManager required to make it work
      */
     private void initRecyclerView() {
+
+        Timber.d("Initializing RecyclerView");
         // Setup the Adapter
         mAdapter = new GuideDetailsAdapter((GuideDetailsActivity) getActivity(), new GuideDetailsAdapter.ClickHandler() {
             @Override
@@ -415,81 +415,115 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
         if (mAuthor != null) mAdapter.addModel(mAuthor);
     }
 
-    /**
-     * Downloads the data models to populate the Adapter from Firebase Database
-     */
-    private void getDataFromFirebase() {
-        final DataCache cache = DataCache.getInstance();
-
-        // Set the data for the Adapter and store the data models in the cache
-        if (mGuide.authorId == null) {
-            FirebaseProviderUtils.getModel(
-                    FirebaseProviderUtils.FirebaseType.GUIDE,
-                    mGuide.firebaseId,
-                    new FirebaseProviderUtils.FirebaseListener() {
-                        @Override
-                        public void onModelReady(BaseModel model) {
-                            mGuide = (Guide) model;
-                            mAdapter.addModel(mGuide);
-
-                            cache.store(mGuide);
-
-                            mBinding.setVm(new GuideViewModel(getActivity(), mGuide));
-
-                            // Retrieve author info if needed
-                            if (mAuthor == null) {
-                                getAuthorFromFirebase(mGuide.authorId);
-                            }
-
-                            stopCacheIcon();
-                        }
-                    });
-        } else if (mAuthor == null) {
-
-            // Get the Author info from Firebase
-            getAuthorFromFirebase(mGuide.authorId);
-        }
-
-        if (mSections == null) {
-
-            FirebaseProviderUtils.getSectionsForGuide(
-                    mGuide.firebaseId,
-                    new FirebaseProviderUtils.FirebaseArrayListener() {
-                        @Override
-                        public void onModelsReady(BaseModel[] models) {
-                            mSections = (Section[]) models;
-                            for (Section section : mSections) {
-                                mAdapter.addModel(section);
-                            }
-
-                            cache.store(mSections);
-
-                            stopCacheIcon();
-                        }
-                    });
-        }
+    public void onServiceConnected() {
+        loadGuideFromFirebase();
     }
 
     /**
-     * Retrieves Author information from Firebase and adds it to the Adapter
-     *
-     * @param authorId    The FirebaseId of the author to be retrieved from Firebase
+     * Loads all the information to display a Guide from Firebase
      */
-    private void getAuthorFromFirebase(String authorId) {
-        FirebaseProviderUtils.getModel(
-                FirebaseProviderUtils.FirebaseType.AUTHOR,
-                authorId,
-                new FirebaseProviderUtils.FirebaseListener() {
-                    @Override
-                    public void onModelReady(BaseModel model) {
-                        mAuthor = (Author) model;
-                        mAdapter.addModel(mAuthor);
+    private void loadGuideFromFirebase() {
 
-                        DataCache.getInstance().store(mAuthor);
+        // Get the guideId and authorId from the argument Bundle passed to the Fragment
+        Bundle args = getArguments();
+        String guideId = args.getString(GUIDE_KEY);
+        String authorId = args.getString(AUTHOR_KEY);
+
+        loadGuide(guideId);
+        loadSections(guideId);
+        loadAuthor(authorId);
+    }
+
+    /**
+     * Loads a Guide from Firebase
+     *
+     * @param guideId    FirebaseId of the Guide to load
+     */
+    private void loadGuide(String guideId) {
+
+        if (mGuide != null) return;
+
+        ModelChangeListener<Guide> guideListener = new ModelChangeListener<Guide>(GUIDE, guideId) {
+            @Override
+            public void onModelReady(Guide model) {
+                mGuide = model;
+                mAdapter.addModel(mGuide);
+                stopCacheIcon();
+
+                mBinding.setVm(new GuideViewModel(getActivity(), mGuide));
+
+                mService.unregisterModelChangeListener(this);
+            }
+
+            @Override
+            public void onModelChanged() {
+
+            }
+        };
+
+        mService.registerModelChangeListener(guideListener);
+    }
+
+    /**
+     * Loads the author's profile from Firebase
+     *
+     * @param authorId    FirebaseId of the Author to load
+     */
+    private void loadAuthor(String authorId) {
+
+        if (mAuthor != null) return;
+
+        ModelChangeListener<Author> authorListener = new ModelChangeListener<Author>(AUTHOR, authorId) {
+            @Override
+            public void onModelReady(Author model) {
+                mAuthor = model;
+                mAdapter.addModel(mAuthor);
+                stopCacheIcon();
+
+                mService.unregisterModelChangeListener(this);
+            }
+
+            @Override
+            public void onModelChanged() {
+
+            }
+        };
+
+        mService.registerModelChangeListener(authorListener);
+    }
+
+    /**
+     * Loads the Sections for a Guide from Firebase
+     *
+     * @param guideId    FirebaseId of the Guide to load Sections for
+     */
+    private void loadSections(final String guideId) {
+
+        if (mSections != null) return;
+
+        Query sectionQuery = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.SECTIONS)
+                .child(guideId)
+                .orderByKey();
+
+        QueryChangeListener<Section> sectionListener =
+                new QueryChangeListener<Section>(SECTION, sectionQuery, guideId) {
+                    @Override
+                    public void onQueryChanged(Section[] models) {
+                        mSections = models;
+                        DataCache.getInstance().store(mSections);
+
+                        for (Section section : mSections) {
+                            mAdapter.addModel(section);
+                        }
 
                         stopCacheIcon();
+
+                        mService.unregisterQueryChangeListener(this);
                     }
-                });
+                };
+
+        mService.registerQueryChangeListener(sectionListener);
     }
 
     /**

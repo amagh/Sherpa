@@ -1,20 +1,33 @@
 package project.sherpa.ui.activities;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import project.sherpa.R;
 import project.sherpa.databinding.ActivityFriendBinding;
+import project.sherpa.models.datamodels.Author;
+import project.sherpa.services.firebaseservice.FirebaseProviderService;
+import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.adapters.FriendFragmentAdapter;
+import project.sherpa.services.firebaseservice.FirebaseProviderService.*;
+import project.sherpa.ui.fragments.abstractfragments.BaseFriendFragment;
 
 import static project.sherpa.ui.activities.SearchUserActivity.SearchTypes.FOLLOW;
 import static project.sherpa.ui.activities.SearchUserActivity.SearchTypes.FRIEND;
 import static project.sherpa.utilities.Constants.IntentKeys.SEARCH_KEY;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
 
 /**
  * Created by Alvin on 9/26/2017.
@@ -26,13 +39,72 @@ public class FriendActivity extends ConnectivityActivity {
     private ActivityFriendBinding mBinding;
     private FriendFragmentAdapter mAdapter;
     private int mSelectedPage;
+    private ModelChangeListener<Author> mAuthorListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_friend);
+        bindFirebaseProviderService(true);
 
         initViewPager();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mAuthorListener != null) mService.registerModelChangeListener(mAuthorListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mAuthorListener != null) mService.unregisterModelChangeListener(mAuthorListener);
+    }
+
+    @Override
+    protected void onServiceConnected() {
+        setAuthorChangeListener();
+        getCurrentFragment().onAuthorChanged(mAuthorListener.getModel());
+    }
+
+    /**
+     * Sets the ModelChangeListener for the logged in user
+     */
+    private void setAuthorChangeListener() {
+
+        if (mAuthorListener != null) return;
+
+        // Check to ensure the user is logged in
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) {
+            finish();
+            return;
+        }
+
+        // Initialize the ModelChangeListener
+        mAuthorListener = new ModelChangeListener<Author>(AUTHOR, user.getUid()) {
+            @Override
+            public void onModelReady(Author model) {
+                getCurrentFragment().onAuthorChanged(getModel());
+            }
+
+            @Override
+            public void onModelChanged() {
+                getCurrentFragment().onAuthorChanged(getModel());
+            }
+        };
+
+        mService.registerModelChangeListener(mAuthorListener);
+    }
+
+    /**
+     * Gets the Fragment currently being displayed to the user
+     * @return Fragment being displayed
+     */
+    private BaseFriendFragment getCurrentFragment() {
+        return (BaseFriendFragment) mAdapter.getItem(mBinding.friendVp.getCurrentItem());
     }
 
     /**
@@ -75,6 +147,7 @@ public class FriendActivity extends ConnectivityActivity {
                 // Set the selected position as member variable to be accessed by the
                 // OnVisibilityChangedListener
                 mSelectedPage = position;
+                getCurrentFragment().onAuthorChanged(mAuthorListener.getModel());
             }
 
             @Override

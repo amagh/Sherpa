@@ -28,4 +28,12 @@ public abstract class BaseModel {
     public void setDraft(boolean draft) {
         this.draft = draft;
     }
+
+    /**
+     * Replaces the values of the BaseModel with new values
+     *
+     * @param newModelValues    BaseModel containing the new Values
+     */
+    @Exclude
+    public abstract void updateValues(BaseModel newModelValues);
 }

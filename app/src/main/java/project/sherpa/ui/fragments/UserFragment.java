@@ -1,11 +1,14 @@
 package project.sherpa.ui.fragments;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +19,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.databinding.library.baseAdapters.BR;
@@ -24,11 +26,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -42,47 +41,55 @@ import java.util.Map;
 import droidninja.filepicker.FilePickerConst;
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import project.sherpa.R;
-import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideDatabase;
 import project.sherpa.databinding.FragmentUserBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.Guide;
-import project.sherpa.models.datamodels.Rating;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.AuthorViewModel;
+import project.sherpa.models.viewmodels.UserFragmentViewModel;
+import project.sherpa.services.firebaseservice.FirebaseProviderService;
+import project.sherpa.services.firebaseservice.ModelChangeListener;
+import project.sherpa.services.firebaseservice.QueryChangeListener;
 import project.sherpa.ui.activities.AccountActivity;
 import project.sherpa.ui.activities.FriendFollowActivity;
-import project.sherpa.ui.activities.MessageActivity;
-import project.sherpa.ui.activities.SelectAreaTrailActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.activities.MainActivity;
+import project.sherpa.ui.activities.MessageActivity;
 import project.sherpa.ui.activities.OpenDraftActivity;
+import project.sherpa.ui.activities.SelectAreaTrailActivity;
 import project.sherpa.ui.adapters.AuthorDetailsAdapter;
 import project.sherpa.ui.adapters.GuideAdapter;
+import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.ui.behaviors.FabSpeedDialScrollBehavior;
-import project.sherpa.ui.behaviors.VanishingBehavior;
 import project.sherpa.ui.dialogs.ProgressDialog;
+import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import project.sherpa.utilities.SaveUtils;
 import project.sherpa.widgets.FavoritesWidgetUpdateService;
+import project.sherpa.services.firebaseservice.FirebaseProviderService.*;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
+import static junit.framework.Assert.assertNotNull;
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_BACKDROP;
 import static project.sherpa.utilities.Constants.RequestCodes.REQUEST_CODE_PROFILE_PIC;
 import static project.sherpa.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.CHAT;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
 import static project.sherpa.utilities.FirebaseProviderUtils.IMAGE_PATH;
 import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
 
 /**
- * Created by Alvin on 8/15/2017.
+ * Created by Alvin on 10/2/2017.
  */
 
 public class UserFragment extends ConnectivityFragment implements FabSpeedDial.MenuListener {
@@ -97,24 +104,24 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
     private AuthorDetailsAdapter mAdapter;
     private List<BaseModel> mModelList;
 
-    public UserFragment() {}
+    private Map<String, ModelChangeListener> mListenerMap = new HashMap<>();
+    private QueryChangeListener<Guide> mGuideQueryListener;
 
     /**
-     * Factory pattern for instantiating a new UserFragment
+     * Factory pattern for creating a new instance of the Fragment
      *
-     * @param author    Author to be attached to the UserFragment
-     * @return UserFragment with an Author attached to load details for
+     * @param userId    The FirebaseId of the user whose details are to be loaded by the Fragment
+     * @return A UserFragment set to load the Firebase profile for the user in the signature
      */
-    public static UserFragment newInstance(Author author) {
+    public static UserFragment newInstance(String userId) {
 
-        // Create a Bundle to pass the Author
+        // Init a Bundle and pass the FirebaseId of the user to be loaded
         Bundle args = new Bundle();
-        args.putParcelable(AUTHOR_KEY, author);
+        args.putString(AUTHOR_KEY, userId);
 
-        // Create the UserFragment and attach the Bundle
+        // Create a new Fragment and attach the Bundle
         UserFragment fragment = new UserFragment();
         fragment.setArguments(args);
-
 
         return fragment;
     }
@@ -122,17 +129,10 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        // Inflate the Layout using DataBindingUtils
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_user, container, false);
+        bindFirebaseProviderService(true);
 
-        // Set a blank Author to the ViewDataBinding so that the FabSpeedDial's visibility will be
-        // properly triggered
-        mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), new Author()));
-        mBinding.fabDial.setMenuListener(this);
-        mBinding.fabDial.getChildAt(0).setContentDescription(getString(R.string.content_description_create_fab));
-
-        setLayoutBehavior();
-
+        initFabSpeedDialer();
         initRecyclerView();
 
         if (savedInstanceState != null) {
@@ -140,192 +140,53 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
             // Restore mModelList from SavedInstanceState
             ArrayList<String> modelIdList = savedInstanceState.getStringArrayList(MODEL_LIST_KEY);
 
-            // Add each model corresponding to the FirebaseId in the List to the Adapter
-            if (modelIdList != null && modelIdList.size() > 0) {
-                for (String firebaseId : modelIdList) {
-
-                    // mAuthor is set once the author has been loaded
+            if (modelIdList != null && mModelList.size() == 0) {
+                for (String modelId : modelIdList) {
                     if (mAuthor == null) {
+                        Author author = (Author) DataCache.getInstance().get(modelId);
 
-                        // Retrieve the Author from DataCache
-                        Author author = (Author) DataCache.getInstance().get(firebaseId);
-
-                        // Check to see if the author loaded from cache
-                        if (author == null) {
-
-                            // Did not load. Load items from web
-                            loadUserSelfProfile(false);
-                            break;
-                        } else {
-
-                            // Set the Author
-                            setAuthor(author);
-                        }
-                    } else {
-
-                        // Hide the ProgressBar
-                        mBinding.userPb.setVisibility(View.GONE);
-
-                        // Add each guide to the Adapter
-                        mAdapter.addModel(DataCache.getInstance().get(firebaseId));
+                        setAuthor(author);
+                        continue;
                     }
+
+                    Guide guide = (Guide) DataCache.getInstance().get(modelId);
+                    mAdapter.addModel(guide);
                 }
             }
-        } else {
 
-            if (getArguments() == null || getArguments().getParcelable(AUTHOR_KEY) == null) {
-
-                // User is checking their own profile
-                loadUserSelfProfile(false);
-            } else {
-                mAuthor = getArguments().getParcelable(AUTHOR_KEY);
-
-                // Add the Author to the Adapter so their info can be displayed
-                AuthorViewModel vm = new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor);
-                mBinding.setVm(vm);
-                mAdapter.setAuthorViewModel(vm);
-                mAdapter.addModel(mAuthor);
-
-                // Load the Guides that the Author has created into the Adapter
-                loadGuidesForAuthor();
-
-                // Check if the User is accessing their own page
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-                if (user != null && mAuthor.firebaseId.equals(user.getUid())) {
-
-                    // Setup for someone viewing their own profile
-                    setupForSelfProfile();
-                }
-            }
+            // Hide the ProgressBar because items will be loaded from SavedInstanceState
+            mBinding.userPb.setVisibility(View.GONE);
         }
 
-        // Load Ads
-        loadAdViewModel(mBinding);
-
-        // Load the logged in user so that the favorites can be synced
-        loadUserForFavorites();
-
         setHasOptionsMenu(true);
+        loadAdViewModel(mBinding);
 
         return mBinding.getRoot();
     }
 
-    private void setLayoutBehavior() {
-        CoordinatorLayout.LayoutParams params =
-                (CoordinatorLayout.LayoutParams) mBinding.userSocialCl.getLayoutParams();
-
-        params.setBehavior(new VanishingBehavior());
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_user, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_user_log_off:
-                // Reset the data in the Adapter
-                mModelList = new ArrayList<>();
-                mAdapter.setModelList(mModelList);
-
-                // Clean the database to start fresh
-                ContentProviderUtils.cleanDatabase(getActivity(), new Author());
-
-                FavoritesWidgetUpdateService.updateWidgets(getActivity());
-
-                // Log the User out
-                FirebaseAuth.getInstance().signOut();
-
-                // Start the AccountActivity
-                startActivityForResult(
-                        new Intent(getActivity(), AccountActivity.class),
-                        ACCOUNT_ACTIVITY_REQUEST_CODE);
-
-                return true;
-
-            case R.id.menu_user_edit:
-                switchAuthorLayout();
-        }
-
-        return false;
-    }
-
     /**
-     * Loads the logged in user's profile from Firebase Database and adds it to the Adapter so that
-     * favorite'd Guides can be synced
+     * Initializes the FABSpeedDialer and its components
      */
-    private void loadUserForFavorites() {
-
-        // Check if the user is logged in
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (user == null) return;
-
-        // Attempt to retrieve the user's profile from the DataCache
-        Author author = (Author) DataCache.getInstance().get(user.getUid());
-
-        if (author != null) {
-
-            // Set the User to the Adapter so the favorite's can be synced
-            mAdapter.setUser(author);
-        } else {
-
-            // Load the Author from Firebase and set it to the Adapter
-            FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
-                @Override
-                public void onModelReady(BaseModel model) {
-
-                    if (model == null) return;
-
-                    Author author = (Author) model;
-
-                    mAdapter.setUser(author);
-                }
-            });
-        }
-    }
-
-    /**
-     * Sets up the layouts to be appropriate for someone viewing their own profile
-     */
-    private void setupForSelfProfile() {
-
-        // Enable option to edit their profile
-        mAdapter.enableEditing();
-        mBinding.getVm().enableEditing();
-
-        // Add the SupportActionBar so the menu items can be created, but remove the title
-        if (getActivity() != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(null);
-        }
-
-        // Set the layout behavior for the FAB
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mBinding.fabDial.getLayoutParams();
-        params.setBehavior(new FabSpeedDialScrollBehavior());
+    private void initFabSpeedDialer() {
+        mBinding.setVm(new AuthorViewModel((AppCompatActivity) getActivity(), new Author()));
+        mBinding.fabDial.setMenuListener(this);
+        mBinding.fabDial.getChildAt(0).setContentDescription(getString(R.string.content_description_create_fab));
     }
 
     /**
      * Initializes components for RecyclerView to function
      */
     private void initRecyclerView() {
-        // Init the Adapter
-        mAdapter = new AuthorDetailsAdapter((AppCompatActivity) getActivity(), new GuideAdapter.ClickHandler() {
+
+        mAdapter = new AuthorDetailsAdapter(new ClickHandler<Guide>() {
             @Override
-            public void onGuideClicked(Guide guide) {
+            public void onClick(Guide guide) {
 
                 // Start the Activity to display Guide details
                 Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
                 intent.putExtra(GUIDE_KEY, guide.firebaseId);
+                intent.putExtra(AUTHOR_KEY, guide.authorId);
                 startActivity(intent);
-            }
-
-            @Override
-            public void onGuideLongClicked(Guide guide) {
-
             }
         });
 
@@ -342,139 +203,268 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         mAdapter.setModelList(mModelList);
     }
 
-    /**
-     * Checks that the Firebase User has been added to the Firebase Database and loads their
-     * profile from Firebase Database.
-     */
-    private void loadUserSelfProfile(final boolean cleanDatabase) {
-        // Get an instance of the FirebaseUser
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    @Override
+    public void onResume() {
+        super.onResume();
 
-        if (user == null) {
-            // No valid user, send to the AccountActivity to sign in
-            startActivityForResult(
-                    new Intent(getActivity(), AccountActivity.class),
-                    ACCOUNT_ACTIVITY_REQUEST_CODE);
-
-            return;
+        // Start listening for changes in the data
+        for (ModelChangeListener listener : mListenerMap.values()) {
+            mService.registerModelChangeListener(listener);
         }
 
-        // First attempt to retrieve the Author from the DataCache
-        Author author = (Author) DataCache.getInstance().get(user.getUid());
+        if (mGuideQueryListener != null) mService.registerQueryChangeListener(mGuideQueryListener);
 
-        if (!cleanDatabase && author != null) {
+        // Reset the message icon
+        if (mBinding.getUfvm() != null) mBinding.getUfvm().setHasNewMessages(false);
+        mBinding.getVm().notifyPropertyChanged(BR._all);
+    }
 
-            setAuthor(author);
+    @Override
+    public void onPause() {
+        super.onPause();
 
-            // Load the Guides that the Author has created into the Adapter
-            loadGuidesForAuthor();
-
-            return;
+        // Stop listening for changes in the data
+        for (ModelChangeListener listener : mListenerMap.values()) {
+            mService.unregisterModelChangeListener(listener);
         }
 
-        FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
-            @Override
-            public void onModelReady(BaseModel model) {
+        if (mGuideQueryListener != null) mService.unregisterQueryChangeListener(mGuideQueryListener);
+    }
 
-                final Author author = (Author) model;
+    @Override
+    protected void onServiceConnected() {
 
-                if (author == null) {
+        Bundle args = UserFragment.this.getArguments();
+        String userId = null;
 
-                    // Transfer the locally favorite'd Guides to their new online profile
-                    Author newAuthor = ContentProviderUtils.generateAuthorFromDatabase(getActivity());
-                    newAuthor.firebaseId = user.getUid();
+        if (args == null) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) userId = user.getUid();
 
-                    // Update the Author's profile on Firebase with the favorites the user had
-                    // before they made a profile
-                    FirebaseProviderUtils.updateUser(newAuthor);
+        } else {
+            userId = args.getString(AUTHOR_KEY, null);
+        }
 
-                    // Set the Author in the Adapter and ViewDataBinding
-                    setAuthor(newAuthor);
-
-                    return;
-                } else if (cleanDatabase) {
-
-                    Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            // Sync the local database of favorite Guides to the online one
-                            ContentProviderUtils.cleanDatabase(getActivity(), author);
-
-                            if (author.favorites == null) return;
-
-                            // Add the User's favorites to the local database
-                            for (String guideId : mAuthor.favorites.keySet()) {
-                                Guide guide = (Guide) DataCache.getInstance().get(guideId);
-                                if (guide != null) {
-                                    guide.setFavorite(true);
-                                    ContentProviderUtils.insertModel(getActivity(), guide);
-                                } else {
-                                    FirebaseProviderUtils.getModel(
-                                            FirebaseProviderUtils.FirebaseType.GUIDE,
-                                            guideId,
-                                            new FirebaseProviderUtils.FirebaseListener() {
-                                                @Override
-                                                public void onModelReady(BaseModel model) {
-
-                                                    // Create a Guide from the model
-                                                    Guide guide = (Guide) model;
-
-                                                    // Set it to be a favorite
-                                                    guide.setFavorite(true);
-
-                                                    // Add it to the database
-                                                    ContentProviderUtils.insertModel(getActivity(), guide);
-
-                                                    // Update the Widget
-                                                    FavoritesWidgetUpdateService.updateWidgets(getActivity());
-                                                }
-                                            });
-                                }
-                            }
-                        }
-                    });
-
-                    thread.start();
-
-                    // Store the User in the DataCache
-                    DataCache.getInstance().store(author);
-                }
-
-                // Set the Author in the Adapter and ViewDataBinding
-                setAuthor(author);
-
-                // Load the Guides that the Author has created into the Adapter
-                loadGuidesForAuthor();
-            }
-        });
+        if (userId == null) {
+            Intent intent = new Intent(getActivity(), AccountActivity.class);
+            startActivityForResult(intent, ACCOUNT_ACTIVITY_REQUEST_CODE);
+        } else {
+            loadUserSelfProfile();
+            loadUserProfile(userId);
+        }
     }
 
     /**
-     * Sets the Author information to be displayed in the Adapter and ViewDataBinding. It also
-     * checks to see if a logged in user is checking their own profile and sets it up
-     * appropriately.
+     * Loads the logged in user's Firebase profile to check if the Guides created by mAuthor have
+     * been favorite'd by the user.
+     */
+    private void loadUserSelfProfile() {
+
+        // Check to ensure user is logged int
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) return;
+
+        // Get the data for the logged in user
+        ModelChangeListener<Author> listener = new ModelChangeListener<Author>(AUTHOR, user.getUid()) {
+            @Override
+            public void onModelReady(Author model) {
+
+                // Set the user to the Adapter so the favorites can be indicated correctly
+                mAdapter.setUser(model);
+            }
+
+            @Override
+            public void onModelChanged() {
+
+            }
+        };
+
+        mService.registerModelChangeListener(listener);
+        mListenerMap.put(user.getUid(), listener);
+    }
+
+    /**
+     * Loads a user's Firebase profile
      *
-     * @param author    Author whose information is to be displayed
+     * @param userId    FirebaseId of the user to load
+     */
+    private void loadUserProfile(final String userId) {
+
+        // Only load the user's profile if it hasn't already been loaded
+        if (mListenerMap.get(userId)!= null && mAuthor != null) return;
+
+        ModelChangeListener<Author> listener = new ModelChangeListener<Author>(AUTHOR, userId) {
+            @Override
+            public void onModelReady(Author author) {
+
+                if (mAuthor == null) setAuthor(author);
+
+                // Load the Guides that the Author has created
+                loadGuidesForAuthor(mAuthor);
+
+                if (mAuthor.firebaseId.equals(getFirebaseId())) {
+                    setChatListeners();
+                }
+
+                mBinding.userPb.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onModelChanged() {
+                updateAuthor();
+            }
+        };
+
+        mService.registerModelChangeListener(listener);
+        mListenerMap.put(userId, listener);
+    }
+
+    /**
+     * Sets the Author's details to be displayed by the Fragment
+     *
+     * @param author    Author whose details are to be displayed
      */
     private void setAuthor(Author author) {
 
+        // Set memvar
         mAuthor = author;
 
-        DataCache.getInstance().store(mAuthor);
-        ContentProviderUtils.insertModel(getActivity(), mAuthor);
-
-        // Add the Author to the Adapter so their info can be displayed
+        // Build the ViewModel that will be shared between the Fragment and the Adapter
         AuthorViewModel vm = new AuthorViewModel((AppCompatActivity) getActivity(), mAuthor);
-        mAdapter.addModel(mAuthor);
-        mAdapter.setAuthorViewModel(vm);
+        UserFragmentViewModel ufvm = new UserFragmentViewModel(mAuthor, this);
         mBinding.setVm(vm);
+        mBinding.setUfvm(ufvm);
+        mAdapter.setAuthorViewModel(vm);
 
-        // Setup for someone viewing their own profile
+        // Add the author to the Adapter
+        mAdapter.addModel(mAuthor);
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null && user.getUid().equals(mAuthor.firebaseId)) {
+
+        if (mAuthor != null && user != null && user.getUid().equals(mAuthor.firebaseId)) {
             setupForSelfProfile();
         }
+    }
+
+    /**
+     * Forces the binding to refresh its Views
+     */
+    private void updateAuthor() {
+        mBinding.getVm().notifyPropertyChanged(BR._all);
+    }
+
+    /**
+     * Loads the guides for the Author whose profile is being shown
+     *
+     * @param author    Author to load the guides for
+     */
+    private void loadGuidesForAuthor(Author author) {
+
+        // Skip loading the guides if they have already been set
+        if (mGuideQueryListener != null) return;
+
+        // Build a query to find all guides Authored by the author
+        Query guideQuery = FirebaseDatabase.getInstance().getReference()
+                .child(GuideDatabase.GUIDES)
+                .orderByChild(GuideContract.GuideEntry.AUTHOR_ID)
+                .equalTo(author.firebaseId);
+
+        mGuideQueryListener = new QueryChangeListener<Guide>(GUIDE, guideQuery, author.firebaseId) {
+            @Override
+            public void onQueryChanged(Guide[] guides) {
+
+                mBinding.userPb.setVisibility(View.GONE);
+
+                for (Guide guide : guides) {
+                    mAdapter.addModel(guide);
+                }
+            }
+        };
+
+        mService.registerQueryChangeListener(mGuideQueryListener);
+    }
+
+    /**
+     * Sets up the layouts to be appropriate for someone viewing their own profile
+     */
+    private void setupForSelfProfile() {
+
+        // Add the SupportActionBar so the menu items can be created, but remove the title
+        if (getActivity() != null) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(null);
+        }
+
+        // Set the layout behavior for the FAB
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mBinding.fabDial.getLayoutParams();
+        params.setBehavior(new FabSpeedDialScrollBehavior());
+    }
+
+    /**
+     * Sets ModelChangeListeners for each of the Chats that the user is a part of to notify the
+     * user if they have a new message
+     */
+    private void setChatListeners() {
+
+        for (String chatId : mAuthor.getChats()) {
+            if (mListenerMap.get(chatId) != null) return;
+
+            mListenerMap.put(chatId, new ModelChangeListener<Chat>(CHAT, chatId) {
+                @Override
+                public void onModelReady(Chat chat) {
+                    int localMessageCount = ContentProviderUtils.getMessageCount(getActivity(), chat.firebaseId);
+                    int firebaseMessageCount = chat.getMessageCount();
+
+                    if (firebaseMessageCount > localMessageCount) {
+                        mBinding.getUfvm().setHasNewMessages(true);
+                    }
+                }
+
+                @Override
+                public void onModelChanged() {
+                    int localMessageCount = ContentProviderUtils.getMessageCount(getActivity(), getModel().firebaseId);
+                    int firebaseMessageCount = getModel().getMessageCount();
+
+                    if (firebaseMessageCount > localMessageCount) {
+                        mBinding.getUfvm().setHasNewMessages(true);
+                    }
+                }
+            });
+
+            mService.registerModelChangeListener(mListenerMap.get(chatId));
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_user, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_user_log_off:
+                // Clean the database to start fresh
+                ContentProviderUtils.cleanDatabase(getActivity(), new Author());
+
+                FavoritesWidgetUpdateService.updateWidgets(getActivity());
+
+                // Log the User out
+                FirebaseAuth.getInstance().signOut();
+
+                // Start the AccountActivity
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new UserFragment())
+                        .commit();
+
+                return true;
+
+            case R.id.menu_user_edit:
+                switchAuthorLayout();
+        }
+
+        return false;
     }
 
     @Override
@@ -482,7 +472,11 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
 
         if (requestCode == ACCOUNT_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK && data.getBooleanExtra(AUTHOR_KEY, false)) {
-                loadUserSelfProfile(true);
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    loadUserSelfProfile();
+                    loadUserProfile(user.getUid());
+                }
             } else {
                 // Handle the log out based on the Activity the Fragment is in
                 if (getActivity() instanceof MainActivity) {
@@ -548,70 +542,22 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                     }
                 }
             })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    dialog.dismiss();
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            dialog.dismiss();
 
-                    // Inform the user of the failure
-                    Toast.makeText(
-                            getActivity(),
-                            getString(R.string.failed_image_upload_text),
-                            Toast.LENGTH_LONG)
-                            .show();
+                            // Inform the user of the failure
+                            Toast.makeText(
+                                    getActivity(),
+                                    getString(R.string.failed_image_upload_text),
+                                    Toast.LENGTH_LONG)
+                                    .show();
 
-                    Timber.e(e, e.getMessage());
-                }
-            });
+                            Timber.e(e, e.getMessage());
+                        }
+                    });
         }
-    }
-
-    /**
-     * Queries the Firebase Database and loads Guides that have been authored by the user
-     */
-    private void loadGuidesForAuthor() {
-
-        // Check to make sure mAuthor has been loaded
-        if (mAuthor == null) return;
-
-        // Query the Firebase Database
-        final Query guideQuery = FirebaseDatabase.getInstance().getReference()
-                .child(GuideDatabase.GUIDES)
-                .orderByChild(GuideContract.GuideEntry.AUTHOR_ID)
-                .equalTo(mAuthor.firebaseId);
-
-        guideQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                // Check that the returned values are valid
-                if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
-                    Guide[] guides = (Guide[]) FirebaseProviderUtils
-                            .getModelsFromSnapshot(FirebaseProviderUtils.FirebaseType.GUIDE, dataSnapshot);
-
-                    // Add each Guide to the Adapter
-                    for (int i = guides.length -1; i > -1; i--) {
-                        Guide guide = guides[i];
-                        mAdapter.addModel(guide);
-
-                        DataCache.getInstance().store(guide);
-                    }
-                }
-
-                // Hide ProgressBar
-                mBinding.userPb.setVisibility(View.GONE);
-
-                // Remove Listener
-                guideQuery.removeEventListener(this);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-                // Remove Listener
-                guideQuery.removeEventListener(this);
-            }
-        });
     }
 
     /**
@@ -620,56 +566,7 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
      */
     public void switchAuthorLayout() {
         mAdapter.switchAuthorLayout();
-    }
-
-    /**
-     * Updates the user's values in FirebaseDatabase with their newly updated values
-     */
-    public void updateAuthorValues() {
-
-        // Get all the Ratings authored by the user so that their values can also be appropriately
-        // updated
-        FirebaseProviderUtils.getAllRatingsForFirebaseUser(new FirebaseProviderUtils.FirebaseArrayListener() {
-            @Override
-            public void onModelsReady(BaseModel[] models) {
-
-                // Get the directory where the Author's info is stored on the FirebaseDatabase
-                String directory = GuideDatabase.AUTHORS + "/" + mAuthor.firebaseId;
-
-                // Create a Map for the update procedure
-                Map<String, Object> childUpdates = new HashMap<>();
-                childUpdates.put(directory, mAuthor.toMap());
-
-                // Modify the Author name for all Guides written by the Author
-                for (int i = 1; i < mModelList.size(); i++) {
-                    Guide guide = (Guide) mModelList.get(i);
-                    guide.authorName = mAuthor.name;
-
-                    directory = GuideDatabase.GUIDES + "/" + guide.firebaseId;
-
-                    childUpdates.put(directory, guide.toMap());
-                }
-
-                // Modify the Author name for all Ratings written by the Author
-                if (models != null) {
-
-                    Rating[] ratings = (Rating[]) models;
-
-                    for (Rating rating : ratings) {
-                        rating.setAuthorName(mAuthor.name);
-
-                        directory = FirebaseProviderUtils.RATING_DIRECTORY + "/" + rating.firebaseId;
-
-                        childUpdates.put(directory, rating.toMap());
-                    }
-                }
-
-                mAdapter.notifyItemRangeChanged(1, mModelList.size());
-
-                // Update the values
-                FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
-            }
-        });
+        mBinding.getUfvm().setInEditMode(!mBinding.getUfvm().getInEditMode());
     }
 
     /**
@@ -709,8 +606,6 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
 
                 Intent intent = new Intent(getActivity(), MessageActivity.class);
                 intent.putExtra(CHAT_KEY, chat.firebaseId);
-
-                DataCache.getInstance().store(chat);
 
                 startActivity(intent);
 
@@ -799,9 +694,4 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         mBinding.userPb.setVisibility(View.GONE);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        mBinding.getVm().notifyPropertyChanged(BR._all);
-    }
 }

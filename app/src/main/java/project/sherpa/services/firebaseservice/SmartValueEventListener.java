@@ -1,4 +1,4 @@
-package project.sherpa.utilities.objects;
+package project.sherpa.services.firebaseservice;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -7,6 +7,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
@@ -22,6 +23,7 @@ public abstract class SmartValueEventListener implements ValueEventListener {
     private DatabaseReference mReference;
     private String mFirebaseId;
     private boolean mStarted;
+    private BaseModel mModel;
 
     public SmartValueEventListener(@FirebaseProviderUtils.FirebaseType int type, String firebaseId) {
         mType = type;
@@ -40,6 +42,12 @@ public abstract class SmartValueEventListener implements ValueEventListener {
         if (!mStarted) {
             mReference.addValueEventListener(this);
             mStarted = true;
+
+            if (mModel == null && DataCache.getInstance().get(mFirebaseId) != null) {
+                mModel = DataCache.getInstance().get(mFirebaseId);
+
+                onModelChange();
+            }
         }
     }
 
@@ -54,17 +62,47 @@ public abstract class SmartValueEventListener implements ValueEventListener {
     }
 
     /**
-     * Returns the data from Firebase at mReference. Called every time the data changes
+     * Returns the data that is being observed by the SmartValueEventListener
      *
-     * @param model    The BaseModel describing the data at mReference
+     * @return Data that is being observed
+     */
+    public BaseModel getModel() {
+        return mModel;
+    }
+
+    /**
+     * Returns the data from Firebase at mReference. Called every time the data changes.
+     *
+     * To be deprecated once all Activities/Fragments switch over to the FirebaseProviderService.
      */
     public abstract void onModelChange(BaseModel model);
 
+    /**
+     * Called when the underlying data has changed
+     */
+    public void onModelChange() {
+
+    }
+
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
+
         if (dataSnapshot.exists()) {
+
+            // Retrieve the data from the DataSnapshot
             BaseModel model = FirebaseProviderUtils.getModelFromSnapshot(mType, dataSnapshot);
-            onModelChange(model);
+
+            // Set the memvar to the returned data if it has not been set yet
+            if (mModel == null) {
+                mModel = model;
+            }
+
+            // Cache the updated data - DataCache will update an entry that already exists instead
+            // of replacing it, allowing all references to maintain fresh data.
+            DataCache.getInstance().store(model);
+
+            onModelChange();
+            onModelChange(mModel);
         }
     }
 

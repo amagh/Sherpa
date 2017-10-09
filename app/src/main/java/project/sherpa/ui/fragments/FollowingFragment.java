@@ -3,6 +3,8 @@ package project.sherpa.ui.fragments;
 import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 
+import java.util.List;
+
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.ui.activities.UserActivity;
@@ -11,6 +13,7 @@ import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.ui.fragments.abstractfragments.BaseFriendFragment;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import timber.log.Timber;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 
@@ -34,8 +37,6 @@ public class FollowingFragment extends BaseFriendFragment {
                 Intent intent = new Intent(getActivity(), UserActivity.class);
                 intent.putExtra(AUTHOR_KEY, clickedItem.firebaseId);
 
-                DataCache.getInstance().store(clickedItem);
-
                 startActivity(intent);
             }
         });
@@ -44,38 +45,76 @@ public class FollowingFragment extends BaseFriendFragment {
         mBinding.friendRv.setAdapter(mAdapter);
     }
 
-    /**
-     * Loads the user's profile
-     */
     @Override
-    protected void loadUser() {
-        super.loadUser();
-
-        if (mUser != null) {
-            loadFollowingList(mUser);
+    public void onAuthorChanged(Author user) {
+        if (mUser == null) {
+            mUser = user;
+            loadFollowingList();
+        } else {
+            updateFollowingList();
         }
     }
 
     /**
      * Loads the user's list of users that they are following and adds them to the Adapter
-     *
-     * @param user    User to retrieve the follow list from
      */
-    private void loadFollowingList(Author user) {
-        if (user.getFollowing() == null) return;
+    private void loadFollowingList() {
+        if (mUser.getFollowing() == null) return;
+
+        Timber.d("Loading following");
 
         // Get each user from the user's list of people they are following and add them to the
         // Adapter
-        for (String userId : user.getFollowing()) {
-            FirebaseProviderUtils.getModel(FirebaseProviderUtils.FirebaseType.AUTHOR, userId,
-                    new FirebaseProviderUtils.FirebaseListener() {
-                        @Override
-                        public void onModelReady(BaseModel model) {
-                            if (model == null) return;
-
-                            mAdapter.addFriend((Author) model);
-                        }
-                    });
+        for (String userId : mUser.getFollowing()) {
+            addUserToAdapter(userId);
         }
+    }
+
+    /**
+     * Updates the Adapter by removing users that are no longer being followed and adding new users
+     * that the user has chosen to follow
+     */
+    private void updateFollowingList() {
+        Timber.d("Updating following list");
+        if (mUser.getFollowing() == null) {
+            Timber.d("Clearing following adapter");
+            mAdapter.clear();
+            return;
+        }
+
+        List<String> adapterIdList = mAdapter.getFirebaseIds();
+
+        // Remove any users that are no longer being followed
+        for (String adapterUserId : adapterIdList) {
+            if (!mUser.getFollowing().contains(adapterUserId)) {
+                Timber.d("Removing " + adapterUserId + " from the adapter");
+                mAdapter.removeFriend(adapterUserId);
+            }
+        }
+
+        // Add new users being followed
+        for (String newUserId : mUser.getFollowing()) {
+            if (!adapterIdList.contains(newUserId)) {
+                Timber.d("Adding " + newUserId + " to adapter");
+                addUserToAdapter(newUserId);
+            }
+        }
+    }
+
+    /**
+     * Downloads a user's profile adds them to the Adapter
+     *
+     * @param userId    FirebaseId of the user to be added to the Adapter
+     */
+    private void addUserToAdapter(String userId) {
+        FirebaseProviderUtils.getModel(FirebaseProviderUtils.FirebaseType.AUTHOR, userId,
+                new FirebaseProviderUtils.FirebaseListener() {
+                    @Override
+                    public void onModelReady(BaseModel model) {
+                        if (model == null) return;
+
+                        mAdapter.addFriend((Author) model);
+                    }
+                });
     }
 }

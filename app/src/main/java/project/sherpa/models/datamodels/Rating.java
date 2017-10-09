@@ -57,6 +57,30 @@ public class Rating extends BaseModel {
         return false;
     }
 
+    /**
+     * Updates a Rating with new values from an update Rating of the same FirebaseId
+     *
+     * @param newModelValues    BaseModel containing the new Values
+     */
+    @Override
+    public void updateValues(BaseModel newModelValues) {
+
+        // Cast newModelValues to a Rating
+        if (!(newModelValues instanceof Rating)) return;
+        Rating newRatingValues = (Rating) newModelValues;
+
+        // Check to ensure newRatingValues has the same FirebaseId
+        if (!newRatingValues.firebaseId.equals(firebaseId)) return;
+
+        guideId         = newRatingValues.guideId;
+        guideAuthorId   = newRatingValues.guideAuthorId;
+        comment         = newRatingValues.comment;
+        rating          = newRatingValues.rating;
+        authorId        = newRatingValues.authorId;
+        authorName      = newRatingValues.authorName;
+        dateAdded       = newRatingValues.dateAdded;
+    }
+
     //********************************************************************************************//
     //*********************************** Getters and Setters ************************************//
     //********************************************************************************************//

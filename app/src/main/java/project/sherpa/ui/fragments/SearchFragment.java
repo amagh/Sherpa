@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 import project.sherpa.R;
-import project.sherpa.ads.viewmodels.AdViewModel;
 import project.sherpa.databinding.FragmentSearchBinding;
 import project.sherpa.firebasestorage.StorageProvider;
 import project.sherpa.models.datamodels.Guide;
@@ -47,6 +46,9 @@ import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.SearchViewModel;
 import project.sherpa.ui.activities.MainActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
+import project.sherpa.ui.adapters.interfaces.ClickHandler;
+import project.sherpa.ui.adapters.interfaces.LongClickHandler;
+import project.sherpa.ui.fragments.abstractfragments.MapboxFragment;
 import project.sherpa.utilities.ColorGenerator;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
@@ -245,16 +247,17 @@ public class SearchFragment extends MapboxFragment {
     private void initRecyclerView() {
 
         // Set up the Adapter
-        mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
+        mAdapter = new GuideAdapter(new ClickHandler<Guide>() {
             @Override
-            public void onGuideClicked(Guide guide) {
+            public void onClick(Guide guide) {
 
                 // Launch the Activity detailing the Guide when the user clicks on it
                 ((MainActivity) getActivity()).onGuideClicked(guide);
             }
 
+        }, new LongClickHandler<Guide>() {
             @Override
-            public void onGuideLongClicked(Guide guide) {
+            public void onLongClick(Guide guide) {
 
                 // Highlight the trail associated with the long-pressed Guide
                 highLightPolylineForGuide(guide);

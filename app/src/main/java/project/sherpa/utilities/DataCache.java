@@ -45,11 +45,11 @@ public class DataCache {
         lock(model);
 
         // Check to see if model being added to the cache is already in the cache
-        if (mDataMap.get(model.firebaseId) != null && get(model.firebaseId) instanceof Author) {
+        if (get(model.firebaseId) != null) {
 
-            // Update the Author with the new values instead of replacing the Author
-            Author cachedAuthor = (Author) get(model.firebaseId);
-            cachedAuthor.updateAuthorValues((Author) model);
+            // Update the model with the new values instead of replacing it
+            BaseModel cachedModel = get(model.firebaseId);
+            cachedModel.updateValues(model);
 
         } else {
             // Add the SoftReference to the DataCache

@@ -370,6 +370,45 @@ public class Chat extends BaseModel {
                 .getKey();
     }
 
+    /**
+     * Updates the values of the Chat with new values from an update Chat with the same FirebaseId
+     *
+     * @param newModelValues    Chat with new values to replace the current values
+     */
+    @Override
+    public void updateValues(BaseModel newModelValues) {
+
+        // Cast the BaseModel to a Chat
+        if (!(newModelValues instanceof Chat)) return;
+        Chat newChatValues = (Chat) newModelValues;
+
+        // Check to ensure the new Chat has the same FirebaseId as the one it is replacing
+        if (!newChatValues.firebaseId.equals(firebaseId)) return;
+
+        activeMembers   = newChatValues.activeMembers;
+        allMembers      = newChatValues.allMembers;
+        messageCount    = newChatValues.messageCount;
+        lastAuthorId    = newChatValues.lastAuthorId;
+        lastAuthorName  = newChatValues.lastAuthorName;
+        lastMessageId   = newChatValues.lastMessageId;
+        lastMessage     = newChatValues.lastMessage;
+        lastMessageDate = newChatValues.lastMessageDate;
+        memberCode      = newChatValues.memberCode;
+    }
+
+    /**
+     * Checks to see if there are any new messages compared to the Chat's copy on the local database
+     *
+     * @param context    Interface to global Context
+     * @return True if there are unread messages. False otherwise.
+     */
+    public int getNewMessageCount(Context context) {
+
+        // Query database for number of messages on local copy of Chat
+        int localMessageCount = ContentProviderUtils.getMessageCount(context, firebaseId);
+        return messageCount - localMessageCount;
+    }
+
     //********************************************************************************************//
     //*********************************** Getters & Setters **************************************//
     //********************************************************************************************//

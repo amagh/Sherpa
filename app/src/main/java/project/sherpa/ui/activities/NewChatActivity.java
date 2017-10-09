@@ -192,7 +192,6 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
         intent.putExtra(CHAT_KEY, chat.firebaseId);
 
         DataCache.getInstance().store(chat);
-        DataCache.getInstance().store(mAuthor);
 
         startActivity(intent);
 

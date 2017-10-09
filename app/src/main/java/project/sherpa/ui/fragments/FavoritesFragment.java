@@ -30,15 +30,20 @@ import project.sherpa.databinding.FragmentFavoritesBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.ui.activities.AttachActivity;
 import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.adapters.GuideAdapter;
+import project.sherpa.ui.adapters.interfaces.ClickHandler;
+import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
 
 /**
  * Created by Alvin on 8/16/2017.
@@ -55,14 +60,20 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
     private List<Guide> mGuideList;
     private Author mAuthor;
 
+    private ModelChangeListener<Author> mUserListener;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         // Inflate the View using DataBindingUtils
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_favorites, container, false);
+        bindFirebaseProviderService(true);
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(mBinding.toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.title_favorites));
+
+        // Show the ProgressBar
+        mBinding.favoritesPb.setVisibility(View.VISIBLE);
 
         // Initialize the RecyclerView
         initRecyclerView();
@@ -93,8 +104,6 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
         return mBinding.getRoot();
     }
 
-
-
     /**
      * Initializes the elements required for the RecyclerView
      */
@@ -104,9 +113,9 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
         mGuideList = new ArrayList<>();
 
         // Init the Adapter and set the click response
-        mAdapter = new GuideAdapter(new GuideAdapter.ClickHandler() {
+        mAdapter = new GuideAdapter(new ClickHandler<Guide>() {
             @Override
-            public void onGuideClicked(Guide guide) {
+            public void onClick(Guide guide) {
 
                 DataCache.getInstance().store(guide);
 
@@ -120,14 +129,10 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
                     // Open the GuideDetailsActivity
                     Intent intent = new Intent(getActivity(), GuideDetailsActivity.class);
                     intent.putExtra(GUIDE_KEY, guide.firebaseId);
+                    intent.putExtra(AUTHOR_KEY, guide.authorId);
 
                     startActivity(intent);
                 }
-            }
-
-            @Override
-            public void onGuideLongClicked(Guide guide) {
-
             }
         });
 
@@ -146,11 +151,6 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
         super.onConnected();
 
         if (mGuideList == null || mGuideList.size() == 0) {
-
-            // Show the ProgressBar
-            mBinding.favoritesPb.setVisibility(View.VISIBLE);
-
-            loadUser();
         } else {
             mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
         }
@@ -225,38 +225,48 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mUserListener != null) mService.registerModelChangeListener(mUserListener);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mUserListener != null) mService.unregisterModelChangeListener(mUserListener);
+    }
+
+    @Override
+    protected void onServiceConnected() {
+        loadCurrentUser();
+    }
+
     /**
      * Loads the favorites for the user either from a local database if they do not have a Firebase
      * Account or the online database if they do
      */
-    private void loadUser() {
+    private void loadCurrentUser() {
 
-        // Check whether the user is logged in
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
         if (user == null) {
-
-            // Load from local database
             loadFavoritesFromDatabase();
         } else {
 
-            mAuthor = (Author) DataCache.getInstance().get(user.getUid());
-
-            if (mAuthor != null) {
-
-                // Load the user's favorites
-                loadFavorites(mAuthor);
-            }
-
-            // Load from online
-            FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
+            mUserListener = new ModelChangeListener<Author>(AUTHOR, user.getUid()) {
                 @Override
-                public void onModelReady(BaseModel model) {
-
-                    // Load the user's favorites
-                    loadFavorites((Author) model);
+                public void onModelReady(Author model) {
+                    mAuthor = model;
+                    loadFavorites(mAuthor);
                 }
-            });
+
+                @Override
+                public void onModelChanged() {
+                    updateFavorites();
+                }
+            };
+
+            mService.registerModelChangeListener(mUserListener);
         }
     }
 
@@ -349,37 +359,69 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
 
         // Iterate through the List and retrieve each Guide from Firebase
         for (String firebaseId : guideIdList) {
+            addGuideToAdapter(firebaseId);
+        }
+    }
 
-            // Check to see if the Guide exists in cache
-            Guide guide = (Guide) DataCache.getInstance().get(firebaseId);
+    /**
+     * Downloads a Guide and adds them to the Adapter
+     *
+     * @param guideId    FirebaseId of the Guide to be added to the Adapter
+     */
+    private void addGuideToAdapter(String guideId) {
 
-            if (guide != null) {
+        ModelChangeListener<Guide> guideListener = new ModelChangeListener<Guide>(GUIDE, guideId) {
+            @Override
+            public void onModelReady(Guide model) {
 
                 // Add the Guide to the Adapter
-                mAdapter.addGuide(guide);
+                mAdapter.addGuide(model);
 
                 // Hide ProgressBar
                 mBinding.favoritesPb.setVisibility(View.GONE);
-            } else {
 
-                // Guide not in cache, download from Firebase Database
-                FirebaseProviderUtils.getModel(
-                        FirebaseProviderUtils.FirebaseType.GUIDE,
-                        firebaseId,
-                        new FirebaseProviderUtils.FirebaseListener() {
-                            @Override
-                            public void onModelReady(BaseModel model) {
+                mService.unregisterModelChangeListener(this);
+            }
 
-                                // Add the Guide to the Adapter
-                                mAdapter.addGuide((Guide) model);
+            @Override
+            public void onModelChanged() {
 
-                                // Store the Model in DataCache
-                                DataCache.getInstance().store(model);
+            }
+        };
 
-                                // Hide ProgressBar
-                                mBinding.favoritesPb.setVisibility(View.GONE);
-                            }
-                        });
+        mService.registerModelChangeListener(guideListener);
+    }
+
+    /**
+     * Modifies the Adapter to match the updated list of favorites from the Author
+     */
+    private void updateFavorites() {
+
+        if (mAuthor.favorites == null) {
+
+            // No favorites. Clear the Adapter
+            mAdapter.clear();
+            return;
+        }
+
+        List<String> newFavoritesList = new ArrayList<>(mAuthor.favorites.keySet());
+        List<String> adapterIdList = mAdapter.getFirebaseIds();
+
+        // Remove any Guides that are no longer favorites
+        for (String guideId : adapterIdList) {
+            if (!newFavoritesList.contains(guideId)) {
+                mAdapter.removeGuide(guideId);
+
+                if (mGuideList.size() == 0) {
+                    showEmptyText();
+                }
+            }
+        }
+
+        // Add any guides that have been favorite'd
+        for (String guideId : newFavoritesList) {
+            if (!adapterIdList.contains(guideId)) {
+                addGuideToAdapter(guideId);
             }
         }
     }
@@ -391,18 +433,5 @@ public class FavoritesFragment extends ConnectivityFragment implements LoaderMan
 
         // Init the CursorLoader
         getActivity().getSupportLoaderManager().initLoader(FAVORITES_LOADER, null, this);
-    }
-
-    /**
-     * Removes a Guide from the Adapter
-     *
-     * @param guide    Guide to be removed
-     */
-    public void removeGuideFromAdapter(Guide guide) {
-        mAdapter.removeGuide(guide.firebaseId);
-
-        if (mGuideList.size() == 0) {
-            showEmptyText();
-        }
     }
 }

@@ -37,7 +37,7 @@ import project.sherpa.R;
 import project.sherpa.firebasestorage.StorageProvider;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.ui.fragments.FavoritesFragment;
-import project.sherpa.ui.fragments.MapboxFragment;
+import project.sherpa.ui.fragments.abstractfragments.MapboxFragment;
 import project.sherpa.ui.views.SmartMapView;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.ui.activities.CreateGuideActivity;
@@ -666,22 +666,6 @@ public class GuideViewModel extends BaseObservable {
 
             // Local Database
             ContentProviderUtils.toggleFavorite(mContext, mGuide);
-        }
-
-        // If the user is on the FavoriteFragment and removing a favorite, then it needs to be
-        // removed from the Adapter when they click the favorite button
-        if (mContext instanceof AppCompatActivity) {
-
-            // Get a reference to the FavoriteFragment using the Fragment tag
-            FavoritesFragment fragment = (FavoritesFragment) ((AppCompatActivity) mContext)
-                    .getSupportFragmentManager()
-                    .findFragmentByTag(FRAG_TAG_FAVORITE);
-
-            if (!mGuide.isFavorite() && fragment != null) {
-
-                // Remove the Guide from the Adapter
-                fragment.removeGuideFromAdapter(mGuide);
-            }
         }
 
         // Update the Widget

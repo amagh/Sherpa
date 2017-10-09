@@ -8,6 +8,10 @@
         <variable
             name="vm"
             type="project.sherpa.models.viewmodels.AuthorViewModel" />
+
+        <variable
+            name="evm"
+            type="project.sherpa.models.viewmodels.ListItemAuthorDetailsEditViewModel"/>
     </data>
 
     <LinearLayout
@@ -29,10 +33,9 @@
             android:src="@drawable/ic_close"
             android:tint="@color/red_900"
             android:contentDescription="@string/content_description_edit_profile_cancel_button"
-            android:onClick="@{vm::onClickEdit}"
+            android:onClick="@{evm::onClickEdit}"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground"
-            app:editVisibility="@{vm.editVisibility}"/>
+            android:background="?attr/selectableItemBackground"/>
 
         <EditText
             android:id="@+id/list_author_name_tv"
@@ -73,12 +76,12 @@
             android:background="?attr/selectableItemBackground"
             android:text="@string/author_edit_accept"
             android:textColor="@color/colorPrimary"
-            android:onClick="@{vm::onClickAccept}"
+            android:onClick="@{evm::onClickAccept}"
             app:nameTv="@{listAuthorNameTv}"
             app:descriptionTv="@{listAuthorDescriptionTv}"
-            app:author="@{vm.author}"
-            app:fragment="@{vm.fragment}"
-            app:accepted="@{vm.accepted}"
+            app:author="@{evm.author}"
+            app:fragment="@{evm.fragment}"
+            app:accepted="@{evm.accepted}"
             style="@style/Widget.AppCompat.Button.Borderless"/>
 
 

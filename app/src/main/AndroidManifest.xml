@@ -80,13 +80,18 @@
                 android:value="project.sherpa.ui.activities.MainActivity" />
         </activity>
 
-        <activity android:name=".ui.activities.ChatActivity"/>
+        <activity
+            android:name=".ui.activities.ChatActivity"
+            android:label="@string/chat_activity_title"/>
         <activity android:name=".ui.activities.MessageActivity"/>
         <activity android:name=".ui.activities.AttachActivity"/>
         <activity android:name=".ui.activities.NewChatActivity"/>
         <activity android:name=".ui.activities.FriendActivity"/>
         <activity android:name=".ui.activities.FriendFollowActivity"/>
         <activity android:name=".ui.activities.SearchUserActivity"/>
+        <service
+            android:name=".services.firebaseservice.FirebaseProviderService"
+            android:enabled="true" />
     </application>
 
 </manifest>

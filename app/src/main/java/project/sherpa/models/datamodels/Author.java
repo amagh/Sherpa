@@ -23,6 +23,7 @@ import java.util.Map;
 
 import project.sherpa.data.GuideContract;
 import project.sherpa.data.GuideDatabase;
+import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
@@ -360,9 +361,13 @@ public class Author extends BaseModelWithImage implements Parcelable {
      * Updates the Author with new values from another Author. This can be used to update the
      * cached Author, allowing it to update all Authors that are referencing the cached Object.
      *
-     * @param newAuthorValues    Author with the values that are to replace the existing Author
+     * @param newModelValues    Author with the values that are to replace the existing Author
      */
-    public void updateAuthorValues(Author newAuthorValues) {
+    @Override
+    public void updateValues(BaseModel newModelValues) {
+
+        if (!(newModelValues instanceof Author)) return;
+        Author newAuthorValues = (Author) newModelValues;
 
         // Check to ensure that the Author values used to replace the current Author has the same
         // FirebaseId

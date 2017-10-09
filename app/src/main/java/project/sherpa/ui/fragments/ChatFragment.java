@@ -4,10 +4,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
@@ -16,11 +12,7 @@ import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,44 +29,43 @@ import project.sherpa.databinding.FragmentChatBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.ui.activities.MessageActivity;
 import project.sherpa.ui.activities.NewChatActivity;
 import project.sherpa.ui.adapters.ChatAdapter;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
+import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.ContentProviderUtils;
-import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.CHAT;
 
 /**
  * Created by Alvin on 9/15/2017.
  */
 
-public class ChatFragment extends ConnectivityFragment implements LoaderManager.LoaderCallbacks<Cursor> {
-
-    // ** Constants ** //
-    private static final int CHAT_LOADER = 5884;
+public class ChatFragment extends ConnectivityFragment {
 
     // ** Member Variables ** //
     private FragmentChatBinding mBinding;
     private Author mAuthor;
     private ChatAdapter mAdapter;
 
-    private Pair<DatabaseReference, ValueEventListener> mAuthorReferenceListenerPair;
-    private Map<String, ChatValueEventListener> mEventListenerMap = new HashMap<>();
+    private Map<String, ModelChangeListener> mListenerMap = new HashMap<>();
     private List<String> mAuthorIdList = new ArrayList<>();
-    private Map<String, Chat> mDatabaseChatMap = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat, container, false);
+        bindFirebaseProviderService(true);
 
-        loadCurrentUser();
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mBinding.chatTb);
 
         initRecyclerView();
-
+        loadAdViewModel(mBinding);
         return mBinding.getRoot();
     }
 
@@ -84,57 +75,123 @@ public class ChatFragment extends ConnectivityFragment implements LoaderManager.
     private void loadCurrentUser() {
 
         // Get the User and load their profile from the DataCache
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        assert user != null;
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            getActivity().finish();
+            return;
+        }
 
-        final DatabaseReference authorRef = FirebaseDatabase.getInstance().getReference()
-                .child(GuideDatabase.AUTHORS)
-                .child(user.getUid());
-
-        ValueEventListener listener = new ValueEventListener() {
+        // Initialize the ModelChangeListener for the logged in User
+        ModelChangeListener<Author> modelChangeListener = new ModelChangeListener<Author>(AUTHOR, user.getUid()) {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onModelReady(Author author) {
 
-                Author author = (Author) FirebaseProviderUtils.getModelFromSnapshot(
-                        FirebaseProviderUtils.FirebaseType.AUTHOR,
-                        dataSnapshot);
-
-                if (author.getChats() == null) {
-
-                    // Stop and remove all ChatValueEventListeners
-                    for (ChatValueEventListener listener : mEventListenerMap.values()) {
-                        listener.stop();
-                    }
-
-                    mEventListenerMap.clear();
-                    mAdapter.clear();
-                }
-
-                // Remove any Chats that are no longer in the User's list of Chats
-                if (mAuthor != null && mAuthor.getChats() != null && author.getChats() != null) {
-
-                    // Check the new list of Chats against the List of Chats that the Author
-                    // previously had and remove any Chats that aren't in the new List
-                    for (String chatId : mAuthor.getChats()) {
-                        if (!author.getChats().contains(chatId)) {
-                            mAdapter.removeChat(chatId);
-                            mEventListenerMap.remove(chatId);
-                        }
-                    }
-                }
-
+                // Set the field to the Author
                 mAuthor = author;
-
                 loadChats();
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onModelChanged() {
+                if (mAuthor.getChats().size() < mAdapter.getItemCount()) {
 
+                    // There are less Chats in the user's profile than in the Adapter. Clear the
+                    // Adapter and re-load the Chats
+                    mAdapter.clear();
+                    unregisterChatListeners();
+
+                }
+
+                loadChats();
             }
         };
 
-        mAuthorReferenceListenerPair  = new Pair<>(authorRef, listener);
+        mListenerMap.put(user.getUid(), modelChangeListener);
+        mService.registerModelChangeListener(mListenerMap.get(user.getUid()));
+    }
+
+    /**
+     * Sets ModelChangeListeners for each of the Chats that the user is a part of to notify the
+     * user if they have a new message
+     */
+    private void loadChats() {
+
+        // Remove any Chats from the local database that have been deleted from the Firebase profile
+        checkAndRemoveDeletedChats();
+
+        // Register a ModelChangeListener for each Chat in the Author's List of Chats
+        for (final String chatId : mAuthor.getChats()) {
+
+            // Skip any Chats that already have ModelChangeListeners registered
+            if (mListenerMap.get(chatId) != null) return;
+
+            mListenerMap.put(chatId, new ModelChangeListener<Chat>(CHAT, chatId) {
+                @Override
+                public void onModelReady(Chat chat) {
+
+                    if (chat == null) {
+
+                        // Chat does not exist. Stop listening for changes
+                        mService.unregisterModelChangeListener(this);
+                        mListenerMap.remove(getFirebaseId());
+
+                        mAuthor.removeChat(getActivity(), getFirebaseId());
+
+                        return;
+                    } else if (chat.getLastMessageId() == null) {
+
+                        // Chat has no messages. Delete the Chat from Firebase.
+                        FirebaseDatabase.getInstance().getReference()
+                                .child(GuideDatabase.CHATS)
+                                .child(chatId)
+                                .removeValue();
+
+                        mService.unregisterModelChangeListener(this);
+                        mListenerMap.remove(chat.firebaseId);
+
+                        return;
+                    }
+
+                    // Add the members of the Chat to the local database so their name can be
+                    // stored
+                    getChatMembers(chat);
+
+                    // Check to see if there are any unread messages and set the layout to reflect
+                    // it in the Adapter
+                    mAdapter.setHasNewMessage(chat.firebaseId, chat.getNewMessageCount(getActivity()) > 0);
+                }
+
+                @Override
+                public void onModelChanged() {
+
+                    // Check to see if there are any unread messages and set the layout to reflect
+                    // it in the Adapter
+                    mAdapter.setHasNewMessage(
+                            getModel().firebaseId,
+                            getModel().getNewMessageCount(getActivity()) > 0);
+                }
+            });
+
+            mService.registerModelChangeListener(mListenerMap.get(chatId));
+        }
+    }
+
+    /**
+     * Unregisters the ModelChangeListeners for the Chats and removes them from the Map so that
+     * they can be registered again.
+     */
+    private void unregisterChatListeners() {
+
+        // Iterate and unregister and remove each ModelChangeListener
+        List<String> keyList = new ArrayList<>(mListenerMap.keySet());
+        for (int i = keyList.size() - 1; i >= 0; i--) {
+            String key = keyList.get(i);
+            if (key.equals(mAuthor.firebaseId)) continue;
+
+            ModelChangeListener listener = mListenerMap.get(key);
+            mService.unregisterModelChangeListener(listener);
+            mListenerMap.remove(key);
+        }
     }
 
     /**
@@ -155,89 +212,29 @@ public class ChatFragment extends ConnectivityFragment implements LoaderManager.
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-
-        if (mAuthorReferenceListenerPair != null) {
-            mAuthorReferenceListenerPair.first.removeEventListener(mAuthorReferenceListenerPair.second);
-        }
-
-        if (mEventListenerMap != null) {
-            for (ChatValueEventListener listener : mEventListenerMap.values()) {
-                listener.stop();
-            }
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
-        // Start the CursorLoader
-        getActivity().getSupportLoaderManager().restartLoader(CHAT_LOADER, null, this);
-
-        if (mAuthorReferenceListenerPair != null) {
-            mAuthorReferenceListenerPair.first.addValueEventListener(mAuthorReferenceListenerPair.second);
-        }
-
-        if (mEventListenerMap != null) {
-            for (ChatValueEventListener listener : mEventListenerMap.values()) {
-                listener.start();
-            }
+        // Start listening to changes in the ModelChangeListeners
+        for (ModelChangeListener listener : mListenerMap.values()) {
+            mAdapter.setHasNewMessage(listener.getFirebaseId(), false);
+            mService.registerModelChangeListener(listener);
         }
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(
-                getActivity(),
-                GuideProvider.Chats.CONTENT_URI,
-                null, null, null, null);
-    }
+    public void onPause() {
+        super.onPause();
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        // Add each Chat in the database to a Map for easier access to check its message coung
-        // against the Firebase one
-        if (data != null) {
-            if (data.moveToFirst()) {
-                do {
-                    Chat chat = Chat.createChatFromCursor(data);
-                    mDatabaseChatMap.put(chat.firebaseId, chat);
-                } while (data.moveToNext());
-            }
+        // Stop listening to changes in the ModelChangeListeners
+        for (ModelChangeListener listener : mListenerMap.values()) {
+            mService.unregisterModelChangeListener(listener);
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-
-    /**
-     * Loads all the chats that the user is involved in
-     */
-    private void loadChats() {
-
-        // Remove any Chats from the database that don't exist on the Firebase Database
-        checkAndRemoveDeletedChats();
-
-        if (mAuthor.getChats() == null) return;
-
-        // Start a ValueEventListener for each Chat the user is involved in
-        for (String chatId : mAuthor.getChats()) {
-
-            // Do not add another Listener for items that already have a Listener attached to them
-            if (mEventListenerMap.keySet().contains(chatId)) return;
-
-            ChatValueEventListener listener = new ChatValueEventListener(chatId);
-            listener.start();
-
-            // Add both to the Set so the ValueEventListener can be added and removed in
-            // onStart/onPause
-            mEventListenerMap.put(chatId, listener);
-        }
+    protected void onServiceConnected() {
+        loadCurrentUser();
     }
 
     /**
@@ -308,7 +305,7 @@ public class ChatFragment extends ConnectivityFragment implements LoaderManager.
             mAuthorIdList.add(authorId);
 
             FirebaseProviderUtils.getModel(
-                    FirebaseProviderUtils.FirebaseType.AUTHOR,
+                    AUTHOR,
                     authorId,
                     new FirebaseProviderUtils.FirebaseListener() {
                         @Override
@@ -317,7 +314,6 @@ public class ChatFragment extends ConnectivityFragment implements LoaderManager.
                             // Add the Author to the DataCache and the local database
                             Author author = (Author) model;
 
-                            DataCache.getInstance().store(author);
                             ContentProviderUtils.insertModel(getActivity(), author);
 
                             // Add the Chat to the Adapter
@@ -336,8 +332,6 @@ public class ChatFragment extends ConnectivityFragment implements LoaderManager.
         Intent intent = new Intent(getActivity(), NewChatActivity.class);
         intent.putExtra(AUTHOR_KEY, mAuthor.firebaseId);
 
-        DataCache.getInstance().store(mAuthor);
-
         startActivity(intent);
     }
 
@@ -351,80 +345,6 @@ public class ChatFragment extends ConnectivityFragment implements LoaderManager.
         intent.putExtra(CHAT_KEY, chat.firebaseId);
 
         // Store the Chat and Author
-        DataCache.getInstance().store(chat);
-        DataCache.getInstance().store(mAuthor);
-
         startActivity(intent);
-    }
-
-    private class ChatValueEventListener implements ValueEventListener {
-
-        // ** Member Variables ** //
-        private String chatId;
-        private DatabaseReference reference;
-
-        ChatValueEventListener(String chatId) {
-            this.chatId = chatId;
-
-            reference = FirebaseDatabase.getInstance().getReference()
-                    .child(GuideDatabase.CHATS)
-                    .child(chatId);
-        }
-
-        // Begins listening for changes in this Chat
-        void start() {
-            reference.addValueEventListener(this);
-        }
-
-        // Stops listening for changes in this Chat
-        void stop() {
-            reference.removeEventListener(this);
-        }
-
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            Chat chat = (Chat) FirebaseProviderUtils.getModelFromSnapshot(
-                    FirebaseProviderUtils.FirebaseType.CHAT,
-                    dataSnapshot);
-
-            if (chat == null) {
-                // Chat does not exist - stop listening for this chat
-                reference.removeEventListener(this);
-                mAuthor.removeChat(getActivity(), this.chatId);
-
-                mEventListenerMap.remove(this.chatId);
-                return;
-            }
-
-            // Retrieve the members from each Chat
-            if (chat.getActiveMembers().size() > 1 && chat.getLastMessageId() != null) {
-                getChatMembers(chat);
-                DataCache.getInstance().store(chat);
-
-            } else {
-                // Remove any Chats that do not have any members or any messages
-                reference.removeValue();
-                reference.removeEventListener(this);
-                mAuthor.removeChat(getActivity(), chat.firebaseId);
-
-                mEventListenerMap.remove(this.chatId);
-            }
-
-            if (mDatabaseChatMap.get(chat.firebaseId) != null) {
-                Chat databaseChat = mDatabaseChatMap.get(chat.firebaseId);
-
-                // Set whether the Chat has unread messages
-                mAdapter.setHasNewMessage(
-                        chat.firebaseId,
-                        chat.getMessageCount() > databaseChat.getMessageCount());
-            } else {
-                mAdapter.setHasNewMessage(chat.firebaseId, true);
-            }
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
     }
 }
