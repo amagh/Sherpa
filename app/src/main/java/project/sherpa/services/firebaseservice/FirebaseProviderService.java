@@ -93,9 +93,6 @@ public class FirebaseProviderService extends Service {
                 }
             };
 
-            // Start listening to changes in the data on Firebase
-            smartValueEventListener.start();
-
             // Add the SmartValueEventListener to the Map
             mSmartListenerMap.put(firebaseId, smartValueEventListener);
 
@@ -105,6 +102,8 @@ public class FirebaseProviderService extends Service {
 
             mModelListenerMap.get(smartValueEventListener).add(modelChangeListener);
 
+            // Start listening to changes in the data on Firebase
+            smartValueEventListener.start();
         } else {
 
             // SmartValueEventListener corresponding to the sought data exists, register the
