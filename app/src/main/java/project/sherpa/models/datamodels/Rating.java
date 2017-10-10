@@ -14,12 +14,14 @@ import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 
 public class Rating extends BaseModel {
     // ** Constants ** //
-    public static final String GUIDE_ID    = "guideId";
-    private static final String COMMENT     = "comment";
-    private static final String RATING      = "rating";
-    public static final String AUTHOR_ID   = "authorId";
-    private static final String AUTHOR_NAME = "authorName";
-    private static final String DATE_ADDED  = "dateAdded";
+    public static final String DIRECTORY        = "ratings";
+    public static final String GUIDE_ID         = "guideId";
+    public static final String GUIDE_AUTHOR_ID  = "guideAuthorId";
+    public static final String COMMENT          = "comment";
+    public static final String RATING           = "rating";
+    public static final String AUTHOR_ID        = "authorId";
+    public static final String AUTHOR_NAME      = "authorName";
+    public static final String DATE_ADDED       = "dateAdded";
 
     // ** Member Variables ** //
     private String guideId;
@@ -34,12 +36,13 @@ public class Rating extends BaseModel {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
-        map.put(GUIDE_ID, guideId);
-        map.put(COMMENT, comment);
-        map.put(RATING, rating);
-        map.put(AUTHOR_ID, authorId);
-        map.put(AUTHOR_NAME, authorName);
-        map.put(DATE_ADDED, getDateAdded());
+        map.put(GUIDE_ID,           guideId);
+        map.put(GUIDE_AUTHOR_ID,    guideAuthorId);
+        map.put(COMMENT,            comment);
+        map.put(RATING,             rating);
+        map.put(AUTHOR_ID,          authorId);
+        map.put(AUTHOR_NAME,        authorName);
+        map.put(DATE_ADDED,         getDateAdded());
 
         return map;
     }
