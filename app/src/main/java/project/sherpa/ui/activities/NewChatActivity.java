@@ -8,18 +8,21 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import project.sherpa.BR;
 import project.sherpa.R;
 import project.sherpa.databinding.ActivityNewChatBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Chat;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.SearchUserViewModel;
+import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.activities.interfaces.SearchUserInterface;
 import project.sherpa.ui.adapters.ChatAuthorAdapter;
@@ -28,6 +31,7 @@ import project.sherpa.utilities.FirebaseProviderUtils;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.CHAT_KEY;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
 
 /**
  * Created by Alvin on 9/19/2017.
@@ -46,6 +50,7 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
     private ChatAuthorAdapter mAdapter;
 
     private Handler mHandler = new Handler();
+    private ModelChangeListener<Author> mAuthorListener;
 
     private Set<Author> mFriends = new HashSet<>();
     private Set<Author> mFriendsFiltered = new HashSet<>();
@@ -54,6 +59,7 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_new_chat);
+        bindFirebaseProviderService(true);
 
         String authorId = getIntent().getStringExtra(AUTHOR_KEY);
 
@@ -61,7 +67,6 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
 
         setupViewModel();
         initRecyclerView();
-        loadFriends();
     }
 
     /**
@@ -85,8 +90,74 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
         mBinding.searchUserLayout.searchUserRv.setAdapter(mAdapter);
     }
 
-    private void loadFriends() {
+    @Override
+    protected void onServiceConnected() {
+        super.onServiceConnected();
+        loadFirebaseUser();
+    }
 
+    /**
+     * Loads the profile for the logged in user
+     */
+    private void loadFirebaseUser() {
+
+        // Load the Firebase User and check that they are logged in
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            finish();
+            return;
+        }
+
+        mAuthorListener = new ModelChangeListener<Author>(AUTHOR, user.getUid()) {
+            @Override
+            public void onModelReady(Author model) {
+                mAuthor = model;
+
+                // Load the Friends list for the User
+                loadFriends();
+            }
+
+            @Override
+            public void onModelChanged() {
+
+            }
+        };
+
+        mService.registerModelChangeListener(mAuthorListener);
+    }
+
+    /**
+     * Adds each friend from mAuthor's friend list to the Adapter
+     */
+    private void loadFriends() {
+        if (mAuthor.getFriends() == null) return;
+        for (String friendId : mAuthor.getFriends()) {
+            addFriendToAdapter(friendId);
+        }
+    }
+
+    /**
+     * Downloads each friend's profile and adds them to the Adapter
+     *
+     * @param friendId    FirebaseId of the friend to download and add to the Adapter
+     */
+    private void addFriendToAdapter(String friendId) {
+
+        ModelChangeListener<Author> friendListener = new ModelChangeListener<Author>(AUTHOR, friendId) {
+            @Override
+            public void onModelReady(Author model) {
+                mAdapter.addAuthor(model);
+                mFriends.add(model);
+                mService.unregisterModelChangeListener(this);
+            }
+
+            @Override
+            public void onModelChanged() {
+
+            }
+        };
+
+        mService.registerModelChangeListener(friendListener);
     }
 
     /**
@@ -96,6 +167,14 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
      */
     @Override
     public void runQueryForUsername(final String query) {
+
+        // Filter the friend's list for any friends that match the query
+        filter(query);
+
+        if (query.length() <= 2) {
+            resetAdapter();
+            return;
+        }
 
         // Set the Author to null so their information isn't showing when the query changes
         mViewModel.setAuthor(null);
@@ -120,12 +199,8 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
                      });
                  }
              }, SEARCH_DELAY);
-
-        // Filter the friend's list for any friends that match the query
-        filter(query);
     }
 
-    @Override
     public void resetAdapter() {
 
         // Cancel any pending searches
@@ -206,5 +281,18 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
      */
     private void filter(String query) {
 
+        // Clear the filtered friends list
+        mFriendsFiltered.clear();
+
+        // Convert the query to lowercase and check if any of the friends have a username that
+        // contain the query
+        query = query.toLowerCase();
+        for (Author friend : mFriends) {
+            if (friend.getUsername().toLowerCase().contains(query)) {
+                mFriendsFiltered.add(friend);
+            }
+        }
+
+        mAdapter.setFriendList(mFriendsFiltered);
     }
 }

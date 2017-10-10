@@ -193,6 +193,11 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
     @Override
     public void runQueryForUsername(final String username) {
 
+        if (username.length() <= 2) {
+            resetAdapter();
+            return;
+        }
+
         // Cancel any queries queued to be run
         mSearchHandler.removeCallbacksAndMessages(null);
 
@@ -273,7 +278,6 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
     /**
      * Resets the Adapter to its starting conditions
      */
-    @Override
     public void resetAdapter() {
 
         // Cancel any pending searches
