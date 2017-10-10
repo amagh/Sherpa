@@ -17,11 +17,12 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/list_search_user_iv"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:padding="@dimen/list_author_icon_padding"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_width="@dimen/chat_author_icon_size"
+            android:layout_height="@dimen/chat_author_icon_size"
             android:src="@drawable/ic_account_circle"
             app:authorImage="@{vm.authorImage}"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -30,6 +31,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@{vm.name}"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             app:author="@{vm.author}"
             app:layout_constraintStart_toEndOf="@id/list_search_user_iv"
             app:layout_constraintEnd_toEndOf="parent"
@@ -44,8 +49,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@{vm.query}"
-            app:layout_constraintStart_toEndOf="@id/list_search_user_iv"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/list_search_user_tv"
+            app:layout_constraintEnd_toEndOf="@id/list_search_user_tv"
             app:layout_constraintTop_toBottomOf="@id/list_search_user_tv"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
