@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,7 +47,7 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
 
         @Override
         public boolean areItemsTheSame(Author item1, Author item2) {
-            return item1 == item2;
+            return item1.firebaseId.equals(item2.firebaseId);
         }
     };
     private SortedList<Author> mSortedList = new SortedList<>(Author.class, mSortedCallback);
@@ -93,6 +94,36 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
         } else {
             return SEARCH_USER_VIEW_TYPE;
         }
+    }
+
+    /**
+     * Sets the List of friends to display in the Adapter
+     *
+     * @param friendList    List of friends to display
+     */
+    public void setFriendList(Collection<Author> friendList) {
+
+        mSortedList.beginBatchedUpdates();
+
+        // Iterate through the two Lists and check if any items are to be removed
+        for (int i = mSortedList.size() - 1; i >= 0; i--) {
+            Author existingFriend = mSortedList.get(i);
+            boolean keep = false;
+
+            for (Author newFriend : friendList) {
+                if (newFriend.firebaseId.equals(existingFriend.firebaseId)) {
+                    keep = true;
+                    break;
+                }
+            }
+
+            // Remove the item as it is new in the friendList
+            if (!keep) mSortedList.removeItemAt(i);
+        }
+
+        // Add all other items from the friendList to the SortedList
+        mSortedList.addAll(friendList);
+        mSortedList.endBatchedUpdates();
     }
 
     /**
