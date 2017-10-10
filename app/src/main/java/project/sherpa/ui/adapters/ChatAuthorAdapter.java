@@ -21,6 +21,7 @@ import project.sherpa.databinding.ListItemFriendBinding;
 import project.sherpa.databinding.ListItemSearchUserBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.viewmodels.AuthorViewModel;
+import project.sherpa.models.viewmodels.ListItemFriendViewModel;
 import project.sherpa.models.viewmodels.SearchUserViewModel;
 
 /**
@@ -193,12 +194,14 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
                 Author author = mSortedList.get(position);
                 AuthorViewModel vm =
                         new AuthorViewModel((AppCompatActivity) mBinding.getRoot().getContext(), author);
+                ListItemFriendViewModel fvm = new ListItemFriendViewModel(author);
 
                 // Set the item background based on whether the user has selected this Author for the
                 // chat
                 vm.setSelected(mSelected.contains(author));
 
                 ((ListItemFriendBinding) mBinding).setVm(vm);
+                ((ListItemFriendBinding) mBinding).setFvm(fvm);
             } else {
                 ((ListItemSearchUserBinding) mBinding).setVm(mViewModel);
             }
