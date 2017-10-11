@@ -903,6 +903,31 @@ public class FirebaseProviderUtils {
     }
 
     /**
+     * Generates a directory from a series of paths, delimited with a '/' for use in getting the
+     * directory of a model on Firebase Database
+     *
+     * @param paths    Array of paths to the directory
+     * @return Directory for the model on Firebase Database
+     */
+    public static String generateDirectory(String... paths) {
+
+        // Delimiter is set to empty first so that it is not pre-prepended to the first path
+        String delimiter = "";
+        StringBuilder builder = new StringBuilder();
+
+        // Append each path to the StringBuilder, prepended with the '/' delimiter
+        for (String path : paths) {
+            builder.append(delimiter)
+                    .append(path);
+
+            // Set the delimiter to '/'
+            delimiter = "/";
+        }
+
+        return builder.toString();
+    }
+
+    /**
      * Returns an instance of GeoFire that is already set to the correct Firebase Database Reference
      *
      * @return a new GeoFire instance
