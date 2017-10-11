@@ -18,7 +18,7 @@
             android:id="@+id/list_rating_heading_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/guide_details_section_margin"
             android:gravity="center_horizontal"
             android:text="@string/list_rating_heading"
             android:visibility="@{vm.ratingHeadingVisibility}"
