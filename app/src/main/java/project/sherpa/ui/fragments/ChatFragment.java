@@ -129,6 +129,9 @@ public class ChatFragment extends ConnectivityFragment {
                 @Override
                 public void onModelReady(Chat chat) {
 
+                    // Hide the ProgressBar
+                    mBinding.chatPb.setVisibility(View.GONE);
+
                     if (chat == null) {
 
                         // Chat does not exist. Stop listening for changes
