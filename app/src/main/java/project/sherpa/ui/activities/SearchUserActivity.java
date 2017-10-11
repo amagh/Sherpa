@@ -68,28 +68,12 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
     private List<Author> mResultList;
     private int mSearchType;
     ModelChangeListener<Author> mUserListener;
-    private FirebaseProviderService mService;
-    private boolean mBound;
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            FirebaseProviderBinder binder = (FirebaseProviderBinder) iBinder;
-            mService = binder.getService();
-            mBound = true;
-
-            loadCurrentUser();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBound = false;
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_search_user);
+        bindFirebaseProviderService(true);
 
         mSearchType = getIntent().getIntExtra(SEARCH_KEY, FOLLOW);
 
@@ -98,22 +82,20 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (!mBound) {
-            Intent intent = new Intent(this, FirebaseProviderService.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        }
+    protected void onResume() {
+        super.onResume();
+        if (mUserListener != null) mService.registerModelChangeListener(mUserListener);
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
+        if (mUserListener != null) mService.unregisterModelChangeListener(mUserListener);
+    }
 
-        if (mBound) {
-            unbindService(mConnection);
-        }
+    @Override
+    protected void onServiceConnected() {
+        loadCurrentUser();
     }
 
     /**
