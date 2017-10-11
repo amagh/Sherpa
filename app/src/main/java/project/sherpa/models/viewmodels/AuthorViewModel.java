@@ -77,7 +77,7 @@ public class AuthorViewModel extends BaseObservable {
     @Bindable
     public Uri getAuthorImage() {
 
-        if (mSelected) {
+        if (mSelected || !mAuthor.hasImage) {
             return null;
         }
 
@@ -143,6 +143,8 @@ public class AuthorViewModel extends BaseObservable {
 
     @Bindable
     public StorageReference getBackdrop() {
+
+        if (!mAuthor.isHasBackdrop()) return null;
         return FirebaseStorage.getInstance().getReference()
                 .child(IMAGE_PATH)
                 .child(mAuthor.firebaseId + BACKDROP_SUFFIX + JPEG_EXT);
@@ -150,6 +152,8 @@ public class AuthorViewModel extends BaseObservable {
 
     @BindingAdapter("backdrop")
     public static void loadBackdrop(final ImageView imageView, final StorageReference backdrop) {
+
+        if (backdrop == null) return;
 
         backdrop.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
             @Override
