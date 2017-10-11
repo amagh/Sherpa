@@ -507,6 +507,7 @@ public class ContentProviderUtils {
         values.put(GuideContract.GuideEntry.TRAIL_NAME,     guide.trailName);
         values.put(GuideContract.GuideEntry.AUTHOR_ID,      guide.authorId);
         values.put(GuideContract.GuideEntry.AUTHOR_NAME,    guide.authorName);
+        values.put(GuideContract.GuideEntry.TITLE,          guide.getTitle());
         values.put(GuideContract.GuideEntry.DATE_ADDED,     guide.getDate());
         values.put(GuideContract.GuideEntry.RATING,         guide.rating);
         values.put(GuideContract.GuideEntry.REVIEWS,        guide.reviews);
