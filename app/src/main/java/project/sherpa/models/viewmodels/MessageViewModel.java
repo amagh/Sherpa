@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -27,6 +28,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import project.sherpa.BR;
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Message;
 import project.sherpa.ui.fragments.MessageFragment;
@@ -46,6 +48,7 @@ public class MessageViewModel extends BaseObservable {
     private Message mMessage;
     private Message mPrevMessage;
     private Message mNextMessage;
+    private boolean mShowProgress;
 
     public MessageViewModel(AppCompatActivity activity, Message message, Message prevMessage) {
         mActivity = activity;
@@ -175,6 +178,26 @@ public class MessageViewModel extends BaseObservable {
                 InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
     }
 
+    @Bindable
+    public boolean getShowProgress() {
+        return mShowProgress;
+    }
+
+    @BindingAdapter("showProgress")
+    public static void setProgressBar(ProgressBar messagePb, boolean showProgress) {
+
+        if (showProgress) {
+            messagePb.setVisibility(View.VISIBLE);
+        } else {
+            messagePb.setVisibility(View.GONE);
+        }
+    }
+
+    public void setShowProgress(boolean showProgress) {
+        mShowProgress = showProgress;
+        notifyPropertyChanged(BR.showProgress);
+    }
+
     /**
      * Click response for attach button
      *
@@ -190,7 +213,10 @@ public class MessageViewModel extends BaseObservable {
     }
 
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
-        if (actionId == EditorInfo.IME_ACTION_SEND) {
+
+        if (mShowProgress && actionId == EditorInfo.IME_ACTION_SEND) {
+            return true;
+        } else if (actionId == EditorInfo.IME_ACTION_SEND) {
 
             // When the user presses the IME option to send, the Message is sent
             MessageFragment fragment = (MessageFragment) mActivity.getSupportFragmentManager()
