@@ -180,6 +180,9 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
             return;
         }
 
+        // Show ProgressBar
+        mBinding.searchUserLayout.getUvm().showProgress();
+
         // Cancel any queries queued to be run
         mSearchHandler.removeCallbacksAndMessages(null);
 
@@ -197,6 +200,8 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
                 usernameQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        // Hide ProgressBar
+                        mBinding.searchUserLayout.getUvm().hideProgress();
 
                         if (!dataSnapshot.exists()) return;
 
@@ -261,6 +266,9 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
      * Resets the Adapter to its starting conditions
      */
     public void resetAdapter() {
+
+        // Hide ProgressBar
+        mBinding.searchUserLayout.getUvm().hideProgress();
 
         // Cancel any pending searches
         mSearchHandler.removeCallbacksAndMessages(null);

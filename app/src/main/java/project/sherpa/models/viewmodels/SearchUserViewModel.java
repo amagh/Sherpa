@@ -5,6 +5,8 @@ import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.net.Uri;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.storage.FirebaseStorage;
@@ -26,6 +28,7 @@ public class SearchUserViewModel extends BaseObservable {
     private SearchUserInterface mSearchInterface;
     private Author mAuthor;
     private String mQuery;
+    private boolean mShowProgress;
 
     public SearchUserViewModel(SearchUserInterface searchInterface) {
         mSearchInterface = searchInterface;
@@ -91,6 +94,24 @@ public class SearchUserViewModel extends BaseObservable {
                 .toString());
     }
 
+    @Bindable
+    public boolean getShowProgress() {
+        return mShowProgress;
+    }
+
+    @BindingAdapter({"searchUserIv", "showProgress"})
+    public static void setShowProgressBar(ProgressBar searchUserPb, ImageView searchUserIv,
+                                          boolean showProgress) {
+
+        if (showProgress) {
+            searchUserPb.setVisibility(View.VISIBLE);
+            searchUserIv.setVisibility(View.INVISIBLE);
+        } else {
+            searchUserPb.setVisibility(View.INVISIBLE);
+            searchUserIv.setVisibility(View.VISIBLE);
+        }
+    }
+
     /**
      * Resets the ViewModel to accept a new query
      */
@@ -101,5 +122,15 @@ public class SearchUserViewModel extends BaseObservable {
         notifyPropertyChanged(BR.query);
         notifyPropertyChanged(BR.author);
         notifyPropertyChanged(BR.authorImage);
+    }
+
+    public void showProgress() {
+        mShowProgress = true;
+        notifyPropertyChanged(BR.showProgress);
+    }
+
+    public void hideProgress() {
+        mShowProgress = false;
+        notifyPropertyChanged(BR.showProgress);
     }
 }
