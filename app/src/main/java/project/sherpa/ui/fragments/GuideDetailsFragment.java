@@ -33,17 +33,15 @@ import project.sherpa.data.GuideProvider;
 import project.sherpa.databinding.FragmentGuideDetailsBinding;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Guide;
+import project.sherpa.models.datamodels.Rating;
 import project.sherpa.models.datamodels.Section;
-import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.GuideViewModel;
-import project.sherpa.services.firebaseservice.FirebaseProviderService;
 import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.services.firebaseservice.QueryChangeListener;
 import project.sherpa.ui.activities.GuideDetailsActivity;
 import project.sherpa.ui.activities.UserActivity;
 import project.sherpa.ui.adapters.GuideDetailsAdapter;
 import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
-import project.sherpa.ui.fragments.interfaces.FirebaseProviderInterface;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
@@ -55,6 +53,7 @@ import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.AUTHOR;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.GUIDE;
+import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.RATING;
 import static project.sherpa.utilities.FirebaseProviderUtils.FirebaseType.SECTION;
 
 /**
@@ -73,8 +72,11 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
     private Guide mGuide;
     private Section[] mSections;
     private Author mAuthor;
+    private Author mUser;
     private GuideDetailsAdapter mAdapter;
     private MenuItem mCacheMenuItem;
+
+    private QueryChangeListener<Rating> mUserRatingListener;
 
     /**
      * Factory for creating a GuideDetailsFragment for a specific Guide
@@ -432,6 +434,8 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
         loadGuide(guideId);
         loadSections(guideId);
         loadAuthor(authorId);
+        loadRatingForFirebaseUser(guideId);
+        loadRatings(guideId);
     }
 
     /**
@@ -524,6 +528,116 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
                 };
 
         mService.registerQueryChangeListener(sectionListener);
+    }
+
+    /**
+     * Loads the Ratings for a Guide
+     *
+     * @param guideId    FirebaseId of the guide to load the ratings for
+     */
+    private void loadRatings(String guideId) {
+
+        // Generate the Query for the Ratings for the Guide
+        Query ratingsQuery = FirebaseDatabase.getInstance().getReference()
+                .child(Rating.DIRECTORY)
+                .child(guideId)
+                .orderByChild(Rating.DATE_ADDED)
+                .limitToLast(10);
+
+        // Register the QueryChangeListener
+        QueryChangeListener<Rating> ratingsListener = new QueryChangeListener<Rating>(RATING, ratingsQuery, guideId) {
+            @Override
+            public void onQueryChanged(Rating[] models) {
+                if (models == null) return;
+
+                // Add each Rating to the Adapter
+                for (Rating rating : models) {
+                    mAdapter.addModel(rating);
+                }
+
+                // Unregister the QueryChangeListener
+                mService.unregisterQueryChangeListener(this);
+            }
+        };
+
+        mService.registerQueryChangeListener(ratingsListener);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mUserRatingListener != null) mService.unregisterQueryChangeListener(mUserRatingListener);
+    }
+
+    /**
+     * Loads the Rating that the user has written for the Guide being displayed if they have
+     * written one. If the user has not given a Rating for this guide, then it loads a new Rating
+     * to be filled by the user.
+     *
+     * @param guideId    FirebaseId of the Guide to load the corresponding Rating for
+     */
+    private void loadRatingForFirebaseUser(final String guideId) {
+
+        // Check to ensure the user is logged in
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        if (mUser == null) {
+
+            // Download the user's profile
+            ModelChangeListener<Author> userListener = new ModelChangeListener<Author>(AUTHOR, user.getUid()) {
+                @Override
+                public void onModelReady(Author model) {
+
+                    // Set the user and recall the function
+                    if (model == null) return;
+                    mUser = model;
+                    mAdapter.setCurrentUser(mUser);
+
+                    loadRatingForFirebaseUser(guideId);
+                    mService.unregisterModelChangeListener(this);
+                }
+
+                @Override
+                public void onModelChanged() {
+
+                }
+            };
+
+            mService.registerModelChangeListener(userListener);
+            return;
+        }
+
+        // Generate the Query for the Ratings written by the user for the guide
+        Query ratingQuery = FirebaseDatabase.getInstance().getReference()
+                .child(Rating.DIRECTORY)
+                .child(guideId)
+                .orderByChild(Rating.AUTHOR_ID)
+                .equalTo(user.getUid());
+
+        // Register the QueryChangeListener
+        mUserRatingListener = new QueryChangeListener<Rating>(RATING, ratingQuery, user.getUid()) {
+            @Override
+            public void onQueryChanged(Rating[] models) {
+                if (models == null || models.length == 0) {
+                    // Has not been rated. Create a new Rating for the User to fill out
+                    Rating rating = new Rating();
+
+                    rating.setGuideId(mGuide.firebaseId);
+                    rating.setGuideAuthorId(mGuide.authorId);
+                    rating.setAuthorId(mUser.firebaseId);
+                    rating.setAuthorName(mUser.name);
+
+                    // Add the new Rating to the Adapter
+                    mAdapter.addModel(rating);
+
+                } else {
+                    mAdapter.addModel(models[0]);
+                }
+            }
+        };
+
+        mService.registerQueryChangeListener(mUserRatingListener);
     }
 
     /**
