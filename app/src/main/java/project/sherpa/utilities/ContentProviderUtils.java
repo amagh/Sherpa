@@ -581,7 +581,7 @@ public class ContentProviderUtils {
         values.put(GuideContract.AuthorEntry.SCORE,                 author.score);
 
         // Add image Uri if the Guide has an image
-        if (author.hasImage) {
+        if (author.getImageUri() != null) {
             values.put(GuideContract.AuthorEntry.IMAGE_URI,         author.getImageUri().toString());
         }
 
