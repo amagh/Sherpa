@@ -77,6 +77,8 @@ public abstract class SmartQueryValueListener<T extends BaseModel> implements Va
             }
 
             onQueryChanged(models);
+        } else {
+            onQueryChanged(null);
         }
     }
 

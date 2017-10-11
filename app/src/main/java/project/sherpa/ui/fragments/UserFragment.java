@@ -373,9 +373,9 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
         mGuideQueryListener = new QueryChangeListener<Guide>(GUIDE, guideQuery, author.firebaseId) {
             @Override
             public void onQueryChanged(Guide[] guides) {
-
                 mBinding.userPb.setVisibility(View.GONE);
 
+                if (guides == null) return;
                 for (Guide guide : guides) {
                     mAdapter.addModel(guide);
                 }
