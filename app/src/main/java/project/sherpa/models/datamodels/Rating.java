@@ -14,6 +14,7 @@ import java.util.Map;
 
 import project.sherpa.data.GuideDatabase;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
+import project.sherpa.utilities.FirebaseProviderUtils;
 import timber.log.Timber;
 
 /**
@@ -101,7 +102,7 @@ public class Rating extends BaseModel {
      *
      * @param previousRating    The previous numerical rating. 0 if it hasn't been rated before
      */
-    public void updateInFirebase(final int previousRating) {
+    public void updateFirebase(final int previousRating) {
 
         // Set the FirebaseId of the Rating if it is new
         if (firebaseId == null) {
@@ -113,7 +114,7 @@ public class Rating extends BaseModel {
         addDate();
 
         // Get the directory for where to push the update
-        String directory = DIRECTORY + "/" + guideId + "/" + firebaseId;
+        String directory = FirebaseProviderUtils.generateDirectory(DIRECTORY, guideId, firebaseId);
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(directory, toMap());

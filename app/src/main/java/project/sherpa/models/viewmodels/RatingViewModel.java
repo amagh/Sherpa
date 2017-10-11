@@ -255,7 +255,7 @@ public class RatingViewModel extends BaseObservable {
         }
 
         // Update the Firebase Database with the rating
-        mRating.updateInFirebase(previousRating);
+        mRating.updateFirebase(previousRating);
 
         // Force the Adapter to update the Guide with the new Rating
         mAdapter.exitEditMode(getRating(), previousRating);
