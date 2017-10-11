@@ -59,7 +59,10 @@ public class FollowingFragment extends BaseFriendFragment {
      * Loads the user's list of users that they are following and adds them to the Adapter
      */
     private void loadFollowingList() {
-        if (mUser.getFollowing() == null) return;
+        if (mUser.getFollowing() == null) {
+            hideProgressBar();
+            return;
+        }
 
         Timber.d("Loading following");
 
@@ -111,8 +114,8 @@ public class FollowingFragment extends BaseFriendFragment {
                 new FirebaseProviderUtils.FirebaseListener() {
                     @Override
                     public void onModelReady(BaseModel model) {
+                        hideProgressBar();
                         if (model == null) return;
-
                         mAdapter.addFriend((Author) model);
                     }
                 });

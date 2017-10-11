@@ -62,7 +62,10 @@ public class RequestFragment extends BaseFriendFragment {
      * Loads the friend requests the user has received and adds them to the Adapter
      */
     private void loadReceivedRequests() {
-        if (mUser.getReceivedRequests() == null) return;
+        if (mUser.getReceivedRequests() == null) {
+            hideProgressBar();
+            return;
+        }
 
         Timber.d("Loading received requests");
 
@@ -75,7 +78,10 @@ public class RequestFragment extends BaseFriendFragment {
      * Loads the friend requests the user has sent and adds them to the Adapter
      */
     private void loadSentRequests() {
-        if (mUser.getSentRequests() == null) return;
+        if (mUser.getSentRequests() == null) {
+            hideProgressBar();
+            return;
+        }
 
         Timber.d("Loading sent requests");
 
@@ -156,8 +162,8 @@ public class RequestFragment extends BaseFriendFragment {
                 new FirebaseProviderUtils.FirebaseListener() {
                     @Override
                     public void onModelReady(BaseModel model) {
+                        hideProgressBar();
                         if (model == null) return;
-
                         mAdapter.addReceivedRequest((Author) model);
                     }
                 });
@@ -173,8 +179,8 @@ public class RequestFragment extends BaseFriendFragment {
                 new FirebaseProviderUtils.FirebaseListener() {
                     @Override
                     public void onModelReady(BaseModel model) {
+                        hideProgressBar();
                         if (model == null) return;
-
                         mAdapter.addSentRequest((Author) model);
                     }
                 });
