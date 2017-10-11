@@ -36,12 +36,14 @@ import timber.log.Timber;
 public class Author extends BaseModelWithImage implements Parcelable {
 
     // ** Constants ** //
+    public static final String DIRECTORY                = "authors";
     private static final String NAME                    = "name";
     private static final String USERNAME                = "username";
     private static final String LOWER_CASE_USERNAME     = "lowerCaseUsername";
     private static final String DESCRIPTION             = "description";
     private static final String LOWER_CASE_NAME         = "lowerCaseName";
     private static final String HAS_IMAGE               = "hasImage";
+    public static final String HAS_BACKDROP             = "hasBackdrop";
     private static final String SCORE                   = "score";
     private static final String FAVORITES               = "favorites";
     public static final String CHATS                    = "chats";
@@ -67,6 +69,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
     public String description;
     public int score;
     public Map<String, String> favorites;
+    private boolean hasBackdrop;
     private List<String> chats;
     private List<String> friends;
     private List<String> following;
@@ -120,6 +123,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
         if (imageUriString != null) {
             File imageFile = new File(Uri.parse(imageUriString).getPath());
             author.setImageUri(imageFile);
+            author.hasImage = true;
         }
 
         return author;
@@ -135,6 +139,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
         map.put(DESCRIPTION,            description);
         map.put(LOWER_CASE_NAME,        name.toLowerCase());
         map.put(HAS_IMAGE,              hasImage);
+        map.put(HAS_BACKDROP,           hasBackdrop);
         map.put(SCORE,                  score);
         map.put(FAVORITES,              favorites);
         map.put(CHATS,                  chats);
@@ -377,6 +382,7 @@ public class Author extends BaseModelWithImage implements Parcelable {
         username            = newAuthorValues.username;
         description         = newAuthorValues.description;
         hasImage            = newAuthorValues.hasImage;
+        hasBackdrop         = newAuthorValues.hasBackdrop;
         score               = newAuthorValues.score;
         favorites           = newAuthorValues.favorites;
         chats               = newAuthorValues.chats;
@@ -385,6 +391,21 @@ public class Author extends BaseModelWithImage implements Parcelable {
         followers           = newAuthorValues.followers;
         receivedRequests    = newAuthorValues.receivedRequests;
         sentRequests        = newAuthorValues.sentRequests;
+    }
+
+    /**
+     * Updates the Author's profile on Firebase Database
+     */
+    public void updateFirebase() {
+
+        // Generate the directory for the model on Firebase
+        String directory = FirebaseProviderUtils.generateDirectory(DIRECTORY, firebaseId);
+
+        // Create Map for where to put the updated values and run the update
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(directory, toMap());
+
+        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
     }
 
     //********************************************************************************************//
@@ -419,6 +440,10 @@ public class Author extends BaseModelWithImage implements Parcelable {
         return sentRequests;
     }
 
+    public boolean isHasBackdrop() {
+        return hasBackdrop;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -445,6 +470,10 @@ public class Author extends BaseModelWithImage implements Parcelable {
 
     public void setSentRequests(List<String> sentRequests) {
         this.sentRequests = sentRequests;
+    }
+
+    public void setHasBackdrop(boolean hasBackdrop) {
+        this.hasBackdrop = hasBackdrop;
     }
 
     //********************************************************************************************//
