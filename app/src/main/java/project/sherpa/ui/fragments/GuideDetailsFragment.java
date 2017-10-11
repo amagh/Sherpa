@@ -579,8 +579,9 @@ public class GuideDetailsFragment extends ConnectivityFragment implements Loader
     private void loadRatingForFirebaseUser(final String guideId) {
 
         // Check to ensure the user is logged in
+        String authorId = getArguments().getString(AUTHOR_KEY);
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) return;
+        if (user == null || user.getUid().equals(authorId)) return;
 
         if (mUser == null) {
 
