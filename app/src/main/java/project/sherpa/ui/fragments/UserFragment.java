@@ -529,19 +529,34 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
             dialog.show(getActivity().getSupportFragmentManager(), null);
 
             // Upload the Image
-            imageRef.putFile(Uri.fromFile(imageFile)).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot snapshot) {
-                    dialog.dismiss();
+            imageRef.putFile(Uri.fromFile(imageFile))
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot snapshot) {
+                            dialog.dismiss();
 
-                    // Update the image
-                    if (requestCode == REQUEST_CODE_PROFILE_PIC) {
-                        mBinding.getVm().notifyPropertyChanged(BR.authorImage);
-                    } else {
-                        mBinding.getVm().notifyPropertyChanged(BR.backdrop);
-                    }
-                }
-            })
+                            boolean updateAuthor = false;
+
+                            // Update the image
+                            if (requestCode == REQUEST_CODE_PROFILE_PIC) {
+                                mBinding.getVm().notifyPropertyChanged(BR.authorImage);
+
+                                if (!mAuthor.hasImage) {
+                                    mAuthor.hasImage = true;
+                                    updateAuthor = true;
+                                }
+                            } else {
+                                mBinding.getVm().notifyPropertyChanged(BR.backdrop);
+
+                                if (!mAuthor.isHasBackdrop()) {
+                                    mAuthor.setHasBackdrop(true);
+                                    updateAuthor = true;
+                                }
+                            }
+
+                            if (updateAuthor) mAuthor.updateFirebase();
+                        }
+                    })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
