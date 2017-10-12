@@ -168,6 +168,9 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
     @Override
     public void runQueryForUsername(final String query) {
 
+        // Show the ProgressBar
+        mViewModel.showProgress();
+
         // Filter the friend's list for any friends that match the query
         filter(query);
 
@@ -190,6 +193,10 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
                      FirebaseProviderUtils.queryForUsername(query, new FirebaseProviderUtils.FirebaseListener() {
                          @Override
                          public void onModelReady(BaseModel model) {
+
+                             // Hide ProgressBar
+                             mViewModel.hideProgress();
+
                              if (model == null ||
                                      mAuthor.getFriends().contains(model.firebaseId) ||
                                      mAuthor.firebaseId.equals(model.firebaseId)) return;
@@ -204,6 +211,9 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
     }
 
     public void resetAdapter() {
+
+        // Hide the ProgressBar
+        mViewModel.hideProgress();
 
         // Cancel any pending searches
         mHandler.removeCallbacksAndMessages(null);
