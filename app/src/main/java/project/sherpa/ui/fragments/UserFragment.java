@@ -401,12 +401,21 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
      */
     private void setChatListeners() {
 
-        for (String chatId : mAuthor.getChats()) {
+        if (mAuthor.getChats() == null) return;
+
+        for (final String chatId : mAuthor.getChats()) {
             if (mListenerMap.get(chatId) != null) return;
 
             mListenerMap.put(chatId, new ModelChangeListener<Chat>(CHAT, chatId) {
                 @Override
                 public void onModelReady(Chat chat) {
+
+                    if (chat == null) {
+                        mService.unregisterModelChangeListener(this);
+                        mListenerMap.remove(chatId);
+                        return;
+                    }
+
                     int localMessageCount = ContentProviderUtils.getMessageCount(getActivity(), chat.firebaseId);
                     int firebaseMessageCount = chat.getMessageCount();
 
@@ -618,6 +627,8 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
 
                 Intent intent = new Intent(getActivity(), MessageActivity.class);
                 intent.putExtra(CHAT_KEY, chat.firebaseId);
+
+                DataCache.getInstance().store(chat);
 
                 startActivity(intent);
 
