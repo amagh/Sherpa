@@ -1,13 +1,9 @@
 package project.sherpa.ui.fragments;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.CoordinatorLayout;
@@ -50,7 +46,6 @@ import project.sherpa.models.datamodels.Guide;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.models.viewmodels.UserFragmentViewModel;
-import project.sherpa.services.firebaseservice.FirebaseProviderService;
 import project.sherpa.services.firebaseservice.ModelChangeListener;
 import project.sherpa.services.firebaseservice.QueryChangeListener;
 import project.sherpa.ui.activities.AccountActivity;
@@ -61,7 +56,6 @@ import project.sherpa.ui.activities.MessageActivity;
 import project.sherpa.ui.activities.OpenDraftActivity;
 import project.sherpa.ui.activities.SelectAreaTrailActivity;
 import project.sherpa.ui.adapters.AuthorDetailsAdapter;
-import project.sherpa.ui.adapters.GuideAdapter;
 import project.sherpa.ui.adapters.interfaces.ClickHandler;
 import project.sherpa.ui.behaviors.FabSpeedDialScrollBehavior;
 import project.sherpa.ui.dialogs.ProgressDialog;
@@ -69,9 +63,9 @@ import project.sherpa.ui.fragments.abstractfragments.ConnectivityFragment;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import project.sherpa.utilities.GeneralUtils;
 import project.sherpa.utilities.SaveUtils;
 import project.sherpa.widgets.FavoritesWidgetUpdateService;
-import project.sherpa.services.firebaseservice.FirebaseProviderService.*;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
@@ -533,8 +527,11 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot snapshot) {
-                            dialog.dismiss();
 
+                            // Force the GlideImageSignature to update
+                            GeneralUtils.forceUpdateGlideImageSignatures(getActivity());
+
+                            dialog.dismiss();
                             boolean updateAuthor = false;
 
                             // Update the image
