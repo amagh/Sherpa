@@ -67,6 +67,7 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
 
         setupViewModel();
         initRecyclerView();
+        initActionBar();
     }
 
     /**
@@ -88,6 +89,10 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
 
         mBinding.searchUserLayout.searchUserRv.setLayoutManager(new LinearLayoutManager(this));
         mBinding.searchUserLayout.searchUserRv.setAdapter(mAdapter);
+    }
+
+    private void initActionBar() {
+        setSupportActionBar(mBinding.newChatTb);
     }
 
     @Override

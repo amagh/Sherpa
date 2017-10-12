@@ -85,7 +85,9 @@
             android:label="@string/chat_activity_title"/>
         <activity android:name=".ui.activities.MessageActivity"/>
         <activity android:name=".ui.activities.AttachActivity"/>
-        <activity android:name=".ui.activities.NewChatActivity"/>
+        <activity
+            android:name=".ui.activities.NewChatActivity"
+            android:label="@string/new_chat_activity_title"/>
         <activity android:name=".ui.activities.FriendActivity"/>
         <activity android:name=".ui.activities.FriendFollowActivity"/>
         <activity android:name=".ui.activities.SearchUserActivity"/>
