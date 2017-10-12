@@ -688,17 +688,6 @@ public class UserFragment extends ConnectivityFragment implements FabSpeedDial.M
     }
 
     @Override
-    public void onConnected() {
-        super.onConnected();
-
-        if (mModelList == null || mModelList.size() == 0) {
-
-            // Show the ProgressBar
-            mBinding.userPb.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
     public void onDisconnected() {
         super.onDisconnected();
 
