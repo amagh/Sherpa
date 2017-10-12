@@ -126,8 +126,6 @@ public class MessageViewModel extends BaseObservable {
                     .using(new FirebaseImageLoader())
                     .load(authorImage)
                     .signature(GeneralUtils.getGlideImageSignature(imageView.getContext(), lastPathSegment))
-                    .placeholder(R.drawable.ic_account_circle)
-                    .error(R.drawable.ic_account_circle)
                     .into(imageView);
         }
     }
