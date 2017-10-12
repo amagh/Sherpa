@@ -190,7 +190,9 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
                      FirebaseProviderUtils.queryForUsername(query, new FirebaseProviderUtils.FirebaseListener() {
                          @Override
                          public void onModelReady(BaseModel model) {
-                             if (model == null) return;
+                             if (model == null ||
+                                     mAuthor.getFriends().contains(model.firebaseId) ||
+                                     mAuthor.firebaseId.equals(model.firebaseId)) return;
 
                              // Set the Author in the ViewModel to update its Views
                              Author author = (Author) model;
@@ -221,12 +223,8 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
         final List<String> selected = new ArrayList<>();
 
         // Add the user's FirebaseId as a member
-        selected.add(mAuthor.firebaseId);
-
-        // Add all the FirebaseIds of the selected user's to the Chat's list of members
-        for (Author author : mAdapter.getSelected()) {
-            selected.add(author.firebaseId);
-        }
+        List<String> selectedList = mAdapter.getSelectedIds();
+        selectedList.add(mAuthor.firebaseId);
 
         // Check for duplicate Chats
         Chat.checkDuplicateChats(selected, new FirebaseProviderUtils.FirebaseListener() {
