@@ -227,7 +227,7 @@ public class GeneralUtils {
      *
      * @param context    Interface to global Context
      *
-     * @return True if the singature time has been updated. False otherwise
+     * @return True if the signature time has been updated. False otherwise
      */
     public synchronized static boolean updateGlideImageSignature(Context context) {
 
@@ -239,19 +239,20 @@ public class GeneralUtils {
         // Convert each time to minutes
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(signatureTime);
-        int signatureMinutes = calendar.get(Calendar.MINUTE);
+        long signatureMinutes = convertMillisToMinutes(signatureTime);
 
         calendar.setTimeInMillis(currentTime);
-        int currentMinutes = calendar.get(Calendar.MINUTE);
+        long currentMinutes = convertMillisToMinutes(currentTime);
 
         if (currentMinutes - signatureMinutes > SIGNATURE_REFRESH_TIME_IN_MINUTES) {
+            signatureTime = currentTime;
+
             SharedPreferences.Editor editor = prefs.edit();
             editor.putLong(context.getString(R.string.pref_signature_key), signatureTime);
             editor.apply();
 
             return true;
         } else {
-
             return false;
         }
     }
@@ -268,5 +269,16 @@ public class GeneralUtils {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putLong(context.getString(R.string.pref_signature_key), 0);
         editor.commit();
+    }
+
+    /**
+     * Converts milliseconds to minutes
+     *
+     * @param timeInMillis    Time in milliseconds
+     *
+     * @return Time in minutes
+     */
+    private static long convertMillisToMinutes(long timeInMillis) {
+        return (timeInMillis / (1000 * 60));
     }
 }
