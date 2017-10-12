@@ -79,6 +79,7 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
 
         initRecyclerView();
         initViewModel();
+        initActionBar();
     }
 
     @Override
@@ -126,6 +127,16 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
     private void initViewModel() {
         SearchUserViewModel uvm = new SearchUserViewModel(this);
         mBinding.searchUserLayout.setUvm(uvm);
+    }
+
+    private void initActionBar() {
+        setSupportActionBar(mBinding.searchUserTb);
+
+        String title = mSearchType == FRIEND
+                ? getString(R.string.search_user_send_request_title)
+                : getString(R.string.search_user_follow_user_title);
+
+        getSupportActionBar().setTitle(title);
     }
 
     /**

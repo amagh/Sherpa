@@ -241,6 +241,10 @@
     <string name="friend_follow_follow_description_text">Find out when this author releases a new guide</string>
     <string name="friend_follow_cancel_request">Cancel friend request.</string>
 
+    <!-- Search User Activity Strings -->
+    <string name="search_user_send_request_title">Send a Friend Request</string>
+    <string name="search_user_follow_user_title">Follow a User</string>
+
     <!-- AcceptFriendRequestDialog Strings -->
     <string name="accept_friend_request_dialog_accept_text">Accept</string>
     <string name="accept_friend_request_dialog_reject_text">Reject</string>
