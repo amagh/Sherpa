@@ -28,6 +28,7 @@ import project.sherpa.models.datamodels.Author;
 import project.sherpa.ui.fragments.UserFragment;
 import project.sherpa.utilities.Constants;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import project.sherpa.utilities.GeneralUtils;
 
 import static project.sherpa.utilities.FirebaseProviderUtils.BACKDROP_SUFFIX;
 import static project.sherpa.utilities.FirebaseProviderUtils.IMAGE_PATH;
@@ -107,30 +108,44 @@ public class AuthorViewModel extends BaseObservable {
 
         // Check whether to load image from File or from Firebase Storage
         if (authorImage.getScheme().matches("gs")) {
+
             StorageReference authorRef = FirebaseProviderUtils.getReferenceFromUri(authorImage);
 
             if (authorRef == null) return;
 
-            authorRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                @Override
-                public void onSuccess(StorageMetadata storageMetadata) {
-                    // Load from Firebase Storage
-                    if (imageView.getContext() != null && !((Activity) imageView.getContext()).isFinishing()) {
-                        Glide.with(imageView.getContext())
-                                .using(new FirebaseImageLoader())
-                                .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
-                                .signature(new StringSignature(storageMetadata.getMd5Hash()))
-                                .error(R.drawable.ic_account_circle)
-                                .into(imageView);
+            final String lastPathSegment = authorImage.getLastPathSegment();
+
+            if (GeneralUtils.updateGlideImageSignature(imageView.getContext())) {
+                authorRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                    @Override
+                    public void onSuccess(StorageMetadata storageMetadata) {
+                        // Load from Firebase Storage
+                        if (imageView.getContext() != null && !((Activity) imageView.getContext()).isFinishing()) {
+                            Glide.with(imageView.getContext())
+                                    .using(new FirebaseImageLoader())
+                                    .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
+                                    .signature(GeneralUtils.getGlideImageSignature(imageView.getContext(), lastPathSegment))
+                                    .error(R.drawable.ic_account_circle)
+                                    .into(imageView);
+                        }
                     }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    imageView.setImageDrawable(
-                            ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_account_circle));
-                }
-            });
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        imageView.setImageDrawable(
+                                ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_account_circle));
+                    }
+                });
+            } else {
+                Glide.with(imageView.getContext())
+                        .using(new FirebaseImageLoader())
+                        .load(FirebaseProviderUtils.getReferenceFromUri(authorImage))
+                        .signature(GeneralUtils.getGlideImageSignature(imageView.getContext(), lastPathSegment))
+                        .error(R.drawable.ic_account_circle)
+                        .into(imageView);
+            }
+
+
 
         } else {
             // No StorageReference, load local file using the File's Uri
@@ -155,20 +170,34 @@ public class AuthorViewModel extends BaseObservable {
 
         if (backdrop == null) return;
 
-        backdrop.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-            @Override
-            public void onSuccess(StorageMetadata storageMetadata) {
+        final String lastPathSegment = Uri.parse(backdrop.toString()).getLastPathSegment();
 
-                // Check to ensure Activity is still active prior to loading image
-                if (imageView.getContext() == null) return;
+        if (GeneralUtils.updateGlideImageSignature(imageView.getContext())) {
 
-                Glide.with(imageView.getContext())
-                        .using(new FirebaseImageLoader())
-                        .load(backdrop)
-                        .signature(new StringSignature(storageMetadata.getMd5Hash()))
-                        .into(imageView);
-            }
-        });
+            backdrop.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                @Override
+                public void onSuccess(StorageMetadata storageMetadata) {
+
+                    // Check to ensure Activity is still active prior to loading image
+                    if (imageView.getContext() == null &&
+                            ((Activity) imageView.getContext()).isFinishing()) return;
+
+                    Glide.with(imageView.getContext())
+                            .using(new FirebaseImageLoader())
+                            .load(backdrop)
+                            .signature(GeneralUtils.getGlideImageSignature(imageView.getContext(), lastPathSegment))
+                            .into(imageView);
+                }
+            });
+        } else {
+            Glide.with(imageView.getContext())
+                    .using(new FirebaseImageLoader())
+                    .load(backdrop)
+                    .signature(GeneralUtils.getGlideImageSignature(imageView.getContext(), lastPathSegment))
+                    .into(imageView);
+        }
+
+
     }
 
     @Bindable
