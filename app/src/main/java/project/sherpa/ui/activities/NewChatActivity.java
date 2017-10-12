@@ -234,15 +234,12 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
      */
     public void onClickStartChat(View view) {
 
-        // List that will be set to active and all members of the Chat
-        final List<String> selected = new ArrayList<>();
-
-        // Add the user's FirebaseId as a member
-        List<String> selectedList = mAdapter.getSelectedIds();
+        // Add the user's FirebaseId as a member to the list of selected users
+        final List<String> selectedList = mAdapter.getSelectedIds();
         selectedList.add(mAuthor.firebaseId);
 
         // Check for duplicate Chats
-        Chat.checkDuplicateChats(selected, new FirebaseProviderUtils.FirebaseListener() {
+        Chat.checkDuplicateChats(selectedList, new FirebaseProviderUtils.FirebaseListener() {
             @Override
             public void onModelReady(BaseModel model) {
 
@@ -253,9 +250,9 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
                     // No duplicate Chat, start a new Chat
                     chat = new Chat();
                     chat.generateFirebaseId();
-                    chat.setActiveMembers(selected);
-                    chat.setAllMembers(selected);
-                    chat.setGroup(selected.size() > 2);
+                    chat.setActiveMembers(selectedList);
+                    chat.setAllMembers(selectedList);
+                    chat.setGroup(selectedList.size() > 2);
                 } else {
 
                     // Get a reference to the duplicate Chat
