@@ -14,9 +14,14 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.bumptech.glide.signature.StringSignature;
+
+import java.util.Calendar;
+
 import droidninja.filepicker.FilePickerConst;
 import project.sherpa.R;
 import project.sherpa.filepicker.CustomFilePickerBuilder;
+import timber.log.Timber;
 
 import static project.sherpa.utilities.FirebaseProviderUtils.GPX_EXT;
 
@@ -191,5 +196,77 @@ public class GeneralUtils {
                 context.getString(R.string.pref_units_key),
                 context.getString(R.string.pref_units_default))
                 .equals(context.getString(R.string.pref_units_metric));
+    }
+
+    private static int SIGNATURE_REFRESH_TIME_IN_MINUTES = 180;
+
+    /**
+     * Generates a StringSignature for Glide to use when loading images. The StringSignature is
+     * unique to each image and is refreshed every three hours. This makes it so that Glide loads
+     * and caches new images every three hours instead of querying to see if it needs to be
+     * refreshed every time it loads.
+     *
+     * @param context            Interface to global Context
+     * @param lastPathSegment    The last path segment of the Uri for the image file on Firebase
+     *                           Storage
+     *
+     * @return StringSignature unique to each file on Firebase
+     */
+    public static StringSignature getGlideImageSignature(Context context, String lastPathSegment) {
+
+        // Get the time the last StringSignature was refreshed
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        long signatureTime = prefs.getLong(context.getString(R.string.pref_signature_key), 0);
+
+        return new StringSignature(Long.toString(signatureTime) + lastPathSegment);
+    }
+
+    /**
+     * Checks whether more than {@link #SIGNATURE_REFRESH_TIME_IN_MINUTES} has passed. If it has
+     * exceeded the limit, then it updates the signature time in SharedPreferences.
+     *
+     * @param context    Interface to global Context
+     *
+     * @return True if the singature time has been updated. False otherwise
+     */
+    public synchronized static boolean updateGlideImageSignature(Context context) {
+
+        // Get the time the last StringSignature was refreshed & the current time
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        long signatureTime = prefs.getLong(context.getString(R.string.pref_signature_key), 0);
+        long currentTime = System.currentTimeMillis();
+
+        // Convert each time to minutes
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(signatureTime);
+        int signatureMinutes = calendar.get(Calendar.MINUTE);
+
+        calendar.setTimeInMillis(currentTime);
+        int currentMinutes = calendar.get(Calendar.MINUTE);
+
+        if (currentMinutes - signatureMinutes > SIGNATURE_REFRESH_TIME_IN_MINUTES) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putLong(context.getString(R.string.pref_signature_key), signatureTime);
+            editor.apply();
+
+            return true;
+        } else {
+
+            return false;
+        }
+    }
+
+    /**
+     * Sets the signature time in the SharedPreferences to 0 to force the next call to check
+     * whether the GlideImageSignature needs to be updated to return true.
+     *
+     * @param context    Interface to global Context
+     */
+    public synchronized static void forceUpdateGlideImageSignatures(Context context) {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(context.getString(R.string.pref_signature_key), 0);
+        editor.commit();
     }
 }

@@ -15,6 +15,7 @@
     <string name="pref_units_metric">metric</string>
     <string name="pref_units_default">@string/pref_units_imperial</string>
     <string name="pref_units_title">Units</string>
+    <string name="pref_signature_key">glide_signature</string>
 
     <!-- Strings for guide details -->
     <string name="list_guide_details_distance_label">Total distance:</string>
