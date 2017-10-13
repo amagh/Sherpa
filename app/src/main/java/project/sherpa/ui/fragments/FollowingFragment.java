@@ -81,6 +81,7 @@ public class FollowingFragment extends BaseFriendFragment {
         Timber.d("Updating following list");
         if (mUser.getFollowing() == null) {
             Timber.d("Clearing following adapter");
+            hideProgressBar();
             mAdapter.clear();
             return;
         }
@@ -119,5 +120,11 @@ public class FollowingFragment extends BaseFriendFragment {
                         mAdapter.addFriend((Author) model);
                     }
                 });
+    }
+
+    @Override
+    public void onDisconnected() {
+        super.onDisconnected();
+        hideProgressBar();
     }
 }

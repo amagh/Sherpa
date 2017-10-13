@@ -87,8 +87,9 @@ public class FriendFragment extends BaseFriendFragment {
      */
     private void updateFriendsList() {
         Timber.d("Updating friends list");
-        if (mUser.getFriends() == null) {
+        if (mUser.getFriends() == null || mUser.getFriends().size() == 0) {
             Timber.d("Clearing friend adapter");
+            hideProgressBar();
             mAdapter.clear();
             return;
         }
@@ -128,5 +129,11 @@ public class FriendFragment extends BaseFriendFragment {
                         mAdapter.addFriend((Author) model);
                     }
                 });
+    }
+
+    @Override
+    public void onDisconnected() {
+        super.onDisconnected();
+        hideProgressBar();
     }
 }

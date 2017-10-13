@@ -97,6 +97,7 @@ public class RequestFragment extends BaseFriendFragment {
     private void updateReceivedRequests() {
         Timber.d("Updating received requests adapter");
         if (mUser.getReceivedRequests() == null) {
+            hideProgressBar();
             mAdapter.clearReceivedRequests();
             Timber.d("Clearing received request adapter");
             return;
@@ -128,6 +129,7 @@ public class RequestFragment extends BaseFriendFragment {
     private void updateSentRequests() {
         Timber.d("Updating sent requests adapter");
         if (mUser.getSentRequests() == null) {
+            hideProgressBar();
             mAdapter.clearSentRequests();
             Timber.d("Clearing sent requests adapter");
             return;
@@ -184,5 +186,11 @@ public class RequestFragment extends BaseFriendFragment {
                         mAdapter.addSentRequest((Author) model);
                     }
                 });
+    }
+
+    @Override
+    public void onDisconnected() {
+        super.onDisconnected();
+        hideProgressBar();
     }
 }
