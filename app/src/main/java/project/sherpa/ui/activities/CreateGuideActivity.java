@@ -46,6 +46,8 @@ import project.sherpa.models.datamodels.Trail;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.datamodels.abstractmodels.BaseModelWithImage;
 import project.sherpa.models.viewmodels.GuideViewModel;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
+import project.sherpa.ui.activities.abstractactivities.MapboxActivity;
 import project.sherpa.ui.adapters.EditGuideDetailsAdapter;
 import project.sherpa.ui.dialogs.DeleteDialog;
 import project.sherpa.ui.dialogs.PublishDialog;
@@ -53,7 +55,6 @@ import project.sherpa.ui.dialogs.SaveDialog;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.DataCache;
 import project.sherpa.utilities.GeneralUtils;
-import timber.log.Timber;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
@@ -344,6 +345,7 @@ public class CreateGuideActivity extends MapboxActivity implements ConnectivityA
                     // Start GuideDetailsActivity for mGuide
                     Intent intent = new Intent(this, GuideDetailsActivity.class);
                     intent.putExtra(GUIDE_KEY, mGuide.firebaseId);
+                    intent.putExtra(AUTHOR_KEY, mGuide.authorId);
 
                     startActivity(intent);
 

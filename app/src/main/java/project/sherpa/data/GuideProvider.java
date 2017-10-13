@@ -5,9 +5,12 @@ import android.net.Uri;
 import net.simonvt.schematic.annotation.ContentProvider;
 import net.simonvt.schematic.annotation.ContentUri;
 import net.simonvt.schematic.annotation.InexactContentUri;
+import net.simonvt.schematic.annotation.NotificationUri;
 import net.simonvt.schematic.annotation.TableEndpoint;
 
 import project.sherpa.BuildConfig;
+import project.sherpa.data.GuideContract.*;
+import project.sherpa.models.datamodels.Message;
 
 /**
  * ContentProvider framework to be used by Schematic to generate the ContentProvider
@@ -53,6 +56,8 @@ public class GuideProvider {
         String AUTHORS      = "authors";
         String SECTIONS     = "sections";
         String AREAS        = "areas";
+        String MESSAGES     = "messages";
+        String CHATS        = "chats";
     }
 
     /**
@@ -74,13 +79,13 @@ public class GuideProvider {
                 whereColumn = GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.FIREBASE_ID,
                 pathSegment = 1,
                 join = "JOIN " + GuideDatabase.TRAILS + " ON " +
-                        GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.TRAIL_ID + " = "  +
-                        GuideDatabase.TRAILS + "." + GuideContract.TrailEntry.FIREBASE_ID               +
-                        " JOIN " + GuideDatabase.AUTHORS + " ON "                               +
-                        GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.AUTHOR_ID + " = " +
-                        GuideDatabase.AUTHORS + "." + GuideContract.AuthorEntry.FIREBASE_ID             +
-                        " JOIN " + GuideDatabase.SECTIONS + " ON "                              +
-                        GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.FIREBASE_ID + " = "       +
+                        GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.TRAIL_ID + " = "      +
+                        GuideDatabase.TRAILS + "." + GuideContract.TrailEntry.FIREBASE_ID           +
+                        " JOIN " + GuideDatabase.AUTHORS + " ON "                                   +
+                        GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.AUTHOR_ID + " = "     +
+                        GuideDatabase.AUTHORS + "." + GuideContract.AuthorEntry.FIREBASE_ID         +
+                        " JOIN " + GuideDatabase.SECTIONS + " ON "                                  +
+                        GuideDatabase.GUIDES + "." + GuideContract.GuideEntry.FIREBASE_ID + " = "   +
                         GuideDatabase.SECTIONS + "." + GuideContract.SectionEntry.GUIDE_ID
         )
         public static Uri withId(String firebaseId) {
@@ -186,5 +191,58 @@ public class GuideProvider {
                 path = Path.AREAS,
                 type = "vnd.android.cursor.dir/areas")
         public static final Uri CONTENT_URI = buildUri(Path.AREAS);
+    }
+
+    /**
+     * URIs for accessing message data
+     */
+    @TableEndpoint(table = GuideDatabase.MESSAGES)
+    public static class Messages {
+
+        @ContentUri(
+                path = Path.MESSAGES,
+                type = "vnd.android.cursor.dir/messages")
+        @NotificationUri(paths = {Path.MESSAGES + "/" + Path.CHATS + "/*"})
+        public static final Uri CONTENT_URI = buildUri(Path.MESSAGES);
+
+        @InexactContentUri(
+                path = Path.MESSAGES + "/" + Path.CHATS + "/*",
+                name = "MESSAGES_FOR_CHAT",
+                type = "vnd.android.cursor.dir/messages",
+                whereColumn = GuideDatabase.MESSAGES + "." + MessageEntry.CHAT_ID,
+                pathSegment = 2,
+                join = "JOIN "                  + GuideDatabase.AUTHORS         + " ON "    +
+                        GuideDatabase.MESSAGES  + "." + Message.AUTHOR_ID       + " = "     +
+                        GuideDatabase.AUTHORS   + "." + AuthorEntry.FIREBASE_ID)
+        public static Uri forChat(String chatId) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Path.CHATS)
+                    .appendPath(chatId)
+                    .build();
+        }
+    }
+
+    /**
+     * URIs for accessing chat data
+     */
+    @TableEndpoint(table = GuideDatabase.CHATS)
+    public static class Chats {
+
+        @ContentUri(
+                path = Path.CHATS,
+                type = "vnd.android.cursor.dir/chats")
+        public static final Uri CONTENT_URI = buildUri(Path.CHATS);
+
+        @InexactContentUri(
+                path = Path.CHATS + "/*",
+                name = "CHATS_BY_ID",
+                type = "vnd.android.cursor.dir/chats",
+                whereColumn = GuideDatabase.CHATS + "." + ChatEntry.FIREBASE_ID,
+                pathSegment = 1)
+        public static Uri byId(String firebaseId) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(firebaseId)
+                    .build();
+        }
     }
 }

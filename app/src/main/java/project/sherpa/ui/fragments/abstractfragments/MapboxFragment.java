@@ -1,4 +1,4 @@
-package project.sherpa.ui.fragments;
+package project.sherpa.ui.fragments.abstractfragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,10 +12,10 @@ import project.sherpa.R;
  * Created by Alvin on 7/25/2017.
  */
 
-public class MapboxFragment extends ConnectivityFragment {
+public abstract class MapboxFragment extends ConnectivityFragment {
     // ** Member Variables ** //
-    MapView mMapView;
-    Bundle mSavedInstanceState;
+    protected MapView mMapView;
+    private Bundle mSavedInstanceState;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

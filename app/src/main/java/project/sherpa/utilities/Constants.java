@@ -15,6 +15,7 @@ public class Constants {
         public static final int REQUEST_CODE_PROFILE_PIC    = 5987;
         public static final int REQUEST_CODE_BACKDROP       = 1894;
         public static final int REQUEST_CODE_PUBLISH        = 6133;
+        public static final int REQUEST_CODE_ATTACH_GUIDE   = 6274;
     }
 
     public static class FragmentTags {
@@ -23,9 +24,10 @@ public class Constants {
 
         public static final String FRAG_TAG_HOME            = "home_frag";
         public static final String FRAG_TAG_SEARCH          = "search_frag";
-        public static final String FRAG_TAG_ACCOUNT         = "account_frag";
+        public static final String FRAG_TAG_USER            = "user_frag";
         public static final String FRAG_TAG_FAVORITE        = "favorite_frag";
         public static final String FRAG_TAG_SAVED_GUIDES    = "saved_guides_frag";
+        public static final String FRAG_TAG_MESSAGES        = "message_tag";
     }
 
     public static class IntentKeys {
@@ -37,5 +39,8 @@ public class Constants {
         public static final String GUIDE_KEY    = "guide";
         public static final String TRAIL_KEY    = "trail";
         public static final String SECTION_KEY  = "section";
+        public static final String CHAT_KEY     = "chat";
+        public static final String SEARCH_KEY   = "searchType";
+
     }
 }

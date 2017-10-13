@@ -1,12 +1,18 @@
 package project.sherpa.data;
 
 import net.simonvt.schematic.annotation.AutoIncrement;
+import net.simonvt.schematic.annotation.ConflictResolutionType;
 import net.simonvt.schematic.annotation.DataType;
 import net.simonvt.schematic.annotation.NotNull;
 import net.simonvt.schematic.annotation.PrimaryKey;
 import net.simonvt.schematic.annotation.References;
+import net.simonvt.schematic.annotation.UniqueConstraint;
 
 import project.sherpa.models.datamodels.Guide;
+
+import project.sherpa.models.datamodels.Chat;
+import project.sherpa.models.datamodels.Message;
+import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 
 /**
  * Defines the tables and columns to be created for the database
@@ -66,6 +72,9 @@ public class GuideContract {
         @DataType(DataType.Type.INTEGER) String DRAFT                               = "draft";
     }
 
+    @UniqueConstraint(
+            columns = AuthorEntry.FIREBASE_ID,
+            onConflict = ConflictResolutionType.REPLACE)
     public interface AuthorEntry {
         @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement String _ID      = "_id";
         @DataType(DataType.Type.TEXT) @NotNull String FIREBASE_ID                   = "firebaseId";
@@ -105,5 +114,43 @@ public class GuideContract {
         @DataType(DataType.Type.TEXT) @NotNull String LOCATION                      = "location";
 
         @DataType(DataType.Type.INTEGER) String DRAFT                               = "draft";
+    }
+
+    @UniqueConstraint(
+            columns = GuideContract.MessageEntry.FIREBASE_ID,
+            onConflict = ConflictResolutionType.REPLACE)
+    public interface MessageEntry {
+        @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement
+        String _ID              = "_id";
+        @DataType(DataType.Type.TEXT) @NotNull
+        String FIREBASE_ID      = BaseModel.FIREBASE_ID;
+        @DataType(DataType.Type.TEXT)
+        @References(table = GuideDatabase.AUTHORS, column = AuthorEntry.FIREBASE_ID)
+        String AUTHOR_ID        = Message.AUTHOR_ID;
+        @DataType(DataType.Type.TEXT)
+        String MESSAGE          = Message.MESSAGE;
+        @DataType(DataType.Type.TEXT)
+        String ATTACHMENT       = Message.ATTACHMENT;
+        @DataType(DataType.Type.TEXT)
+        String ATTACHMENT_TYPE  = Message.ATTACHMENT_TYPE;
+        @DataType(DataType.Type.TEXT) @NotNull
+        @References(table = GuideDatabase.CHATS, column = ChatEntry.FIREBASE_ID)
+        String CHAT_ID          = Message.CHAT_ID;
+        @DataType(DataType.Type.REAL) @NotNull
+        String DATE             = Message.DATE;
+        @DataType(DataType.Type.INTEGER)
+        String STATUS           = Message.STATUS;
+    }
+
+    @UniqueConstraint(
+            columns = {ChatEntry.FIREBASE_ID},
+            onConflict = ConflictResolutionType.REPLACE)
+    public interface ChatEntry {
+        @DataType(DataType.Type.INTEGER) @PrimaryKey @AutoIncrement
+        String _ID                  = "_id";
+        @DataType(DataType.Type.TEXT) @NotNull
+        String FIREBASE_ID          = BaseModel.FIREBASE_ID;
+        @DataType(DataType.Type.INTEGER)
+        String MESSAGE_COUNT        = Chat.MESSAGE_COUNT;
     }
 }

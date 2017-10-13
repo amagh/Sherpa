@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="vm"
+            type="project.sherpa.models.viewmodels.ChatViewModel"/>
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/chat_author_iv"
+            android:layout_width="@dimen/chat_author_icon_size"
+            android:layout_height="@dimen/chat_author_icon_size"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"
+            app:authorImage="@{vm.authorImage}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:src="@drawable/placeholder_profile_image"/>
+
+        <TextView
+            android:id="@+id/chat_author_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:text="@{vm.members}"
+            app:newMessage="@{vm.newMessage}"
+            app:layout_constraintStart_toEndOf="@id/chat_author_iv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/chat_author_iv"
+            style="@style/TextAppearance.AppCompat.Body1"
+            tools:text="@string/list_author_text"/>
+
+        <TextView
+            android:id="@+id/chat_message_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@{vm.lastMessage}"
+            app:layout_constraintStart_toStartOf="@id/chat_author_tv"
+            app:layout_constraintEnd_toEndOf="@id/chat_author_tv"
+            app:layout_constraintTop_toBottomOf="@id/chat_author_tv"
+            style="@style/TextAppearance.AppCompat.Caption"/>
+    </android.support.constraint.ConstraintLayout>
+</layout>

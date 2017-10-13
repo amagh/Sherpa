@@ -30,9 +30,8 @@ import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.models.viewmodels.GuideViewModel;
 import project.sherpa.models.viewmodels.RatingViewModel;
 import project.sherpa.models.viewmodels.SectionViewModel;
-import project.sherpa.ui.activities.MapboxActivity;
-import project.sherpa.utilities.DataCache;
-import project.sherpa.utilities.FirebaseProviderUtils;
+import project.sherpa.ui.activities.abstractactivities.MapboxActivity;
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 7/22/2017.
@@ -72,7 +71,9 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
             } else if (o1.getClass().equals(Rating.class) && o2.getClass().equals(Rating.class)) {
 
                 if (mUser != null) {
-                    if (((Rating) o1).getAuthorId().equals(mUser.firebaseId) || ((Rating) o1).getRating() == 0) {
+                    if (((Rating) o1).getAuthorId().equals(((Rating) o2).getAuthorId())) {
+                        return 0;
+                    } else if (((Rating) o1).getAuthorId().equals(mUser.firebaseId) || ((Rating) o1).getRating() == 0) {
                         return -1;
                     } else if (((Rating) o2).getAuthorId().equals(mUser.firebaseId) || ((Rating) o2).getRating() == 0) {
                         return 1;
@@ -102,12 +103,15 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
 
         @Override
         public boolean areContentsTheSame(BaseModel oldItem, BaseModel newItem) {
-            return oldItem.firebaseId.equals(newItem.firebaseId);
+            return oldItem.equals(newItem);
         }
 
         @Override
         public boolean areItemsTheSame(BaseModel item1, BaseModel item2) {
-            return item1 == item2;
+
+            return !((item1.firebaseId == null && item2.firebaseId != null) ||
+                    (item1.firebaseId != null && item2.firebaseId == null)) &&
+                    (item1.firebaseId == item2.firebaseId || item1.firebaseId.equals(item2.firebaseId));
         }
 
         @Override
@@ -129,7 +133,6 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
 
     private MapboxActivity mActivity;
     private ClickHandler mClickHandler;
-    private Guide mGuide;
     private Author mUser;
     private boolean mIsInEditMode;
 
@@ -138,30 +141,6 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
     public GuideDetailsAdapter(MapboxActivity activity, ClickHandler clickHandler) {
         mActivity = activity;
         mClickHandler = clickHandler;
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (user != null) {
-
-            // Attempt to retrieve current user from cache
-            mUser = (Author) DataCache.getInstance().get(user.getUid());
-
-            // Successfully retrieved. No need to retrieve the user from Firebase
-            if (mUser != null) return;
-
-            FirebaseProviderUtils.getAuthorForFirebaseUser(new FirebaseProviderUtils.FirebaseListener() {
-                @Override
-                public void onModelReady(BaseModel model) {
-                    mUser = (Author) model;
-
-                    if (mGuide != null) {
-
-                        // Add the user's review of the Guide
-                        addUserReview();
-                    }
-                }
-            });
-        }
     }
 
     @Override
@@ -263,93 +242,31 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
     }
 
     /**
+     * Sets the User to be
+     * @param user
+     */
+    public void setCurrentUser(Author user) {
+        mUser = user;
+
+        // Change the layout of the first Rating
+        for (int i = 0; i < mModelsList.size(); i++) {
+            BaseModel model = mModelsList.get(i);
+
+            if (model instanceof Rating) {
+                notifyItemChanged(i);
+                return;
+            }
+        }
+    }
+
+    /**
      * Adds a model to the Adapter to be displayed
      *
      * @param model    Model to be added to the Adapter
      */
     public void addModel(final BaseModel model) {
-
-        // Iterate through and check to see if the model is already in the Adapter
-        for (int i = 0; i < mModelsList.size(); i++) {
-
-            if (mModelsList.get(i).firebaseId != null &&
-                    mModelsList.get(i).firebaseId.equals(model.firebaseId)) {
-
-                // Model is in Adapter, do nothing
-                return;
-            }
-        }
-
-        if (model instanceof Guide) {
-
-            // Set memvar to the Guide
-            mGuide = (Guide) model;
-
-            // If User is logged in, add the User's review of this Guide
-            if (mUser != null) addUserReview();
-
-            // Retrieve the Ratings for the displayed Guide
-            FirebaseProviderUtils.getRatingsForGuide((Guide) model, 0, new FirebaseProviderUtils.FirebaseArrayListener() {
-                @Override
-                public void onModelsReady(BaseModel[] models) {
-
-                    if (models == null) return;
-
-                    // Add the Ratings to the Adapter
-                    Rating[] ratings = (Rating[]) models;
-
-                    for (Rating rating : ratings) {
-
-                        // Set the guideId and guideAuthorId for the Ratings as they are not saved
-                        // in the Firebase Database
-                        rating.setGuideId(mGuide.firebaseId);
-                        rating.setGuideAuthorId(mGuide.authorId);
-                        addModel(rating);
-                    }
-                }
-            });
-        }
-
         // Add the Model to the Adapter
         mModelsList.add(model);
-    }
-
-    /**
-     * Add the logged in Firebase User's review to the Adapter
-     */
-    private void addUserReview() {
-
-        // Check to ensure the User is logged in
-        if (mUser != null && !mUser.firebaseId.equals(mGuide.authorId)) {
-            FirebaseProviderUtils.getGuideRatingForFirebaseUser(mGuide.firebaseId, new FirebaseProviderUtils.FirebaseListener() {
-                @Override
-                public void onModelReady(BaseModel model) {
-
-                    // Check to see if the User has rated this Guide previously
-                    if (model == null) {
-
-                        // Has not been rated. Create a new Rating for the User to fill out
-                        Rating rating = new Rating();
-
-                        rating.setGuideId(mGuide.firebaseId);
-                        rating.setGuideAuthorId(mGuide.authorId);
-                        rating.setAuthorId(mUser.firebaseId);
-                        rating.setAuthorName(mUser.name);
-
-                        // Add the new Rating to the Adapter
-                        addModel(rating);
-                    } else {
-
-                        Rating rating = (Rating) model;
-                        rating.setGuideId(mGuide.firebaseId);
-                        rating.setGuideAuthorId(mGuide.authorId);
-
-                        // Add the found Rating to the Adapter
-                        addModel(model);
-                    }
-                }
-            });
-        }
     }
 
     /**
@@ -384,7 +301,7 @@ public class GuideDetailsAdapter extends RecyclerView.Adapter<GuideDetailsAdapte
      * @param newRating         The new rating that the User assigned to the Guide
      * @param previousRating    The previous rating that the User assigned to the Guide
      */
-    public void updateRating(int newRating, int previousRating) {
+    public void exitEditMode(int newRating, int previousRating) {
 
         // Retrieve the Guide
         Guide guide = (Guide) mModelsList.get(0);

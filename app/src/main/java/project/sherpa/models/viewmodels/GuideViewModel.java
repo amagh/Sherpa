@@ -9,10 +9,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.SubtitleCollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,12 +37,12 @@ import project.sherpa.R;
 import project.sherpa.firebasestorage.StorageProvider;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.ui.fragments.FavoritesFragment;
-import project.sherpa.ui.fragments.MapboxFragment;
+import project.sherpa.ui.fragments.abstractfragments.MapboxFragment;
 import project.sherpa.ui.views.SmartMapView;
 import project.sherpa.models.datamodels.Guide;
 import project.sherpa.ui.activities.CreateGuideActivity;
 import project.sherpa.ui.activities.GuideDetailsActivity;
-import project.sherpa.ui.activities.MapboxActivity;
+import project.sherpa.ui.activities.abstractactivities.MapboxActivity;
 import project.sherpa.utilities.ColorGenerator;
 import project.sherpa.utilities.ContentProviderUtils;
 import project.sherpa.utilities.FormattingUtils;
@@ -668,22 +666,6 @@ public class GuideViewModel extends BaseObservable {
 
             // Local Database
             ContentProviderUtils.toggleFavorite(mContext, mGuide);
-        }
-
-        // If the user is on the FavoriteFragment and removing a favorite, then it needs to be
-        // removed from the Adapter when they click the favorite button
-        if (mContext instanceof AppCompatActivity) {
-
-            // Get a reference to the FavoriteFragment using the Fragment tag
-            FavoritesFragment fragment = (FavoritesFragment) ((AppCompatActivity) mContext)
-                    .getSupportFragmentManager()
-                    .findFragmentByTag(FRAG_TAG_FAVORITE);
-
-            if (!mGuide.isFavorite() && fragment != null) {
-
-                // Remove the Guide from the Adapter
-                fragment.removeGuideFromAdapter(mGuide);
-            }
         }
 
         // Update the Widget

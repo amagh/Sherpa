@@ -7,8 +7,8 @@ android {
         applicationId "project.sherpa"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 9
-        versionName "0.3.0"
+        versionCode 14
+        versionName "0.6.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -85,6 +85,8 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.hendraanggrian:collapsingtoolbarlayout-subtitle:0.7.0'
     compile 'org.jsoup:jsoup:1.10.3'
+
+    compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
 
     compile project(':MPChartLib-release')
 }

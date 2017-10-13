@@ -44,15 +44,16 @@ public class RatingViewModel extends BaseObservable {
     public RatingViewModel(Context context, Rating rating, GuideDetailsAdapter adapter, Author author) {
         mContext = context;
 
-        mOriginalRating = rating;
+        mRating = rating;
 
-        mRating = new Rating();
-        mRating.setGuideId(rating.getGuideId());
-        mRating.setGuideAuthorId(rating.getGuideAuthorId());
-        mRating.setAuthorId(rating.getAuthorId());
-        mRating.setAuthorName(rating.getAuthorName());
-        mRating.setRating(rating.getRating());
-        mRating.setComment(rating.getComment());
+        mOriginalRating = new Rating();
+        mOriginalRating.firebaseId = rating.firebaseId;
+        mOriginalRating.setGuideId(rating.getGuideId());
+        mOriginalRating.setGuideAuthorId(rating.getGuideAuthorId());
+        mOriginalRating.setAuthorId(rating.getAuthorId());
+        mOriginalRating.setAuthorName(rating.getAuthorName());
+        mOriginalRating.setRating(rating.getRating());
+        mOriginalRating.setComment(rating.getComment());
 
         mAdapter = adapter;
         mUser = author;
@@ -253,16 +254,11 @@ public class RatingViewModel extends BaseObservable {
             previousRating = mOriginalRating.getRating();
         }
 
-        // Update the original Rating with the new Rating values
-        mOriginalRating.setRating(mRating.getRating());
-        mOriginalRating.setComment(mRating.getComment());
-        mOriginalRating.addDate();
-
         // Update the Firebase Database with the rating
-        FirebaseProviderUtils.updateRating(mOriginalRating, previousRating);
+        mRating.updateFirebase(previousRating);
 
         // Force the Adapter to update the Guide with the new Rating
-        mAdapter.updateRating(getRating(), previousRating);
+        mAdapter.exitEditMode(getRating(), previousRating);
     }
 
     public void onClickEditRating(View view) {
@@ -270,6 +266,6 @@ public class RatingViewModel extends BaseObservable {
     }
 
     public void onClickCancelEditRating(View view) {
-        mAdapter.updateRating(mOriginalRating.getRating(), mOriginalRating.getRating());
+        mAdapter.exitEditMode(mOriginalRating.getRating(), mOriginalRating.getRating());
     }
 }

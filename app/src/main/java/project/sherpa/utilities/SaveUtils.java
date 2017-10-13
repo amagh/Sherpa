@@ -34,7 +34,8 @@ import static project.sherpa.utilities.FirebaseProviderUtils.JPEG_EXT;
 public class SaveUtils {
     // ** Constants ** //
     private static final File TEMP_DIRECTORY = new File(System.getProperty("java.io.tmpdir", "."));
-    private static final int MAX_SIZE = 1280;
+    private static final int MAX_SIZE   = 1024;
+    private static final int QUALITY    = 30;
 
     /**
      * Saves a completed guide to the Firebase Database
@@ -222,7 +223,7 @@ public class SaveUtils {
             FileOutputStream outStream = new FileOutputStream(imageFile);
 
             // Compress and write to the FOS
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY, outStream);
             outStream.flush();
             outStream.close();
 

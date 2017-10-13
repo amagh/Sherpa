@@ -12,17 +12,20 @@ import com.mapbox.mapboxsdk.Mapbox;
 
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Guide;
+import project.sherpa.services.firebaseservice.FirebaseProviderService;
+import project.sherpa.ui.activities.abstractactivities.ConnectivityActivity;
 import project.sherpa.ui.fragments.FavoritesFragment;
 import project.sherpa.ui.fragments.GuideListFragment;
 import project.sherpa.ui.fragments.SavedGuidesFragment;
 import project.sherpa.ui.fragments.SearchFragment;
 import project.sherpa.ui.fragments.UserFragment;
 
-import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_ACCOUNT;
+import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_USER;
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_FAVORITE;
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_HOME;
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_SAVED_GUIDES;
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_SEARCH;
+import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.GUIDE_KEY;
 
 public class MainActivity extends ConnectivityActivity implements GuideListFragment.OnGuideClickListener {
@@ -53,7 +56,7 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
                     break;
                 case R.id.navigation_account:
                     fragment = new UserFragment();
-                    tag = FRAG_TAG_ACCOUNT;
+                    tag = FRAG_TAG_USER;
                     break;
 
                 case R.id.navigation_favorites:
@@ -90,6 +93,10 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
             switchFragments(R.id.navigation_home);
         }
 
+        // Start the FirebaseProviderService server
+        Intent firebaseProviderServiceIntent = new Intent(this, FirebaseProviderService.class);
+        startService(firebaseProviderServiceIntent);
+
         Mapbox.getInstance(this, getString(R.string.mapbox_token));
     }
 
@@ -99,6 +106,7 @@ public class MainActivity extends ConnectivityActivity implements GuideListFragm
         // extra
         Intent intent = new Intent(this, GuideDetailsActivity.class);
         intent.putExtra(GUIDE_KEY, guide.firebaseId);
+        intent.putExtra(AUTHOR_KEY, guide.authorId);
         startActivity(intent);
     }
 

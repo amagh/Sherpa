@@ -9,6 +9,10 @@ import java.util.Map;
  */
 
 public abstract class BaseModel {
+
+    // ** Constants ** //
+    public static final String FIREBASE_ID = "firebaseId";
+
     // ** Member Variables ** //
     public String firebaseId;
     private boolean draft;
@@ -24,4 +28,12 @@ public abstract class BaseModel {
     public void setDraft(boolean draft) {
         this.draft = draft;
     }
+
+    /**
+     * Replaces the values of the BaseModel with new values
+     *
+     * @param newModelValues    BaseModel containing the new Values
+     */
+    @Exclude
+    public abstract void updateValues(BaseModel newModelValues);
 }

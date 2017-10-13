@@ -9,8 +9,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 
 import project.sherpa.R;
-import project.sherpa.ui.activities.MapboxActivity;
-import project.sherpa.ui.fragments.MapboxFragment;
+import project.sherpa.ui.activities.abstractactivities.MapboxActivity;
+import project.sherpa.ui.fragments.abstractfragments.MapboxFragment;
 
 /**
  * Created by Alvin on 7/24/2017.

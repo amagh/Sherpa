@@ -43,7 +43,7 @@ import project.sherpa.models.datamodels.PlaceModel;
 import project.sherpa.models.datamodels.Trail;
 import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.ui.activities.SelectAreaTrailActivity;
-import project.sherpa.ui.activities.MapboxActivity;
+import project.sherpa.ui.activities.abstractactivities.MapboxActivity;
 import project.sherpa.ui.adapters.AreaAdapter;
 import project.sherpa.ui.adapters.TrailAdapter;
 import project.sherpa.ui.adapters.abstractadapters.HideableAdapter;

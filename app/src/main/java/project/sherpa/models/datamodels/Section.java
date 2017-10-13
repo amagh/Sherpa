@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import project.sherpa.data.GuideContract;
+import project.sherpa.models.datamodels.abstractmodels.BaseModel;
 import project.sherpa.models.datamodels.abstractmodels.BaseModelWithImage;
 
 /**
@@ -104,6 +105,26 @@ public class Section extends BaseModelWithImage implements Parcelable {
 
     public void setRatio(float ratio) {
         this.ratio = ratio;
+    }
+
+    /**
+     * Updates the values of the Section with new Values from an updated Section
+     *
+     * @param newModelValues    BaseModel containing the new Values
+     */
+    @Override
+    public void updateValues(BaseModel newModelValues) {
+
+        // Cast newModelValues to a Section
+        if (!(newModelValues instanceof Section)) return;
+        Section newSectionValues = (Section) newModelValues;
+
+        // Check to ensure newSectionValues has the same FirebaseId
+        if (!newSectionValues.firebaseId.equals(firebaseId)) return;
+
+        guideId = newSectionValues.guideId;
+        section = newSectionValues.section;
+        content = newSectionValues.content;
     }
 
     //********************************************************************************************//

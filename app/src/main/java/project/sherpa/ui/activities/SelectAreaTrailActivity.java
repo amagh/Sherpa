@@ -10,6 +10,7 @@ import project.sherpa.models.datamodels.Area;
 import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.datamodels.Trail;
 import project.sherpa.models.viewmodels.DoubleSearchViewModel;
+import project.sherpa.ui.activities.abstractactivities.MapboxActivity;
 
 import static project.sherpa.utilities.Constants.IntentKeys.AREA_KEY;
 import static project.sherpa.utilities.Constants.IntentKeys.AUTHOR_KEY;

@@ -91,6 +91,22 @@ public class Trail extends BaseModel implements Parcelable {
         return map;
     }
 
+
+    @Override
+    public void updateValues(BaseModel newModelValues) {
+
+        if (!(newModelValues instanceof Trail)) return;
+        Trail newTrailValues = (Trail) newModelValues;
+
+        if (!newTrailValues.firebaseId.equals(firebaseId)) return;
+
+        areaId      = newTrailValues.areaId;
+        name        = newTrailValues.name;
+        notes       = newTrailValues.notes;
+        latitude    = newTrailValues.latitude;
+        longitude   = newTrailValues.longitude;
+    }
+
     //********************************************************************************************//
     //*********************************** Getters & Setters **************************************//
     //********************************************************************************************//

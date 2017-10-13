@@ -15,6 +15,7 @@
     <string name="pref_units_metric">metric</string>
     <string name="pref_units_default">@string/pref_units_imperial</string>
     <string name="pref_units_title">Units</string>
+    <string name="pref_signature_key">glide_signature</string>
 
     <!-- Strings for guide details -->
     <string name="list_guide_details_distance_label">Total distance:</string>
@@ -52,7 +53,7 @@
     <string name="invalid_password_length_error">Password must be at least 8 characters.</string>
     <string name="invalid_username_length_error">Username must be at least 4 characters</string>
     <string name="invalid_username_char_error">Username may only contain letters, numbers, and underscores</string>
-    <string name="invalid_username_taken">Username already exists. Please change your username and try again.</string>
+    <string name="invalid_username_taken">Username already exists. Please change your query and try again.</string>
     <string name="authentication_error">Authentication failed. Please try again.</string>
 
     <!-- Formatting for guide list item -->
@@ -143,7 +144,7 @@
 
     <string name="content_description_author_image">Author Image</string>
     <string name="content_description_author_backdrop">Author Backdrop</string>
-    <string name="content_description_edit_profile_button">Edit Profile</string>
+    <string name="menu_user_edit_profile">Edit Profile</string>
     <string name="content_description_edit_profile_cancel_button">Cancel Editing Profile</string>
     <string name="content_description_create_fab">Add a Guide</string>
 
@@ -207,7 +208,49 @@
 
     <!-- Connectivity Strings -->
     <string name="connectivity_error_no_network">No network connection.</string>
-    
+
+    <!-- Messaging Strings -->
+    <string name="message_hint_text">Type a message</string>
+    <string name="menu_add_user">Add user to chat</string>
+    <string name="menu_leave_chat">Leave chat</string>
+
+    <!-- Chat Strings -->
+    <string name="new_chat_activity_title">Start a New Chat</string>
+    <string name="chat_activity_title">Chats</string>
+    <string name="chat_last_message_text">%1$s: %2$s</string>
+    <string name="chat_attachment_text">Attachment</string>
+    <string name="chat_add_member_hint">Type a user\'s username</string>
+    <string name="toast_error_add_self">Cannot add yourself to the chat</string>
+    <string name="toast_error_user_in_chat">User is already in chat</string>
+    <string name="toast_error_user_does_not_exist">User does not exist</string>
+
+    <!-- Friend Strings -->
+    <string name="header_received_requests">Friend Requests</string>
+    <string name="header_sent_requests">Sent Requests</string>
+    <string name="page_title_friends">Friends</string>
+    <string name="page_title_following">Following</string>
+    <string name="page_title_requests">Requests</string>
+
+    <!-- Friend Follow Strings -->
+    <string name="friend_follow_title">Connect with %s</string>
+    <string name="friend_follow_friend_request_text">Send a Friend Request</string>
+    <string name="friend_follow_respond_friend_request_text">Respond to Friend  Request</string>
+    <string name="friend_follow_un_friend_text">Un-friend this User</string>
+    <string name="friend_follow_friend_description_text">Friends can see the private guides made by the author</string>
+    <string name="friend_follow_follow_text">Follow this Author</string>
+    <string name="friend_follow_un_follow_text">Stop Following this Author</string>
+    <string name="friend_follow_follow_description_text">Find out when this author releases a new guide</string>
+    <string name="friend_follow_cancel_request">Cancel friend request.</string>
+
+    <!-- Search User Activity Strings -->
+    <string name="search_user_send_request_title">Send a Friend Request</string>
+    <string name="search_user_follow_user_title">Follow a User</string>
+
+    <!-- AcceptFriendRequestDialog Strings -->
+    <string name="accept_friend_request_dialog_accept_text">Accept</string>
+    <string name="accept_friend_request_dialog_reject_text">Reject</string>
+    <string name="accept_friend_request_dialog_message_text">Accept friend request from %s ?</string>
+
     <!-- Dummy text for testing purposes -->
     <string name="list_guide_title_text">Four Mile Trail</string>
 
@@ -222,6 +265,7 @@
     <string name="list_guide_details_elevation_text">3226 ft</string>
 
     <string name="list_author_text">Christa</string>
+    <string name="list_author_username_text">christa78</string>
     <string name="list_author_score_text">1200 pts</string>
     <string name="list_author_description_text">We (Christa and Rob) are from Northern California and we like to hike.  We’ve shared our photos and experiences so that others may find new parks, trails or places to visit.</string>
 
@@ -230,6 +274,8 @@
 
     <string name="list_rating_comment_text">This is a test comment to see how a real comment would be displayed. We are making it long to see what it looks like as multiple lines.</string>
     <string name="title_activity_settings">Settings</string>
+
+    <string name="list_message_text">This is the test text just to see how it looks. Let\'s see how it looks if we make it two lines.</string>
 
     <!-- Strings related to Settings -->
 
