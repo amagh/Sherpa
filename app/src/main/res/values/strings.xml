@@ -15,6 +15,7 @@
     <string name="pref_units_metric">metric</string>
     <string name="pref_units_default">@string/pref_units_imperial</string>
     <string name="pref_units_title">Units</string>
+    <string name="pref_signature_key">glide_signature</string>
 
     <!-- Strings for guide details -->
     <string name="list_guide_details_distance_label">Total distance:</string>
@@ -214,6 +215,7 @@
     <string name="menu_leave_chat">Leave chat</string>
 
     <!-- Chat Strings -->
+    <string name="new_chat_activity_title">Start a New Chat</string>
     <string name="chat_activity_title">Chats</string>
     <string name="chat_last_message_text">%1$s: %2$s</string>
     <string name="chat_attachment_text">Attachment</string>
@@ -239,6 +241,10 @@
     <string name="friend_follow_un_follow_text">Stop Following this Author</string>
     <string name="friend_follow_follow_description_text">Find out when this author releases a new guide</string>
     <string name="friend_follow_cancel_request">Cancel friend request.</string>
+
+    <!-- Search User Activity Strings -->
+    <string name="search_user_send_request_title">Send a Friend Request</string>
+    <string name="search_user_follow_user_title">Follow a User</string>
 
     <!-- AcceptFriendRequestDialog Strings -->
     <string name="accept_friend_request_dialog_accept_text">Accept</string>

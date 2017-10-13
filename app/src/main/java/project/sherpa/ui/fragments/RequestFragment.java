@@ -62,7 +62,10 @@ public class RequestFragment extends BaseFriendFragment {
      * Loads the friend requests the user has received and adds them to the Adapter
      */
     private void loadReceivedRequests() {
-        if (mUser.getReceivedRequests() == null) return;
+        if (mUser.getReceivedRequests() == null) {
+            hideProgressBar();
+            return;
+        }
 
         Timber.d("Loading received requests");
 
@@ -75,7 +78,10 @@ public class RequestFragment extends BaseFriendFragment {
      * Loads the friend requests the user has sent and adds them to the Adapter
      */
     private void loadSentRequests() {
-        if (mUser.getSentRequests() == null) return;
+        if (mUser.getSentRequests() == null) {
+            hideProgressBar();
+            return;
+        }
 
         Timber.d("Loading sent requests");
 
@@ -91,6 +97,7 @@ public class RequestFragment extends BaseFriendFragment {
     private void updateReceivedRequests() {
         Timber.d("Updating received requests adapter");
         if (mUser.getReceivedRequests() == null) {
+            hideProgressBar();
             mAdapter.clearReceivedRequests();
             Timber.d("Clearing received request adapter");
             return;
@@ -122,6 +129,7 @@ public class RequestFragment extends BaseFriendFragment {
     private void updateSentRequests() {
         Timber.d("Updating sent requests adapter");
         if (mUser.getSentRequests() == null) {
+            hideProgressBar();
             mAdapter.clearSentRequests();
             Timber.d("Clearing sent requests adapter");
             return;
@@ -156,8 +164,8 @@ public class RequestFragment extends BaseFriendFragment {
                 new FirebaseProviderUtils.FirebaseListener() {
                     @Override
                     public void onModelReady(BaseModel model) {
+                        hideProgressBar();
                         if (model == null) return;
-
                         mAdapter.addReceivedRequest((Author) model);
                     }
                 });
@@ -173,10 +181,16 @@ public class RequestFragment extends BaseFriendFragment {
                 new FirebaseProviderUtils.FirebaseListener() {
                     @Override
                     public void onModelReady(BaseModel model) {
+                        hideProgressBar();
                         if (model == null) return;
-
                         mAdapter.addSentRequest((Author) model);
                     }
                 });
+    }
+
+    @Override
+    public void onDisconnected() {
+        super.onDisconnected();
+        hideProgressBar();
     }
 }

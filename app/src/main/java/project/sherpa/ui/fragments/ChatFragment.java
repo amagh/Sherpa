@@ -93,7 +93,7 @@ public class ChatFragment extends ConnectivityFragment {
 
             @Override
             public void onModelChanged() {
-                if (mAuthor.getChats().size() < mAdapter.getItemCount()) {
+                if (mAuthor.getChats() == null || mAuthor.getChats().size() < mAdapter.getItemCount()) {
 
                     // There are less Chats in the user's profile than in the Adapter. Clear the
                     // Adapter and re-load the Chats
@@ -119,6 +119,13 @@ public class ChatFragment extends ConnectivityFragment {
         // Remove any Chats from the local database that have been deleted from the Firebase profile
         checkAndRemoveDeletedChats();
 
+        if (mAuthor.getChats() == null) {
+
+            // Hide the ProgressBar
+            mBinding.chatPb.setVisibility(View.GONE);
+            return;
+        }
+
         // Register a ModelChangeListener for each Chat in the Author's List of Chats
         for (final String chatId : mAuthor.getChats()) {
 
@@ -128,6 +135,9 @@ public class ChatFragment extends ConnectivityFragment {
             mListenerMap.put(chatId, new ModelChangeListener<Chat>(CHAT, chatId) {
                 @Override
                 public void onModelReady(Chat chat) {
+
+                    // Hide the ProgressBar
+                    mBinding.chatPb.setVisibility(View.GONE);
 
                     if (chat == null) {
 
@@ -145,6 +155,9 @@ public class ChatFragment extends ConnectivityFragment {
                                 .child(GuideDatabase.CHATS)
                                 .child(chatId)
                                 .removeValue();
+
+                        // Remove teh Chat from the Author's list of Chats
+                        mAuthor.removeChat(getActivity(), getFirebaseId());
 
                         mService.unregisterModelChangeListener(this);
                         mListenerMap.remove(chat.firebaseId);
@@ -243,6 +256,8 @@ public class ChatFragment extends ConnectivityFragment {
      */
     private void checkAndRemoveDeletedChats() {
 
+        if (getActivity() == null) return;
+
         // Query the local database to get all ChatIds that exist in the local database
         Cursor cursor = getActivity().getContentResolver().query(
                 GuideProvider.Chats.CONTENT_URI, null, null, null, null);
@@ -288,6 +303,8 @@ public class ChatFragment extends ConnectivityFragment {
      * @param chat    Chat whose members are to be retrieved
      */
     private void getChatMembers(final Chat chat) {
+
+        if (chat.getAllMembers() == null) return;
 
         // Iterate through the member list and retrieve each member
         for (String authorId : chat.getAllMembers()) {

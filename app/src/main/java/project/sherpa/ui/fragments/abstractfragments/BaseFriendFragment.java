@@ -37,4 +37,11 @@ public abstract class BaseFriendFragment extends ConnectivityFragment {
      * Called when the Author is updated
      */
     public abstract void onAuthorChanged(Author user);
+
+    /**
+     * Hides the ProgressBar
+     */
+    protected void hideProgressBar() {
+        mBinding.friendPb.setVisibility(View.GONE);
+    }
 }

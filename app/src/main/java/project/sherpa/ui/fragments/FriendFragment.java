@@ -69,7 +69,10 @@ public class FriendFragment extends BaseFriendFragment {
      * Loads the friend list and adds them to the Adapter
      */
     private void loadFriendsList() {
-        if (mUser.getFriends() == null) return;
+        if (mUser.getFriends() == null) {
+            hideProgressBar();
+            return;
+        }
 
         Timber.d("Loading friends");
 
@@ -84,8 +87,9 @@ public class FriendFragment extends BaseFriendFragment {
      */
     private void updateFriendsList() {
         Timber.d("Updating friends list");
-        if (mUser.getFriends() == null) {
+        if (mUser.getFriends() == null || mUser.getFriends().size() == 0) {
             Timber.d("Clearing friend adapter");
+            hideProgressBar();
             mAdapter.clear();
             return;
         }
@@ -119,10 +123,17 @@ public class FriendFragment extends BaseFriendFragment {
                 new FirebaseProviderUtils.FirebaseListener() {
                     @Override
                     public void onModelReady(BaseModel model) {
-                        if (model == null) return;
+                        hideProgressBar();
 
+                        if (model == null) return;
                         mAdapter.addFriend((Author) model);
                     }
                 });
+    }
+
+    @Override
+    public void onDisconnected() {
+        super.onDisconnected();
+        hideProgressBar();
     }
 }

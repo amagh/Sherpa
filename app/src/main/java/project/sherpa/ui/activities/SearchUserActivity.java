@@ -68,52 +68,35 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
     private List<Author> mResultList;
     private int mSearchType;
     ModelChangeListener<Author> mUserListener;
-    private FirebaseProviderService mService;
-    private boolean mBound;
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            FirebaseProviderBinder binder = (FirebaseProviderBinder) iBinder;
-            mService = binder.getService();
-            mBound = true;
-
-            loadCurrentUser();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBound = false;
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_search_user);
+        bindFirebaseProviderService(true);
 
         mSearchType = getIntent().getIntExtra(SEARCH_KEY, FOLLOW);
 
         initRecyclerView();
         initViewModel();
+        initActionBar();
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (!mBound) {
-            Intent intent = new Intent(this, FirebaseProviderService.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        }
+    protected void onResume() {
+        super.onResume();
+        if (mUserListener != null) mService.registerModelChangeListener(mUserListener);
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
+        if (mUserListener != null) mService.unregisterModelChangeListener(mUserListener);
+    }
 
-        if (mBound) {
-            unbindService(mConnection);
-        }
+    @Override
+    protected void onServiceConnected() {
+        loadCurrentUser();
     }
 
     /**
@@ -144,6 +127,16 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
     private void initViewModel() {
         SearchUserViewModel uvm = new SearchUserViewModel(this);
         mBinding.searchUserLayout.setUvm(uvm);
+    }
+
+    private void initActionBar() {
+        setSupportActionBar(mBinding.searchUserTb);
+
+        String title = mSearchType == FRIEND
+                ? getString(R.string.search_user_send_request_title)
+                : getString(R.string.search_user_follow_user_title);
+
+        getSupportActionBar().setTitle(title);
     }
 
     /**
@@ -198,6 +191,9 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
             return;
         }
 
+        // Show ProgressBar
+        mBinding.searchUserLayout.getUvm().showProgress();
+
         // Cancel any queries queued to be run
         mSearchHandler.removeCallbacksAndMessages(null);
 
@@ -215,6 +211,8 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
                 usernameQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        // Hide ProgressBar
+                        mBinding.searchUserLayout.getUvm().hideProgress();
 
                         if (!dataSnapshot.exists()) return;
 
@@ -279,6 +277,9 @@ public class SearchUserActivity extends ConnectivityActivity implements SearchUs
      * Resets the Adapter to its starting conditions
      */
     public void resetAdapter() {
+
+        // Hide ProgressBar
+        mBinding.searchUserLayout.getUvm().hideProgress();
 
         // Cancel any pending searches
         mSearchHandler.removeCallbacksAndMessages(null);

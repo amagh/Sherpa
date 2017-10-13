@@ -103,6 +103,11 @@ public abstract class SmartValueEventListener implements ValueEventListener {
 
             onModelChange();
             onModelChange(mModel);
+        } else {
+
+            // Return a null result
+            onModelChange();
+            onModelChange(null);
         }
     }
 

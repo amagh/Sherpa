@@ -12,8 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import project.sherpa.R;
@@ -23,6 +25,7 @@ import project.sherpa.models.datamodels.Author;
 import project.sherpa.models.viewmodels.AuthorViewModel;
 import project.sherpa.models.viewmodels.ListItemFriendViewModel;
 import project.sherpa.models.viewmodels.SearchUserViewModel;
+import timber.log.Timber;
 
 /**
  * Created by Alvin on 9/20/2017.
@@ -111,6 +114,8 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
             Author existingFriend = mSortedList.get(i);
             boolean keep = false;
 
+            // If the friend has been selected, do not remove it from the Adapter
+            if (mSelected.contains(existingFriend)) continue;
             for (Author newFriend : friendList) {
                 if (newFriend.firebaseId.equals(existingFriend.firebaseId)) {
                     keep = true;
@@ -123,7 +128,10 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
         }
 
         // Add all other items from the friendList to the SortedList
-        mSortedList.addAll(friendList);
+        for (Author friend : friendList) {
+            mSortedList.add(friend);
+        }
+
         mSortedList.endBatchedUpdates();
     }
 
@@ -147,12 +155,20 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
     }
 
     /**
-     * Returns a Set of the items that have been selected
+     * Returns a List of the items that have been selected by the user to add a new Chat
      *
      * @return Items that were selected
      */
-    public Set<Author> getSelected() {
-        return mSelected;
+    public List<String> getSelectedIds() {
+
+        Set<String> selectedIdSet = new HashSet<>();
+
+        for (int i = 0; i < mSortedList.size(); i++) {
+            Author selected = mSortedList.get(i);
+            selectedIdSet.add(selected.firebaseId);
+        }
+
+        return new ArrayList<>(selectedIdSet);
     }
 
     /**
@@ -161,7 +177,7 @@ public class ChatAuthorAdapter extends RecyclerView.Adapter<ChatAuthorAdapter.Au
      * @param author      Author to set the selected status for
      * @param selected    boolean value for whether it should be selected
      */
-    public void setSelected(Author author, boolean selected) {
+    private void setSelected(Author author, boolean selected) {
 
         // Add/remove the Author from the List of selected items
         if (selected && !mSelected.contains(author)) {

@@ -451,6 +451,8 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
      */
     public void sendMessage() {
 
+        mBinding.getVm().setShowProgress(true);
+
         // Check to ensure there is a message to send
         if (mMessage.getAttachment() == null
                 && (mMessage.getMessage() == null || mMessage.getMessage().isEmpty())) return;
@@ -459,6 +461,7 @@ public class MessageFragment extends ConnectivityFragment implements LoaderManag
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        mBinding.getVm().setShowProgress(false);
 
                         boolean newChat = false;
 

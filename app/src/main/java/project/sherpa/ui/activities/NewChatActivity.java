@@ -67,6 +67,7 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
 
         setupViewModel();
         initRecyclerView();
+        initActionBar();
     }
 
     /**
@@ -88,6 +89,10 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
 
         mBinding.searchUserLayout.searchUserRv.setLayoutManager(new LinearLayoutManager(this));
         mBinding.searchUserLayout.searchUserRv.setAdapter(mAdapter);
+    }
+
+    private void initActionBar() {
+        setSupportActionBar(mBinding.newChatTb);
     }
 
     @Override
@@ -168,6 +173,9 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
     @Override
     public void runQueryForUsername(final String query) {
 
+        // Show the ProgressBar
+        mViewModel.showProgress();
+
         // Filter the friend's list for any friends that match the query
         filter(query);
 
@@ -190,7 +198,13 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
                      FirebaseProviderUtils.queryForUsername(query, new FirebaseProviderUtils.FirebaseListener() {
                          @Override
                          public void onModelReady(BaseModel model) {
-                             if (model == null) return;
+
+                             // Hide ProgressBar
+                             mViewModel.hideProgress();
+
+                             if (model == null ||
+                                     mAuthor.getFriends().contains(model.firebaseId) ||
+                                     mAuthor.firebaseId.equals(model.firebaseId)) return;
 
                              // Set the Author in the ViewModel to update its Views
                              Author author = (Author) model;
@@ -202,6 +216,9 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
     }
 
     public void resetAdapter() {
+
+        // Hide the ProgressBar
+        mViewModel.hideProgress();
 
         // Cancel any pending searches
         mHandler.removeCallbacksAndMessages(null);
@@ -217,19 +234,12 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
      */
     public void onClickStartChat(View view) {
 
-        // List that will be set to active and all members of the Chat
-        final List<String> selected = new ArrayList<>();
-
-        // Add the user's FirebaseId as a member
-        selected.add(mAuthor.firebaseId);
-
-        // Add all the FirebaseIds of the selected user's to the Chat's list of members
-        for (Author author : mAdapter.getSelected()) {
-            selected.add(author.firebaseId);
-        }
+        // Add the user's FirebaseId as a member to the list of selected users
+        final List<String> selectedList = mAdapter.getSelectedIds();
+        selectedList.add(mAuthor.firebaseId);
 
         // Check for duplicate Chats
-        Chat.checkDuplicateChats(selected, new FirebaseProviderUtils.FirebaseListener() {
+        Chat.checkDuplicateChats(selectedList, new FirebaseProviderUtils.FirebaseListener() {
             @Override
             public void onModelReady(BaseModel model) {
 
@@ -240,9 +250,9 @@ public class NewChatActivity extends ConnectivityActivity implements SearchUserI
                     // No duplicate Chat, start a new Chat
                     chat = new Chat();
                     chat.generateFirebaseId();
-                    chat.setActiveMembers(selected);
-                    chat.setAllMembers(selected);
-                    chat.setGroup(selected.size() > 2);
+                    chat.setActiveMembers(selectedList);
+                    chat.setAllMembers(selectedList);
+                    chat.setGroup(selectedList.size() > 2);
                 } else {
 
                     // Get a reference to the duplicate Chat

@@ -115,6 +115,18 @@
             app:layout_constraintTop_toTopOf="@id/message_tv"
             app:layout_constraintBottom_toBottomOf="@id/message_tv"/>
 
+        <ProgressBar
+            android:id="@+id/message_pb"
+            android:layout_width="@dimen/message_progressbar_size"
+            android:layout_height="@dimen/message_progressbar_size"
+            android:layout_marginRight="@dimen/message_progressbar_right_margin"
+            android:layout_marginEnd="@dimen/message_progressbar_right_margin"
+            android:visibility="gone"
+            app:showProgress="@{vm.showProgress}"
+            app:layout_constraintTop_toTopOf="@id/message_text_outline_v"
+            app:layout_constraintBottom_toBottomOf="@id/message_text_outline_v"
+            app:layout_constraintEnd_toEndOf="@id/message_text_outline_v"/>
+
         <View
             android:id="@+id/message_chat_separator_v"
             android:layout_width="0dp"

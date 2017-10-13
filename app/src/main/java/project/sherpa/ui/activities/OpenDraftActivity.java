@@ -98,6 +98,7 @@ public class OpenDraftActivity extends AppCompatActivity implements LoaderManage
             if (mGuideList.size() == 0) {
 
                 // Inform the user that there are no saved Guide drafts
+                mAdapter.clear();
                 mBinding.draftEmptyTv.setVisibility(View.VISIBLE);
             }
         }

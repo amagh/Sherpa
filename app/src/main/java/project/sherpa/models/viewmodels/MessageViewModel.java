@@ -1,9 +1,13 @@
 package project.sherpa.models.viewmodels;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -26,12 +31,17 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import project.sherpa.BR;
 import project.sherpa.R;
 import project.sherpa.models.datamodels.Message;
 import project.sherpa.ui.fragments.MessageFragment;
 import project.sherpa.utilities.DimensionUtils;
 import project.sherpa.utilities.FirebaseProviderUtils;
+import project.sherpa.utilities.GeneralUtils;
 
 import static project.sherpa.utilities.Constants.FragmentTags.FRAG_TAG_MESSAGES;
 
@@ -46,6 +56,7 @@ public class MessageViewModel extends BaseObservable {
     private Message mMessage;
     private Message mPrevMessage;
     private Message mNextMessage;
+    private boolean mShowProgress;
 
     public MessageViewModel(AppCompatActivity activity, Message message, Message prevMessage) {
         mActivity = activity;
@@ -83,29 +94,40 @@ public class MessageViewModel extends BaseObservable {
     public static void loadAuthorImage(final CircleImageView imageView, final StorageReference authorImage) {
 
         if (authorImage == null) return;
+        final String lastPathSegment = Uri.parse(authorImage.toString()).getLastPathSegment();
 
-        // Load the author's image from Firebase Storage
-        authorImage.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-            @Override
-            public void onSuccess(StorageMetadata storageMetadata) {
-                // Load from Firebase Storage
-                if (imageView.getContext() != null && !((Activity) imageView.getContext()).isFinishing()) {
-                    Glide.with(imageView.getContext())
-                            .using(new FirebaseImageLoader())
-                            .load(authorImage)
-                            .signature(new StringSignature(storageMetadata.getMd5Hash()))
-                            .placeholder(R.drawable.ic_account_circle)
-                            .error(R.drawable.ic_account_circle)
-                            .into(imageView);
+        // Get the StringSignature for loading images from Firebase
+        if (GeneralUtils.updateGlideImageSignature(imageView.getContext())) {
+
+            // Load the author's image from Firebase Storage
+            authorImage.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                @Override
+                public void onSuccess(StorageMetadata storageMetadata) {
+                    // Load from Firebase Storage
+                    if (imageView.getContext() != null && !((Activity) imageView.getContext()).isFinishing()) {
+                        Glide.with(imageView.getContext())
+                                .using(new FirebaseImageLoader())
+                                .load(authorImage)
+                                .signature(GeneralUtils.getGlideImageSignature(imageView.getContext(), lastPathSegment))
+                                .placeholder(R.drawable.ic_account_circle)
+                                .error(R.drawable.ic_account_circle)
+                                .into(imageView);
+                    }
                 }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                imageView.setImageDrawable(
-                        ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_account_circle));
-            }
-        });
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    imageView.setImageDrawable(
+                            ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_account_circle));
+                }
+            });
+        } else {
+            Glide.with(imageView.getContext())
+                    .using(new FirebaseImageLoader())
+                    .load(authorImage)
+                    .signature(GeneralUtils.getGlideImageSignature(imageView.getContext(), lastPathSegment))
+                    .into(imageView);
+        }
     }
 
     @Bindable
@@ -175,6 +197,26 @@ public class MessageViewModel extends BaseObservable {
                 InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
     }
 
+    @Bindable
+    public boolean getShowProgress() {
+        return mShowProgress;
+    }
+
+    @BindingAdapter("showProgress")
+    public static void setProgressBar(ProgressBar messagePb, boolean showProgress) {
+
+        if (showProgress) {
+            messagePb.setVisibility(View.VISIBLE);
+        } else {
+            messagePb.setVisibility(View.GONE);
+        }
+    }
+
+    public void setShowProgress(boolean showProgress) {
+        mShowProgress = showProgress;
+        notifyPropertyChanged(BR.showProgress);
+    }
+
     /**
      * Click response for attach button
      *
@@ -190,7 +232,10 @@ public class MessageViewModel extends BaseObservable {
     }
 
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
-        if (actionId == EditorInfo.IME_ACTION_SEND) {
+
+        if (mShowProgress && actionId == EditorInfo.IME_ACTION_SEND) {
+            return true;
+        } else if (actionId == EditorInfo.IME_ACTION_SEND) {
 
             // When the user presses the IME option to send, the Message is sent
             MessageFragment fragment = (MessageFragment) mActivity.getSupportFragmentManager()
