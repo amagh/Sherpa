@@ -40,13 +40,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         @Override
         public void onChanged(int position, int count) {
-
-            // Modify the position based on which list it is in
-            if (position < mReceivedRequestList.size()) {
-                notifyItemRangeChanged(position + 1, count);
-            } else {
-                notifyItemRangeChanged(position + 2 + mReceivedRequestList.size(), count);
-            }
+            notifyDataSetChanged();
         }
 
         @Override
@@ -61,24 +55,12 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         @Override
         public void onInserted(int position, int count) {
-
-            // Modify the position based on which list it is in
-            if (position < mReceivedRequestList.size()) {
-                notifyItemRangeInserted(position + 1, count);
-            } else {
-                notifyItemRangeInserted(position + 2 + mReceivedRequestList.size(), count);
-            }
+            notifyDataSetChanged();
         }
 
         @Override
         public void onRemoved(int position, int count) {
-
-            // Modify the position based on which list it is in
-            if (position < mReceivedRequestList.size()) {
-                notifyItemRangeRemoved(position + 1, count);
-            } else {
-                notifyItemRangeRemoved(position + 2 + mReceivedRequestList.size(), count);
-            }
+            notifyDataSetChanged();
         }
 
         @Override
